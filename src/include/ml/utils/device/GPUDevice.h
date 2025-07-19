@@ -16,12 +16,10 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by Napbad on 7/12/25.
+// Created by Napbad on 7/19/25.
 //
 
-#include <gtest/gtest.h>
+#ifndef GPUDEVICE_H
+#define GPUDEVICE_H
 
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
+#endif //GPUDEVICE_H

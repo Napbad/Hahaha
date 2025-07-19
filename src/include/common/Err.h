@@ -16,12 +16,32 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by Napbad on 7/12/25.
+// Created by root on 7/27/25.
 //
 
-#include <gtest/gtest.h>
+#ifndef ERR_H
+#define ERR_H
+#include "ds/str.h"
 
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
+namespace hiahiahia {
+    class Err {
+    public:
+      virtual ~Err() = default;
+
+      // Get the error type name
+      [[nodiscard]] virtual ds::Str typeName() const = 0;
+
+      // Get the error message
+      [[nodiscard]] virtual ds::Str message() const = 0;
+
+      // Get the error location
+      [[nodiscard]] virtual ds::Str location() const = 0;
+
+      // Convert the error to a string
+      [[nodiscard]] virtual ds::Str toString() const = 0;
+    };
+
+} // namespace hiahiahia
+
+
+#endif //ERR_H

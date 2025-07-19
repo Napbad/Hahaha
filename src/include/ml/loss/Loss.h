@@ -16,12 +16,19 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by Napbad on 7/12/25.
+// Created by Napbad on 7/19/25.
 //
 
-#include <gtest/gtest.h>
+#ifndef LOSS_H
+#define LOSS_H
+#include "include/common/ds/Tensor.h"
+#include "include/ml/utils/h3vec.h"
 
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
+namespace hiahiahia {
+
+
+
+
+} // namespace hiahiahia
+
+#endif //LOSS_H

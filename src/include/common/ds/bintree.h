@@ -16,12 +16,10 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by Napbad on 7/12/25.
+// Created by root on 7/27/25.
 //
 
-#include <gtest/gtest.h>
+#ifndef BINTREE_H
+#define BINTREE_H
 
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
+#endif //BINTREE_H

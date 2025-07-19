@@ -16,12 +16,10 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by Napbad on 7/12/25.
+// Created by root on 8/3/25.
 //
 
-#include <gtest/gtest.h>
+#ifndef LIST_H
+#define LIST_H
 
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
+#endif //LIST_H

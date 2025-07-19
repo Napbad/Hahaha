@@ -19,9 +19,31 @@
 // Created by Napbad on 7/12/25.
 //
 
-#include <gtest/gtest.h>
+#ifndef MEMORY_H
+#define MEMORY_H
+#include "include/common/defines/h3defs.h"
+#include "include/ml/common/defines.h"
 
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+namespace hiahiahia {
+    inline void *hmalloc(uint size) {
+        return nullptr;
+    }
+
+    inline void hfree(void *ptr) {
+        return ;
+    }
+
+    inline void hmemcpy(void *src, void *dst, uint size) {
+
+        if (src == dst) {
+            return;
+        }
+
+        for (uint i = 0; i < size; ++i) {
+            static_cast<char *>(dst)[i] = static_cast<char *>(src)[i];
+        }
+    }
+
 }
+
+#endif //MEMORY_H

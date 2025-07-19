@@ -16,12 +16,13 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by Napbad on 7/12/25.
+// Created by root on 8/1/25.
 //
 
-#include <gtest/gtest.h>
+#ifndef LOG_H
+#define LOG_H
 
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
+class Logger {
+
+};
+#endif //LOG_H

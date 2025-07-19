@@ -16,12 +16,14 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by Napbad on 7/12/25.
+// Created by Napbad on 7/13/25.
 //
 
-#include <gtest/gtest.h>
+#ifndef KNN_H
+#define KNN_H
 
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
+namespace hiahiahia {
+    class KNN {};
+} // namespace hiahiahia
+
+#endif //KNN_H

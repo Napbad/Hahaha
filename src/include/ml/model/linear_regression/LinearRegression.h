@@ -16,12 +16,32 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by Napbad on 7/12/25.
+// Created by Napbad on 7/19/25.
 //
 
-#include <gtest/gtest.h>
+#ifndef LINEARREGRESSION_H
+#define LINEARREGRESSION_H
+#include "include/common/ds/Tensor.h"
+#include "include/ml/model/Model.h"
 
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
+namespace hiahiahia {
+
+    class LinearRegression : public Model {
+    public:
+        LinearRegression();
+        void train(const h3vec<h3vec<float>> &features, const h3vec<float> &labels) override;
+        [[nodiscard]] float predict(const h3vec<float> &features) const override;
+
+    private:
+        Tensor<float> _inputFeatures;
+        Tensor<float> _outputFeatures;
+
+        Tensor<float> _weights;
+        Tensor<float> _bias;
+    };
+
+} // namespace hiahiahia
+
+
+
+#endif //LINEARREGRESSION_H

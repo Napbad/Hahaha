@@ -16,12 +16,36 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by Napbad on 7/12/25.
+// Created by root on 7/27/25.
 //
 
-#include <gtest/gtest.h>
+#ifndef H3DEFS_H
+#define H3DEFS_H
 
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
+namespace hiahiahia {
+
+  typedef unsigned int uint;
+  typedef unsigned long ulong;
+  typedef unsigned char uchar;
+  typedef unsigned short ushort;
+  typedef unsigned long long ullong;
+
+  typedef long long int128;
+  typedef long int64;
+  typedef int int32;
+  typedef short int16;
+  typedef char int8;
+
+  typedef unsigned long long uint128;
+  typedef unsigned long int uint64;
+  typedef unsigned int uint32;
+  typedef unsigned short uint16;
+  typedef unsigned char uint8;
+
+  typedef unsigned int sizeT;
+  typedef long ptrDiffT;
+
+
+} // namespace hiahiahia
+
+#endif //H3DEFS_H
