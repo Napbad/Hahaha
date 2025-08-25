@@ -23,23 +23,23 @@
 #define SAMPLE_H
 #include "include/common/ds/str.h"
 #include "include/common/ds/vec.h"
+#include "include/common/util/commonUtil.h"
 
 namespace hiahiahia {
   template<typename SampleType>
   class Sample {
   public:
     explicit Sample(const ds::Str &str, const char split = ',') {
-      int currBegin = 0;
+      sizeT currBegin = 0;
 
       ds::Str curr;
       for (sizeT i = 0; i < str.size(); i++) {
         if (str[i] == split) {
           curr.reserve(i - currBegin);
-          for (int j = currBegin; j < i; j++) {
+          for (sizeT j = currBegin; j < i; j++) {
             curr.push_back(str[j]);
-
           }
-          _data.emplace_back(strTo<SampleType>(curr));
+          _data.emplace_back(util::strTo<SampleType>(curr));
         }
         currBegin = i + 1;
       }

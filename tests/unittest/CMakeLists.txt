@@ -9,7 +9,7 @@ include_directories(../../src)
 enable_testing()
 
 # Try to find GTest, but don't fail if not found
-add_subdirectory(/usr/src/googletest gtest)
+#add_subdirectory(/usr/src/googletest gtest)
 
 # Create the test executable
 add_executable(haihiaiha_dev_tests_unit_exe

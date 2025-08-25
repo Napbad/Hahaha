@@ -28,14 +28,17 @@
 #include <variant>
 
 namespace hiahiahia {
-
-  template<class T, class E = std::unique_ptr<Err>>
+  template<class T, class E = std::unique_ptr<Error>>
   class Res {
     static_assert(!std::is_same_v<T, E>, "T and E cannot be the same type");
     static_assert(std::is_move_constructible_v<T> && std::is_move_constructible_v<E>,
                   "T and E must be move constructible");
 
-public:
+  public:
+    using okType = T;
+    using errType = E;
+
+
     template<typename U = T>
     explicit Res(U &&value, std::enable_if_t<!std::is_same_v<std::decay_t<U>, Res>, int> = 0) :
         data(std::forward<U>(value)) {}
@@ -69,30 +72,10 @@ public:
       throw std::runtime_error("Called `res::unwrapErr()` on an `Ok` value");
     }
 
-    T &&unwrap() && {
-      if (isOk()) {
-        return std::move(std::get<T>(data));
-      }
-      throw std::runtime_error("Called `res::unwrap()` on an `Err` value");
-    }
-
-    E &unwrapErr() & {
-      if (isErr()) {
-        return std::get<E>(data);
-      }
-      throw std::runtime_error("Called `res::unwrapErr()` on an `Ok` value");
-    }
 
     const E &unwrapErr() const & {
       if (isErr()) {
         return std::get<E>(data);
-      }
-      throw std::runtime_error("Called `res::unwrapErr()` on an `Ok` value");
-    }
-
-    E &&unwrapErr() && {
-      if (isErr()) {
-        return std::move(std::get<E>(data));
       }
       throw std::runtime_error("Called `res::unwrapErr()` on an `Ok` value");
     }
@@ -153,12 +136,6 @@ public:
       return default_value;
     }
 
-    T unwrapOr(T default_value) && {
-      if (isOk()) {
-        return std::move(std::get<T>(data));
-      }
-      return default_value;
-    }
 
     template<typename F>
     T unwrapOrElse(F &&f) {
@@ -253,10 +230,11 @@ public:
     static Res Ok(T &&value) { return Res(std::move(value)); }
     static Res Err(const E &error) { return Res(error); }
     static Res Err(E &&error) { return Res(std::move(error)); }
-private:
+
+  private:
     std::variant<T, E> data;
 
-    template<typename R>
+    template<class>
     struct is_res : std::false_type {};
 
     template<typename U, typename G>
@@ -265,7 +243,38 @@ private:
     template<typename R>
     static constexpr bool is_res_v = is_res<R>::value;
   };
+  template<typename T, typename E = std::unique_ptr<Error>>
+  Res<std::decay_t<T>, E> Ok(T &&value) {
+    return Res<std::decay_t<T>, E>::Ok(std::forward<T>(value));
+  }
 
-} // namespace hiahiahia
+  template<typename R, typename V>
+    requires requires {
+    typename R::okType;
+    typename R::errType;
+    }
+  R Ok(V &&value) {
+    using T = R::okType;
+    static_assert(std::is_constructible_v<T, V>, "Value must be constructible into Ok type");
+    return R::Ok(std::forward<V>(value));
+  }
+
+  template<typename E, typename RT = void>
+  auto err(E &&error) -> decltype(auto) {
+    return Res<RT, std::decay_t<E>>::Err(std::forward<E>(error));
+  }
+
+  template<typename R, typename V>
+    requires requires {
+    typename R::okType;
+    typename R::errType;
+    }
+
+  R err(V &&error) {
+    using E = R::errType;
+    static_assert(std::is_constructible_v<E, V>, "Error must be constructible into Err type");
+    return R::Err(std::forward<V>(error));
+  }
+}// namespace hiahiahia
 
 #endif // RES_H

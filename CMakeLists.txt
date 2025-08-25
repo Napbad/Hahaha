@@ -32,7 +32,7 @@ add_library(hiahiahia STATIC
         src/include/common/ds/bintree.h
         src/include/common/defines/h3defs.h
         src/include/common/Res.h
-        src/include/common/Err.h
+        src/include/common/Error.h
         src/include/common/util/Log.h
         src/include/common/algo/StrFinder.h
         src/include/common/util/mem/Allocator.h
@@ -44,6 +44,14 @@ add_library(hiahiahia STATIC
         src/include/ml/utils/dataset/DatasetType.h
         src/include/ml/utils/dataset/Sample.h
         src/include/common/util/commonUtil.h
+        src/include/common/util/StringStream.h
 )
+
+# Examples
+add_executable(device_example src/examples/device_example.cpp)
+target_link_libraries(device_example hiahiahia)
+
+add_executable(res_example src/examples/res_example.cpp)
+target_link_libraries(res_example hiahiahia)
 
 add_subdirectory(tests)

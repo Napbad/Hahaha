@@ -1,13 +1,15 @@
 // Default Ubuntu-based DevContainer Template.
 // For more customization options, see https://containers.dev/implementors/json_reference
 {
-  name: "Default",
+  name: "HiahiahiaDevDefaultContainer",
   "dockerFile": "../../Dockerfile",
-  "runArgs": [
-    "--gpus", "all",
-    "--runtime", "nvidia"
-  ],
-
+  "build": {
+      "args": {
+        "IMAGE_NAME": "nvidia/cuda",
+        "TARGETARCH": "amd64"
+      }
+  },
+ 
   "mounts": [
     "type=bind,source=${localWorkspaceFolder},target=/workspace"
   ],
@@ -22,7 +24,7 @@
       },
       plugins: [
         // A set of plugin IDs.
-        // Plugin ID can be found on the corresponding plugin’s page at https://plugins.jetbrains.com.
+        // Plugin ID can be found on the corresponding plugin’s page at https://plugins.jetbrains.com        docker run --rm --gpus all nvidia/cuda:12.4.1-base-ubuntu22.04 nvidia-smi.
       ]
     }
   },

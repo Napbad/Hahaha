@@ -50,13 +50,65 @@ public:
     explicit vec(const sizeTp count): _data(nullptr), _size(0), _capacity(count) {
       reserve(count);
     }
+    vec(std::initializer_list<T> shape) {
+      _data = new T[shape.size()];
+      _size = shape.size();
+      _capacity = shape.size();
+      sizeT idx = 0;
+      for (auto i : shape) {
+        _data[idx++] = i;
+      }
+    }
 
     ~vec() {
       delete []_data;
     }
 
-    void emplace_back()
-private:
+    void emplace_back(const T & value) {
+      if (_size == _capacity) {
+        reserve(_size * 2);
+      }
+      _data[_size++] = value;
+    }
+
+    iterator begin() const {
+      return _data;
+    }
+
+    iterator end() const {
+      return &_data[_size - 1];
+    }
+    bool operator==(const vec & vec) const {
+      if (_size != vec._size) {
+        return false;
+      }
+
+      for (int i = 0; i < _size; i++) {
+        if (_data[i] != vec._data[i]) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    [[nodiscard]] sizeT size() const {
+      return _size;
+    }
+
+    [[nodiscard]] sizeT capacity() const {
+      return _capacity;
+    }
+
+    T & operator[](const sizeTp index) {
+      return _data[index];
+    }
+
+    T & operator[](const sizeTp index) const {
+      return _data[index];
+    }
+
+  private:
     T *_data;
     sizeT _size;
     sizeT _capacity;

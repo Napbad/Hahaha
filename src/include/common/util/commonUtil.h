@@ -23,7 +23,7 @@
 #define COMMONUTIL_H
 #include <utility>
 
-#include "include/common/Err.h"
+#include "include/common/Error.h"
 #include "include/common/Res.h"
 
 namespace hiahiahia::ds {
@@ -31,26 +31,33 @@ namespace hiahiahia::ds {
 }
 namespace hiahiahia::util {
 
-  class ConvertErr final : public Err {
+  class ConvertErr final : public Error {
 
 public:
     explicit ConvertErr(const ds::Str &msg, ds::Str loca = ds::Str("Unknown")) : _location(std::move(loca)) {
       _message = "ConvertErr: " + msg;
     }
-
+    ConvertErr(const char * str, const char * text) {
+      _message = ds::Str(str);
+      _location = ds::Str(text);
+    }
+    ConvertErr(const ds::Str & str, const char * text) {
+      _message = ds::Str(str);
+      _location = ds::Str(text);
+    }
     ~ConvertErr() override = default;
 
     // Get the error type name
-    [[nodiscard]] ds::Str typeName() const override { return ds::Str("ConvertErr"); };
+    [[nodiscard]] ds::Str typeName() const override { return ds::Str("ConvertErr"); }
 
     // Get the error message
-    [[nodiscard]] ds::Str message() const override { return _message; };
+    [[nodiscard]] ds::Str message() const override { return _message; }
 
     // Get the error location
-    [[nodiscard]] ds::Str location() const override { return _location; };
+    [[nodiscard]] ds::Str location() const override { return _location; }
 
     // Convert the error to a string
-    [[nodiscard]] ds::Str toString() const override { return _message + " at: " + _location; };
+    [[nodiscard]] ds::Str toString() const override { return _message + " at: " + _location; }
 
 private:
     ds::Str _message;
@@ -58,8 +65,8 @@ private:
   };
 
   template<typename Target>
-  Res<Target, ConvertErr> strTo(const ds::Str &str) {
-    return Res<Target, ConvertErr>();
+  Res<Target, std::unique_ptr<ConvertErr>> strTo(const ds::Str &) {
+    return Res<Target, std::unique_ptr<ConvertErr>>();
   }
 
       /**
@@ -87,23 +94,23 @@ private:
      * @return Result containing either int value or ConvertErr
      */
     template<>
-    inline Res<int, ConvertErr> strTo<int>(const ds::Str &str) {
+    inline auto strTo<int>(const ds::Str &str) -> Res<int, std::unique_ptr<ConvertErr>> {
         try {
-            ds::Str trimmed = trim(str);
+        const ds::Str trimmed = trim(str);
             size_t pos;
-            int value = std::stoi(trimmed, &pos);
+            const int value = std::stoi(trimmed.c_str(), &pos);
 
             // Check if entire string was converted
             if (pos != trimmed.size()) {
-                return ConvertErr("Contains invalid characters", "strTo<int>");
+                return err(ConvertErr("Contains invalid characters", "strTo<int>"));
             }
-            return Res(value);
+            return Ok(value);
         } catch (const std::invalid_argument &e) {
-            return ConvertErr("Invalid argument format: " + ds::Str(e.what()), "strTo<int>");
+            return err<ConvertErr, int>(ConvertErr("Invalid argument format: " + ds::Str(e.what()), "strTo<int>"));
         } catch (const std::out_of_range &e) {
-            return ConvertErr("Value out of range: " + ds::Str(e.what()), "strTo<int>");
+            return err(ConvertErr("Value out of range: " + ds::Str(e.what()), "strTo<int>"));
         } catch (const std::exception &e) {
-            return ConvertErr("Conversion failed: " + ds::Str(e.what()), "strTo<int>");
+            return err(ConvertErr("Conversion failed: " + ds::Str(e.what()), "strTo<int>"));
         }
     }
 
@@ -117,7 +124,7 @@ private:
         try {
             ds::Str trimmed = trim(str);
             size_t pos;
-            long value = std::stol(trimmed, &pos);
+            long value = std::stol(trimmed.c_str(), &pos);
 
             if (pos != trimmed.size()) {
                 return ConvertErr("Contains invalid characters", "strTo<long>");

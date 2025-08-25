@@ -16,33 +16,32 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by Napbad on 7/19/25.
+// Created by root on 7/27/25.
 //
 
-#ifndef LINEARREGRESSION_H
-#define LINEARREGRESSION_H
-#include "include/common/ds/vec.h"
-#include "include/ml/model/Model.h"
+#ifndef ERR_H
+#define ERR_H
+#include "ds/str.h"
 
 namespace hiahiahia {
-
-  using namespace hiahiahia::ds;
-    class LinearRegression : public Model {
+    class Error {
     public:
-        LinearRegression();
-        void train(const vec<vec<float>> &features, const ds::vec<float> &labels) override {}
-        [[nodiscard]] float predict(const vec<float> &features) const override;
+      virtual ~Error() = default;
 
-    private:
-        // Tensor<float> _inputFeatures;
-        // Tensor<float> _outputFeatures;
-        //
-        // Tensor<float> _weights;
-        // Tensor<float> _bias;
+      // Get the error type name
+      [[nodiscard]] virtual ds::Str typeName() const = 0;
+
+      // Get the error message
+      [[nodiscard]] virtual ds::Str message() const = 0;
+
+      // Get the error location
+      [[nodiscard]] virtual ds::Str location() const = 0;
+
+      // Convert the error to a string
+      [[nodiscard]] virtual ds::Str toString() const = 0;
     };
 
 } // namespace hiahiahia
 
 
-
-#endif //LINEARREGRESSION_H
+#endif //ERR_H

@@ -16,32 +16,14 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by root on 7/27/25.
+// Created by root on 8/7/25.
 //
 
-#ifndef ERR_H
-#define ERR_H
-#include "ds/str.h"
+#ifndef HIAHIAHIA_STRINGSTREAM_H
+#define HIAHIAHIA_STRINGSTREAM_H
 
-namespace hiahiahia {
-    class Err {
-    public:
-      virtual ~Err() = default;
+class StringStream {
 
-      // Get the error type name
-      [[nodiscard]] virtual ds::Str typeName() const = 0;
+};
 
-      // Get the error message
-      [[nodiscard]] virtual ds::Str message() const = 0;
-
-      // Get the error location
-      [[nodiscard]] virtual ds::Str location() const = 0;
-
-      // Convert the error to a string
-      [[nodiscard]] virtual ds::Str toString() const = 0;
-    };
-
-} // namespace hiahiahia
-
-
-#endif //ERR_H
+#endif // HIAHIAHIA_STRINGSTREAM_H

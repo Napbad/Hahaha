@@ -29,8 +29,8 @@ namespace hiahiahia {
         return nullptr;
     }
 
-    inline void hfree(void *ptr) {
-        return ;
+    inline void hfree(const void *ptr) {
+        delete ptr;
     }
 
     inline void hmemcpy(void *src, void *dst, uint size) {
