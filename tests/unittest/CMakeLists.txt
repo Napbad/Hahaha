@@ -8,27 +8,17 @@ include_directories(../../src)
 # Enable testing
 enable_testing()
 
-# Try to find GTest, but don't fail if not found
-#add_subdirectory(/usr/src/googletest gtest)
+# Find Google Test package
+find_package(GTest REQUIRED)
 
 # Create the test executable
 add_executable(haihiaiha_dev_tests_unit_exe
         unittest_main.cpp
+        hiahiahia/common/ResTest.cpp
 )
 
 # Link with Google Test
-if(GTest_FOUND)
-    target_link_libraries(haihiaiha_dev_tests_unit_exe GTest::GTest GTest::Main)
-else()
-    # Link with the built-from-source libraries
-    target_link_libraries(haihiaiha_dev_tests_unit_exe gtest gtest_main)
-    
-    # Add the Google Test include path
-    target_include_directories(haihiaiha_dev_tests_unit_exe PRIVATE 
-        /usr/src/googletest/googletest/include
-        /usr/src/googletest/googlemock/include
-    )
-endif()
+target_link_libraries(haihiaiha_dev_tests_unit_exe GTest::GTest GTest::Main pthread)
 
 # Add test
 add_test(NAME hiahiahia_unit_tests COMMAND haihiaiha_dev_tests_unit_exe)

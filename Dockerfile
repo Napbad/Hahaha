@@ -102,7 +102,13 @@ RUN apt-get update && apt-get install -y \
     vim \
     python3 \
     python3-pip \
+    libgtest-dev \
     && rm -rf /var/lib/apt/lists/*
+
+# Build and install Google Test from source
+RUN cd /usr/src/googletest && \
+    cmake . && \
+    cmake --build . --target install
 
 WORKDIR /workspace
 

@@ -21,6 +21,7 @@
 
 #ifndef COMMONUTIL_H
 #define COMMONUTIL_H
+#include <functional>
 #include <utility>
 
 #include "include/common/Error.h"
@@ -37,11 +38,11 @@ public:
     explicit ConvertErr(const ds::Str &msg, ds::Str loca = ds::Str("Unknown")) : _location(std::move(loca)) {
       _message = "ConvertErr: " + msg;
     }
-    ConvertErr(const char * str, const char * text) {
+    ConvertErr(const char *str, const char *text) {
       _message = ds::Str(str);
       _location = ds::Str(text);
     }
-    ConvertErr(const ds::Str & str, const char * text) {
+    ConvertErr(const ds::Str &str, const char *text) {
       _message = ds::Str(str);
       _location = ds::Str(text);
     }
@@ -58,23 +59,22 @@ public:
 
     // Convert the error to a string
     [[nodiscard]] ds::Str toString() const override { return _message + " at: " + _location; }
-
 private:
     ds::Str _message;
     ds::Str _location;
   };
 
   template<typename Target>
-  Res<Target, std::unique_ptr<ConvertErr>> strTo(const ds::Str &) {
+  Res<Target, ConvertErr> strTo(const ds::Str &) {
     return Res<Target, std::unique_ptr<ConvertErr>>();
   }
 
-      /**
-     * Helper function to trim whitespace from both ends of a string
-     * @param s Input string to trim
-     * @return Trimmed string
-     */
-    inline ds::Str trim(const ds::Str &s) {
+  /**
+   * Helper function to trim whitespace from both ends of a string
+   * @param s Input string to trim
+   * @return Trimmed string
+   */
+  inline ds::Str trim(const ds::Str &s) {
     auto start = s.begin();
     while (start != s.end() && std::isspace(*start)) {
       start++;
@@ -86,141 +86,73 @@ private:
     } while (std::distance(start, end) > 0 && std::isspace(*end));
 
     return {start, end + 1};
+  }
+  /**
+   * Specialization for int type conversion
+   * @param str Input string to convert
+   * @return Result containing either int value or ConvertErr
+   */
+  template<>
+  inline auto strTo<int>(const ds::Str &str) -> Res<int, ConvertErr> {
+    SetRetT(int, ConvertErr)
+    try {
+      const ds::Str trimmed = trim(str);
+      size_t pos;
+      const int value = std::stoi(trimmed.c_str(), &pos);
+      // Check if the entire string was consumed
+      if (pos != trimmed.length()) {
+        return RetType::err(newE(ConvertErr, "Invalid integer format", __func__));
+      }
+      Ok(value);
+    } catch (const std::exception &e) {
+      return RetType::err(ConvertErr(e.what(), __func__));
+      Err(ConvertErr(e.what(), __func__));
     }
+  }
 
-    /**
-     * Specialization for int type conversion
-     * @param str Input string to convert
-     * @return Result containing either int value or ConvertErr
-     */
-    template<>
-    inline auto strTo<int>(const ds::Str &str) -> Res<int, std::unique_ptr<ConvertErr>> {
-        try {
-        const ds::Str trimmed = trim(str);
-            size_t pos;
-            const int value = std::stoi(trimmed.c_str(), &pos);
-
-            // Check if entire string was converted
-            if (pos != trimmed.size()) {
-                return err(ConvertErr("Contains invalid characters", "strTo<int>"));
-            }
-            return Ok(value);
-        } catch (const std::invalid_argument &e) {
-            return err<ConvertErr, int>(ConvertErr("Invalid argument format: " + ds::Str(e.what()), "strTo<int>"));
-        } catch (const std::out_of_range &e) {
-            return err(ConvertErr("Value out of range: " + ds::Str(e.what()), "strTo<int>"));
-        } catch (const std::exception &e) {
-            return err(ConvertErr("Conversion failed: " + ds::Str(e.what()), "strTo<int>"));
-        }
+  /**
+   * Specialization for double type conversion
+   * @param str Input string to convert
+   * @return Result containing either double value or ConvertErr
+   */
+  template<>
+  inline auto strTo<double>(const ds::Str &str) -> Res<double, ConvertErr> {
+    SetRetT(double, ConvertErr)
+    try {
+      const ds::Str trimmed = trim(str);
+      size_t pos;
+      const double value = std::stod(trimmed.c_str(), &pos);
+      // Check if the entire string was consumed
+      if (pos != trimmed.length()) {
+        Err(ConvertErr("Invalid double format", __func__));
+      }
+      Ok(value);
+    } catch (const std::exception &e) {
+      Err(ConvertErr(e.what(), __func__));
     }
+  }
 
-    /**
-     * Specialization for long type conversion
-     * @param str Input string to convert
-     * @return Result containing either long value or ConvertErr
-     */
-    template<>
-    Res<long, ConvertErr> strTo<long>(const ds::Str &str) {
-        try {
-            ds::Str trimmed = trim(str);
-            size_t pos;
-            long value = std::stol(trimmed.c_str(), &pos);
-
-            if (pos != trimmed.size()) {
-                return ConvertErr("Contains invalid characters", "strTo<long>");
-            }
-            return value;
-        } catch (const std::invalid_argument &e) {
-            return ConvertErr("Invalid argument format: " + ds::Str(e.what()), "strTo<long>");
-        } catch (const std::out_of_range &e) {
-            return ConvertErr("Value out of range: " + ds::Str(e.what()), "strTo<long>");
-        } catch (const std::exception &e) {
-            return ConvertErr("Conversion failed: " + ds::Str(e.what()), "strTo<long>");
-        }
+  /**
+   * Specialization for float type conversion
+   * @param str Input string to convert
+   * @return Result containing either float value or ConvertErr
+   */
+  template<>
+  inline auto strTo<float>(const ds::Str &str) -> Res<float, ConvertErr> {
+    SetRetT(float, ConvertErr)
+    try {
+      const ds::Str trimmed = trim(str);
+      size_t pos;
+      const float value = std::stof(trimmed.c_str(), &pos);
+      // Check if the entire string was consumed
+      if (pos != trimmed.length()) {
+        Err(ConvertErr("Invalid float format", __func__));
+      }
+      Ok(value);
+    } catch (const std::exception &e) {
+      Err(ConvertErr(e.what(), __func__));
     }
-
-    /**
-     * Specialization for double type conversion
-     * @param str Input string to convert
-     * @return Result containing either double value or ConvertErr
-     */
-    template<>
-    Res<double, ConvertErr> strTo<double>(const ds::Str &str) {
-        try {
-            ds::Str trimmed = trim(str);
-            size_t pos;
-            double value = std::stod(trimmed, &pos);
-
-            if (pos != trimmed.size()) {
-                return ConvertErr("Contains invalid characters", "strTo<double>");
-            }
-            return value;
-        } catch (const std::invalid_argument &e) {
-            return ConvertErr("Invalid argument format: " + ds::Str(e.what()), "strTo<double>");
-        } catch (const std::out_of_range &e) {
-            return ConvertErr("Value out of range: " + ds::Str(e.what()), "strTo<double>");
-        } catch (const std::exception &e) {
-            return ConvertErr("Conversion failed: " + ds::Str(e.what()), "strTo<double>");
-        }
-    }
-
-    /**
-     * Specialization for float type conversion
-     * @param str Input string to convert
-     * @return Result containing either float value or ConvertErr
-     */
-    template<>
-    Res<float, ConvertErr> strTo<float>(const ds::Str &str) {
-        try {
-            ds::Str trimmed = trim(str);
-            size_t pos;
-            float value = std::stof(trimmed, &pos);
-
-            if (pos != trimmed.size()) {
-                return ConvertErr("Contains invalid characters", "strTo<float>");
-            }
-            return value;
-        } catch (const std::invalid_argument &e) {
-            return ConvertErr("Invalid argument format: " + ds::Str(e.what()), "strTo<float>");
-        } catch (const std::out_of_range &e) {
-            return ConvertErr("Value out of range: " + ds::Str(e.what()), "strTo<float>");
-        } catch (const std::exception &e) {
-            return ConvertErr("Conversion failed: " + ds::Str(e.what()), "strTo<float>");
-        }
-    }
-
-    /**
-     * Specialization for bool type conversion
-     * Accepts "true", "false", "1", "0" (case-insensitive)
-     * @param str Input string to convert
-     * @return Result containing either bool value or ConvertErr
-     */
-    template<>
-    Res<bool, ConvertErr> strTo<bool>(const ds::Str &str) {
-        ds::Str trimmed = trim(str);
-        // Convert to lowercase for case-insensitive comparison
-        std::transform(trimmed.begin(), trimmed.end(), trimmed.begin(),
-                      [](unsigned char c){ return std::tolower(c); });
-
-        if (trimmed == "true" || trimmed == "1") {
-            return true;
-        } else if (trimmed == "false" || trimmed == "0") {
-            return false;
-        } else {
-            return ConvertErr("Invalid boolean format, must be true/false or 1/0", "strTo<bool>");
-        }
-    }
-
-    /**
-     * Specialization for string type (returns trimmed string)
-     * @param str Input string to process
-     * @return Result containing trimmed string
-     */
-    template<>
-    Res<ds::Str, ConvertErr> strTo<ds::Str>(const ds::Str &str) {
-        return trim(str);
-    }
-
+  }
 } // namespace hiahiahia::util
 
 

@@ -39,6 +39,8 @@ namespace hiahiahia {
 
       // Convert the error to a string
       [[nodiscard]] virtual ds::Str toString() const = 0;
+
+      Error() = default;
     };
 
 } // namespace hiahiahia

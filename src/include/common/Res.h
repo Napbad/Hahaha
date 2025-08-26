@@ -23,258 +23,181 @@
 #define RES_H
 
 #include <memory>
-#include <optional>
 #include <stdexcept>
 #include <variant>
 
 namespace hiahiahia {
-  template<class T, class E = std::unique_ptr<Error>>
+
+
+  /// Res<T, E> is a Rust-like Result type.
+  /// - Holds either a value (T) or an error (E).
+  /// - Errors are RAII-managed with std::unique_ptr.
+  template<typename T, typename E>
   class Res {
-    static_assert(!std::is_same_v<T, E>, "T and E cannot be the same type");
-    static_assert(std::is_move_constructible_v<T> && std::is_move_constructible_v<E>,
-                  "T and E must be move constructible");
+public:
+    using OkType = T;
+    using ErrType = E;
 
-  public:
-    using okType = T;
-    using errType = E;
+private:
+    std::variant<T, std::unique_ptr<E>> data;
 
+    // ----------------------
+    // Private constructors
+    // ----------------------
+    explicit Res(T &&value) : data(std::in_place_type<T>, std::move(value)) {}
+    explicit Res(const T &value) : data(std::in_place_type<T>, value) {}
 
-    template<typename U = T>
-    explicit Res(U &&value, std::enable_if_t<!std::is_same_v<std::decay_t<U>, Res>, int> = 0) :
-        data(std::forward<U>(value)) {}
+    explicit Res(E &&error) : data(std::in_place_type<std::unique_ptr<E>>, std::make_unique<E>(std::move(error))) {}
+    explicit Res(const E &error) : data(std::in_place_type<std::unique_ptr<E>>, std::make_unique<E>(error)) {}
+    explicit Res(std::unique_ptr<E> &&error) : data(std::in_place_type<std::unique_ptr<E>>, std::move(error)) {}
+    explicit Res(E *error) : data(std::in_place_type<std::unique_ptr<E>>, std::unique_ptr<E>(error)) {}
 
+public:
+    // Copy / move
+    Res(const Res &) = default;
+    Res(Res &&) noexcept = default;
+    Res &operator=(const Res &) = default;
+    Res &operator=(Res &&) noexcept = default;
 
-    explicit Res(const T &value) : data(value) {}
-    explicit Res(T &&value) : data(std::move(value)) {}
-    explicit Res(const E &error) : data(error) {}
-    explicit Res(E &&error) : data(std::move(error)) {}
+    // ----------------
+    // Static factories
+    // ----------------
 
-    Res(const Res &other) = default;
-    Res(Res &&other) noexcept = default;
-    Res &operator=(const Res &other) = default;
-    Res &operator=(Res &&other) noexcept = default;
+    static Res ok(T &&value) { return Res(std::forward<T>(value)); }
+    static Res ok(const T &value) { return Res(value); }
 
+    static Res err(E &&error) { return Res(std::forward<E>(error)); }
+    static Res err(const E &error) { return Res(error); }
+    static Res err(std::unique_ptr<E> &&error) { return Res(std::move(error)); }
+    static Res err(E *error) { return Res(error); }
+
+    // ----------------
+    // Queries
+    // ----------------
     [[nodiscard]] bool isOk() const { return std::holds_alternative<T>(data); }
+    [[nodiscard]] bool isErr() const { return std::holds_alternative<std::unique_ptr<E>>(data); }
 
-    [[nodiscard]] bool isErr() const { return std::holds_alternative<E>(data); }
-
-    T &unwrap() {
-      if (isOk()) {
-        return std::get<T>(data);
-      }
-      throw std::runtime_error("Called `res::unwrap()` on an `Err` value");
+    // ----------------
+    // Unwrap (T)
+    // ----------------
+    T &unwrap() & {
+      if (!isOk())
+        throw std::runtime_error("unwrap() called on Err");
+      return std::get<T>(data);
     }
 
-    E &unwrapErr() {
-      if (isErr()) {
-        return std::get<E>(data);
-      }
-      throw std::runtime_error("Called `res::unwrapErr()` on an `Ok` value");
+    const T &unwrap() const & {
+      if (!isOk())
+        throw std::runtime_error("unwrap() called on Err");
+      return std::get<T>(data);
     }
 
+    T &&unwrap() && {
+      if (!isOk())
+        throw std::runtime_error("unwrap() called on Err");
+      return std::move(std::get<T>(data));
+    }
+
+    // ----------------
+    // UnwrapErr (E)
+    // ----------------
+    E &unwrapErr() & {
+      if (!isErr())
+        throw std::runtime_error("unwrapErr() called on Ok");
+      return *std::get<std::unique_ptr<E>>(data);
+    }
 
     const E &unwrapErr() const & {
-      if (isErr()) {
-        return std::get<E>(data);
-      }
-      throw std::runtime_error("Called `res::unwrapErr()` on an `Ok` value");
+      if (!isErr())
+        throw std::runtime_error("unwrapErr() called on Ok");
+      return *std::get<std::unique_ptr<E>>(data);
     }
 
-    std::optional<T> ok() & {
-      if (isOk()) {
-        return std::get<T>(data);
-      }
-      return std::nullopt;
+    E unwrapErr() && {
+      if (!isErr())
+        throw std::runtime_error("unwrapErr() called on Ok");
+      return std::move(*std::get<std::unique_ptr<E>>(data));
     }
 
-    std::optional<T> ok() const & {
-      if (isOk()) {
-        return std::get<T>(data);
-      }
-      return std::nullopt;
-    }
-
-    std::optional<T> ok() && {
-      if (isOk()) {
-        return std::move(std::get<T>(data));
-      }
-      return std::nullopt;
-    }
-
-    std::optional<E> err() & {
-      if (isErr()) {
-        return std::get<E>(data);
-      }
-      return std::nullopt;
-    }
-
-    std::optional<E> err() const & {
-      if (isErr()) {
-        return std::get<E>(data);
-      }
-      return std::nullopt;
-    }
-
-    std::optional<E> err() && {
-      if (isErr()) {
-        return std::move(std::get<E>(data));
-      }
-      return std::nullopt;
-    }
-
-    T unwrapOr(T default_value) {
-      if (isOk()) {
-        return std::get<T>(data);
-      }
-      return default_value;
-    }
-
-    T unwrapOr(T default_value) const & {
-      if (isOk()) {
-        return std::get<T>(data);
-      }
-      return default_value;
-    }
-
-
+    // ----------------
+    // Functional helpers
+    // ----------------
     template<typename F>
-    T unwrapOrElse(F &&f) {
-      if (isOk()) {
-        return std::get<T>(data);
-      }
-      return std::forward<F>(f)(std::get<E>(data));
+    auto map(F &&f) const & -> Res<std::invoke_result_t<F, const T &>, E> {
+      using U = std::invoke_result_t<F, const T &>;
+      if (isOk())
+        return Res<U, E>::ok(f(std::get<T>(data)));
+      return Res<U, E>::err(E(*std::get<std::unique_ptr<E>>(data)));
     }
 
     template<typename F>
-    auto andThen(F &&f) & {
-      using ReturnType = std::invoke_result_t<F, T &>;
-      static_assert(is_res_v<ReturnType>, "F must return a Res type to support chain call");
-      if (isOk()) {
-        return std::forward<F>(f)(std::get<T>(data));
-      }
-      return ReturnType(std::get<E>(data));
-    }
-
-
-    template<typename F>
-    auto andThen(F &&f) const & {
-      using ReturnType = std::invoke_result_t<F, const T &>;
-      static_assert(is_res_v<ReturnType>, "F must return a Res type to support chain call");
-      if (isOk()) {
-        return std::forward<F>(f)(std::get<T>(data));
-      }
-      return ReturnType(std::get<E>(data));
+    auto map(F &&f) && -> Res<std::invoke_result_t<F, T &&>, E> {
+      using U = std::invoke_result_t<F, T &&>;
+      if (isOk())
+        return Res<U, E>::ok(f(std::move(std::get<T>(data))));
+      return Res<U, E>::err(std::move(*std::get<std::unique_ptr<E>>(data)));
     }
 
     template<typename F>
-    auto andThen(F &&f) && {
-      using ReturnType = std::invoke_result_t<F, T &&>;
-      static_assert(is_res_v<ReturnType>, "F must return a Res type to support chain call");
-      if (isOk()) {
-        return std::forward<F>(f)(std::move(std::get<T>(data)));
-      }
-      return ReturnType(std::move(std::get<E>(data)));
+    auto mapErr(F &&f) const & -> Res<T, std::invoke_result_t<F, const E &>> {
+      using FErr = std::invoke_result_t<F, const E &>;
+      if (isErr())
+        return Res<T, FErr>::err(f(*std::get<std::unique_ptr<E>>(data)));
+      return Res<T, FErr>::ok(std::get<T>(data));
     }
 
     template<typename F>
-    auto orElse(F &&f) & {
-      using ReturnType = std::invoke_result_t<F, E &>;
-      static_assert(is_res_v<ReturnType>, "F must return a Res type to support chain call");
-
-      if (isErr()) {
-        return std::forward<F>(f)(std::get<E>(data));
-      }
-      return ReturnType(std::get<T>(data));
+    auto mapErr(F &&f) && -> Res<T, std::invoke_result_t<F, E &&>> {
+      using FErr = std::invoke_result_t<F, E &&>;
+      if (isErr())
+        return Res<T, FErr>::err(f(std::move(*std::get<std::unique_ptr<E>>(data))));
+      return Res<T, FErr>::ok(std::move(std::get<T>(data)));
     }
-
-    template<typename F>
-    auto orElse(F &&f) const & {
-      using ReturnType = std::invoke_result_t<F, const E &>;
-      static_assert(is_res_v<ReturnType>, "F must return a Res type to support chain call");
-
-      if (isErr()) {
-        return std::forward<F>(f)(std::get<E>(data));
-      }
-      return ReturnType(std::get<T>(data));
-    }
-
-
-    template<typename F>
-    auto orElse(F &&f) && {
-      using ReturnType = std::invoke_result_t<F, E &&>;
-      static_assert(is_res_v<ReturnType>, "F must return a Res type to support chain call");
-
-      if (isErr()) {
-        return std::forward<F>(f)(std::move(std::get<E>(data)));
-      }
-      return ReturnType(std::move(std::get<T>(data)));
-    }
-
-    template<typename U, typename G>
-    bool operator==(const Res<U, G> &other) const {
-      if (isOk() && other.isOk()) {
-        return std::get<T>(data) == std::get<U>(other.data);
-      }
-      if (isErr() && other.isErr()) {
-        return std::get<E>(data) == std::get<G>(other.data);
-      }
-      return false;
-    }
-
-    template<typename U, typename G>
-    bool operator!=(const Res<U, G> &other) const {
-      return !(*this == other);
-    }
-
-    static Res Ok(const T &value) { return Res(value); }
-    static Res Ok(T &&value) { return Res(std::move(value)); }
-    static Res Err(const E &error) { return Res(error); }
-    static Res Err(E &&error) { return Res(std::move(error)); }
-
-  private:
-    std::variant<T, E> data;
-
-    template<class>
-    struct is_res : std::false_type {};
-
-    template<typename U, typename G>
-    struct is_res<Res<U, G>> : std::true_type {};
-
-    template<typename R>
-    static constexpr bool is_res_v = is_res<R>::value;
   };
-  template<typename T, typename E = std::unique_ptr<Error>>
-  Res<std::decay_t<T>, E> Ok(T &&value) {
-    return Res<std::decay_t<T>, E>::Ok(std::forward<T>(value));
-  }
 
-  template<typename R, typename V>
-    requires requires {
-    typename R::okType;
-    typename R::errType;
-    }
-  R Ok(V &&value) {
-    using T = R::okType;
-    static_assert(std::is_constructible_v<T, V>, "Value must be constructible into Ok type");
-    return R::Ok(std::forward<V>(value));
-  }
 
-  template<typename E, typename RT = void>
-  auto err(E &&error) -> decltype(auto) {
-    return Res<RT, std::decay_t<E>>::Err(std::forward<E>(error));
-  }
+  /**
+   * @brief Define return type alias for function
+   *
+   * This macro defines a type alias RetType pointing to Res<T, E> type
+   * within function scope. It is typically used before Ok() or Err() macros
+   * to set the return type.
+   *
+   * @param T The first template parameter of Res type, representing the type of value contained in success state
+   * @param E The second template parameter of Res type, representing the error type contained in error state
+   */
+#define SetRetT(T, E) using RetType = Res<T, E>;
 
-  template<typename R, typename V>
-    requires requires {
-    typename R::okType;
-    typename R::errType;
-    }
+  /**
+   * @brief Return a successful Res object
+   *
+   * This macro returns a successful state Res object containing the specified value.
+   * Requires using SetRetT macro first to define RetType type alias.
+   *
+   * @param Val The value to be contained in the successful state Res object
+   */
+#define Ok(Val) return RetType::ok(Val);
 
-  R err(V &&error) {
-    using E = R::errType;
-    static_assert(std::is_constructible_v<E, V>, "Error must be constructible into Err type");
-    return R::Err(std::forward<V>(error));
-  }
-}// namespace hiahiahia
+  /**
+   * @brief Return a failed Res object
+   *
+   * This macro returns a failed state Res object containing the specified error.
+   * Requires using SetRetT macro first to define RetType type alias.
+   *
+   * @param Error The error to be contained in the failed state Res object
+   */
+#define Err(Error) return RetType::err((Error));
+
+  /**
+   * @brief Create a new error object
+   *
+   * This macro creates a new error object instance.
+   * Requires using SetRetT macro first to define RetType type alias.
+   *
+   * @param ErrorT Error type
+   * @param ... Arguments passed to the error constructor
+   */
+#define newE(ErrorT, ...) (new ErrorT(__VA_ARGS__))
+} // namespace hiahiahia
 
 #endif // RES_H

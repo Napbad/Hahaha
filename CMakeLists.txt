@@ -47,11 +47,4 @@ add_library(hiahiahia STATIC
         src/include/common/util/StringStream.h
 )
 
-# Examples
-add_executable(device_example src/examples/device_example.cpp)
-target_link_libraries(device_example hiahiahia)
-
-add_executable(res_example src/examples/res_example.cpp)
-target_link_libraries(res_example hiahiahia)
-
 add_subdirectory(tests)
