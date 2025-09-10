@@ -16,7 +16,7 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by root on 7/26/25.
+// Created by Napbad on 7/26/25.
 //
 
 #ifndef STACK_H

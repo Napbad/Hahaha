@@ -16,7 +16,7 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by root on 7/27/25.
+// Created by Napbad on 7/27/25.
 //
 
 #ifndef H3DEFS_H

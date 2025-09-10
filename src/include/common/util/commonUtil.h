@@ -16,7 +16,7 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by root on 8/4/25.
+// Created by Napbad on 8/4/25.
 //
 
 #ifndef COMMONUTIL_H

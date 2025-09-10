@@ -16,7 +16,7 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by root on 7/27/25.
+// Created by Napbad on 7/27/25.
 //
 
 #ifndef RES_H
@@ -25,6 +25,9 @@
 #include <memory>
 #include <stdexcept>
 #include <variant>
+
+#include "Error.h"
+#include "Res.h"
 
 namespace hiahiahia {
 

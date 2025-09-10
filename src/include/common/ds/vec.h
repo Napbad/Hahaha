@@ -16,13 +16,13 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by root on 7/26/25.
+// Created by Napbad on 7/26/25.
 //
 
 #ifndef VEC_H
 #define VEC_H
 #include <algorithm>
-
+#include <memory>
 
 #include "include/common/defines/h3defs.h"
 
@@ -69,6 +69,10 @@ public:
         reserve(_size * 2);
       }
       _data[_size++] = value;
+    }
+
+    void push_back(const T & value) {
+      emplace_back(value);
     }
 
     iterator begin() const {

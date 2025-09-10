@@ -16,13 +16,14 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by root on 7/27/25.
+// Created by Napbad on 7/27/25.
 //
 
 #ifndef STR_H
 #define STR_H
 #include <algorithm>
 #include <cstring>
+#include <sstream>
 
 #include "include/common/defines/h3defs.h"
 
@@ -59,7 +60,28 @@ public:
       _data = new char[_size];
       std::copy_n(begin, _size, _data);
     }
+    explicit Str(const std::string & string) {
+      _data = new char[string.size() + 1];
+      _size = string.size();
+      std::strcpy(_data, string.c_str());
+      _capacity = string.size();
+      _data[_size] = '\0';
+    }
 
+    explicit Str (const std::stringstream &ss) {
+      _data = new char[ss.str().size() + 1];
+      _size = ss.str().size();
+      std::strcpy(_data, ss.str().c_str());
+      _capacity = ss.str().size();
+      _data[_size] = '\0';
+    }
+    explicit Str(const std::ostringstream & oss) {
+      _data = new char[oss.str().size() + 1];
+      _size = oss.str().size();
+      std::strcpy(_data, oss.str().c_str());
+      _capacity = oss.str().size();
+      _data[_size] = '\0';
+    }
     ~Str() { delete[] _data; }
 
     Str &operator=(const Str &other) {
@@ -215,6 +237,7 @@ public:
         _capacity = n;
       }
     }
+    void append(char * contents, sizeT size);
 
 private:
     char *_data;
@@ -251,6 +274,19 @@ private:
     result += lhs;
     result += rhs;
     return result;
+  }
+
+  inline std::ostream& operator<<(std::ostream& os, const ds::Str& str) {
+    os << str.c_str();
+    return os;
+  }
+
+  inline Str operator+(const Str& a, const std::string& b) {
+    return a + Str(b);
+  }
+
+  inline Str operator+(const std::string& a, const Str& b) {
+    return Str(a) + b;
   }
 } // namespace hiahiahia::ds
 

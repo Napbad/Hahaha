@@ -98,6 +98,7 @@ RUN apt-get update && apt-get install -y \
     git \
     wget \
     curl \
+    libcurl4-openssl-dev \
     libc-bin \
     vim \
     python3 \

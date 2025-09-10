@@ -33,5 +33,5 @@
     // Add additional features to your project using auto-completion.
   },
   // Use root user for development
-  remoteUser: "root"
+  remoteUser: "napbad"
 }

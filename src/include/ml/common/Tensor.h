@@ -15,13 +15,14 @@
 // Email: napbad.sen@gmail.com
 // GitHub: https://github.com/Napbad
 //
-// Created by root on 7/27/25.
+// Created by Napbad on 7/27/25.
 //
 
 #ifndef TENSOR_H
 #define TENSOR_H
 #include <initializer_list>
 #include <iostream>
+#include <memory>
 #include <numeric>
 
 #include "include/common/Error.h"
@@ -38,7 +39,7 @@ public:
 
     Tensor() = default;
 
-    Tensor(std::initializer_list<hiahiahia::sizeT> shape)
+    Tensor(std::initializer_list<sizeT> shape)
         : _shape(shape), _data(computeSize(shape)) {}
 
     explicit Tensor(const ds::vec<sizeT>& shape)
@@ -49,26 +50,28 @@ public:
     [[nodiscard]] sizeT size() const { return _data.size(); }
 
     // Index calculation (flattened)
-  [[nodiscard]] Res<sizeT, err> index(const ds::vec<sizeT>& indices) const {
+  [[nodiscard]] Res<sizeT, BaseError> index(const ds::vec<sizeT>& indices) const {
+      SetRetT(sizeT, BaseError)
+
       if (indices.size() != _shape.size())
-        return err(std::make_unique<err>("Incorrect number of indices"));
+        Err(BaseError("Incorrect number of indices"));
       sizeT idx = 0;
       sizeT stride = 1;
       for (int i = static_cast<int>(_shape.size()) - 1; i >= 0; --i) {
         if (indices[i] >= _shape[i])
-          return err(std::make_unique<err>("Index out of bounds"));
+          Err(BaseError("Index out of bounds"));
         idx += indices[i] * stride;
         stride *= _shape[i];
       }
-      return Ok(idx);
+      Ok(idx);
     }
 
   // Element access
     valueType& operator()(const ds::vec<sizeT>& indices) {
-        return _data[index(indices)];
+        return _data[index(indices).unwrap()];
     }
     const valueType& operator()(const ds::vec<sizeT>& indices) const {
-        return _data[index(indices)];
+        return _data[index(indices).unwrap()];
     }
 
     // Fill tensor with value

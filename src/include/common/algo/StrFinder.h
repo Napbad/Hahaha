@@ -16,7 +16,7 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by root on 8/1/25.
+// Created by Napbad on 8/1/25.
 //
 
 #ifndef STRFINDER_H
@@ -25,7 +25,7 @@
 
 using hiahiahia::ds::Str;
 
-namespace hiahiahia {
+namespace hiahiahia::ds {
 
     // KMP
     class StrFinder {

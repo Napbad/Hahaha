@@ -16,7 +16,7 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by root on 8/7/25.
+// Created by Napbad on 8/7/25.
 //
 
 #ifndef HIAHIAHIA_STRINGSTREAM_H

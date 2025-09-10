@@ -21,8 +21,6 @@
 
 #ifndef LOSS_H
 #define LOSS_H
-#include "include/common/ds/Tensor.h"
-#include "include/ml/utils/h3vec.h"
 
 namespace hiahiahia {
 
