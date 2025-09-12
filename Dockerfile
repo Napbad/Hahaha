@@ -1,25 +1,3 @@
-# FROM docker.io/nvidia/cuda:12.4.1-devel-ubuntu22.04
-# LABEL authors="napbad"
-
-# RUN apt-get update && apt-get install -y \
-#     build-essential \
-#     cmake \
-#     gcc-10 g++-10 \
-#     git \
-#     vim \
-#     wget \
-#     gdb \
-#     googletest \
-#     googletest-tools
-
-# RUN useradd -m -s /bin/bash ubuntu && \
-#     echo "ubuntu:ubuntu" | chpasswd && \
-#     adduser ubuntu sudo && \
-#     mkdir -p /home/ubuntu && \
-#     chown -R ubuntu:ubuntu /home/ubuntu
-
-# WORKDIR /workspace
-
 ARG IMAGE_NAME=nvidia/cuda
 FROM ${IMAGE_NAME}:13.0.0-runtime-ubuntu24.04 AS base
 
@@ -64,10 +42,8 @@ ENV NV_LIBNCCL_DEV_PACKAGE_VERSION=2.27.7-1
 ENV NCCL_VERSION=2.27.7-1
 ENV NV_LIBNCCL_DEV_PACKAGE=${NV_LIBNCCL_DEV_PACKAGE_NAME}=${NV_LIBNCCL_DEV_PACKAGE_VERSION}+cuda13.0
 
-
-FROM base-${TARGETARCH}
-
 ARG TARGETARCH=amd64
+FROM base-${TARGETARCH}
 
 LABEL maintainer="NVIDIA CORPORATION <cudatools@nvidia.com>"
 
@@ -86,7 +62,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Keep apt from auto upgrading the cublas and nccl packages. See https://gitlab.com/nvidia/container-images/cuda/-/issues/88
 RUN apt-mark hold ${NV_LIBCUBLAS_DEV_PACKAGE_NAME} ${NV_LIBNCCL_DEV_PACKAGE_NAME}
-ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs
+ENV LIBRARY_PATH=/usr/local/cuda/lib64/stubs
 
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -116,5 +92,5 @@ WORKDIR /workspace
 ENV PATH=/usr/local/cuda/bin:${PATH}
 ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:${LD_LIBRARY_PATH}
 
-CMD ["/bin/bash"]
 
+CMD ["/bin/bash"]
