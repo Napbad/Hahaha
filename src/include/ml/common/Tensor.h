@@ -25,32 +25,33 @@
 #include <memory>
 #include <numeric>
 
-#include "include/common/Error.h"
-#include "include/common/Res.h"
-#include "include/common/defines/h3defs.h"
-#include "include/common/ds/vec.h"
+#include "common/Error.h"
+#include "common/Res.h"
+#include "common/defines/h3defs.h"
+#include "common/ds/Vec.h"
 
 namespace hiahiahia {
 
 
+  template<typename T>
 class Tensor {
 public:
-    using valueType = float; // You can make this a template parameter for other types
+    using valueType = T; // You can make this a template parameter for other types
 
     Tensor() = default;
 
     Tensor(std::initializer_list<sizeT> shape)
         : _shape(shape), _data(computeSize(shape)) {}
 
-    explicit Tensor(const ds::vec<sizeT>& shape)
+    explicit Tensor(const ds::Vec<sizeT>& shape)
         : _shape(shape), _data(computeSize(shape)) {}
 
     // Access shape
-    [[nodiscard]] const ds::vec<sizeT>& shape() const { return _shape; }
+    [[nodiscard]] const ds::Vec<sizeT>& shape() const { return _shape; }
     [[nodiscard]] sizeT size() const { return _data.size(); }
 
     // Index calculation (flattened)
-  [[nodiscard]] Res<sizeT, BaseError> index(const ds::vec<sizeT>& indices) const {
+  [[nodiscard]] Res<sizeT, BaseError> index(const ds::Vec<sizeT>& indices) const {
       SetRetT(sizeT, BaseError)
 
       if (indices.size() != _shape.size())
@@ -67,10 +68,10 @@ public:
     }
 
   // Element access
-    valueType& operator()(const ds::vec<sizeT>& indices) {
+    valueType& operator()(const ds::Vec<sizeT>& indices) {
         return _data[index(indices).unwrap()];
     }
-    const valueType& operator()(const ds::vec<sizeT>& indices) const {
+    const valueType& operator()(const ds::Vec<sizeT>& indices) const {
         return _data[index(indices).unwrap()];
     }
 
@@ -111,11 +112,20 @@ public:
         std::cout << "\n";
     }
 
-private:
-    ds::vec<sizeT> _shape;
-    ds::vec<valueType> _data;
+    // Static factory methods
+    static Tensor fromVector(const ds::Vec<T>& vec) {
+        Tensor tensor({vec.size()});
+        for (sizeT i = 0; i < vec.size(); ++i) {
+            tensor._data[i] = vec[i];
+        }
+        return tensor;
+    }
 
-    static sizeT computeSize(const ds::vec<sizeT>& shape) {
+private:
+    ds::Vec<sizeT> _shape;
+    ds::Vec<valueType> _data;
+
+    static sizeT computeSize(const ds::Vec<sizeT>& shape) {
         return std::accumulate(shape.begin(), shape.end(), sizeT{1}, std::multiplies<>());
     }
 

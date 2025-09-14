@@ -15,34 +15,26 @@
 // Email: napbad.sen@gmail.com
 // GitHub: https://github.com/Napbad
 
-//
-// Created by Napbad on 7/19/25.
-//
+#ifndef HIAHIAHIA_LINEARREGRESSION_H
+#define HIAHIAHIA_LINEARREGRESSION_H
 
-#ifndef LINEARREGRESSION_H
-#define LINEARREGRESSION_H
-#include "include/common/ds/vec.h"
-#include "include/ml/model/Model.h"
+#include <ml/model/Model.h>
+#include <common/ds/Vec.h>
 
 namespace hiahiahia {
 
-  using namespace hiahiahia::ds;
-    class LinearRegression : public Model {
-    public:
-        LinearRegression();
-        void train(const vec<vec<float>> &features, const ds::vec<float> &labels) override {}
-        [[nodiscard]] float predict(const vec<float> &features) const override;
+class LinearRegression : public Model {
+public:
+  LinearRegression() = default;
 
-    private:
-        // Tensor<float> _inputFeatures;
-        // Tensor<float> _outputFeatures;
-        //
-        // Tensor<float> _weights;
-        // Tensor<float> _bias;
-    };
+  void train(const ds::Vec<ds::Vec<float>>& features, const ds::Vec<float>& labels) override;
+  float predict(const ds::Vec<float>& features) const override;
+
+private:
+  ds::Vec<float> _weights;
+  float _bias{0.0f};
+};
 
 } // namespace hiahiahia
 
-
-
-#endif //LINEARREGRESSION_H
+#endif // HIAHIAHIA_LINEARREGRESSION_H

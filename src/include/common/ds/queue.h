@@ -22,9 +22,9 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 
-#include "vec.h"
 #include <initializer_list>
 #include <stdexcept>
+#include "Vec.h"
 
 namespace hiahiahia::ds {
 
@@ -111,13 +111,13 @@ public:
     }
 
 private:
-    vec<T, Allocator> _container; // Underlying storage
+    Vec<T, Allocator> _container; // Underlying storage
     size_type _start;             // Index of the first active element
 
     // Rebase: move remaining elements to the start of the container to free space
     void rebase() {
         const size_type new_size = size();
-        vec<T, Allocator> new_container(new_size); // Pre-reserve space
+        Vec<T, Allocator> new_container(new_size); // Pre-reserve space
 
         // Copy active elements (from _start to end) to the new container
         for (size_type i = 0; i < new_size; ++i) {

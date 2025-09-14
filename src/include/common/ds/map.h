@@ -44,8 +44,8 @@
 #include <map>
 
 
+#include "Vec.h"
 #include "str.h"
-#include "vec.h"
 
 namespace hiahiahia::ds {
   template <typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>>

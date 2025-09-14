@@ -21,7 +21,7 @@
 
 #ifndef STRFINDER_H
 #define STRFINDER_H
-#include "include/common/ds/str.h"
+#include "common/ds/str.h"
 
 using hiahiahia::ds::Str;
 

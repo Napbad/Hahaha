@@ -24,12 +24,12 @@
 #include <algorithm>
 #include <memory>
 
-#include "include/common/defines/h3defs.h"
+#include "common/defines/h3defs.h"
 
 
 namespace hiahiahia::ds {
   template<class T, class Allocator = std::allocator<T>>
-  class vec {
+  class Vec {
 
 public:
 
@@ -43,14 +43,14 @@ public:
     using sizeTp = sizeT;
     using differenceTp = ptrDiffT;
 
-    vec ()  noexcept : _data(nullptr), _size(0), _capacity(0) {
+    Vec ()  noexcept : _data(nullptr), _size(0), _capacity(0) {
 
     }
 
-    explicit vec(const sizeTp count): _data(nullptr), _size(0), _capacity(count) {
+    explicit Vec(const sizeTp count): _data(nullptr), _size(0), _capacity(count) {
       reserve(count);
     }
-    vec(std::initializer_list<T> shape) {
+    Vec(std::initializer_list<T> shape) {
       _data = new T[shape.size()];
       _size = shape.size();
       _capacity = shape.size();
@@ -60,7 +60,7 @@ public:
       }
     }
 
-    ~vec() {
+    ~Vec() {
       delete []_data;
     }
 
@@ -82,7 +82,7 @@ public:
     iterator end() const {
       return &_data[_size - 1];
     }
-    bool operator==(const vec & vec) const {
+    bool operator==(const Vec & vec) const {
       if (_size != vec._size) {
         return false;
       }
@@ -112,10 +112,11 @@ public:
       return _data[index];
     }
 
-  private:
-    T *_data;
-    sizeT _size;
-    sizeT _capacity;
+    void clear() {
+      delete []_data;
+      _size = 0;
+      _capacity = 0;
+    }
 
     void reserve(const sizeTp newCap) {
       auto newData = static_cast<pointer>(operator new(newCap * sizeof(T)));
@@ -128,6 +129,11 @@ public:
       _capacity = newCap;
       _data = newData;
     }
+private:
+    T *_data;
+    sizeT _size;
+    sizeT _capacity;
+
   };
 } // namespace hiahiahia::ds
 

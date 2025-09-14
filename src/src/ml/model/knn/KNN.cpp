@@ -19,5 +19,5 @@
 // Created by Napbad on 7/13/25.
 //
 
-#include "include/ml/model/knn/KNN.h"
+#include "ml/model/knn/KNN.h"
 

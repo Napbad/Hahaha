@@ -24,8 +24,8 @@
 #include <functional>
 #include <utility>
 
-#include "include/common/Error.h"
-#include "include/common/Res.h"
+#include "common/Error.h"
+#include "common/Res.h"
 
 namespace hiahiahia::ds {
   class Str;

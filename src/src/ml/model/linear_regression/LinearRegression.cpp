@@ -15,28 +15,47 @@
 // Email: napbad.sen@gmail.com
 // GitHub: https://github.com/Napbad
 
-//
-// Created by Napbad on 7/19/25.
-//
-
-#include "include/ml/model/linear_regression/LinearRegression.h"
-
-#include "include/common/ds/Tensor.h"
-#include "include/ml/model/Model.h"
+#include <ml/model/linear_regression/LinearRegression.h>
 
 namespace hiahiahia {
-    LinearRegression::LinearRegression(): _inputFeatures({}), _outputFeatures({}) {
+
+float LinearRegression::predict(const ds::Vec<float>& features) const {
+  float result = _bias;
+  for (size_t i = 0; i < features.size(); ++i) {
+    result += features[i] * _weights[i];
+  }
+  return result;
+}
+
+void LinearRegression::train(const ds::Vec<ds::Vec<float>>& features, const ds::Vec<float>& labels) {
+  // Initialize weights if not already done
+  if (_weights.size() == 0) {
+    // Create weights vector with zeros
+    for (size_t i = 0; i < features[0].size(); ++i) {
+      _weights.push_back(0.0f);
     }
+    _bias = 0.0f;
+  }
 
-    void LinearRegression::train(const h3vec<h3vec<float> > &features, const h3vec<float> &labels) {
-        auto predictRes = h3vec<float>(labels.size());
-        for (size_t i = 0; i < labels.size(); ++i) {
-            predictRes[i] = predict(features[i]);
-        }
+  // Simple gradient descent
+  const float learningRate = 0.01f;
+  const int numEpochs = 100;
 
+  for (int epoch = 0; epoch < numEpochs; ++epoch) {
+    for (size_t i = 0; i < features.size(); ++i) {
+      // Forward pass
+      float prediction = predict(features[i]);
+      float error = prediction - labels[i];
+
+      // Update weights
+      for (size_t j = 0; j < _weights.size(); ++j) {
+        _weights[j] -= learningRate * error * features[i][j];
+      }
+
+      // Update bias
+      _bias -= learningRate * error;
     }
+  }
+}
 
-    float LinearRegression::predict(const h3vec<float> &features) const {
-
-    }
 } // namespace hiahiahia

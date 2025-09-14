@@ -25,11 +25,11 @@
 #include <cstring>
 #include <sstream>
 
-#include "include/common/defines/h3defs.h"
+#include "common/defines/h3defs.h"
 
 namespace hiahiahia::ds {
   class Str {
-public:
+  public:
     static const sizeT npos = static_cast<sizeT>(-1);
 
     Str() : _data(new char[1]), _size(0), _capacity(0) { _data[0] = '\0'; }
@@ -239,7 +239,7 @@ public:
     }
     void append(char * contents, sizeT size);
 
-private:
+  private:
     char *_data;
     sizeT _size;
     sizeT _capacity;
@@ -290,5 +290,19 @@ private:
   }
 } // namespace hiahiahia::ds
 
+// Hash specialization for ds::Str
+namespace std {
+  template<>
+  struct hash<hiahiahia::ds::Str> {
+    size_t operator()(const hiahiahia::ds::Str& s) const noexcept {
+      size_t hash = 5381;
+      const char* str = s.c_str();
+      while (*str) {
+        hash = ((hash << 5) + hash) + *str++;
+      }
+      return hash;
+    }
+  };
+} // namespace std
 
 #endif // STR_H
