@@ -3,7 +3,7 @@
 #include <array>
 #include <cstddef>
 
-using namespace hiahiahia::vectorize;
+using namespace hahaha::vectorize;
 
 class VecTest : public ::testing::Test {
 protected:

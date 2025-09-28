@@ -22,7 +22,7 @@
 #include <common/Res.h>
 #include <common/Error.h>
 
-namespace hiahiahia::ml {
+namespace hahaha::ml {
 
 /**
  * Dataset downloader error class
@@ -84,6 +84,6 @@ public:
   );
 };
 
-} // namespace hiahiahia::ml
+} // namespace hahaha::ml
 
 #endif // HIAHIAHIA_DATASETDOWNLOADER_H 

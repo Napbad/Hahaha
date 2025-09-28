@@ -26,7 +26,7 @@
 #include <memory>
 #include <random>
 
-namespace hiahiahia::ml {
+namespace hahaha::ml {
 
   /**
    * DataLoader error class
@@ -206,6 +206,6 @@ private:
     }
   };
 
-} // namespace hiahiahia::ml
+} // namespace hahaha::ml
 
 #endif // HIAHIAHIA_DATALOADER_H 

@@ -1,7 +1,7 @@
 // Default Ubuntu-based DevContainer Template.
 // For more customization options, see https://containers.dev/implementors/json_reference
 {
-  name: "HiahiahiaDevDefaultContainer",
+  name: "HahahaDevDefaultContainer",
   "dockerFile": "../../Dockerfile",
   "build": {
       "args": {

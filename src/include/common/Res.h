@@ -22,7 +22,7 @@
 #include <variant>
 #include <type_traits>
 
-namespace hiahiahia {
+namespace hahaha {
 
 // Forward declaration for VoidType
 struct VoidType {
@@ -159,7 +159,7 @@ public:
   // Map operations
   template<typename F>
   auto map(F&& f) const & {
-    using RetType = typename function_traits<std::remove_reference_t<F>>::return_type;
+    using RetType = function_traits<std::remove_reference_t<F>>::return_type;
     if (isOk()) {
       if constexpr (std::is_same_v<T, void>) {
         return Res<RetType, E>::ok(f());
@@ -172,7 +172,7 @@ public:
 
   template<typename F>
   auto map(F&& f) && {
-    using RetType = typename function_traits<std::remove_reference_t<F>>::return_type;
+    using RetType = function_traits<std::remove_reference_t<F>>::return_type;
     if (isOk()) {
       if constexpr (std::is_same_v<T, void>) {
         return Res<RetType, E>::ok(f());
@@ -186,7 +186,7 @@ public:
   // MapErr operations
   template<typename F>
   auto mapErr(F&& f) const & {
-    using NewError = typename function_traits<std::remove_reference_t<F>>::return_type;
+    using NewError = function_traits<std::remove_reference_t<F>>::return_type;
     if (isErr()) {
       return Res<T, NewError>::err(f(*std::get<std::unique_ptr<E>>(data)));
     }
@@ -199,7 +199,7 @@ public:
 
   template<typename F>
   auto mapErr(F&& f) && {
-    using NewError = typename function_traits<std::remove_reference_t<F>>::return_type;
+    using NewError = function_traits<std::remove_reference_t<F>>::return_type;
     if (isErr()) {
       return Res<T, NewError>::err(f(std::move(*std::get<std::unique_ptr<E>>(data))));
     }
@@ -215,11 +215,11 @@ private:
 };
 
 // Macros for easier use
-#define SetRetT(T, E) using RetType = Res<T, E>;
+#define SetRetT(T, E) using RetType = Res<T, E>; using ErrType = E; using ValueType = T;
 #define Ok(Val) return RetType::ok(Val);
-#define Err(Error) return RetType::err((Error));
+#define Err(Error) return RetType::err(ErrType(Error));
 #define newE(ErrorT, ...) (new ErrorT(__VA_ARGS__))
 
-} // namespace hiahiahia
+} // namespace hahaha
 
 #endif // HIAHIAHIA_RES_H

@@ -22,13 +22,13 @@
 #ifndef DATASETTYPE_H
 #define DATASETTYPE_H
 
-namespace hiahiahia {
+namespace hahaha {
   enum class DatasetType {
     MNIST,
     CIFAR10,
     CIFAR100,
 };
-} // namespace hiahiahia
+} // namespace hahaha
 
 
 #endif //DATASETTYPE_H

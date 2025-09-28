@@ -22,11 +22,11 @@
 #ifndef LOSS_H
 #define LOSS_H
 
-namespace hiahiahia {
+namespace hahaha {
 
 
 
 
-} // namespace hiahiahia
+} // namespace hahaha
 
 #endif //LOSS_H

@@ -27,7 +27,7 @@
 
 #include "common/Res.h"
 
-namespace hiahiahia::util {
+namespace hahaha::common::util {
 
   bool fileExists(const ds::Str &path) {
     std::filesystem::path p((path.data()));
@@ -60,4 +60,4 @@ namespace hiahiahia::util {
     file << content.data();
     return file.good();
   }
-} // namespace hiahiahia::util
+} // namespace hahaha::common::util

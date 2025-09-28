@@ -23,9 +23,9 @@
 #define CPUDEVICE_H
 #include "Device.h"
 
-namespace hiahiahia {
+namespace hahaha {
 
-} // namespace hiahiahia
+} // namespace hahaha
 
 
 #endif //CPUDEVICE_H

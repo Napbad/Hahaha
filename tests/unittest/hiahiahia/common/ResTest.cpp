@@ -25,7 +25,7 @@
 #include <string>
 #include <memory>
 
-namespace hiahiahia {
+namespace hahaha {
 namespace test {
 
 // Custom error type for testing
@@ -254,4 +254,4 @@ TEST_F(ResTest, TypeTransformation) {
 }
 
 } // namespace test
-} // namespace hiahiahia 
+} // namespace hahaha

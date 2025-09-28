@@ -21,7 +21,7 @@
 #include <ml/model/Model.h>
 #include <common/ds/Vec.h>
 
-namespace hiahiahia {
+namespace hahaha {
 
 class LinearRegression : public Model {
 public:
@@ -35,6 +35,6 @@ private:
   float _bias{0.0f};
 };
 
-} // namespace hiahiahia
+} // namespace hahaha
 
 #endif // HIAHIAHIA_LINEARREGRESSION_H

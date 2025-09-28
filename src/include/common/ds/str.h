@@ -27,7 +27,7 @@
 
 #include "common/defines/h3defs.h"
 
-namespace hiahiahia::ds {
+namespace hahaha::common::ds {
   class Str {
   public:
     static const sizeT npos = static_cast<sizeT>(-1);
@@ -288,13 +288,13 @@ namespace hiahiahia::ds {
   inline Str operator+(const std::string& a, const Str& b) {
     return Str(a) + b;
   }
-} // namespace hiahiahia::ds
+} // namespace hahaha::common::ds
 
 // Hash specialization for ds::Str
 namespace std {
   template<>
-  struct hash<hiahiahia::ds::Str> {
-    size_t operator()(const hiahiahia::ds::Str& s) const noexcept {
+  struct hash<hahaha::common::ds::Str> {
+    size_t operator()(const hahaha::common::ds::Str& s) const noexcept {
       size_t hash = 5381;
       const char* str = s.c_str();
       while (*str) {

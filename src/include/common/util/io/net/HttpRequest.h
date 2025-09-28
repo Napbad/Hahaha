@@ -27,7 +27,7 @@
 #include "common/ds/map.h"
 
 
-namespace hiahiahia::util {
+namespace hahaha::common::util {
   class HttpRequest {
   public:
     HttpRequest(const ds::Str&  url, HttpMethod method);
@@ -48,7 +48,7 @@ namespace hiahiahia::util {
   };
 
 
-} // namespace hiahiahia::util::net
+} // namespace hahaha::common::util::net
 
 
 #endif // HIAHIAHIA_HTTPREQUEST_H

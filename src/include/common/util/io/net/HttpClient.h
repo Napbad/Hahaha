@@ -25,7 +25,7 @@
 #include "HttpRequest.h"
 #include "HttpResponse.h"
 
-namespace hiahiahia::util {
+namespace hahaha::common::util {
   class HttpClient {
   public:
     static std::unique_ptr<HttpResponse> send(const HttpRequest& request);

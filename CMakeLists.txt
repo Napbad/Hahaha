@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(hiahiahia)
+project(hahaha)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -21,18 +21,23 @@ file(GLOB_RECURSE SOURCE_FILES
 )
 
 # Main library
-add_library(hiahiahia STATIC
+add_library(hahaha STATIC
     ${SOURCE_FILES}
     ${HEADER_FILES}
+        tests/unittest/hiahiahia/ml/util/dataset/DatasetDownloaderTest.cpp
+        src/include/ml/util/compute/ComputeGraphNode.h
+        src/include/ml/util/compute/ComputeFn.h
+        src/include/common/util/vectorize/archDefines.h
+        src/include/common/util/vectorize/Vectorize.h
 )
 
 # Set C++ as the link language
-set_target_properties(hiahiahia PROPERTIES
+set_target_properties(hahaha PROPERTIES
     LINKER_LANGUAGE CXX
 )
 
 # Link dependencies
-target_link_libraries(hiahiahia
+target_link_libraries(hahaha
     ${CURL_LIBRARIES}
 )
 

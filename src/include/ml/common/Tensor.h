@@ -30,13 +30,20 @@
 #include "common/defines/h3defs.h"
 #include "common/ds/Vec.h"
 
-namespace hiahiahia {
+namespace hahaha::ml {
 
+  using namespace hahaha::common;
+
+class TensorErr final : public BaseErr {
+public:
+  TensorErr() = default;
+  explicit TensorErr(const char *msg) : BaseErr(msg) {}
+};
 
   template<typename T>
 class Tensor {
 public:
-    using valueType = T; // You can make this a template parameter for other types
+    using valueType = T;
 
     Tensor() = default;
 
@@ -51,16 +58,16 @@ public:
     [[nodiscard]] sizeT size() const { return _data.size(); }
 
     // Index calculation (flattened)
-  [[nodiscard]] Res<sizeT, BaseError> index(const ds::Vec<sizeT>& indices) const {
-      SetRetT(sizeT, BaseError)
+  [[nodiscard]] Res<sizeT, BaseErr> index(const ds::Vec<sizeT>& indices) const {
+      SetRetT(sizeT, BaseErr)
 
       if (indices.size() != _shape.size())
-        Err(BaseError("Incorrect number of indices"));
+        Err(BaseErr("Incorrect number of indices"));
       sizeT idx = 0;
       sizeT stride = 1;
       for (int i = static_cast<int>(_shape.size()) - 1; i >= 0; --i) {
         if (indices[i] >= _shape[i])
-          Err(BaseError("Index out of bounds"));
+          Err(BaseErr("Index out of bounds"));
         idx += indices[i] * stride;
         stride *= _shape[i];
       }
@@ -121,6 +128,21 @@ public:
         return tensor;
     }
 
+    Res<void, TensorErr> copy(const Tensor other) {
+      SetRetT(void, TensorErr)
+      if (other.shape() != _shape) {
+        Err("can not copy value from a tensor with different shape")
+      }
+
+      for (int i = 0; i < other.size(); ++i) {
+        if (auto val = dynamic_cast<Tensor*>(other._data[i])) {
+          dynamic_cast<Tensor*> (_data[i])->copy(*val);
+        } else {
+          val = other._data[i];
+        }
+      }
+      Ok()
+    }
 private:
     ds::Vec<sizeT> _shape;
     ds::Vec<valueType> _data;
@@ -135,5 +157,5 @@ private:
     }
 };
 
-} // namespace hiahiahia
+} // namespace hahaha
 #endif //TENSOR_H

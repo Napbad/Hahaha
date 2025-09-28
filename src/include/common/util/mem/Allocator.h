@@ -28,7 +28,7 @@
 
 #include "common/defines/h3defs.h"
 
-namespace hiahiahia::util {
+namespace hahaha::common::util {
 
   template<class T>
   class Allocator {
@@ -99,7 +99,7 @@ public:
       return !(*this == other);
     }
   };
-} // namespace hiahiahia::util
+} // namespace hahaha::common::util
 
 template<class T>
 class Allocator {

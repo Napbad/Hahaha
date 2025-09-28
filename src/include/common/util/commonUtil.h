@@ -27,10 +27,10 @@
 #include "common/Error.h"
 #include "common/Res.h"
 
-namespace hiahiahia::ds {
+namespace hahaha::common::ds {
   class Str;
 }
-namespace hiahiahia::util {
+namespace hahaha::common::util {
 
   class ConvertErr final : public Error {
 
@@ -153,7 +153,7 @@ private:
       Err(ConvertErr(e.what(), __func__));
     }
   }
-} // namespace hiahiahia::util
+} // namespace hahaha::common::util
 
 
 #endif // COMMONUTIL_H

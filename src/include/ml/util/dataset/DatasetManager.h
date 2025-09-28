@@ -28,7 +28,7 @@
 #include <memory>
 #include <unordered_map>
 
-namespace hiahiahia::ml {
+namespace hahaha::ml {
 
 /**
  * Dataset source type
@@ -141,6 +141,6 @@ const std::unordered_map<ds::Str, DatasetConfig> DatasetManager::_datasetConfigs
   }}
 };
 
-} // namespace hiahiahia::ml
+} // namespace hahaha::ml
 
 #endif // HIAHIAHIA_DATASETMANAGER_H 

@@ -26,7 +26,7 @@
 #include <common/Res.h>
 #include <common/Error.h>
 
-namespace hiahiahia::util {
+namespace hahaha::common::util {
 
 /**
  * File error class
@@ -56,6 +56,6 @@ private:
  */
 Res<ds::Str, FileError> readFile(const ds::Str& path);
 
-} // namespace hiahiahia::util
+} // namespace hahaha::common::util
 
 #endif // HIAHIAHIA_FILEUTIL_H

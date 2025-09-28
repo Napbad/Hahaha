@@ -26,7 +26,7 @@
 
 #include "Sample.h"
 
-namespace hiahiahia {
+namespace hahaha {
 namespace ml {
 
 /**
@@ -107,6 +107,6 @@ public:
 };
 
 } // namespace ml
-} // namespace hiahiahia
+} // namespace hahaha
 
 #endif // HIAHIAHIA_DATASET_H

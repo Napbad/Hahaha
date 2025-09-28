@@ -24,7 +24,7 @@
 #include "HttpMethod.h"
 #include "common/ds/map.h"
 
-namespace hiahiahia::util {
+namespace hahaha::common::util {
 
   class HttpResponse {
   public:

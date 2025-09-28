@@ -27,7 +27,7 @@
 #include <fstream>
 #include <sstream>
 
-namespace hiahiahia::ml {
+namespace hahaha::ml {
 
   /**
    * CSV dataset error class
@@ -252,6 +252,6 @@ private:
     }
   };
 
-} // namespace hiahiahia::ml
+} // namespace hahaha::ml
 
 #endif // HIAHIAHIA_CSVDATASET_H 

@@ -23,9 +23,9 @@
 #define STRFINDER_H
 #include "common/ds/str.h"
 
-using hiahiahia::ds::Str;
+using hahaha::common::ds::Str;
 
-namespace hiahiahia::ds {
+namespace hahaha::common::ds {
 
     // KMP
     class StrFinder {
@@ -97,6 +97,6 @@ namespace hiahiahia::ds {
         }
     };
 
-} // namespace hiahiahia
+} // namespace hahaha
 
 #endif //STRFINDER_H

@@ -23,7 +23,7 @@
 #define DEVICE_H
 #include "common/ds/str.h"
 
-namespace hiahiahia {
+namespace hahaha {
 
   enum class DeviceType {
     CPU = 0,
@@ -55,6 +55,6 @@ namespace hiahiahia {
     }
   };
 
-} // namespace hiahiahia
+} // namespace hahaha
 
 #endif //DEVICE_H

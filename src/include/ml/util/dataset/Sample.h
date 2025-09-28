@@ -20,7 +20,7 @@
 
 #include <ml/common/Tensor.h>
 
-namespace hiahiahia::ml {
+namespace hahaha::ml {
 
   /**
    * Sample class
@@ -88,6 +88,6 @@ private:
     Tensor<T> _labels;
   };
 
-} // namespace hiahiahia::ml
+} // namespace hahaha::ml
 
 #endif // HIAHIAHIA_SAMPLE_H

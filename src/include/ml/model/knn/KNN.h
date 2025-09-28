@@ -22,8 +22,8 @@
 #ifndef KNN_H
 #define KNN_H
 
-namespace hiahiahia {
+namespace hahaha {
     class KNN {};
-} // namespace hiahiahia
+} // namespace hahaha
 
 #endif //KNN_H

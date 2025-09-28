@@ -17,7 +17,9 @@
 
 #include <ml/model/linear_regression/LinearRegression.h>
 
-namespace hiahiahia {
+namespace hahaha {
+
+  using namespace hahaha::common;
 
 float LinearRegression::predict(const ds::Vec<float>& features) const {
   float result = _bias;
@@ -58,4 +60,4 @@ void LinearRegression::train(const ds::Vec<ds::Vec<float>>& features, const ds::
   }
 }
 
-} // namespace hiahiahia
+} // namespace hahaha

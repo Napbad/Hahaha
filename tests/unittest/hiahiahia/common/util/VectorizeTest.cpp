@@ -4,7 +4,7 @@
 #include <array>
 #include <cmath>
 
-using namespace hiahiahia::vectorize;
+using namespace hahaha::vectorize;
 
 class VectorizeTest : public ::testing::Test {
 protected:

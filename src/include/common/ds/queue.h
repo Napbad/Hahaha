@@ -26,7 +26,7 @@
 #include <stdexcept>
 #include "Vec.h"
 
-namespace hiahiahia::ds {
+namespace hahaha::common::ds {
 
 template<class T, class Allocator = std::allocator<T>>
 class queue {
@@ -130,6 +130,6 @@ private:
     }
 };
 
-} // namespace hiahiahia::ds
+} // namespace hahaha::common::ds
 
 #endif // QUEUE_H

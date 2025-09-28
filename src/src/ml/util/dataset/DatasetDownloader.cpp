@@ -21,7 +21,7 @@
 #include <fstream>
 #include <sstream>
 
-namespace hiahiahia::ml {
+namespace hahaha::ml {
 
 namespace {
 
@@ -146,4 +146,4 @@ Res<void, DatasetDownloaderError> DatasetDownloader::downloadFromKaggle(
   Ok();
 }
 
-} // namespace hiahiahia::ml
+} // namespace hahaha::ml

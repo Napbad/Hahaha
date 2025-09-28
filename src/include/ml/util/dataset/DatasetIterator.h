@@ -25,7 +25,7 @@
 
 
 #include "common/defines/h3defs.h"
-namespace hiahiahia {
+namespace hahaha {
 
   template <class SampleType>
   class Dataset;
@@ -77,7 +77,7 @@ class DatasetIterator {
     const Dataset<SampleType>* _dataset;
     size_t _index;
   };
-} // namespace hiahiahia
+} // namespace hahaha
 
 
 

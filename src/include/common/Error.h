@@ -25,7 +25,7 @@
 
 #include "ds/str.h"
 
-namespace hiahiahia {
+namespace hahaha::common {
   class Error {
 public:
     virtual ~Error() = default;
@@ -45,17 +45,17 @@ public:
     Error() = default;
   };
 
-  class BaseError : public Error {
+  class BaseErr : public Error {
     const ds::Str TypeName = ds::Str("BaseError");
 
 public:
-    explicit BaseError(ds::Str msg) : _msg(std::move(msg)) {}
-    explicit BaseError(ds::Str msg, ds::Str loc) : _msg(std::move(msg)), _loc(std::move(loc)) {}
-    explicit BaseError(const char *msg) : _msg(msg) {}
-    explicit BaseError(const char *msg, const char *loc) : _msg(msg), _loc(loc) {}
+    explicit BaseErr(ds::Str msg) : _msg(std::move(msg)) {}
+    explicit BaseErr(ds::Str msg, ds::Str loc) : _msg(std::move(msg)), _loc(std::move(loc)) {}
+    explicit BaseErr(const char *msg) : _msg(msg) {}
+    explicit BaseErr(const char *msg, const char *loc) : _msg(msg), _loc(loc) {}
 
-    BaseError() = default;
-    ~BaseError() override = default;
+    BaseErr() = default;
+    ~BaseErr() override = default;
     [[nodiscard]] ds::Str typeName() const override { return TypeName; }
     [[nodiscard]] ds::Str message() const override { return _msg; }
     [[nodiscard]] ds::Str location() const override { return _loc; }
@@ -65,7 +65,7 @@ private:
     ds::Str _msg;
     ds::Str _loc;
   };
-} // namespace hiahiahia
+} // namespace hahaha
 
 
 #endif // ERR_H

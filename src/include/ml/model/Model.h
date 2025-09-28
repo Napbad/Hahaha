@@ -27,7 +27,7 @@
 #include "common/ds/Vec.h"
 
 
-namespace hiahiahia {
+namespace hahaha {
 
     class Model {
     public:
@@ -51,6 +51,6 @@ namespace hiahiahia {
         // Get a name describing the model type
         [[nodiscard]] virtual std::string modelName() const = 0;
     };
-} // namespace hiahiahia
+} // namespace hahaha
 
 #endif //MODEL_H

@@ -22,7 +22,7 @@
 #ifndef ARR_H
 #define ARR_H
 
-namespace hiahiahia::ds {
+namespace hahaha::common::ds {
     template<class T, int len>
     class arr {
     public:
@@ -39,7 +39,7 @@ namespace hiahiahia::ds {
         T data[len];
 
     };
-} // namespace hiahiahia
+} // namespace hahaha
 
 
 #endif //ARR_H

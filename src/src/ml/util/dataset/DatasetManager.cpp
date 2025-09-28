@@ -18,7 +18,7 @@
 #include <ml/util/dataset/DatasetManager.h>
 #include <filesystem>
 
-namespace hiahiahia::ml {
+namespace hahaha::ml {
 
 ds::Str DatasetManager::getDatasetPath(const ds::Str& name) {
   return name + ds::Str(".csv");
@@ -93,4 +93,4 @@ Res<std::shared_ptr<DataLoader<float>>, DatasetManagerError> DatasetManager::get
   Ok(loader);
 }
 
-} // namespace hiahiahia::ml
+} // namespace hahaha::ml

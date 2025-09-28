@@ -27,7 +27,7 @@
 #include "common/defines/h3defs.h"
 
 
-namespace hiahiahia::ds {
+namespace hahaha::common::ds {
   template<class T, class Allocator = std::allocator<T>>
   class Vec {
 
@@ -135,7 +135,7 @@ private:
     sizeT _capacity;
 
   };
-} // namespace hiahiahia::ds
+} // namespace hahaha::common::ds
 
 
 #endif // VEC_H

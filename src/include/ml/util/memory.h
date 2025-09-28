@@ -24,7 +24,7 @@
 #include "common/defines/h3defs.h"
 #include "ml/common/defines.h"
 
-namespace hiahiahia {
+namespace hahaha {
     inline void *hmalloc(uint size) {
         return nullptr;
     }

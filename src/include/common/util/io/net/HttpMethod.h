@@ -24,7 +24,7 @@
 
 #include "common/ds/str.h"
 
-namespace hiahiahia::util {
+namespace hahaha::common::util {
 
   /**
    * HTTP method enum

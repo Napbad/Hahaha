@@ -34,7 +34,7 @@
 #include "common/ds/queue.h"
 #include "common/ds/str.h"
 
-namespace hiahiahia::util {
+namespace hahaha::common::util {
   enum class LogLevel {
     DEBUG,
     INFO,

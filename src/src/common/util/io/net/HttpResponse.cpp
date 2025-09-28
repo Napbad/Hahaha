@@ -23,7 +23,7 @@
 
 #include "common/ds/str.h"
 
-namespace hiahiahia::util {
+namespace hahaha::common::util {
 void HttpResponse::setHeader(const ds::Str& key, const ds::Str& value) {
     _headers[key] = value;
 }

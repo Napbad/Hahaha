@@ -16,34 +16,11 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by Napbad on 8/4/25.
+// Created by napbad on 9/28/25.
 //
 
-#ifndef DATASETLOADER_H
-#define DATASETLOADER_H
-#include "Dataset.h"
-#include "common/ds/str.h"
-
-namespace hiahiahia {
-
-  enum class DatasetSource {
-    MINST,
-    // More
-  };
-
-  class DatasetLoader {
-
-    template<typename SampleType>
-    Dataset<SampleType> loadFromCSV(ds::Str path) {
-
-    }
-
-    template<typename SampleType>
-    Dataset<SampleType> loadFromName(ds::Str name, DatasetSource source) {
-
-    }
-  };
-} // namespace hiahiahia
+class DatasetDownloaderTest : public ::testing::Test {
 
 
-#endif //DATASETLOADER_H
+
+};

@@ -21,9 +21,9 @@
 #!/bin/bash
 
 # 容器和镜像配置
-CONTAINER_NAME="hiahiahia_dev_container"
+CONTAINER_NAME="hahaha_dev_container"
 DOCKERFILE_PATH="Dockerfile"
-IMAGE_TAG="hiahiahia_dev_image:latest"
+IMAGE_TAG="hahaha_dev_image:latest"
 WORKSPACE_DIR="$(pwd)"  # 宿主机当前目录
 
 # 颜色输出

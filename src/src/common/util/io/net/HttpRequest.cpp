@@ -26,7 +26,7 @@
 
 #include "common/ds/str.h"
 
-namespace hiahiahia::util {
+namespace hahaha::common::util {
   HttpRequest::HttpRequest(const ds::Str&  url, const HttpMethod method)
       : _url(std::move(url)), _method(method) {}
 

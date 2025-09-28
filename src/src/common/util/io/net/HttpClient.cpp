@@ -26,7 +26,7 @@
 #include "common/defines/h3defs.h"
 #include "common/util/io/net/HttpRequest.h"
 
-namespace hiahiahia::util {
+namespace hahaha::common::util {
 
 
   sizeT WriteCallback(void* dataBuffer, const sizeT blockSize, const sizeT blockCount, void* userData) {
@@ -98,4 +98,4 @@ namespace hiahiahia::util {
     return response;
 }
 
-} // namespace hiahiahia::ds
+} // namespace hahaha::common::ds

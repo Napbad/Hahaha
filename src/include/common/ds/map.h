@@ -47,7 +47,7 @@
 #include "Vec.h"
 #include "str.h"
 
-namespace hiahiahia::ds {
+namespace hahaha::common::ds {
   template <typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>>
   class Map {
   public:
@@ -102,7 +102,7 @@ namespace hiahiahia::ds {
     std::map<Key, T, Compare, Allocator> _data;
   };
 
-} // namespace hiahiahia::ds
+} // namespace hahaha::common::ds
 
 #endif // MAP_H
 

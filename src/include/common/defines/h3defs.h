@@ -22,7 +22,7 @@
 #ifndef H3DEFS_H
 #define H3DEFS_H
 
-namespace hiahiahia {
+namespace hahaha {
 
   typedef unsigned int uint;
   typedef unsigned long ulong;
@@ -46,6 +46,6 @@ namespace hiahiahia {
   typedef long ptrDiffT;
 
 
-} // namespace hiahiahia
+} // namespace hahaha
 
 #endif //H3DEFS_H
