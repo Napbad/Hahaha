@@ -1,0 +1,30 @@
+  {
+    "name": "HahahaDevContainer",
+    "dockerFile": "../Dockerfile",
+    "image": "hahaha-dev",
+    "build": {
+        "args": {
+          "IMAGE_NAME": "nvidia/cuda",
+          "TARGETARCH": "amd64"
+        }
+    },
+    "runArgs": [
+      "--gpus", "all",
+      "--privileged"
+    ],
+    "mounts": [
+      "type=bind,source=${localWorkspaceFolder},target=/workspace"
+    ],
+    "workspaceFolder": "/workspace",
+    "remoteUser": "root",
+    "postCreateCommand": "echo 'CUDA Dev Container started! Check CUDA with: nvidia-smi'",
+    "customizations": {
+      "vscode": {
+        "extensions": [
+          "ms-vscode.cpptools",
+          "ms-python.python",
+          "streetsidesoftware.code-spell-checker"
+        ]
+      }
+    }
+  }

@@ -1,4 +1,8 @@
 ARG IMAGE_NAME=nvidia/cuda
+ARG TARGETARCH=amd64
+ARG USERNAME=napbad
+ARG USER_UID=1000
+ARG USER_GID=1000
 FROM ${IMAGE_NAME}:13.0.0-runtime-ubuntu24.04 AS base
 
 ENV NV_CUDA_LIB_VERSION="13.0.0-1"
@@ -22,6 +26,7 @@ ENV NV_LIBNCCL_DEV_PACKAGE_NAME=libnccl-dev
 ENV NV_LIBNCCL_DEV_PACKAGE_VERSION=2.27.7-1
 ENV NCCL_VERSION=2.27.7-1
 ENV NV_LIBNCCL_DEV_PACKAGE=${NV_LIBNCCL_DEV_PACKAGE_NAME}=${NV_LIBNCCL_DEV_PACKAGE_VERSION}+cuda13.0
+
 FROM base AS base-arm64
 
 ENV NV_CUDA_CUDART_DEV_VERSION=13.0.48-1
@@ -42,7 +47,6 @@ ENV NV_LIBNCCL_DEV_PACKAGE_VERSION=2.27.7-1
 ENV NCCL_VERSION=2.27.7-1
 ENV NV_LIBNCCL_DEV_PACKAGE=${NV_LIBNCCL_DEV_PACKAGE_NAME}=${NV_LIBNCCL_DEV_PACKAGE_VERSION}+cuda13.0
 
-ARG TARGETARCH=amd64
 FROM base-${TARGETARCH}
 
 LABEL maintainer="NVIDIA CORPORATION <cudatools@nvidia.com>"
@@ -64,7 +68,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN apt-mark hold ${NV_LIBCUBLAS_DEV_PACKAGE_NAME} ${NV_LIBNCCL_DEV_PACKAGE_NAME}
 ENV LIBRARY_PATH=/usr/local/cuda/lib64/stubs
 
-
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
@@ -77,6 +80,7 @@ RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libc-bin \
     vim \
+    sudo \
     python3 \
     swig \
     python3-pip \
@@ -88,10 +92,11 @@ RUN cd /usr/src/googletest && \
     cmake . && \
     cmake --build . --target install  
 
-WORKDIR /workspace
-
 ENV PATH=/usr/local/cuda/bin:${PATH}
 ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:${LD_LIBRARY_PATH}
 
+WORKDIR /workspace
+
 
 CMD ["/bin/bash"]
+
