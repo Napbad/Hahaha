@@ -22,39 +22,39 @@
 #ifndef HIAHIAHIA_FILEUTIL_H
 #define HIAHIAHIA_FILEUTIL_H
 
-#include <common/ds/str.h>
-#include <common/Res.h>
 #include <common/Error.h>
+#include <common/Res.h>
+#include <common/ds/str.h>
 
 namespace hahaha::common::util {
 
-/**
- * File error class
- */
-class FileError final : public Error {
+  /**
+   * File error class
+   */
+  class FileError final : public Error {
 public:
-  explicit FileError(const ds::Str& message, const ds::Str& location = ds::Str("FileUtil")) :
-    _message(message), _location(location) {}
+    explicit FileError(const ds::Str &message, const ds::Str &location = ds::Str("FileUtil")) :
+        _message(message), _location(location) {}
 
-  explicit FileError(const char* message, const ds::Str& location = ds::Str("FileUtil")) :
-    _message(ds::Str(message)), _location(location) {}
+    explicit FileError(const char *message, const ds::Str &location = ds::Str("FileUtil")) :
+        _message(ds::Str(message)), _location(location) {}
 
-  [[nodiscard]] ds::Str typeName() const override { return ds::Str("FileError"); }
-  [[nodiscard]] ds::Str message() const override { return _message; }
-  [[nodiscard]] ds::Str location() const override { return _location; }
-  [[nodiscard]] ds::Str toString() const override {
-    return typeName() + ds::Str(": ") + message() + ds::Str(" at ") + location();
-  }
+    [[nodiscard]] ds::Str typeName() const override { return ds::Str("FileError"); }
+    [[nodiscard]] ds::Str message() const override { return _message; }
+    [[nodiscard]] ds::Str location() const override { return _location; }
+    [[nodiscard]] ds::Str toString() const override {
+      return typeName() + ds::Str(": ") + message() + ds::Str(" at ") + location();
+    }
 
 private:
-  ds::Str _message;
-  ds::Str _location;
-};
+    ds::Str _message;
+    ds::Str _location;
+  };
 
-/**
- * Read a file into a string
- */
-Res<ds::Str, FileError> readFile(const ds::Str& path);
+  /**
+   * Read a file into a string
+   */
+  Res<ds::Str, FileError> readFile(const ds::Str &path);
 
 } // namespace hahaha::common::util
 

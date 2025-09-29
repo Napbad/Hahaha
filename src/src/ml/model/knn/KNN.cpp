@@ -20,4 +20,3 @@
 //
 
 #include "ml/model/knn/KNN.h"
-

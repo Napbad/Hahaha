@@ -22,4 +22,4 @@
 #ifndef HASHSET_H
 #define HASHSET_H
 
-#endif //HASHSET_H
+#endif // HASHSET_H

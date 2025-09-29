@@ -48,9 +48,10 @@
 #include "str.h"
 
 namespace hahaha::common::ds {
-  template <typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>>
+  template<typename Key, typename T, typename Compare = std::less<Key>,
+           typename Allocator = std::allocator<std::pair<const Key, T>>>
   class Map {
-  public:
+public:
     // Type definitions
     using key_type = Key;
     using mapped_type = T;
@@ -59,8 +60,8 @@ namespace hahaha::common::ds {
     using difference_type = ptrdiff_t;
     using key_compare = Compare;
     using allocator_type = Allocator;
-    using reference = value_type&;
-    using const_reference = const value_type&;
+    using reference = value_type &;
+    using const_reference = const value_type &;
     using pointer = typename std::allocator_traits<Allocator>::pointer;
     using const_pointer = typename std::allocator_traits<Allocator>::const_pointer;
     // Iterator types (required for resolving the symbol)
@@ -82,22 +83,16 @@ namespace hahaha::common::ds {
     [[nodiscard]] bool empty() const { return _data.empty(); }
 
     // Element access
-    T& operator[](const Key& key) {
-      return _data[key];
-    }
+    T &operator[](const Key &key) { return _data[key]; }
 
     // Insertion/removal operations
-    std::pair<iterator, bool> insert(const value_type& value) {
-      return _data.insert(value);
-    }
+    std::pair<iterator, bool> insert(const value_type &value) { return _data.insert(value); }
 
-    size_type erase(const Key& key) {
-      return _data.erase(key);
-    }
+    size_type erase(const Key &key) { return _data.erase(key); }
 
     void clear() { _data.clear(); }
 
-  private:
+private:
     // Internal storage using std::map (for interface demonstration only)
     std::map<Key, T, Compare, Allocator> _data;
   };
@@ -105,4 +100,3 @@ namespace hahaha::common::ds {
 } // namespace hahaha::common::ds
 
 #endif // MAP_H
-

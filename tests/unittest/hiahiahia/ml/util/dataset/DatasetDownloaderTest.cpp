@@ -19,8 +19,11 @@
 // Created by napbad on 9/28/25.
 //
 
+#include <gtest/gtest.h>
 class DatasetDownloaderTest : public ::testing::Test {
-
-
-
+  public:
+  void SetUp() override {}
+  void TearDown() override {}
 };
+
+TEST_F(DatasetDownloaderTest, DownloadTest) {}

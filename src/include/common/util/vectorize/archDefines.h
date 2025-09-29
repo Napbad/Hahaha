@@ -40,54 +40,58 @@ namespace hahaha::common::util {
 #endif
   };
 
-  inline Vec4f vadd(const Vec4f& a, const Vec4f& b) {
+  inline Vec4f vadd(const Vec4f &a, const Vec4f &b) {
     Vec4f r{};
 #if defined(__AVX__)
     r.data = _mm_add_ps(a.data, b.data);
 #elif defined(__ARM_NEON)
     r.data = vaddq_f32(a.data, b.data);
 #else
-    for (int i = 0; i < 4; i++) r.data[i] = a.data[i] + b.data[i];
+    for (int i = 0; i < 4; i++)
+      r.data[i] = a.data[i] + b.data[i];
 #endif
     return r;
   }
 
-  inline Vec4f vmul(const Vec4f& a, const Vec4f& b) {
+  inline Vec4f vmul(const Vec4f &a, const Vec4f &b) {
     Vec4f r{};
 #if defined(__AVX__)
     r.data = _mm_mul_ps(a.data, b.data);
 #elif defined(__ARM_NEON)
     r.data = vmulq_f32(a.data, b.data);
 #else
-    for (int i = 0; i < 4; i++) r.data[i] = a.data[i] * b.data[i];
+    for (int i = 0; i < 4; i++)
+      r.data[i] = a.data[i] * b.data[i];
 #endif
     return r;
   }
-  inline Vec4f vsub(const Vec4f& a, const Vec4f& b) {
+  inline Vec4f vsub(const Vec4f &a, const Vec4f &b) {
     Vec4f r{};
 #if defined(__AVX__)
     r.data = _mm_sub_ps(a.data, b.data);
 #elif defined(__ARM_NEON)
     r.data = vsubq_f32(a.data, b.data);
 #else
-    for (int i = 0; i < 4; i++) r.data[i] = a.data[i] - b.data[i];
+    for (int i = 0; i < 4; i++)
+      r.data[i] = a.data[i] - b.data[i];
 #endif
     return r;
   }
 
-    inline Vec4f vdiv(const Vec4f& a, const Vec4f& b) {
-      Vec4f r{};
+  inline Vec4f vdiv(const Vec4f &a, const Vec4f &b) {
+    Vec4f r{};
 #if defined(__AVX__)
-      r.data = _mm_div_ps(a.data, b.data);
+    r.data = _mm_div_ps(a.data, b.data);
 #elif defined(__ARM_NEON)
-      r.data = vdivq_f32(a.data, b.data);
+    r.data = vdivq_f32(a.data, b.data);
 #else
-      for (int i = 0; i < 4; i++) r.data[i] = a.data[i] / b.data[i];
+    for (int i = 0; i < 4; i++)
+      r.data[i] = a.data[i] / b.data[i];
 #endif
     return r;
-    }
+  }
 
-    inline void add_arrays(const float* a, const float* b, float* out, size_t n) {
+  inline void add_arrays(const float *a, const float *b, float *out, size_t n) {
     size_t i = 0;
 
     // process 4 elements at a time
@@ -125,7 +129,7 @@ namespace hahaha::common::util {
   }
 
 
-  inline void sub_arrays(const float* a, const float* b, float* out, size_t n) {
+  inline void sub_arrays(const float *a, const float *b, float *out, size_t n) {
     size_t i = 0;
 
     // process 4 elements at a time
@@ -162,7 +166,7 @@ namespace hahaha::common::util {
     }
   }
 
-  inline void mul_arrays(const float* a, const float* b, float* out, size_t n) {
+  inline void mul_arrays(const float *a, const float *b, float *out, size_t n) {
     size_t i = 0;
 
     // process 4 elements at a time
@@ -199,7 +203,7 @@ namespace hahaha::common::util {
     }
   }
 
-  inline void div_arrays(const float* a, const float* b, float* out, size_t n) {
+  inline void div_arrays(const float *a, const float *b, float *out, size_t n) {
     size_t i = 0;
 
     // process 4 elements at a time
@@ -237,5 +241,5 @@ namespace hahaha::common::util {
   }
 
 
-}
+} // namespace hahaha::common::util
 #endif // HAHAHA_VECTORIZE_H

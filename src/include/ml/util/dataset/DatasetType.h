@@ -27,8 +27,8 @@ namespace hahaha {
     MNIST,
     CIFAR10,
     CIFAR100,
-};
+  };
 } // namespace hahaha
 
 
-#endif //DATASETTYPE_H
+#endif // DATASETTYPE_H

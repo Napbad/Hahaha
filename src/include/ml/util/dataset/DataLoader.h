@@ -18,12 +18,12 @@
 #ifndef HIAHIAHIA_DATALOADER_H
 #define HIAHIAHIA_DATALOADER_H
 
-#include <common/ds/Vec.h>
-#include <common/Res.h>
 #include <common/Error.h>
+#include <common/Res.h>
+#include <common/ds/Vec.h>
+#include <memory>
 #include <ml/util/dataset/Dataset.h>
 #include <ml/util/dataset/Sample.h>
-#include <memory>
 #include <random>
 
 namespace hahaha::ml {
@@ -208,4 +208,4 @@ private:
 
 } // namespace hahaha::ml
 
-#endif // HIAHIAHIA_DATALOADER_H 
+#endif // HIAHIAHIA_DATALOADER_H

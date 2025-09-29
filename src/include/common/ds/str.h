@@ -29,7 +29,7 @@
 
 namespace hahaha::common::ds {
   class Str {
-  public:
+public:
     static const sizeT npos = static_cast<sizeT>(-1);
 
     Str() : _data(new char[1]), _size(0), _capacity(0) { _data[0] = '\0'; }
@@ -53,14 +53,14 @@ namespace hahaha::common::ds {
       other._size = 0;
       other._capacity = 0;
     }
-    Str(char *begin, const char * end) {
+    Str(char *begin, const char *end) {
       _size = end - begin;
       _capacity = end - begin;
 
       _data = new char[_size];
       std::copy_n(begin, _size, _data);
     }
-    explicit Str(const std::string & string) {
+    explicit Str(const std::string &string) {
       _data = new char[string.size() + 1];
       _size = string.size();
       std::strcpy(_data, string.c_str());
@@ -68,14 +68,14 @@ namespace hahaha::common::ds {
       _data[_size] = '\0';
     }
 
-    explicit Str (const std::stringstream &ss) {
+    explicit Str(const std::stringstream &ss) {
       _data = new char[ss.str().size() + 1];
       _size = ss.str().size();
       std::strcpy(_data, ss.str().c_str());
       _capacity = ss.str().size();
       _data[_size] = '\0';
     }
-    explicit Str(const std::ostringstream & oss) {
+    explicit Str(const std::ostringstream &oss) {
       _data = new char[oss.str().size() + 1];
       _size = oss.str().size();
       std::strcpy(_data, oss.str().c_str());
@@ -237,9 +237,9 @@ namespace hahaha::common::ds {
         _capacity = n;
       }
     }
-    void append(char * contents, sizeT size);
+    void append(char *contents, sizeT size);
 
-  private:
+private:
     char *_data;
     sizeT _size;
     sizeT _capacity;
@@ -276,27 +276,23 @@ namespace hahaha::common::ds {
     return result;
   }
 
-  inline std::ostream& operator<<(std::ostream& os, const ds::Str& str) {
+  inline std::ostream &operator<<(std::ostream &os, const ds::Str &str) {
     os << str.c_str();
     return os;
   }
 
-  inline Str operator+(const Str& a, const std::string& b) {
-    return a + Str(b);
-  }
+  inline Str operator+(const Str &a, const std::string &b) { return a + Str(b); }
 
-  inline Str operator+(const std::string& a, const Str& b) {
-    return Str(a) + b;
-  }
+  inline Str operator+(const std::string &a, const Str &b) { return Str(a) + b; }
 } // namespace hahaha::common::ds
 
 // Hash specialization for ds::Str
 namespace std {
   template<>
   struct hash<hahaha::common::ds::Str> {
-    size_t operator()(const hahaha::common::ds::Str& s) const noexcept {
+    size_t operator()(const hahaha::common::ds::Str &s) const noexcept {
       size_t hash = 5381;
-      const char* str = s.c_str();
+      const char *str = s.c_str();
       while (*str) {
         hash = ((hash << 5) + hash) + *str++;
       }

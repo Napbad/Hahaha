@@ -29,6 +29,11 @@
 
 namespace hahaha::common::util {
 
+  void deleteFile(const ds::Str &path) {
+    std::filesystem::path p((path.data()));
+    std::filesystem::remove(p);
+  }
+
   bool fileExists(const ds::Str &path) {
     std::filesystem::path p((path.data()));
     return std::filesystem::exists(p);
@@ -37,7 +42,7 @@ namespace hahaha::common::util {
     std::filesystem::path p((dir.data()));
     return std::filesystem::create_directory(p);
   }
-  Res<ds::Str, FileError> readFile(const ds::Str& path) {
+  Res<ds::Str, FileError> readFile(const ds::Str &path) {
     SetRetT(ds::Str, FileError);
 
     std::ifstream file(path.data());

@@ -27,86 +27,80 @@
 #include "Sample.h"
 
 namespace hahaha {
-namespace ml {
+  namespace ml {
 
-/**
- * Dataset error class
- */
-class DatasetError : public Error {
-public:
-  explicit DatasetError(ds::Str message, ds::Str location = ds::Str("dataset"))
-    : _message(std::move(message)), _location(std::move(location)) {}
+    /**
+     * Dataset error class
+     */
+    class DatasetError : public Error {
+  public:
+      explicit DatasetError(ds::Str message, ds::Str location = ds::Str("dataset")) :
+          _message(std::move(message)), _location(std::move(location)) {}
 
-  [[nodiscard]] ds::Str typeName() const override { return ds::Str("DatasetError"); }
-  [[nodiscard]] ds::Str message() const override { return _message; }
-  [[nodiscard]] ds::Str location() const override { return _location; }
-  [[nodiscard]] ds::Str toString() const override { 
-    return typeName() + ds::Str(": ") + message() + ds::Str(" at ") + location();
-  }
+      [[nodiscard]] ds::Str typeName() const override { return ds::Str("DatasetError"); }
+      [[nodiscard]] ds::Str message() const override { return _message; }
+      [[nodiscard]] ds::Str location() const override { return _location; }
+      [[nodiscard]] ds::Str toString() const override {
+        return typeName() + ds::Str(": ") + message() + ds::Str(" at ") + location();
+      }
 
-private:
-  ds::Str _message;
-  ds::Str _location;
-};
+  private:
+      ds::Str _message;
+      ds::Str _location;
+    };
 
-/**
- * Dataset interface
- * 
- * Base class for all dataset implementations
- */
-template<typename T>
-class Dataset {
-public:
-  virtual ~Dataset() = default;
+    /**
+     * Dataset interface
+     *
+     * Base class for all dataset implementations
+     */
+    template<typename T>
+    class Dataset {
+  public:
+      virtual ~Dataset() = default;
 
-  /**
-   * Load the dataset
-   */
-  virtual Res<void, DatasetError> load() = 0;
+      /**
+       * Load the dataset
+       */
+      virtual Res<void, DatasetError> load() = 0;
 
-  /**
-   * Get the size of the dataset
-   */
-  [[nodiscard]] virtual size_t size() const = 0;
+      /**
+       * Get the size of the dataset
+       */
+      [[nodiscard]] virtual size_t size() const = 0;
 
-  /**
-   * Get a sample by index
-   */
-  [[nodiscard]] virtual Res<Sample<T>, DatasetError> get(size_t index) const = 0;
+      /**
+       * Get a sample by index
+       */
+      [[nodiscard]] virtual Res<Sample<T>, DatasetError> get(size_t index) const = 0;
 
-  /**
-   * Get the feature dimension
-   */
-  [[nodiscard]] virtual size_t featureDim() const = 0;
+      /**
+       * Get the feature dimension
+       */
+      [[nodiscard]] virtual size_t featureDim() const = 0;
 
-  /**
-   * Get the label dimension
-   */
-  [[nodiscard]] virtual size_t labelDim() const = 0;
+      /**
+       * Get the label dimension
+       */
+      [[nodiscard]] virtual size_t labelDim() const = 0;
 
-  /**
-   * Get feature names if available
-   */
-  [[nodiscard]] virtual ds::Vec<ds::Str> featureNames() const {
-    return ds::Vec<ds::Str>();
-  }
+      /**
+       * Get feature names if available
+       */
+      [[nodiscard]] virtual ds::Vec<ds::Str> featureNames() const { return ds::Vec<ds::Str>(); }
 
-  /**
-   * Get label names if available
-   */
-  [[nodiscard]] virtual ds::Vec<ds::Str> labelNames() const {
-    return ds::Vec<ds::Str>();
-  }
+      /**
+       * Get label names if available
+       */
+      [[nodiscard]] virtual ds::Vec<ds::Str> labelNames() const { return ds::Vec<ds::Str>(); }
 
-  /**
-   * Get dataset description if available
-   */
-  [[nodiscard]] virtual ds::Str description() const {
-    return ds::Str();
-  }
-};
+      /**
+       * Get dataset description if available
+       */
+      [[nodiscard]] virtual ds::Str description() const { return ds::Str(); }
+    };
 
-} // namespace ml
+  } // namespace ml
 } // namespace hahaha
 
 #endif // HIAHIAHIA_DATASET_H

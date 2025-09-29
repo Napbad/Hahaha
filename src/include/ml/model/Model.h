@@ -26,31 +26,31 @@
 
 #include "common/ds/Vec.h"
 
-
 namespace hahaha {
 
-    class Model {
-    public:
-        virtual ~Model() = default;
+  using namespace hahaha::common;
+  class Model {
+public:
+    virtual ~Model() = default;
 
-        // Train the model with given features and labels
-        virtual void train(const ds::Vec<ds::Vec<float>>& features, const ds::Vec<float>& labels) = 0;
+    // Train the model with given features and labels
+    virtual void train(const ds::Vec<ds::Vec<float>> &features, const ds::Vec<float> &labels) = 0;
 
-        // Make a prediction given input features
-        [[nodiscard]] virtual float predict(const ds::Vec<float>& features) const = 0;
+    // Make a prediction given input features
+    [[nodiscard]] virtual float predict(const ds::Vec<float> &features) const = 0;
 
-        // Save the model to a file
-        [[nodiscard]] virtual bool save(const std::string& filepath) const = 0;
+    // Save the model to a file
+    [[nodiscard]] virtual bool save(const std::string &filepath) const = 0;
 
-        // Load the model from a file
-        virtual bool load(const std::string& filepath) = 0;
+    // Load the model from a file
+    virtual bool load(const std::string &filepath) = 0;
 
-        // Get the number of parameters in the model
-        [[nodiscard]] virtual size_t parameterCount() const = 0;
+    // Get the number of parameters in the model
+    [[nodiscard]] virtual size_t parameterCount() const = 0;
 
-        // Get a name describing the model type
-        [[nodiscard]] virtual std::string modelName() const = 0;
-    };
+    // Get a name describing the model type
+    [[nodiscard]] virtual std::string modelName() const = 0;
+  };
 } // namespace hahaha
 
-#endif //MODEL_H
+#endif // MODEL_H

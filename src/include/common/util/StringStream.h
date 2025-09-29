@@ -22,8 +22,6 @@
 #ifndef HIAHIAHIA_STRINGSTREAM_H
 #define HIAHIAHIA_STRINGSTREAM_H
 
-class StringStream {
-
-};
+class StringStream {};
 
 #endif // HIAHIAHIA_STRINGSTREAM_H

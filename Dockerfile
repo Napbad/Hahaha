@@ -1,8 +1,6 @@
 ARG IMAGE_NAME=nvidia/cuda
 ARG TARGETARCH=amd64
-ARG USERNAME=napbad
-ARG USER_UID=1000
-ARG USER_GID=1000
+
 FROM ${IMAGE_NAME}:13.0.0-runtime-ubuntu24.04 AS base
 
 ENV NV_CUDA_LIB_VERSION="13.0.0-1"
@@ -85,6 +83,8 @@ RUN apt-get update && apt-get install -y \
     swig \
     python3-pip \
     libgtest-dev \
+    clang \
+    clang-format\
     && rm -rf /var/lib/apt/lists/*
 
 # Build and install Google Test from source
@@ -92,11 +92,15 @@ RUN cd /usr/src/googletest && \
     cmake . && \
     cmake --build . --target install  
 
+# RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+
 ENV PATH=/usr/local/cuda/bin:${PATH}
 ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:${LD_LIBRARY_PATH}
 
 WORKDIR /workspace
 
+# RUN cd /workspace/src/python/ 
+# RUN uv sync
 
 CMD ["/bin/bash"]
 

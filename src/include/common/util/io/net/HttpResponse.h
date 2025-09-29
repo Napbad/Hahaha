@@ -21,28 +21,27 @@
 
 #ifndef HIAHIAHIA_HTTPRESPONSE_H
 #define HIAHIAHIA_HTTPRESPONSE_H
-#include "HttpMethod.h"
 #include "common/ds/map.h"
 
 namespace hahaha::common::util {
 
   class HttpResponse {
-  public:
+public:
     HttpResponse() : _statusCode(0) {}
 
     void setStatusCode(const int code) { _statusCode = code; }
-    void setHeader(const ds::Str& key, const ds::Str& value);
-    void setBody(const ds::Str& body) { _body = body; }
+    void setHeader(const ds::Str &key, const ds::Str &value);
+    void setBody(const ds::Str &body) { _body = body; }
 
     [[nodiscard]] int getStatusCode() const { return _statusCode; }
-    [[nodiscard]] const ds::Map<ds::Str, ds::Str>& getHeaders() const { return _headers; }
-    [[nodiscard]] const ds::Str& getBody() const { return _body; }
+    [[nodiscard]] const ds::Map<ds::Str, ds::Str> &getHeaders() const { return _headers; }
+    [[nodiscard]] const ds::Str &getBody() const { return _body; }
 
-  private:
+private:
     int _statusCode;
     ds::Map<ds::Str, ds::Str> _headers;
     ds::Str _body;
   };
 
-}
+} // namespace hahaha::common::util
 #endif // HIAHIAHIA_HTTPRESPONSE_H

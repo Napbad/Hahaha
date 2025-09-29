@@ -25,15 +25,12 @@
 
 namespace hahaha {
 
-  enum class DeviceType {
-    CPU = 0,
-    GPU = 1
-  };
+  enum class DeviceType { CPU = 0, GPU = 1 };
 
   using ds::Str;
 
   class Device {
-  public:
+public:
     virtual ~Device() = default;
 
     [[nodiscard]] virtual DeviceType type() const = 0;
@@ -46,15 +43,11 @@ namespace hahaha {
 
     virtual void activate() const = 0;
 
-    bool operator==(const Device& other) const {
-      return type() == other.type() && id() == other.id();
-    }
+    bool operator==(const Device &other) const { return type() == other.type() && id() == other.id(); }
 
-    bool operator!=(const Device& other) const {
-      return !(*this == other);
-    }
+    bool operator!=(const Device &other) const { return !(*this == other); }
   };
 
 } // namespace hahaha
 
-#endif //DEVICE_H
+#endif // DEVICE_H

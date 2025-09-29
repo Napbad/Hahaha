@@ -22,4 +22,4 @@
 #ifndef STRBUF_H
 #define STRBUF_H
 
-#endif //STRBUF_H
+#endif // STRBUF_H

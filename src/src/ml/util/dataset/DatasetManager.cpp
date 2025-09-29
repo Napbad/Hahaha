@@ -15,82 +15,66 @@
 // Email: napbad.sen@gmail.com
 // GitHub: https://github.com/Napbad
 
-#include <ml/util/dataset/DatasetManager.h>
 #include <filesystem>
+#include <ml/util/dataset/DatasetManager.h>
 
 namespace hahaha::ml {
 
-ds::Str DatasetManager::getDatasetPath(const ds::Str& name) {
-  return name + ds::Str(".csv");
-}
+  ds::Str DatasetManager::getDatasetPath(const ds::Str &name) { return name + ds::Str(".csv"); }
 
-ds::Str DatasetManager::getDatasetUrl(const ds::Str& name, DatasetSource source, const DatasetConfig& config) {
-  switch (source) {
-    case DatasetSource::UCI:
-      return ds::Str("https://archive.ics.uci.edu/ml/machine-learning-databases/") + 
-             name + ds::Str("/") + name + ds::Str(".data");
-    
-    case DatasetSource::SKLEARN:
-    case DatasetSource::URL:
-      return config.url;
-    
-    case DatasetSource::KAGGLE:
-      return ds::Str("https://www.kaggle.com/api/v1/datasets/download/") + 
-             config.owner + ds::Str("/") + name;
-    
-    default:
-      return {};
-  }
-}
+  ds::Str DatasetManager::getDatasetUrl(const ds::Str &name, DatasetSource source, const DatasetConfig &config) {
+    switch (source) {
+      case DatasetSource::UCI:
+        return ds::Str("https://archive.ics.uci.edu/ml/machine-learning-databases/") + name + ds::Str("/") + name +
+               ds::Str(".data");
 
-Res<std::shared_ptr<DataLoader<float>>, DatasetManagerError> DatasetManager::getDataset(
-  const ds::Str& name,
-  DatasetSource source,
-  size_t batchSize,
-  bool shuffle
-) {
-  SetRetT(std::shared_ptr<DataLoader<float>>, DatasetManagerError);
+      case DatasetSource::SKLEARN:
+      case DatasetSource::URL:
+        return config.url;
 
-  // Find pre-configured dataset
-  auto it = _datasetConfigs.find(name);
-  if (it == _datasetConfigs.end()) {
-    Err(DatasetManagerError(ds::Str("Dataset not found: ") + name));
+      case DatasetSource::KAGGLE:
+        return ds::Str("https://www.kaggle.com/api/v1/datasets/download/") + config.owner + ds::Str("/") + name;
+
+      default:
+        return {};
+    }
   }
 
-  return getDatasetWithConfig(name, it->second, source, batchSize, shuffle);
-}
+  Res<std::shared_ptr<DataLoader<float>>, DatasetManagerError>
+  DatasetManager::getDataset(const ds::Str &name, DatasetSource source, size_t batchSize, bool shuffle) {
+    SetRetT(std::shared_ptr<DataLoader<float>>, DatasetManagerError);
 
-Res<std::shared_ptr<DataLoader<float>>, DatasetManagerError> DatasetManager::getDatasetWithConfig(
-  const ds::Str& name,
-  const DatasetConfig& config,
-  DatasetSource source,
-  size_t batchSize,
-  bool shuffle
-) {
-  SetRetT(std::shared_ptr<DataLoader<float>>, DatasetManagerError);
+    // Find pre-configured dataset
+    auto it = _datasetConfigs.find(name);
+    if (it == _datasetConfigs.end()) {
+      Err(DatasetManagerError(ds::Str("Dataset not found: ") + name));
+    }
 
-  // Get dataset path and URL
-  ds::Str path = getDatasetPath(name);
-  ds::Str url = getDatasetUrl(name, source, config);
-
-  // Create dataset
-  auto dataset = std::make_shared<CSVDataset<float>>(
-    path,
-    config.featureCols,
-    config.labelCols,
-    config.hasHeader,
-    config.delimiter
-  );
-
-  // Load the dataset
-  auto loadResult = dataset->load();
-  if (loadResult.isErr()) {
-    Err(DatasetManagerError(loadResult.unwrapErr().message()));
+    return getDatasetWithConfig(name, it->second, source, batchSize, shuffle);
   }
 
-  // Create and return data loader
-  auto loader = std::make_shared<DataLoader<float>>(dataset, batchSize, shuffle);
-  Ok(loader);
-}
+  Res<std::shared_ptr<DataLoader<float>>, DatasetManagerError>
+  DatasetManager::getDatasetWithConfig(const ds::Str &name, const DatasetConfig &config, DatasetSource source,
+                                       size_t batchSize, bool shuffle) {
+    SetRetT(std::shared_ptr<DataLoader<float>>, DatasetManagerError);
+
+    // Get dataset path and URL
+    ds::Str path = getDatasetPath(name);
+    ds::Str url = getDatasetUrl(name, source, config);
+
+    // Create dataset
+    auto dataset = std::make_shared<CSVDataset<float>>(path, config.featureCols, config.labelCols, config.hasHeader,
+                                                       config.delimiter);
+
+    // Load the dataset
+    auto loadResult = dataset->load();
+    if (loadResult.isErr()) {
+      Err(DatasetManagerError(loadResult.unwrapErr().message()));
+    }
+
+    // Create and return data loader
+    auto loader = std::make_shared<DataLoader<float>>(dataset, batchSize, shuffle);
+    Ok(loader);
+  }
 
 } // namespace hahaha::ml

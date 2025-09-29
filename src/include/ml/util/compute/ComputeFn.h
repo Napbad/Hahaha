@@ -26,42 +26,30 @@
 
 namespace hahaha::ml::util {
   // define some common functions for compute graph usage
-  class ComputeErr final : public BaseErr {
-
-  };
+  class ComputeErr final : public BaseErr {};
 
   class ComputeFn {
-  public:
+public:
     template<typename T>
     Res<Tensor<T>, ComputeErr> add(Tensor<T> src1, Tensor<T> src2) {
-      SetRetT(Tensor<T>, ComputeErr)
-      if (src1.shape() != src2. shape()) {
-        Err("the src1's shape is not same to the src2!")
-      }
-      Ok(src1 + src2);
+      SetRetT(Tensor<T>, ComputeErr) if (src1.shape() != src2.shape()){
+              Err("the src1's shape is not same to the src2!")} Ok(src1 + src2);
     }
 
     template<typename T>
     Res<Tensor<T>, ComputeErr> mul(Tensor<T> src1, Tensor<T> src2) {
-      SetRetT(Tensor<T>, ComputeErr)
-      if (src1.shape() != src2. shape()) {
-        Err("the src1's shape is not same to the src2!")
-      }
-      Ok(src1 * src2);
+      SetRetT(Tensor<T>, ComputeErr) if (src1.shape() != src2.shape()){
+              Err("the src1's shape is not same to the src2!")} Ok(src1 * src2);
     }
 
     template<typename T>
     Res<Tensor<T>, ComputeErr> sub(Tensor<T> src1, Tensor<T> src2) {
-      SetRetT(Tensor<T>, ComputeErr)
-      if (src1.shape() != src2. shape()) {
-        Err("the src1's shape is not same to the src2!")
-      }
-      Ok(src1 - src2);
+      SetRetT(Tensor<T>, ComputeErr) if (src1.shape() != src2.shape()){
+              Err("the src1's shape is not same to the src2!")} Ok(src1 - src2);
     }
   };
 
 
-
-}
+} // namespace hahaha::ml::util
 
 #endif // HAHAHA_COMPUTEFN_H

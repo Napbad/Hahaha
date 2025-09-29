@@ -24,8 +24,6 @@
 #include "common/ds/str.h"
 
 namespace hahaha::common::util {
-void HttpResponse::setHeader(const ds::Str& key, const ds::Str& value) {
-    _headers[key] = value;
-}
+  void HttpResponse::setHeader(const ds::Str &key, const ds::Str &value) { _headers[key] = value; }
 
-}
+} // namespace hahaha::common::util

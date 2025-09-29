@@ -18,91 +18,83 @@
 # Email: napbad.sen@gmail.com
 # GitHub: https://github.com/Napbad
 #
-#!/bin/bash
 
-# 容器和镜像配置
 CONTAINER_NAME="hahaha_dev_container"
 DOCKERFILE_PATH="Dockerfile"
-IMAGE_TAG="hahaha_dev_image:latest"
-WORKSPACE_DIR="$(pwd)"  # 宿主机当前目录
+IMAGE_TAG="hahaha_dev"
+WORKSPACE_DIR="$(pwd)"
 
-# 颜色输出
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # 无颜色
+NC='\033[0m' 
 
-# 检查容器是否存在
 container_exists() {
     docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"
 }
 
-# 检查容器是否正在运行
 container_running() {
     docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"
 }
 
-# 获取容器使用的镜像
 get_container_image() {
-    docker inspect -f '{{.Config.Image}}' "${CONTAINER_NAME}" 2>/dev/null
+    # Return the image ID (sha) used by the container if it exists
+    docker inspect -f '{{.Image}}' "${CONTAINER_NAME}" 2>/dev/null
 }
 
-# 获取Dockerfile构建的镜像ID (改进版本)
 get_dockerfile_image_id() {
-    # 回退到直接检查镜像标签
     local image_id=$(docker images -q "${IMAGE_TAG}" 2>/dev/null)
     if [ -n "$image_id" ]; then
         echo "$image_id"
         return 0
     fi
 
-    # 如果镜像不存在，返回空
     return 1
 }
 
-# 构建镜像 (改进版本)
 build_image() {
-    echo -e "${BLUE}正在构建镜像: ${IMAGE_TAG}${NC}"
+    echo -e "${BLUE}Building image: ${IMAGE_TAG}${NC}"
 
-    # 尝试使用BuildKit (如果可用)
     if docker buildx version >/dev/null 2>&1; then
-        echo -e "${YELLOW}使用 buildx 构建镜像${NC}"
-        docker buildx build -t "${IMAGE_TAG}" -f "${DOCKERFILE_PATH}" .
+        echo -e "${YELLOW}Using buildx to build image${NC}"
+        # Use --load so the built image is available to the local docker daemon
+        # and pass host user args so the image user matches the host
+        docker buildx build --load -t "${IMAGE_TAG}" -f "${DOCKERFILE_PATH}" \
+            --build-arg USERNAME="$(id -un)" --build-arg USER_UID="$(id -u)" --build-arg USER_GID="$(id -g)" .
     else
-        echo -e "${YELLOW}使用普通 docker build 构建镜像${NC}"
-        docker build -t "${IMAGE_TAG}" -f "${DOCKERFILE_PATH}" .
+        echo -e "${YELLOW}Using docker build to build image${NC}"
+        docker build -t "${IMAGE_TAG}" -f "${DOCKERFILE_PATH}" \
+            --build-arg USERNAME="$(id -un)" --build-arg USER_UID="$(id -u)" --build-arg USER_GID="$(id -g)" .
     fi
 
     if [ $? -ne 0 ]; then
-        echo -e "${RED}镜像构建失败${NC}"
+        echo -e "${RED}Image build failed${NC}"
         exit 1
     fi
-    echo -e "${GREEN}镜像构建成功${NC}"
+    echo -e "${GREEN}Image build succeeded${NC}"
 }
 
-# 重新创建容器
 recreate_container() {
-    echo -e "${BLUE}正在重新创建容器: ${CONTAINER_NAME}${NC}"
+    echo -e "${BLUE}Recreating container: ${CONTAINER_NAME}${NC}"
 
-    # 停止并删除现有容器
     if container_running; then
-        echo -e "${YELLOW}停止现有容器${NC}"
+        echo -e "${YELLOW}Stopping existing container${NC}"
         docker stop "${CONTAINER_NAME}" >/dev/null
     fi
 
-    echo -e "${YELLOW}删除现有容器${NC}"
+    echo -e "${YELLOW}Removing existing container${NC}"
     docker rm "${CONTAINER_NAME}" >/dev/null
 
-    # 创建并启动新容器
+    # Create and start a new container
     create_and_start_container
 }
 
 # 创建并启动容器
 create_and_start_container() {
-    echo -e "${BLUE}正在创建并启动容器: ${CONTAINER_NAME}${NC}"
+    echo -e "${BLUE}Creating and starting container: ${CONTAINER_NAME}${NC}"
 
-    # 启动容器，将当前目录挂载到容器的~/workspace
+    # Start the container, mount the current directory to /workspace
     docker run -d \
         --name "${CONTAINER_NAME}" \
         -v "${WORKSPACE_DIR}:/workspace" \
@@ -116,53 +108,53 @@ create_and_start_container() {
         tail -f /dev/null
 
     if [ $? -ne 0 ]; then
-        echo -e "${RED}容器启动失败${NC}"
+        echo -e "${RED}Failed to start container${NC}"
         exit 1
     fi
-    echo -e "${GREEN}容器启动成功${NC}"
+    echo -e "${GREEN}Container started successfully${NC}"
 }
 
 # 启动已存在的容器
 start_existing_container() {
-    echo -e "${BLUE}正在启动容器: ${CONTAINER_NAME}${NC}"
+    echo -e "${BLUE}Starting container: ${CONTAINER_NAME}${NC}"
     docker start "${CONTAINER_NAME}"
     if [ $? -ne 0 ]; then
-        echo -e "${RED}容器启动失败${NC}"
+        echo -e "${RED}Failed to start container${NC}"
         exit 1
     fi
-    echo -e "${GREEN}容器启动成功${NC}"
+    echo -e "${GREEN}Container started successfully${NC}"
 }
 
 # 进入容器
 enter_container() {
-    echo -e "${BLUE}正在进入容器: ${CONTAINER_NAME}${NC}"
+    echo -e "${BLUE}Entering container: ${CONTAINER_NAME}${NC}"
     docker exec -it "${CONTAINER_NAME}" /bin/bash
 }
 
 # 主逻辑
 main() {
-    # 检查容器是否存在
+    # Check whether the container exists
     if container_exists; then
-        echo -e "${YELLOW}检测到同名容器: ${CONTAINER_NAME}${NC}"
+        echo -e "${YELLOW}Found existing container: ${CONTAINER_NAME}${NC}"
 
-        # 检查容器是否正在运行
+        # Check whether it's running
         if container_running; then
-            echo -e "${YELLOW}容器正在运行${NC}"
+            echo -e "${YELLOW}Container is currently running${NC}"
 
-            # 获取容器当前使用的镜像
-            current_image=$(get_container_image)
-            echo -e "${YELLOW}容器当前使用的镜像: ${current_image}${NC}"
+            # Get image ID used by the running container
+            current_image_id=$(get_container_image)
+            echo -e "${YELLOW}Container image ID: ${current_image_id}${NC}"
 
-            # 获取Dockerfile构建的镜像ID
-            dockerfile_image=$(get_dockerfile_image_id)
-            echo -e "${YELLOW}Dockerfile对应的镜像: ${dockerfile_image}${NC}"
+            # Get image ID built from Dockerfile (if present)
+            dockerfile_image_id=$(get_dockerfile_image_id)
+            echo -e "${YELLOW}Dockerfile image ID: ${dockerfile_image_id}${NC}"
 
-            # 检查镜像是否匹配
-            if [ "$current_image" = "$dockerfile_image" ]; then
-                echo -e "${GREEN}镜像匹配，使用现有容器${NC}"
+            # Compare image IDs
+            if [ -n "$dockerfile_image_id" ] && [ "$current_image_id" = "$dockerfile_image_id" ]; then
+                echo -e "${GREEN}Image matches container; using existing container${NC}"
             else
-                echo -e "${RED}镜像不匹配，更新容器${NC}"
-                read -p "是否更新容器? [Y/n]: " answer
+                echo -e "${RED}Image mismatch or Dockerfile image not found; updating container${NC}"
+                read -p "Update container? [Y/n]: " answer
                 answer=${answer:-Y}
                 if [[ $answer =~ ^[Yy]$ ]]; then
                     build_image
@@ -170,38 +162,40 @@ main() {
                 fi
             fi
 
-            # 询问用户是否进入容器
-            read -p "是否进入容器? [Y/n]: " answer
+            # Ask whether to enter the container
+            read -p "Enter container now? [Y/n]: " answer
             answer=${answer:-Y}
             if [[ $answer =~ ^[Yy]$ ]]; then
                 enter_container
             fi
         else
-            echo -e "${YELLOW}容器未运行，正在启动${NC}"
+            echo -e "${YELLOW}Container is not running; starting it${NC}"
             start_existing_container
 
-            # 询问用户是否进入容器
-            read -p "是否进入容器? [Y/n]: " answer
+            # Ask whether to enter the container
+            read -p "Enter container now? [Y/n]: " answer
             answer=${answer:-Y}
             if [[ $answer =~ ^[Yy]$ ]]; then
                 enter_container
             fi
         fi
     else
-        echo -e "${YELLOW}未找到同名容器${NC}"
+        echo -e "${YELLOW}No existing container found${NC}"
 
-        # 检查是否有最新的镜像
-        if docker images -q "${IMAGE_TAG}" >/dev/null 2>&1; then
-            echo -e "${YELLOW}找到现有镜像: ${IMAGE_TAG}${NC}"
+        # If image exists locally, create the container; otherwise build then create
+        # Note: `docker run` will attempt to pull the image from a registry if it
+        # is not present locally. We check explicitly for a local image here.
+        if [ -n "$(docker images -q "${IMAGE_TAG}")" ]; then
+            echo -e "${YELLOW}Found existing image: ${IMAGE_TAG}${NC}"
             create_and_start_container
         else
-            echo -e "${YELLOW}未找到镜像，开始构建${NC}"
+            echo -e "${YELLOW}Image not found; building${NC}"
             build_image
             create_and_start_container
         fi
 
-        # 询问用户是否进入容器
-        read -p "是否进入容器? [Y/n]: " answer
+        # Ask whether to enter the container
+        read -p "Enter container now? [Y/n]: " answer
         answer=${answer:-Y}
         if [[ $answer =~ ^[Yy]$ ]]; then
             enter_container

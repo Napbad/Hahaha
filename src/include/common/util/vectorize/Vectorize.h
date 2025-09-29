@@ -27,19 +27,18 @@ namespace hahaha::common::util {
   using ml::Tensor;
 
   class VectorizeErr final : public BaseErr {
-  public:
+public:
     VectorizeErr() = default;
     explicit VectorizeErr(const char *msg) : BaseErr(msg) {}
   };
 
   class Vectorize {
 
-  public:
+public:
     template<typename T>
     static Res<Tensor<T>, VectorizeErr> add(std::initializer_list<Tensor<T>> list) {
-      SetRetT(Tensor<T>, VectorizeErr)
-      auto shape = list.begin()->shape();
-      for (auto &tensor : list) {
+      SetRetT(Tensor<T>, VectorizeErr) auto shape = list.begin()->shape();
+      for (auto &tensor: list) {
         if (shape != tensor.shape()) {
           Err("Wrong tensor type during calc!")
         }
@@ -47,17 +46,17 @@ namespace hahaha::common::util {
 
       auto res = Tensor<T>(shape);
       res.fill(0);
+      auto tmp = res;
       for (auto &val: list) {
         res += val;
       }
       Ok(res)
     }
 
-    template <typename T>
+    template<typename T>
     Res<Tensor<T>, VectorizeErr> sub(std::initializer_list<Tensor<T>> list) {
-      SetRetT(Tensor<T>, VectorizeErr)
-     auto shape = list.begin()->shape();
-      for (auto &tensor : list) {
+      SetRetT(Tensor<T>, VectorizeErr) auto shape = list.begin()->shape();
+      for (auto &tensor: list) {
         if (shape != tensor.shape()) {
           Err("Wrong tensor type during calc!")
         }
@@ -74,31 +73,29 @@ namespace hahaha::common::util {
     }
 
     template<typename T>
-static Res<Tensor<T>, VectorizeErr> mul(std::initializer_list<Tensor<T>> list) {
-      SetRetT(Tensor<T>, VectorizeErr)
-      auto shape = list.begin()->shape();
-      for (auto &tensor : list) {
+    static Res<Tensor<T>, VectorizeErr> mul(std::initializer_list<Tensor<T>> list) {
+      SetRetT(Tensor<T>, VectorizeErr) auto shape = list.begin()->shape();
+      for (auto &tensor: list) {
         if (shape != tensor.shape()) {
           Err("Wrong tensor type during calc!")
-      }
+        }
       }
 
       auto res = Tensor<T>(shape);
-      res.fill(1);  // Start with 1 for multiplication
+      res.fill(1); // Start with 1 for multiplication
       for (auto &val: list) {
         res *= val;
       }
       Ok(res)
-  }
+    }
 
     template<typename T>
     static Res<Tensor<T>, VectorizeErr> div(std::initializer_list<Tensor<T>> list) {
-      SetRetT(Tensor<T>, VectorizeErr)
-      auto shape = list.begin()->shape();
-      for (auto &tensor : list) {
+      SetRetT(Tensor<T>, VectorizeErr) auto shape = list.begin()->shape();
+      for (auto &tensor: list) {
         if (shape != tensor.shape()) {
           Err("Wrong tensor type during calc!")
-      }
+        }
       }
 
       auto res = Tensor<T>(shape);
@@ -109,9 +106,9 @@ static Res<Tensor<T>, VectorizeErr> mul(std::initializer_list<Tensor<T>> list) {
         res /= *begin;
       }
       Ok(res)
-  }
+    }
   };
 
-}
+} // namespace hahaha::common::util
 
 #endif // HAHAHA_VECTORIZE_H

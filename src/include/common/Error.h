@@ -65,7 +65,7 @@ private:
     ds::Str _msg;
     ds::Str _loc;
   };
-} // namespace hahaha
+} // namespace hahaha::common
 
 
 #endif // ERR_H

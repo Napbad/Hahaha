@@ -22,4 +22,4 @@
 #ifndef GPUDEVICE_H
 #define GPUDEVICE_H
 
-#endif //GPUDEVICE_H
+#endif // GPUDEVICE_H

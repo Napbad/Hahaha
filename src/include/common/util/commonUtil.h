@@ -59,6 +59,7 @@ public:
 
     // Convert the error to a string
     [[nodiscard]] ds::Str toString() const override { return _message + " at: " + _location; }
+
 private:
     ds::Str _message;
     ds::Str _location;
@@ -94,8 +95,7 @@ private:
    */
   template<>
   inline auto strTo<int>(const ds::Str &str) -> Res<int, ConvertErr> {
-    SetRetT(int, ConvertErr)
-    try {
+    SetRetT(int, ConvertErr) try {
       const ds::Str trimmed = trim(str);
       size_t pos;
       const int value = std::stoi(trimmed.c_str(), &pos);
@@ -117,8 +117,7 @@ private:
    */
   template<>
   inline auto strTo<double>(const ds::Str &str) -> Res<double, ConvertErr> {
-    SetRetT(double, ConvertErr)
-    try {
+    SetRetT(double, ConvertErr) try {
       const ds::Str trimmed = trim(str);
       size_t pos;
       const double value = std::stod(trimmed.c_str(), &pos);
@@ -139,8 +138,7 @@ private:
    */
   template<>
   inline auto strTo<float>(const ds::Str &str) -> Res<float, ConvertErr> {
-    SetRetT(float, ConvertErr)
-    try {
+    SetRetT(float, ConvertErr) try {
       const ds::Str trimmed = trim(str);
       size_t pos;
       const float value = std::stof(trimmed.c_str(), &pos);

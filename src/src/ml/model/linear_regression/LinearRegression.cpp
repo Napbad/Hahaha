@@ -21,43 +21,43 @@ namespace hahaha {
 
   using namespace hahaha::common;
 
-float LinearRegression::predict(const ds::Vec<float>& features) const {
-  float result = _bias;
-  for (size_t i = 0; i < features.size(); ++i) {
-    result += features[i] * _weights[i];
-  }
-  return result;
-}
-
-void LinearRegression::train(const ds::Vec<ds::Vec<float>>& features, const ds::Vec<float>& labels) {
-  // Initialize weights if not already done
-  if (_weights.size() == 0) {
-    // Create weights vector with zeros
-    for (size_t i = 0; i < features[0].size(); ++i) {
-      _weights.push_back(0.0f);
-    }
-    _bias = 0.0f;
-  }
-
-  // Simple gradient descent
-  const float learningRate = 0.01f;
-  const int numEpochs = 100;
-
-  for (int epoch = 0; epoch < numEpochs; ++epoch) {
+  float LinearRegression::predict(const ds::Vec<float> &features) const {
+    float result = _bias;
     for (size_t i = 0; i < features.size(); ++i) {
-      // Forward pass
-      float prediction = predict(features[i]);
-      float error = prediction - labels[i];
+      result += features[i] * _weights[i];
+    }
+    return result;
+  }
 
-      // Update weights
-      for (size_t j = 0; j < _weights.size(); ++j) {
-        _weights[j] -= learningRate * error * features[i][j];
+  void LinearRegression::train(const ds::Vec<ds::Vec<float>> &features, const ds::Vec<float> &labels) {
+    // Initialize weights if not already done
+    if (_weights.size() == 0) {
+      // Create weights vector with zeros
+      for (size_t i = 0; i < features[0].size(); ++i) {
+        _weights.push_back(0.0f);
       }
+      _bias = 0.0f;
+    }
 
-      // Update bias
-      _bias -= learningRate * error;
+    // Simple gradient descent
+    const float learningRate = 0.01f;
+    const int numEpochs = 100;
+
+    for (int epoch = 0; epoch < numEpochs; ++epoch) {
+      for (size_t i = 0; i < features.size(); ++i) {
+        // Forward pass
+        float prediction = predict(features[i]);
+        float error = prediction - labels[i];
+
+        // Update weights
+        for (size_t j = 0; j < _weights.size(); ++j) {
+          _weights[j] -= learningRate * error * features[i][j];
+        }
+
+        // Update bias
+        _bias -= learningRate * error;
+      }
     }
   }
-}
 
 } // namespace hahaha

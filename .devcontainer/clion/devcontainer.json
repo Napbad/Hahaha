@@ -17,7 +17,7 @@
   customizations : {
     // Configure JetBrains IDE-specific properties
     jetbrains : {
-      backend : "IntelliJ",
+      backend : "Clion",
       settings : {
         // IDE settings can be added via “Show context actions”|“Add currently modified settings from IDE”.
         // A complete list of supported settings is also available through auto-completion

@@ -54,6 +54,6 @@ namespace hahaha::common::util {
         return ds::Str("UNKNOWN");
     }
   }
-}
+} // namespace hahaha::common::util
 
 #endif // HIAHIAHIA_HTTPMETHOD_H

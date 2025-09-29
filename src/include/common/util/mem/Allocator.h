@@ -91,19 +91,15 @@ public:
 
     [[nodiscard]] static sizeTp maxSize() noexcept { return std::numeric_limits<sizeT>::max(); }
 
-    bool operator==(const Allocator&) const noexcept {
-      return true;
-    }
+    bool operator==(const Allocator &) const noexcept { return true; }
 
-    bool operator!=(const Allocator& other) const noexcept {
-      return !(*this == other);
-    }
+    bool operator!=(const Allocator &other) const noexcept { return !(*this == other); }
   };
 } // namespace hahaha::common::util
 
 template<class T>
 class Allocator {
-public:
+  public:
   using valueTp = T;
   using pointer = T *;
   using constPointer = const T *;
@@ -112,8 +108,7 @@ public:
   using sizeTp = sizeT;
   using differenceTp = ptrDiffT;
 
-  pointer allocate(const sizeTp n) {
-  }
+  pointer allocate(const sizeTp n) {}
 
   template<typename U, typename... Args>
   void construct(U *ptr, Args &&...args) {

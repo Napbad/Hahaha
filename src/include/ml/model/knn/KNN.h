@@ -23,7 +23,7 @@
 #define KNN_H
 
 namespace hahaha {
-    class KNN {};
+  class KNN {};
 } // namespace hahaha
 
-#endif //KNN_H
+#endif // KNN_H

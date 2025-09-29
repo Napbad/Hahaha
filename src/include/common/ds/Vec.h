@@ -32,57 +32,44 @@ namespace hahaha::common::ds {
   class Vec {
 
 public:
-
     using valueTp = T;
-    using reference = T&;
-    using constReference = const T&;
-    using pointer = T*;
-    using constPointer = const T*;
-    using iterator = T*;
-    using constIterator = const T*;
+    using reference = T &;
+    using constReference = const T &;
+    using pointer = T *;
+    using constPointer = const T *;
+    using iterator = T *;
+    using constIterator = const T *;
     using sizeTp = sizeT;
     using differenceTp = ptrDiffT;
 
-    Vec ()  noexcept : _data(nullptr), _size(0), _capacity(0) {
+    Vec() noexcept : _data(nullptr), _size(0), _capacity(0) {}
 
-    }
-
-    explicit Vec(const sizeTp count): _data(nullptr), _size(0), _capacity(count) {
-      reserve(count);
-    }
+    explicit Vec(const sizeTp count) : _data(nullptr), _size(0), _capacity(count) { reserve(count); }
     Vec(std::initializer_list<T> shape) {
       _data = new T[shape.size()];
       _size = shape.size();
       _capacity = shape.size();
       sizeT idx = 0;
-      for (auto i : shape) {
+      for (auto i: shape) {
         _data[idx++] = i;
       }
     }
 
-    ~Vec() {
-      delete []_data;
-    }
+    ~Vec() { delete[] _data; }
 
-    void emplace_back(const T & value) {
+    void emplace_back(const T &value) {
       if (_size == _capacity) {
         reserve(_size * 2);
       }
       _data[_size++] = value;
     }
 
-    void push_back(const T & value) {
-      emplace_back(value);
-    }
+    void push_back(const T &value) { emplace_back(value); }
 
-    iterator begin() const {
-      return _data;
-    }
+    iterator begin() const { return _data; }
 
-    iterator end() const {
-      return &_data[_size - 1];
-    }
-    bool operator==(const Vec & vec) const {
+    iterator end() const { return &_data[_size - 1]; }
+    bool operator==(const Vec &vec) const {
       if (_size != vec._size) {
         return false;
       }
@@ -96,24 +83,16 @@ public:
       return true;
     }
 
-    [[nodiscard]] sizeT size() const {
-      return _size;
-    }
+    [[nodiscard]] sizeT size() const { return _size; }
 
-    [[nodiscard]] sizeT capacity() const {
-      return _capacity;
-    }
+    [[nodiscard]] sizeT capacity() const { return _capacity; }
 
-    T & operator[](const sizeTp index) {
-      return _data[index];
-    }
+    T &operator[](const sizeTp index) { return _data[index]; }
 
-    T & operator[](const sizeTp index) const {
-      return _data[index];
-    }
+    T &operator[](const sizeTp index) const { return _data[index]; }
 
     void clear() {
-      delete []_data;
+      delete[] _data;
       _size = 0;
       _capacity = 0;
     }
@@ -125,15 +104,15 @@ public:
         _data[i].~T();
       }
 
-      delete [] _data;
+      delete[] _data;
       _capacity = newCap;
       _data = newData;
     }
+
 private:
     T *_data;
     sizeT _size;
     sizeT _capacity;
-
   };
 } // namespace hahaha::common::ds
 

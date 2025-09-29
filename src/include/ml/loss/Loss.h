@@ -22,11 +22,10 @@
 #ifndef LOSS_H
 #define LOSS_H
 
-namespace hahaha {
+namespace hahaha::ml {
 
+  class Loss
 
+} // namespace hahaha::ml
 
-
-} // namespace hahaha
-
-#endif //LOSS_H
+#endif // LOSS_H

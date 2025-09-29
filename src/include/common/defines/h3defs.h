@@ -48,4 +48,4 @@ namespace hahaha {
 
 } // namespace hahaha
 
-#endif //H3DEFS_H
+#endif // H3DEFS_H

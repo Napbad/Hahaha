@@ -18,13 +18,13 @@
 #ifndef HIAHIAHIA_CSVDATASET_H
 #define HIAHIAHIA_CSVDATASET_H
 
+#include <common/Error.h>
+#include <common/Res.h>
 #include <common/ds/Vec.h>
 #include <common/ds/str.h>
-#include <common/Res.h>
-#include <common/Error.h>
+#include <fstream>
 #include <ml/util/dataset/Dataset.h>
 #include <ml/util/dataset/Sample.h>
-#include <fstream>
 #include <sstream>
 
 namespace hahaha::ml {
@@ -254,4 +254,4 @@ private:
 
 } // namespace hahaha::ml
 
-#endif // HIAHIAHIA_CSVDATASET_H 
+#endif // HIAHIAHIA_CSVDATASET_H

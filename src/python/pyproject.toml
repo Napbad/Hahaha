@@ -3,4 +3,8 @@ name = "python"
 version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "matplotlib>=3.10.6",
+    "numpy>=2.2.6",
+    "torch>=2.8.0",
+]

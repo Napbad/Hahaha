@@ -71,19 +71,12 @@ public:
         return;
       }
       RBTreeNode<T> *cur = root;
-      
     }
     void remove(RBTreeNode<T> *node) {}
 
-    RBTreeNode<T> *find(RBTreeNode<T> *node) {
-      return nullptr;
-    }
-    RBTreeNode<T> *min() {
-      return nullptr;
-    }
-    RBTreeNode<T> *max() {
-      return nullptr;
-    }
+    RBTreeNode<T> *find(RBTreeNode<T> *node) { return nullptr; }
+    RBTreeNode<T> *min() { return nullptr; }
+    RBTreeNode<T> *max() { return nullptr; }
 
 private:
     RBTreeNode<T> *root = nullptr;
