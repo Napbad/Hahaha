@@ -30,215 +30,219 @@ namespace hahaha::common::util {
 #include <arm_neon.h>
 #endif
 
-  struct Vec4f {
+    struct Vec4f {
 #if defined(__AVX__)
-    __m128 data;
+        __m128 data;
 #elif defined(__ARM_NEON)
-    float32x4_t data;
+        float32x4_t data;
 #else
-    float data[4];
+        float data[4];
 #endif
-  };
+    };
 
-  inline Vec4f vadd(const Vec4f &a, const Vec4f &b) {
-    Vec4f r{};
+    inline Vec4f vadd(const Vec4f& a, const Vec4f& b) {
+        Vec4f r{};
 #if defined(__AVX__)
-    r.data = _mm_add_ps(a.data, b.data);
+        r.data = _mm_add_ps(a.data, b.data);
 #elif defined(__ARM_NEON)
-    r.data = vaddq_f32(a.data, b.data);
+        r.data = vaddq_f32(a.data, b.data);
 #else
-    for (int i = 0; i < 4; i++)
-      r.data[i] = a.data[i] + b.data[i];
+        for (int i = 0; i < 4; i++) {
+            r.data[i] = a.data[i] + b.data[i];
+        }
 #endif
-    return r;
-  }
-
-  inline Vec4f vmul(const Vec4f &a, const Vec4f &b) {
-    Vec4f r{};
-#if defined(__AVX__)
-    r.data = _mm_mul_ps(a.data, b.data);
-#elif defined(__ARM_NEON)
-    r.data = vmulq_f32(a.data, b.data);
-#else
-    for (int i = 0; i < 4; i++)
-      r.data[i] = a.data[i] * b.data[i];
-#endif
-    return r;
-  }
-  inline Vec4f vsub(const Vec4f &a, const Vec4f &b) {
-    Vec4f r{};
-#if defined(__AVX__)
-    r.data = _mm_sub_ps(a.data, b.data);
-#elif defined(__ARM_NEON)
-    r.data = vsubq_f32(a.data, b.data);
-#else
-    for (int i = 0; i < 4; i++)
-      r.data[i] = a.data[i] - b.data[i];
-#endif
-    return r;
-  }
-
-  inline Vec4f vdiv(const Vec4f &a, const Vec4f &b) {
-    Vec4f r{};
-#if defined(__AVX__)
-    r.data = _mm_div_ps(a.data, b.data);
-#elif defined(__ARM_NEON)
-    r.data = vdivq_f32(a.data, b.data);
-#else
-    for (int i = 0; i < 4; i++)
-      r.data[i] = a.data[i] / b.data[i];
-#endif
-    return r;
-  }
-
-  inline void add_arrays(const float *a, const float *b, float *out, size_t n) {
-    size_t i = 0;
-
-    // process 4 elements at a time
-    for (; i + 4 <= n; i += 4) {
-      Vec4f va{}, vb{};
-#if defined(__AVX__)
-      va.data = _mm_loadu_ps(a + i);
-      vb.data = _mm_loadu_ps(b + i);
-#elif defined(__ARM_NEON)
-      va.data = vld1q_f32(a + i);
-      vb.data = vld1q_f32(b + i);
-#else
-      for (int j = 0; j < 4; j++) {
-        va.data[j] = a[i + j];
-        vb.data[j] = b[i + j];
-      }
-#endif
-      Vec4f vc = vadd(va, vb);
-
-#if defined(__AVX__)
-      _mm_storeu_ps(out + i, vc.data);
-#elif defined(__ARM_NEON)
-      vst1q_f32(out + i, vc.data);
-#else
-      for (int j = 0; j < 4; j++) {
-        out[i + j] = vc.data[j];
-      }
-#endif
+        return r;
     }
 
-    // scalar remainder
-    for (; i < n; i++) {
-      out[i] = a[i] + b[i];
+    inline Vec4f vmul(const Vec4f& a, const Vec4f& b) {
+        Vec4f r{};
+#if defined(__AVX__)
+        r.data = _mm_mul_ps(a.data, b.data);
+#elif defined(__ARM_NEON)
+        r.data = vmulq_f32(a.data, b.data);
+#else
+        for (int i = 0; i < 4; i++) {
+            r.data[i] = a.data[i] * b.data[i];
+        }
+#endif
+        return r;
     }
-  }
-
-
-  inline void sub_arrays(const float *a, const float *b, float *out, size_t n) {
-    size_t i = 0;
-
-    // process 4 elements at a time
-    for (; i + 4 <= n; i += 4) {
-      Vec4f va{}, vb{};
+    inline Vec4f vsub(const Vec4f& a, const Vec4f& b) {
+        Vec4f r{};
 #if defined(__AVX__)
-      va.data = _mm_loadu_ps(a + i);
-      vb.data = _mm_loadu_ps(b + i);
+        r.data = _mm_sub_ps(a.data, b.data);
 #elif defined(__ARM_NEON)
-      va.data = vld1q_f32(a + i);
-      vb.data = vld1q_f32(b + i);
+        r.data = vsubq_f32(a.data, b.data);
 #else
-      for (int j = 0; j < 4; j++) {
-        va.data[j] = a[i + j];
-        vb.data[j] = b[i + j];
-      }
+        for (int i = 0; i < 4; i++) {
+            r.data[i] = a.data[i] - b.data[i];
+        }
 #endif
-      Vec4f vc = vsub(va, vb);
-
-#if defined(__AVX__)
-      _mm_storeu_ps(out + i, vc.data);
-#elif defined(__ARM_NEON)
-      vst1q_f32(out + i, vc.data);
-#else
-      for (int j = 0; j < 4; j++) {
-        out[i + j] = vc.data[j];
-      }
-#endif
+        return r;
     }
 
-    // scalar remainder
-    for (; i < n; i++) {
-      out[i] = a[i] - b[i];
-    }
-  }
-
-  inline void mul_arrays(const float *a, const float *b, float *out, size_t n) {
-    size_t i = 0;
-
-    // process 4 elements at a time
-    for (; i + 4 <= n; i += 4) {
-      Vec4f va{}, vb{};
+    inline Vec4f vdiv(const Vec4f& a, const Vec4f& b) {
+        Vec4f r{};
 #if defined(__AVX__)
-      va.data = _mm_loadu_ps(a + i);
-      vb.data = _mm_loadu_ps(b + i);
+        r.data = _mm_div_ps(a.data, b.data);
 #elif defined(__ARM_NEON)
-      va.data = vld1q_f32(a + i);
-      vb.data = vld1q_f32(b + i);
+        r.data = vdivq_f32(a.data, b.data);
 #else
-      for (int j = 0; j < 4; j++) {
-        va.data[j] = a[i + j];
-        vb.data[j] = b[i + j];
-      }
+        for (int i = 0; i < 4; i++) {
+            r.data[i] = a.data[i] / b.data[i];
+        }
 #endif
-      Vec4f vc = vmul(va, vb);
+        return r;
+    }
+
+    inline void add_arrays(const float* a, const float* b, float* out, size_t n) {
+        size_t i = 0;
+
+        // process 4 elements at a time
+        for (; i + 4 <= n; i += 4) {
+            Vec4f va{}, vb{};
+#if defined(__AVX__)
+            va.data = _mm_loadu_ps(a + i);
+            vb.data = _mm_loadu_ps(b + i);
+#elif defined(__ARM_NEON)
+            va.data = vld1q_f32(a + i);
+            vb.data = vld1q_f32(b + i);
+#else
+            for (int j = 0; j < 4; j++) {
+                va.data[j] = a[i + j];
+                vb.data[j] = b[i + j];
+            }
+#endif
+            Vec4f vc = vadd(va, vb);
 
 #if defined(__AVX__)
-      _mm_storeu_ps(out + i, vc.data);
+            _mm_storeu_ps(out + i, vc.data);
 #elif defined(__ARM_NEON)
-      vst1q_f32(out + i, vc.data);
+            vst1q_f32(out + i, vc.data);
 #else
-      for (int j = 0; j < 4; j++) {
-        out[i + j] = vc.data[j];
-      }
+            for (int j = 0; j < 4; j++) {
+                out[i + j] = vc.data[j];
+            }
 #endif
+        }
+
+        // scalar remainder
+        for (; i < n; i++) {
+            out[i] = a[i] + b[i];
+        }
     }
 
-    // scalar remainder
-    for (; i < n; i++) {
-      out[i] = a[i] * b[i];
-    }
-  }
 
-  inline void div_arrays(const float *a, const float *b, float *out, size_t n) {
-    size_t i = 0;
+    inline void sub_arrays(const float* a, const float* b, float* out, size_t n) {
+        size_t i = 0;
 
-    // process 4 elements at a time
-    for (; i + 4 <= n; i += 4) {
-      Vec4f va{}, vb{};
+        // process 4 elements at a time
+        for (; i + 4 <= n; i += 4) {
+            Vec4f va{}, vb{};
 #if defined(__AVX__)
-      va.data = _mm_loadu_ps(a + i);
-      vb.data = _mm_loadu_ps(b + i);
+            va.data = _mm_loadu_ps(a + i);
+            vb.data = _mm_loadu_ps(b + i);
 #elif defined(__ARM_NEON)
-      va.data = vld1q_f32(a + i);
-      vb.data = vld1q_f32(b + i);
+            va.data = vld1q_f32(a + i);
+            vb.data = vld1q_f32(b + i);
 #else
-      for (int j = 0; j < 4; j++) {
-        va.data[j] = a[i + j];
-        vb.data[j] = b[i + j];
-      }
+            for (int j = 0; j < 4; j++) {
+                va.data[j] = a[i + j];
+                vb.data[j] = b[i + j];
+            }
 #endif
-      Vec4f vc = vdiv(va, vb);
+            Vec4f vc = vsub(va, vb);
 
 #if defined(__AVX__)
-      _mm_storeu_ps(out + i, vc.data);
+            _mm_storeu_ps(out + i, vc.data);
 #elif defined(__ARM_NEON)
-      vst1q_f32(out + i, vc.data);
+            vst1q_f32(out + i, vc.data);
 #else
-      for (int j = 0; j < 4; j++) {
-        out[i + j] = vc.data[j];
-      }
+            for (int j = 0; j < 4; j++) {
+                out[i + j] = vc.data[j];
+            }
 #endif
+        }
+
+        // scalar remainder
+        for (; i < n; i++) {
+            out[i] = a[i] - b[i];
+        }
     }
 
-    // scalar remainder
-    for (; i < n; i++) {
-      out[i] = a[i] / b[i];
+    inline void mul_arrays(const float* a, const float* b, float* out, size_t n) {
+        size_t i = 0;
+
+        // process 4 elements at a time
+        for (; i + 4 <= n; i += 4) {
+            Vec4f va{}, vb{};
+#if defined(__AVX__)
+            va.data = _mm_loadu_ps(a + i);
+            vb.data = _mm_loadu_ps(b + i);
+#elif defined(__ARM_NEON)
+            va.data = vld1q_f32(a + i);
+            vb.data = vld1q_f32(b + i);
+#else
+            for (int j = 0; j < 4; j++) {
+                va.data[j] = a[i + j];
+                vb.data[j] = b[i + j];
+            }
+#endif
+            Vec4f vc = vmul(va, vb);
+
+#if defined(__AVX__)
+            _mm_storeu_ps(out + i, vc.data);
+#elif defined(__ARM_NEON)
+            vst1q_f32(out + i, vc.data);
+#else
+            for (int j = 0; j < 4; j++) {
+                out[i + j] = vc.data[j];
+            }
+#endif
+        }
+
+        // scalar remainder
+        for (; i < n; i++) {
+            out[i] = a[i] * b[i];
+        }
     }
-  }
+
+    inline void div_arrays(const float* a, const float* b, float* out, size_t n) {
+        size_t i = 0;
+
+        // process 4 elements at a time
+        for (; i + 4 <= n; i += 4) {
+            Vec4f va{}, vb{};
+#if defined(__AVX__)
+            va.data = _mm_loadu_ps(a + i);
+            vb.data = _mm_loadu_ps(b + i);
+#elif defined(__ARM_NEON)
+            va.data = vld1q_f32(a + i);
+            vb.data = vld1q_f32(b + i);
+#else
+            for (int j = 0; j < 4; j++) {
+                va.data[j] = a[i + j];
+                vb.data[j] = b[i + j];
+            }
+#endif
+            Vec4f vc = vdiv(va, vb);
+
+#if defined(__AVX__)
+            _mm_storeu_ps(out + i, vc.data);
+#elif defined(__ARM_NEON)
+            vst1q_f32(out + i, vc.data);
+#else
+            for (int j = 0; j < 4; j++) {
+                out[i + j] = vc.data[j];
+            }
+#endif
+        }
+
+        // scalar remainder
+        for (; i < n; i++) {
+            out[i] = a[i] / b[i];
+        }
+    }
 
 
 } // namespace hahaha::common::util

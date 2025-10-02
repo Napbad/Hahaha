@@ -23,20 +23,22 @@
 #define ARR_H
 
 namespace hahaha::common::ds {
-  template<class T, int len>
-  class arr {
-public:
-    void set(int i, T val) {
-      if (i < 0 || i >= len) {
-      }
-      data[i] = val;
-    }
+    template <class T, int len>
+    class arr {
+    public:
+        void set(int i, T val) {
+            if (i < 0 || i >= len) {
+            }
+            data[i] = val;
+        }
 
-    T get(int i) { return data[i]; }
+        T get(int i) {
+            return data[i];
+        }
 
-private:
-    T data[len];
-  };
+    private:
+        T data[len];
+    };
 } // namespace hahaha::common::ds
 
 

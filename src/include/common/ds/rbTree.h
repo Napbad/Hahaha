@@ -24,63 +24,91 @@
 
 namespace hahaha::common::ds {
 
-  enum class Color { Red, Black };
+    enum class Color { Red, Black };
 
-  template<typename T>
-  class RBTreeNode {
-public:
-    explicit RBTreeNode(const T &data) : data(data) {}
-    ~RBTreeNode() {
-      delete left;
-      delete right;
-    }
+    template <typename T>
+    class RBTreeNode {
+    public:
+        explicit RBTreeNode(const T& data) : data(data) {}
+        ~RBTreeNode() {
+            delete left;
+            delete right;
+        }
 
-    void setBlack() { color = Color::Black; }
-    void setRed() { color = Color::Red; }
-    [[nodiscard]] Color getColor() const { return color; }
-    T getData() const { return data; }
-    RBTreeNode *getLeft() const { return left; }
-    RBTreeNode *getRight() const { return right; }
-    RBTreeNode *getParent() const { return parent; }
-    void setLeft(RBTreeNode *node) { left = node; }
-    void setRight(RBTreeNode *node) { right = node; }
-    void setParent(RBTreeNode *node) { parent = node; }
+        void setBlack() {
+            color = Color::Black;
+        }
+        void setRed() {
+            color = Color::Red;
+        }
+        [[nodiscard]] Color getColor() const {
+            return color;
+        }
+        T getData() const {
+            return data;
+        }
+        RBTreeNode* getLeft() const {
+            return left;
+        }
+        RBTreeNode* getRight() const {
+            return right;
+        }
+        RBTreeNode* getParent() const {
+            return parent;
+        }
+        void setLeft(RBTreeNode* node) {
+            left = node;
+        }
+        void setRight(RBTreeNode* node) {
+            right = node;
+        }
+        void setParent(RBTreeNode* node) {
+            parent = node;
+        }
 
-private:
-    Color color = Color::Red; // default color of node that inserted is red
-    RBTreeNode *left = nullptr;
-    RBTreeNode *right = nullptr;
-    RBTreeNode *parent = nullptr;
+    private:
+        Color color        = Color::Red; // default color of node that inserted is red
+        RBTreeNode* left   = nullptr;
+        RBTreeNode* right  = nullptr;
+        RBTreeNode* parent = nullptr;
 
-    T data;
-  };
+        T data;
+    };
 
-  // Red-Black Tree
-  template<typename T>
-  class RBTree {
-public:
-    class iterator {};
+    // Red-Black Tree
+    template <typename T>
+    class RBTree {
+    public:
+        class iterator {};
 
-    RBTree() = default;
-    ~RBTree() { delete root; }
+        RBTree() = default;
+        ~RBTree() {
+            delete root;
+        }
 
-    void insert(T val) {
-      if (!root) {
-        root = new RBTreeNode<T>(val);
-        root->setBlack();
-        return;
-      }
-      RBTreeNode<T> *cur = root;
-    }
-    void remove(RBTreeNode<T> *node) {}
+        void insert(T val) {
+            if (!root) {
+                root = new RBTreeNode<T>(val);
+                root->setBlack();
+                return;
+            }
+            RBTreeNode<T>* cur = root;
+        }
+        void remove(RBTreeNode<T>* node) {}
 
-    RBTreeNode<T> *find(RBTreeNode<T> *node) { return nullptr; }
-    RBTreeNode<T> *min() { return nullptr; }
-    RBTreeNode<T> *max() { return nullptr; }
+        RBTreeNode<T>* find(RBTreeNode<T>* node) {
+            return nullptr;
+        }
+        RBTreeNode<T>* min() {
+            return nullptr;
+        }
+        RBTreeNode<T>* max() {
+            return nullptr;
+        }
 
-private:
-    RBTreeNode<T> *root = nullptr;
-  };
+    private:
+        RBTreeNode<T>* root = nullptr;
+    };
 } // namespace hahaha::common::ds
 
 #endif // HIAHIAHIA_RBTREE_H

@@ -26,10 +26,10 @@
 #include "HttpResponse.h"
 
 namespace hahaha::common::util {
-  class HttpClient {
-public:
-    static std::unique_ptr<HttpResponse> send(const HttpRequest &request);
-  };
+    class HttpClient {
+    public:
+        static std::unique_ptr<HttpResponse> send(const HttpRequest& request);
+    };
 } // namespace hahaha::common::util
 
 #endif // HIAHIAHIA_HTTPCLIENT_H

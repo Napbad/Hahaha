@@ -28,24 +28,32 @@
 
 
 namespace hahaha::common::util {
-  class HttpRequest {
-public:
-    HttpRequest(const ds::Str &url, HttpMethod method);
+    class HttpRequest {
+    public:
+        HttpRequest(const ds::Str& url, HttpMethod method);
 
-    void addHeader(const ds::Str &key, const ds::Str &value);
-    void setBody(const ds::Str &body);
+        void addHeader(const ds::Str& key, const ds::Str& value);
+        void setBody(const ds::Str& body);
 
-    [[nodiscard]] const ds::Str &getUrl() const { return _url; }
-    [[nodiscard]] HttpMethod getMethod() const { return _method; }
-    [[nodiscard]] const ds::Map<ds::Str, ds::Str> &getHeaders() const { return _headers; }
-    [[nodiscard]] const ds::Str &getBody() const { return _body; }
+        [[nodiscard]] const ds::Str& getUrl() const {
+            return _url;
+        }
+        [[nodiscard]] HttpMethod getMethod() const {
+            return _method;
+        }
+        [[nodiscard]] const ds::Map<ds::Str, ds::Str>& getHeaders() const {
+            return _headers;
+        }
+        [[nodiscard]] const ds::Str& getBody() const {
+            return _body;
+        }
 
-private:
-    ds::Str _url;
-    HttpMethod _method;
-    ds::Map<ds::Str, ds::Str> _headers;
-    ds::Str _body;
-  };
+    private:
+        ds::Str _url;
+        HttpMethod _method;
+        ds::Map<ds::Str, ds::Str> _headers;
+        ds::Str _body;
+    };
 
 
 } // namespace hahaha::common::util

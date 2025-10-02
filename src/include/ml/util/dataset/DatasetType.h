@@ -23,11 +23,11 @@
 #define DATASETTYPE_H
 
 namespace hahaha {
-  enum class DatasetType {
-    MNIST,
-    CIFAR10,
-    CIFAR100,
-  };
+    enum class DatasetType {
+        MNIST,
+        CIFAR10,
+        CIFAR100,
+    };
 } // namespace hahaha
 
 

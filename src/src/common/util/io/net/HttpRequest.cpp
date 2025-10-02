@@ -20,16 +20,19 @@
 //
 
 
-#include <utility>
-
 #include "common/util/io/net/HttpRequest.h"
 
-#include "common/ds/str.h"
+#include "common/ds/Str.h"
+#include <utility>
 
 namespace hahaha::common::util {
-  HttpRequest::HttpRequest(const ds::Str &url, const HttpMethod method) : _url(std::move(url)), _method(method) {}
+    HttpRequest::HttpRequest(const ds::Str& url, const HttpMethod method) : _url(std::move(url)), _method(method) {}
 
-  void HttpRequest::addHeader(const ds::Str &key, const ds::Str &value) { _headers[key] = value; }
+    void HttpRequest::addHeader(const ds::Str& key, const ds::Str& value) {
+        _headers[key] = value;
+    }
 
-  void HttpRequest::setBody(const ds::Str &body) { _body = body; }
+    void HttpRequest::setBody(const ds::Str& body) {
+        _body = body;
+    }
 } // namespace hahaha::common::util

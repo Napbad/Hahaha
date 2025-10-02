@@ -21,55 +21,59 @@
 
 #ifndef DATASETITERATOR_H
 #define DATASETITERATOR_H
-#include <iterator>
-
-
 #include "common/defines/h3defs.h"
+#include <iterator>
 namespace hahaha {
 
-  template<class SampleType>
-  class Dataset;
+    template <class SampleType>
+    class Dataset;
 
 
-  template<typename SampleType>
-  class DatasetIterator {
-public:
-    using iteratorCategory = std::forward_iterator_tag;
-    using valueType = SampleType;
-    using differenceType = ptrDiffT;
-    using pointer = const SampleType *;
-    using reference = const SampleType &;
+    template <typename SampleType>
+    class DatasetIterator {
+    public:
+        using iteratorCategory = std::forward_iterator_tag;
+        using valueType        = SampleType;
+        using differenceType   = ptrDiffT;
+        using pointer          = const SampleType*;
+        using reference        = const SampleType&;
 
-    DatasetIterator(const Dataset<SampleType> *dataset, size_t index) : _dataset(dataset), _index(index) {}
+        DatasetIterator(const Dataset<SampleType>* dataset, size_t index) : _dataset(dataset), _index(index) {}
 
-    reference operator*() const {
-      if (_index >= _dataset->size()) {
-        throw std::out_of_range("Dataset iterator out of range");
-      }
-      return _dataset->get(_index);
-    }
+        reference operator*() const {
+            if (_index >= _dataset->size()) {
+                throw std::out_of_range("Dataset iterator out of range");
+            }
+            return _dataset->get(_index);
+        }
 
-    pointer operator->() const { return &operator*(); }
+        pointer operator->() const {
+            return &operator*();
+        }
 
-    DatasetIterator &operator++() {
-      _index++;
-      return *this;
-    }
+        DatasetIterator& operator++() {
+            _index++;
+            return *this;
+        }
 
-    DatasetIterator operator++(int) {
-      DatasetIterator temp = *this;
-      _index++;
-      return temp;
-    }
+        DatasetIterator operator++(int) {
+            DatasetIterator temp = *this;
+            _index++;
+            return temp;
+        }
 
-    bool operator==(const DatasetIterator &other) const { return _dataset == other._dataset && _index == other._index; }
+        bool operator==(const DatasetIterator& other) const {
+            return _dataset == other._dataset && _index == other._index;
+        }
 
-    bool operator!=(const DatasetIterator &other) const { return !(*this == other); }
+        bool operator!=(const DatasetIterator& other) const {
+            return !(*this == other);
+        }
 
-private:
-    const Dataset<SampleType> *_dataset;
-    size_t _index;
-  };
+    private:
+        const Dataset<SampleType>* _dataset;
+        size_t _index;
+    };
 } // namespace hahaha
 
 

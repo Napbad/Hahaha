@@ -21,32 +21,36 @@
 
 #ifndef DEVICE_H
 #define DEVICE_H
-#include "common/ds/str.h"
+#include "common/ds/Str.h"
 
 namespace hahaha {
 
-  enum class DeviceType { CPU = 0, GPU = 1 };
+    enum class DeviceType { CPU = 0, GPU = 1 };
 
-  using ds::Str;
+    using ds::Str;
 
-  class Device {
-public:
-    virtual ~Device() = default;
+    class Device {
+    public:
+        virtual ~Device() = default;
 
-    [[nodiscard]] virtual DeviceType type() const = 0;
+        [[nodiscard]] virtual DeviceType type() const = 0;
 
-    [[nodiscard]] virtual int id() const = 0;
+        [[nodiscard]] virtual int id() const = 0;
 
-    [[nodiscard]] virtual Str toString() const = 0;
+        [[nodiscard]] virtual Str toString() const = 0;
 
-    [[nodiscard]] virtual bool isAvailable() const = 0;
+        [[nodiscard]] virtual bool isAvailable() const = 0;
 
-    virtual void activate() const = 0;
+        virtual void activate() const = 0;
 
-    bool operator==(const Device &other) const { return type() == other.type() && id() == other.id(); }
+        bool operator==(const Device& other) const {
+            return type() == other.type() && id() == other.id();
+        }
 
-    bool operator!=(const Device &other) const { return !(*this == other); }
-  };
+        bool operator!=(const Device& other) const {
+            return !(*this == other);
+        }
+    };
 
 } // namespace hahaha
 

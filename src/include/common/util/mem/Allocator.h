@@ -21,98 +21,102 @@
 
 #ifndef ALLOCATOR_H
 #define ALLOCATOR_H
+#include "common/defines/h3defs.h"
 #include <limits>
 #include <new>
 #include <utility>
 
-
-#include "common/defines/h3defs.h"
-
 namespace hahaha::common::util {
 
-  template<class T>
-  class Allocator {
-public:
-    using valueTp = T;
-    using pointer = T *;
-    using constPointer = const T *;
-    using reference = T &;
-    using constReference = const T &;
-    using sizeTp = sizeT;
-    using differenceTp = ptrDiffT;
+    template <class T>
+    class Allocator {
+    public:
+        using valueTp        = T;
+        using pointer        = T*;
+        using constPointer   = const T*;
+        using reference      = T&;
+        using constReference = const T&;
+        using sizeTp         = sizeT;
+        using differenceTp   = ptrDiffT;
 
-    template<typename U>
-    struct rebind {
-      using other = Allocator<U>;
+        template <typename U>
+        struct rebind {
+            using other = Allocator<U>;
+        };
+
+        Allocator() noexcept = default;
+
+        Allocator(const Allocator&) noexcept = default;
+
+        template <typename U>
+        explicit Allocator(const Allocator<U>&) noexcept {}
+
+        ~Allocator() noexcept = default;
+
+        pointer allocate(const sizeTp n) {
+            if (n == 0) {
+                return nullptr;
+            }
+
+            if (n > maxSize()) {
+                throw std::bad_alloc();
+            }
+
+            auto ptr = static_cast<pointer>(::operator new(n * sizeof(T)));
+
+            if (!ptr) {
+                throw std::bad_alloc();
+            }
+
+            return ptr;
+        }
+
+        void deallocate(constPointer p, sizeTp) {
+            if (p) {
+                ::operator delete(p);
+            }
+        }
+
+        template <typename U, typename... Args>
+        void construct(U* ptr, Args&&... args) {
+            ::new (static_cast<void*>(ptr)) U(std::forward<Args>(args)...);
+        }
+
+        template <typename U>
+        void destroy(U* ptr) noexcept {
+            ptr->~U();
+        }
+
+        [[nodiscard]] static sizeTp maxSize() noexcept {
+            return std::numeric_limits<sizeT>::max();
+        }
+
+        bool operator==(const Allocator&) const noexcept {
+            return true;
+        }
+
+        bool operator!=(const Allocator& other) const noexcept {
+            return !(*this == other);
+        }
     };
-
-    Allocator() noexcept = default;
-
-    Allocator(const Allocator &) noexcept = default;
-
-    template<typename U>
-    explicit Allocator(const Allocator<U> &) noexcept {}
-
-    ~Allocator() noexcept = default;
-
-    pointer allocate(const sizeTp n) {
-      if (n == 0) {
-        return nullptr;
-      }
-
-      if (n > maxSize()) {
-        throw std::bad_alloc();
-      }
-
-      auto ptr = static_cast<pointer>(::operator new(n * sizeof(T)));
-
-      if (!ptr) {
-        throw std::bad_alloc();
-      }
-
-      return ptr;
-    }
-
-    void deallocate(constPointer p, sizeTp) {
-      if (p) {
-        ::operator delete(p);
-      }
-    }
-
-    template<typename U, typename... Args>
-    void construct(U *ptr, Args &&...args) {
-      ::new (static_cast<void *>(ptr)) U(std::forward<Args>(args)...);
-    }
-
-    template<typename U>
-    void destroy(U *ptr) noexcept {
-      ptr->~U();
-    }
-
-    [[nodiscard]] static sizeTp maxSize() noexcept { return std::numeric_limits<sizeT>::max(); }
-
-    bool operator==(const Allocator &) const noexcept { return true; }
-
-    bool operator!=(const Allocator &other) const noexcept { return !(*this == other); }
-  };
 } // namespace hahaha::common::util
 
-template<class T>
+template <class T>
 class Allocator {
-  public:
-  using valueTp = T;
-  using pointer = T *;
-  using constPointer = const T *;
-  using reference = T &;
-  using constReference = const T &;
-  using sizeTp = sizeT;
-  using differenceTp = ptrDiffT;
+public:
+    using valueTp        = T;
+    using pointer        = T*;
+    using constPointer   = const T*;
+    using reference      = T&;
+    using constReference = const T&;
+    using sizeTp         = sizeT;
+    using differenceTp   = ptrDiffT;
 
-  pointer allocate(const sizeTp n) {}
+    pointer allocate(const sizeTp n) {}
 
-  template<typename U, typename... Args>
-  void construct(U *ptr, Args &&...args) {
-    ::new (static_cast<void *>(ptr)) U(std::forward<Args>(args)...);
-  }
+    template <typename U, typename... Args>
+    void construct(U* ptr, Args&&... args) {
+        ::new (static_cast<void*>(ptr)) U(std::forward<Args>(args)...);
+    }
 };
 #endif // ALLOCATOR_H

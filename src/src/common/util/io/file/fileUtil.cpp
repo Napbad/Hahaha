@@ -21,48 +21,47 @@
 
 #include "common/util/io/file/fileUtil.h"
 
+#include "common/Res.h"
 #include <filesystem>
 #include <fstream>
 #include <sstream>
 
-#include "common/Res.h"
-
 namespace hahaha::common::util {
 
-  void deleteFile(const ds::Str &path) {
-    std::filesystem::path p((path.data()));
-    std::filesystem::remove(p);
-  }
-
-  bool fileExists(const ds::Str &path) {
-    std::filesystem::path p((path.data()));
-    return std::filesystem::exists(p);
-  }
-  bool createDir(const ds::Str &dir) {
-    std::filesystem::path p((dir.data()));
-    return std::filesystem::create_directory(p);
-  }
-  Res<ds::Str, FileError> readFile(const ds::Str &path) {
-    SetRetT(ds::Str, FileError);
-
-    std::ifstream file(path.data());
-    if (!file) {
-      Err(FileError("File not found"));
+    void deleteFile(const ds::Str& path) {
+        std::filesystem::path p((path.data()));
+        std::filesystem::remove(p);
     }
 
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-    file.close();
-
-    Ok(ds::Str(buffer.str()));
-  }
-  bool writeFile(const ds::Str &path, const ds::Str &content) {
-    std::ofstream file(path.data());
-    if (!file.is_open()) {
-      return false;
+    bool fileExists(const ds::Str& path) {
+        std::filesystem::path p((path.data()));
+        return std::filesystem::exists(p);
     }
+    bool createDir(const ds::Str& dir) {
+        std::filesystem::path p((dir.data()));
+        return std::filesystem::create_directory(p);
+    }
+    Res<ds::Str, FileError> readFile(const ds::Str& path) {
+        SetRetT(ds::Str, FileError);
 
-    file << content.data();
-    return file.good();
-  }
+        std::ifstream file(path.data());
+        if (!file) {
+            Err(FileError("File not found"));
+        }
+
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        file.close();
+
+        Ok(ds::Str(buffer.str()));
+    }
+    bool writeFile(const ds::Str& path, const ds::Str& content) {
+        std::ofstream file(path.data());
+        if (!file.is_open()) {
+            return false;
+        }
+
+        file << content.data();
+        return file.good();
+    }
 } // namespace hahaha::common::util

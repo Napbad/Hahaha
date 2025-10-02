@@ -15,15 +15,69 @@
 // Email: napbad.sen@gmail.com
 // GitHub: https://github.com/Napbad
 
-//
-// Created by napbad on 9/28/25.
-//
+#include "ml/util/dataset/DatasetDownloader.h"
 
+#include "common/ds/Str.h"
+#include <filesystem>
+#include <fstream>
 #include <gtest/gtest.h>
+
+using namespace hahaha::ml;
+using namespace hahaha::common;
+
 class DatasetDownloaderTest : public ::testing::Test {
-  public:
-  void SetUp() override {}
-  void TearDown() override {}
+public:
+    void SetUp() override {
+        // Make sure test file doesn't exist
+        std::remove("test_download.txt");
+    }
+
+    void TearDown() override {
+        // Clean up test file
+        std::remove("test_download.txt");
+    }
 };
 
-TEST_F(DatasetDownloaderTest, DownloadTest) {}
+TEST_F(DatasetDownloaderTest, DownloadFromUrlTest) {
+    // This test would require an actual internet connection and a valid URL
+    // For unit testing purposes, we'll test with a known invalid URL to verify error handling
+
+    auto res = DatasetDownloader::downloadFromUrl(
+        ds::Str("http://invalid-url-that-does-not-exist-12345.com/test.txt"), ds::Str("test_download.txt"), false);
+
+    // Should fail with an error
+    EXPECT_TRUE(res.isErr());
+
+    // Verify file was not created or is empty
+    if (std::ifstream file("test_download.txt"); file.is_open()) {
+        file.seekg(0, std::ios::end);
+        EXPECT_EQ(file.tellg(), 0); // File should be empty
+        file.close();
+    }
+}
+
+TEST_F(DatasetDownloaderTest, DownloadFromUCITest) {
+    // Test with a non-existent UCI dataset to verify error handling
+    const auto res = DatasetDownloader::downloadFromUCI(ds::Str("non-existent-dataset"), ds::Str("test_download.txt"));
+
+    // Should fail with an error
+    EXPECT_TRUE(res.isErr());
+}
+
+TEST_F(DatasetDownloaderTest, DownloadFromKaggleTest) {
+    // Test with a non-existent Kaggle dataset to verify error handling
+    const auto res = DatasetDownloader::downloadFromKaggle(
+        ds::Str("non-existent-dataset/non-existent-file"), ds::Str("test_download.txt"), ds::Str("fake-api-token"));
+
+    // Should fail with an error
+    EXPECT_TRUE(res.isErr());
+}
+
+TEST_F(DatasetDownloaderTest, DownloadToInvalidPathTest) {
+    // Try to download to an invalid path
+    const auto res = DatasetDownloader::downloadFromUrl(
+        ds::Str("http://httpbin.org/get"), ds::Str("/invalid/path/that/should/not/exist/test.txt"), false);
+
+    // Should fail with an error
+    EXPECT_TRUE(res.isErr());
+}

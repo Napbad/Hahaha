@@ -22,38 +22,38 @@
 #ifndef HIAHIAHIA_HTTPMETHOD_H
 #define HIAHIAHIA_HTTPMETHOD_H
 
-#include "common/ds/str.h"
+#include "common/ds/Str.h"
 
 namespace hahaha::common::util {
 
-  /**
-   * HTTP method enum
-   */
-  enum class HttpMethod { GET, POST, PUT, DELETE, HEAD, PATCH, OPTIONS };
+    /**
+     * HTTP method enum
+     */
+    enum class HttpMethod { GET, POST, PUT, DELETE, HEAD, PATCH, OPTIONS };
 
-  /**
-   * Convert HttpMethod to string
-   */
-  inline ds::Str methodToString(const HttpMethod method) {
-    switch (method) {
-      case HttpMethod::GET:
-        return ds::Str("GET");
-      case HttpMethod::POST:
-        return ds::Str("POST");
-      case HttpMethod::PUT:
-        return ds::Str("PUT");
-      case HttpMethod::DELETE:
-        return ds::Str("DELETE");
-      case HttpMethod::HEAD:
-        return ds::Str("HEAD");
-      case HttpMethod::PATCH:
-        return ds::Str("PATCH");
-      case HttpMethod::OPTIONS:
-        return ds::Str("OPTIONS");
-      default:
-        return ds::Str("UNKNOWN");
+    /**
+     * Convert HttpMethod to string
+     */
+    inline ds::Str methodToString(const HttpMethod method) {
+        switch (method) {
+        case HttpMethod::GET:
+            return ds::Str("GET");
+        case HttpMethod::POST:
+            return ds::Str("POST");
+        case HttpMethod::PUT:
+            return ds::Str("PUT");
+        case HttpMethod::DELETE:
+            return ds::Str("DELETE");
+        case HttpMethod::HEAD:
+            return ds::Str("HEAD");
+        case HttpMethod::PATCH:
+            return ds::Str("PATCH");
+        case HttpMethod::OPTIONS:
+            return ds::Str("OPTIONS");
+        default:
+            return ds::Str("UNKNOWN");
+        }
     }
-  }
 } // namespace hahaha::common::util
 
 #endif // HIAHIAHIA_HTTPMETHOD_H

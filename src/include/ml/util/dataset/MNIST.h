@@ -15,26 +15,11 @@
 // Email: napbad.sen@gmail.com
 // GitHub: https://github.com/Napbad
 
-#ifndef HIAHIAHIA_LINEARREGRESSION_H
-#define HIAHIAHIA_LINEARREGRESSION_H
+//
+// Created by root on 10/2/25.
+//
 
-#include <common/ds/Vec.h>
-#include <ml/model/Model.h>
+#ifndef HAHAHA_MNIST_H
+#define HAHAHA_MNIST_H
 
-namespace hahaha {
-
-    class LinearRegression : public Model {
-    public:
-        LinearRegression() = default;
-
-        void train(const ds::Vec<ds::Vec<float>>& features, const ds::Vec<float>& labels) override;
-        [[nodiscard]] float predict(const ds::Vec<float>& features) const override;
-
-    private:
-        ds::Vec<float> _weights;
-        float _bias{0.0f};
-    };
-
-} // namespace hahaha
-
-#endif // HIAHIAHIA_LINEARREGRESSION_H
+#endif // HAHAHA_MNIST_H

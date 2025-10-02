@@ -18,11 +18,12 @@ find_package(GTest REQUIRED)
 # Create the test executable
 add_executable(hahaha_dev_tests_unit_exe
         ${SOURCE_FILES}
-        hiahiahia/ml/util/dataset/CSVLoaderTest.cpp
+        hiahiahia/ml/model/linear_regression/LinearRegressionTest.cpp
+        hiahiahia/ml/util/dataset/CSVDatasetTest.cpp
 )
 
-# Link with Google Test
-target_link_libraries(hahaha_dev_tests_unit_exe GTest::GTest GTest::Main pthread)
+# Link with Google Test and the hahaha library
+target_link_libraries(hahaha_dev_tests_unit_exe GTest::GTest GTest::Main pthread hahaha)
 
 # Add test
 add_test(NAME hahaha_unit_tests COMMAND hahaha_dev_tests_unit_exe)

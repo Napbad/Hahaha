@@ -25,20 +25,24 @@
 #include "ml/common/defines.h"
 
 namespace hahaha {
-  inline void *hmalloc(uint size) { return nullptr; }
-
-  inline void hfree(const void *ptr) { delete ptr; }
-
-  inline void hmemcpy(void *src, void *dst, uint size) {
-
-    if (src == dst) {
-      return;
+    inline void* hmalloc(uint size) {
+        return nullptr;
     }
 
-    for (uint i = 0; i < size; ++i) {
-      static_cast<char *>(dst)[i] = static_cast<char *>(src)[i];
+    inline void hfree(const void* ptr) {
+        delete ptr;
     }
-  }
+
+    inline void hmemcpy(void* src, void* dst, uint size) {
+
+        if (src == dst) {
+            return;
+        }
+
+        for (uint i = 0; i < size; ++i) {
+            static_cast<char*>(dst)[i] = static_cast<char*>(src)[i];
+        }
+    }
 
 } // namespace hahaha
 

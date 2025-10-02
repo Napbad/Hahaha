@@ -21,76 +21,78 @@
 
 #ifndef STRFINDER_H
 #define STRFINDER_H
-#include "common/ds/str.h"
+#include "common/ds/Str.h"
 
 using hahaha::common::ds::Str;
 
 namespace hahaha::common::ds {
 
-  // KMP
-  class StrFinder {
+    // KMP
+    class StrFinder {
 
-public:
-    explicit StrFinder(Str &str, bool lateinit = false) {
-      _str = &str;
-      _len = str.size();
-      _next = nullptr;
+    public:
+        explicit StrFinder(Str& str, bool lateinit = false) {
+            _str  = &str;
+            _len  = str.size();
+            _next = nullptr;
 
-      if (!lateinit) {
-        buildNextVal();
-      }
-    }
-
-    ~StrFinder() { delete[] _next; }
-
-    [[nodiscard]] sizeT find(char c) const {
-      for (sizeT i = 0; i < _len; ++i) {
-        if ((*_str)[i] == c) {
-          return i;
+            if (!lateinit) {
+                buildNextVal();
+            }
         }
-      }
-      return Str::npos;
-    }
 
-    sizeT find(Str &str) {
-
-      sizeT i = 0, j = 0;
-      while (j < _len) {
-        if ((*_str)[j] == str[i]) {
-          ++i;
-          if (i == str.size()) {
-            return j - i + 1;
-          }
-          ++j;
-        } else {
-          i = _next[i];
+        ~StrFinder() {
+            delete[] _next;
         }
-      }
 
-      return Str::npos;
-    }
-
-private:
-    Str *_str;
-    int *_next;
-    sizeT _len;
-
-    void buildNextVal() {
-      _next = new int[_len];
-      _next[0] = -1;
-
-      sizeT i = -1, j = 0;
-      while (j < _len - 1) {
-        if (i == -1 || (*_str)[i] == (*_str)[j]) {
-          ++i;
-          ++j;
-          _next[j] = static_cast<int>(i);
-        } else {
-          i = _next[i];
+        [[nodiscard]] sizeT find(char c) const {
+            for (sizeT i = 0; i < _len; ++i) {
+                if ((*_str)[i] == c) {
+                    return i;
+                }
+            }
+            return Str::npos;
         }
-      }
-    }
-  };
+
+        sizeT find(Str& str) {
+
+            sizeT i = 0, j = 0;
+            while (j < _len) {
+                if ((*_str)[j] == str[i]) {
+                    ++i;
+                    if (i == str.size()) {
+                        return j - i + 1;
+                    }
+                    ++j;
+                } else {
+                    i = _next[i];
+                }
+            }
+
+            return Str::npos;
+        }
+
+    private:
+        Str* _str;
+        int* _next;
+        sizeT _len;
+
+        void buildNextVal() {
+            _next    = new int[_len];
+            _next[0] = -1;
+
+            sizeT i = -1, j = 0;
+            while (j < _len - 1) {
+                if (i == -1 || (*_str)[i] == (*_str)[j]) {
+                    ++i;
+                    ++j;
+                    _next[j] = static_cast<int>(i);
+                } else {
+                    i = _next[i];
+                }
+            }
+        }
+    };
 
 } // namespace hahaha::common::ds
 

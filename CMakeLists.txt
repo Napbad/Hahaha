@@ -23,10 +23,20 @@ file(GLOB_RECURSE SOURCE_FILES
     "${CMAKE_SOURCE_DIR}/src/src/*.cpp"
 )
 
+# Print debug information to check if files are found
+message(STATUS "Found source files:")
+foreach(src ${SOURCE_FILES})
+    message(STATUS "  ${src}")
+endforeach()
+
 # Main library
 add_library(hahaha STATIC
     ${SOURCE_FILES}
     ${HEADER_FILES}
+        src/include/ml/util/dataset/MNIST.h
+        src/include/ml/common/Array.h
+        src/src/common/error.cpp
+        src/src/common/ds/Str.cpp
 )
 
 # Set C++ as the link language
@@ -41,20 +51,3 @@ target_link_libraries(hahaha
 
 # Add tests
 add_subdirectory(tests)
-
-# Print debug information
-message(STATUS "Include directories:")
-get_property(dirs DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-foreach(dir ${dirs})
-    message(STATUS "  ${dir}")
-endforeach()
-
-message(STATUS "Source files:")
-foreach(src ${SOURCE_FILES})
-    message(STATUS "  ${src}")
-endforeach()
-
-message(STATUS "Header files:")
-foreach(hdr ${HEADER_FILES})
-    message(STATUS "  ${hdr}")
-endforeach()

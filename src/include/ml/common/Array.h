@@ -16,12 +16,15 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by root on 9/29/25.
+// Created by root on 10/2/25.
 //
 
-#include <gtest/gtest.h>
-class CSVLoaderTest : public ::testing::Test {
-  public:
-  void SetUp() override {}
-  void TearDown() override {}
-};
+#ifndef HAHAHA_ARRAY_H
+#define HAHAHA_ARRAY_H
+
+namespace hahaha::ml {
+
+    class Array {};
+}
+
+#endif // HAHAHA_ARRAY_H

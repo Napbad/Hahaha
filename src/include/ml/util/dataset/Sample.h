@@ -22,72 +22,84 @@
 
 namespace hahaha::ml {
 
-  /**
-   * Sample class
-   *
-   * Represents a single sample in a dataset, containing features and labels
-   */
-  template<typename T>
-  class Sample {
-public:
     /**
-     * Create a new sample
+     * Sample class
+     *
+     * Represents a single sample in a dataset, containing features and labels
      */
-    explicit Sample(Tensor<T> features, Tensor<T> labels) :
-        _features(std::move(features)), _labels(std::move(labels)) {}
+    template <typename T>
+    class Sample {
+    public:
+        /**
+         * Create a new sample
+         */
+        explicit Sample(Tensor<T> features, Tensor<T> labels)
+            : _features(std::move(features)), _labels(std::move(labels)) {}
 
-    /**
-     * Get the features
-     */
-    [[nodiscard]] const Tensor<T> &features() const { return _features; }
+        /**
+         * Get the features
+         */
+        [[nodiscard]] const Tensor<T>& features() const {
+            return _features;
+        }
 
-    /**
-     * Get the labels
-     */
-    [[nodiscard]] const Tensor<T> &labels() const { return _labels; }
+        /**
+         * Get the labels
+         */
+        [[nodiscard]] const Tensor<T>& labels() const {
+            return _labels;
+        }
 
-    /**
-     * Get mutable features
-     */
-    Tensor<T> &features() { return _features; }
+        /**
+         * Get mutable features
+         */
+        Tensor<T>& features() {
+            return _features;
+        }
 
-    /**
-     * Get mutable labels
-     */
-    Tensor<T> &labels() { return _labels; }
+        /**
+         * Get mutable labels
+         */
+        Tensor<T>& labels() {
+            return _labels;
+        }
 
-    /**
-     * Get feature dimension
-     */
-    [[nodiscard]] size_t featureDim() const { return _features.size(); }
+        /**
+         * Get feature dimension
+         */
+        [[nodiscard]] size_t featureDim() const {
+            return _features.size();
+        }
 
-    /**
-     * Get label dimension
-     */
-    [[nodiscard]] size_t labelDim() const { return _labels.size(); }
+        /**
+         * Get label dimension
+         */
+        [[nodiscard]] size_t labelDim() const {
+            return _labels.size();
+        }
 
-    /**
-     * Apply a transform function to features
-     */
-    template<typename F>
-    Sample &transformFeatures(F &&f) {
-      _features = f(std::move(_features));
-      return *this;
-    }
+        /**
+         * Apply a transform function to features
+         */
+        template <typename F>
+        Sample& transformFeatures(F&& f) {
+            _features = f(std::move(_features));
+            return *this;
+        }
 
-    /**
-     * Apply a transform function to labels
-     */
-    template<typename F>
-    Sample &transformLabels(F &&f) {
-      _labels = f(std::move(_labels));
-      return *this;
-    }
+        /**
+         * Apply a transform function to labels
+         */
+        template <typename F>
+        Sample& transformLabels(F&& f) {
+            _labels = f(std::move(_labels));
+            return *this;
+        }
 
-private:
-    Tensor<T> _features;
-    Tensor<T> _labels;
-  };
+    private:
+        Tensor<T> _features;
+        Tensor<T> _labels;
+    };
 
 } // namespace hahaha::ml
 

@@ -99,7 +99,7 @@ ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:${LD_LIBRARY_PATH}
 
 WORKDIR /workspace
 
-# RUN cd /workspace/src/python/ 
+# RUN cd /workspace/src/python_interface/
 # RUN uv sync
 
 CMD ["/bin/bash"]

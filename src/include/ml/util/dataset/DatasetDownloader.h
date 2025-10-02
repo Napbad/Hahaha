@@ -18,62 +18,71 @@
 #ifndef HIAHIAHIA_DATASETDOWNLOADER_H
 #define HIAHIAHIA_DATASETDOWNLOADER_H
 
-#include <common/Error.h>
 #include <common/Res.h>
-#include <common/ds/str.h>
+#include <common/ds/Str.h>
+#include <common/error.h>
+#include <utility>
 
 namespace hahaha::ml {
 
-  /**
-   * Dataset downloader error class
-   */
-  class DatasetDownloaderError final : public Error {
-public:
-    explicit DatasetDownloaderError(const ds::Str &message, const ds::Str &location = ds::Str("DatasetDownloader")) :
-        _message(message), _location(location) {}
-
-    explicit DatasetDownloaderError(const char *message, const ds::Str &location = ds::Str("DatasetDownloader")) :
-        _message(ds::Str(message)), _location(location) {}
-
-    [[nodiscard]] ds::Str typeName() const override { return ds::Str("DatasetDownloaderError"); }
-    [[nodiscard]] ds::Str message() const override { return _message; }
-    [[nodiscard]] ds::Str location() const override { return _location; }
-    [[nodiscard]] ds::Str toString() const override {
-      return typeName() + ds::Str(": ") + message() + ds::Str(" at ") + location();
-    }
-
-private:
-    ds::Str _message;
-    ds::Str _location;
-  };
-
-  /**
-   * Dataset downloader class
-   *
-   * Provides functionality to download datasets from various sources:
-   * - Direct URL
-   * - UCI Machine Learning Repository
-   * - Kaggle
-   */
-  class DatasetDownloader {
-public:
+    using namespace hahaha::common;
     /**
-     * Download a dataset from a direct URL
+     * Dataset downloader error class
      */
-    static Res<void, DatasetDownloaderError> downloadFromUrl(const ds::Str &url, const ds::Str &outputPath,
-                                                             bool showProgress = false);
+    class DatasetDownloaderError final : public error {
+    public:
+        explicit DatasetDownloaderError(ds::Str message, ds::Str location = ds::Str("DatasetDownloader"))
+            : _message(std::move(message)), _location(std::move(location)), message_(nullptr) {}
+
+        explicit DatasetDownloaderError(const char* message, ds::Str location = ds::Str("DatasetDownloader"))
+            : _message(ds::Str(message)), _location(std::move(location)), message_(message) {}
+
+        [[nodiscard]] ds::Str typeName() const override {
+            return ds::Str("DatasetDownloaderError");
+        }
+        [[nodiscard]] ds::Str message() const override {
+            return _message;
+        }
+        [[nodiscard]] ds::Str location() const override {
+            return _location;
+        }
+        [[nodiscard]] ds::Str toString() const override {
+            return typeName() + ds::Str(": ") + message() + ds::Str(" at ") + location();
+        }
+
+    private:
+        ds::Str _message;
+        ds::Str _location;
+        const char* message_;
+    };
 
     /**
-     * Download a dataset from UCI Machine Learning Repository
+     * Dataset downloader class
+     *
+     * Provides functionality to download datasets from various sources:
+     * - Direct URL
+     * - UCI Machine Learning Repository
+     * - Kaggle
      */
-    static Res<void, DatasetDownloaderError> downloadFromUCI(const ds::Str &datasetName, const ds::Str &outputPath);
+    class DatasetDownloader {
+    public:
+        /**
+         * Download a dataset from a direct URL
+         */
+        static Res<void, DatasetDownloaderError> downloadFromUrl(
+            const ds::Str& url, const ds::Str& outputPath, bool showProgress = false);
 
-    /**
-     * Download a dataset from Kaggle
-     */
-    static Res<void, DatasetDownloaderError> downloadFromKaggle(const ds::Str &datasetName, const ds::Str &outputPath,
-                                                                const ds::Str &apiToken);
-  };
+        /**
+         * Download a dataset from UCI Machine Learning Repository
+         */
+        static Res<void, DatasetDownloaderError> downloadFromUCI(const ds::Str& datasetName, const ds::Str& outputPath);
+
+        /**
+         * Download a dataset from Kaggle
+         */
+        static Res<void, DatasetDownloaderError> downloadFromKaggle(
+            const ds::Str& datasetName, const ds::Str& outputPath, const ds::Str& apiToken);
+    };
 
 } // namespace hahaha::ml
 

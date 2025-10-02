@@ -24,7 +24,7 @@
 
 namespace hahaha::ml {
 
-  class Loss
+    class Loss
 
 } // namespace hahaha::ml
 

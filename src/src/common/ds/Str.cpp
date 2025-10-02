@@ -15,26 +15,25 @@
 // Email: napbad.sen@gmail.com
 // GitHub: https://github.com/Napbad
 
-#ifndef HIAHIAHIA_LINEARREGRESSION_H
-#define HIAHIAHIA_LINEARREGRESSION_H
+//
+// Created by napbad on 10/2/25.
+//
 
-#include <common/ds/Vec.h>
-#include <ml/model/Model.h>
+#include "common/ds/Str.h"
 
+#include "common/Res.h"
+#include "common/error.h"
 namespace hahaha {
+    class IndexOutOfBoundError;
+}
 
-    class LinearRegression : public Model {
-    public:
-        LinearRegression() = default;
+namespace hahaha::common::ds {
+    Res<char, IndexOutOfBoundError> Str::at(sizeT i) const {
+        SetRetT(char, IndexOutOfBoundError)
+        if (i >= _size) {
+            Err("Index out of bound");
+        }
+        Ok(_data[i]);
+    }
+}
 
-        void train(const ds::Vec<ds::Vec<float>>& features, const ds::Vec<float>& labels) override;
-        [[nodiscard]] float predict(const ds::Vec<float>& features) const override;
-
-    private:
-        ds::Vec<float> _weights;
-        float _bias{0.0f};
-    };
-
-} // namespace hahaha
-
-#endif // HIAHIAHIA_LINEARREGRESSION_H

@@ -25,23 +25,33 @@
 
 namespace hahaha::common::util {
 
-  class HttpResponse {
-public:
-    HttpResponse() : _statusCode(0) {}
+    class HttpResponse {
+    public:
+        HttpResponse() : _statusCode(0) {}
 
-    void setStatusCode(const int code) { _statusCode = code; }
-    void setHeader(const ds::Str &key, const ds::Str &value);
-    void setBody(const ds::Str &body) { _body = body; }
+        void setStatusCode(const int code) {
+            _statusCode = code;
+        }
+        void setHeader(const ds::Str& key, const ds::Str& value);
+        void setBody(const ds::Str& body) {
+            _body = body;
+        }
 
-    [[nodiscard]] int getStatusCode() const { return _statusCode; }
-    [[nodiscard]] const ds::Map<ds::Str, ds::Str> &getHeaders() const { return _headers; }
-    [[nodiscard]] const ds::Str &getBody() const { return _body; }
+        [[nodiscard]] int getStatusCode() const {
+            return _statusCode;
+        }
+        [[nodiscard]] const ds::Map<ds::Str, ds::Str>& getHeaders() const {
+            return _headers;
+        }
+        [[nodiscard]] const ds::Str& getBody() const {
+            return _body;
+        }
 
-private:
-    int _statusCode;
-    ds::Map<ds::Str, ds::Str> _headers;
-    ds::Str _body;
-  };
+    private:
+        int _statusCode;
+        ds::Map<ds::Str, ds::Str> _headers;
+        ds::Str _body;
+    };
 
 } // namespace hahaha::common::util
 #endif // HIAHIAHIA_HTTPRESPONSE_H

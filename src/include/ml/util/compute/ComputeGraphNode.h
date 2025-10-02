@@ -21,53 +21,51 @@
 
 #ifndef HAHAHA_COMPUTEGRAPHNODE_H
 #define HAHAHA_COMPUTEGRAPHNODE_H
+#include "ml/common/Tensor.h"
 #include <functional>
 
-
-#include "ml/common/Tensor.h"
-
 namespace hahaha::ml::util {
-  /**
-   * ComputeGraphNode class
-   *
-   * Represents a node in a computational graph
-   */
+    /**
+     * ComputeGraphNode class
+     *
+     * Represents a node in a computational graph
+     */
 
-  template<typename T>
-  class ComputeGraphNode {
+    template <typename T>
+    class ComputeGraphNode {
 
-public:
-    ComputeGraphNode() = default;
-    ~ComputeGraphNode() = default;
+    public:
+        ComputeGraphNode()  = default;
+        ~ComputeGraphNode() = default;
 
-private:
-    Tensor<T> _tensor;
-    Tensor<T> _grad;
-    ds::Vec<ComputeGraphNode *> _inputs;
-    ds::Vec<ComputeGraphNode *> _outputs;
-    std::function<Tensor<T>(ds::Vec<Tensor<T>>)> _forwardFn;
-    std::function<ds::Vec<Tensor<T>>(Tensor<T>)> _backwardFn;
+    private:
+        Tensor<T> _tensor;
+        Tensor<T> _grad;
+        ds::Vec<ComputeGraphNode*> _inputs;
+        ds::Vec<ComputeGraphNode*> _outputs;
+        std::function<Tensor<T>(ds::Vec<Tensor<T>>)> _forwardFn;
+        std::function<ds::Vec<Tensor<T>>(Tensor<T>)> _backwardFn;
 
 
-    Tensor<T> forwardFnAdd(ds::Vec<Tensor<T>> vals) {
-      _grad = Tensor<T>(vals.begin()->shape()).fill(1);
-      // create a Tensor from specified shape
-      Tensor<T> res = Tensor<T>(vals.begin()->shape());
-      res.fill(0);
-      for (auto &val: vals) {
-      }
-      return res;
-    }
+        Tensor<T> forwardFnAdd(ds::Vec<Tensor<T>> vals) {
+            _grad = Tensor<T>(vals.begin()->shape()).fill(1);
+            // create a Tensor from specified shape
+            Tensor<T> res = Tensor<T>(vals.begin()->shape());
+            res.fill(0);
+            for (auto& val : vals) {
+            }
+            return res;
+        }
 
-    Tensor<T> forwardRnSub(ds::Vec<Tensor<T>> vals) {
-      _grad = Tensor<T>::fill(1);
-      // create a Tensor from specified shape
-      Tensor<T> res = Tensor<T>(vals.begin()->shape());
-      res.copy(vals.begin);
-      for (auto &val: vals) {
-      }
-    }
-  };
+        Tensor<T> forwardRnSub(ds::Vec<Tensor<T>> vals) {
+            _grad = Tensor<T>::fill(1);
+            // create a Tensor from specified shape
+            Tensor<T> res = Tensor<T>(vals.begin()->shape());
+            res.copy(vals.begin);
+            for (auto& val : vals) {
+            }
+        }
+    };
 
 
 } // namespace hahaha::ml::util

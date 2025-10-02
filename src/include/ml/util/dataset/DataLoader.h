@@ -18,9 +18,9 @@
 #ifndef HIAHIAHIA_DATALOADER_H
 #define HIAHIAHIA_DATALOADER_H
 
-#include <common/Error.h>
 #include <common/Res.h>
 #include <common/ds/Vec.h>
+#include <common/error.h>
 #include <memory>
 #include <ml/util/dataset/Dataset.h>
 #include <ml/util/dataset/Sample.h>
@@ -28,183 +28,206 @@
 
 namespace hahaha::ml {
 
-  /**
-   * DataLoader error class
-   */
-  class DataLoaderError : public Error {
-public:
-    explicit DataLoaderError(ds::Str message, ds::Str location = ds::Str("DataLoader")) :
-        _message(std::move(message)), _location(std::move(location)) {}
-
-    [[nodiscard]] ds::Str typeName() const override { return ds::Str("DataLoaderError"); }
-    [[nodiscard]] ds::Str message() const override { return _message; }
-    [[nodiscard]] ds::Str location() const override { return _location; }
-    [[nodiscard]] ds::Str toString() const override {
-      return typeName() + ds::Str(": ") + message() + ds::Str(" at ") + location();
-    }
-
-private:
-    ds::Str _message;
-    ds::Str _location;
-  };
-
-  /**
-   * DataLoader class
-   *
-   * Provides functionality to load data in batches with optional shuffling
-   * and preprocessing capabilities.
-   */
-  template<typename T>
-  class DataLoader {
-public:
     /**
-     * Create a new DataLoader
+     * DataLoader error class
      */
-    DataLoader(std::shared_ptr<Dataset<T>> dataset, size_t batchSize, bool shuffle = true, bool dropLast = false) :
-        _dataset(std::move(dataset)), _batchSize(batchSize), _shuffle(shuffle), _dropLast(dropLast), _currentIndex(0) {
-      if (_shuffle) {
-        shuffleIndices();
-      } else {
-        _indices.reserve(_dataset->size());
-        for (size_t i = 0; i < _dataset->size(); ++i) {
-          _indices.push_back(i);
+    class DataLoaderError : public error {
+    public:
+        explicit DataLoaderError(ds::Str message, ds::Str location = ds::Str("DataLoader"))
+            : _message(std::move(message)), _location(std::move(location)) {}
+
+        [[nodiscard]] ds::Str typeName() const override {
+            return ds::Str("DataLoaderError");
         }
-      }
-    }
-
-    /**
-     * Reset the iterator to the beginning and optionally reshuffle
-     */
-    void reset() {
-      _currentIndex = 0;
-      if (_shuffle) {
-        shuffleIndices();
-      }
-    }
-
-    /**
-     * Get the next batch of samples
-     */
-    Res<ds::Vec<Sample<T>>, DataLoaderError> nextBatch() {
-      SetRetT(ds::Vec<Sample<T>>, DataLoaderError);
-
-      if (_currentIndex >= _dataset->size()) {
-        Err(DataLoaderError(ds::Str("No more batches available")));
-      }
-
-      ds::Vec<Sample<T>> batch;
-      const size_t remaining = std::min(_batchSize, _dataset->size() - _currentIndex);
-
-      // If drop_last is true and this is the last incomplete batch, return error
-      if (_dropLast && remaining < _batchSize) {
-        Err(DataLoaderError(ds::Str("Dropping last incomplete batch")));
-      }
-
-      // Load the batch
-      for (size_t i = 0; i < remaining; ++i) {
-        auto sampleRes = _dataset->get(_indices[_currentIndex + i]);
-        if (sampleRes.isErr()) {
-          Err(DataLoaderError(sampleRes.unwrapErr().message()));
+        [[nodiscard]] ds::Str message() const override {
+            return _message;
         }
-        batch.push_back(sampleRes.unwrap());
-      }
+        [[nodiscard]] ds::Str location() const override {
+            return _location;
+        }
+        [[nodiscard]] ds::Str toString() const override {
+            return typeName() + ds::Str(": ") + message() + ds::Str(" at ") + location();
+        }
 
-      _currentIndex += remaining;
-      Ok(std::move(batch));
-    }
-
-    /**
-     * Check if there are more batches available
-     */
-    [[nodiscard]] bool hasNext() const {
-      if (_dropLast) {
-        return _currentIndex + _batchSize <= _dataset->size();
-      }
-      return _currentIndex < _dataset->size();
-    }
+    private:
+        ds::Str _message;
+        ds::Str _location;
+    };
 
     /**
-     * Get the total number of batches
+     * DataLoader class
+     *
+     * Provides functionality to load data in batches with optional shuffling
+     * and preprocessing capabilities.
      */
-    [[nodiscard]] size_t numBatches() const {
-      if (_dropLast) {
-        return _dataset->size() / _batchSize;
-      }
-      return (_dataset->size() + _batchSize - 1) / _batchSize;
-    }
+    template <typename T>
+    class DataLoader {
+    public:
+        /**
+         * Create a new DataLoader
+         */
+        DataLoader(std::shared_ptr<Dataset<T>> dataset, size_t batchSize, bool shuffle = true, bool dropLast = false)
+            : _dataset(std::move(dataset)), _batchSize(batchSize), _shuffle(shuffle), _dropLast(dropLast),
+              _currentIndex(0) {
+            if (_shuffle) {
+                shuffleIndices();
+            } else {
+                _indices.reserve(_dataset->size());
+                for (size_t i = 0; i < _dataset->size(); ++i) {
+                    _indices.push_back(i);
+                }
+            }
+        }
 
-    /**
-     * Get the batch size
-     */
-    [[nodiscard]] size_t batchSize() const { return _batchSize; }
+        /**
+         * Reset the iterator to the beginning and optionally reshuffle
+         */
+        void reset() {
+            _currentIndex = 0;
+            if (_shuffle) {
+                shuffleIndices();
+            }
+        }
 
-    /**
-     * Get the dataset size
-     */
-    [[nodiscard]] size_t datasetSize() const { return _dataset->size(); }
+        /**
+         * Get the next batch of samples
+         */
+        Res<ds::Vec<Sample<T>>, DataLoaderError> nextBatch() {
+            SetRetT(ds::Vec<Sample<T>>, DataLoaderError);
 
-    /**
-     * Get feature dimension
-     */
-    [[nodiscard]] size_t featureDim() const { return _dataset->featureDim(); }
+            if (_currentIndex >= _dataset->size()) {
+                Err(DataLoaderError(ds::Str("No more batches available")));
+            }
 
-    /**
-     * Get label dimension
-     */
-    [[nodiscard]] size_t labelDim() const { return _dataset->labelDim(); }
+            ds::Vec<Sample<T>> batch;
+            const size_t remaining = std::min(_batchSize, _dataset->size() - _currentIndex);
 
-    /**
-     * Set whether to shuffle the data
-     */
-    void setShuffle(bool shuffle) {
-      _shuffle = shuffle;
-      if (_shuffle) {
-        shuffleIndices();
-      }
-    }
+            // If drop_last is true and this is the last incomplete batch, return error
+            if (_dropLast && remaining < _batchSize) {
+                Err(DataLoaderError(ds::Str("Dropping last incomplete batch")));
+            }
 
-    /**
-     * Set whether to drop the last incomplete batch
-     */
-    void setDropLast(bool dropLast) { _dropLast = dropLast; }
+            // Load the batch
+            for (size_t i = 0; i < remaining; ++i) {
+                auto sampleRes = _dataset->get(_indices[_currentIndex + i]);
+                if (sampleRes.isErr()) {
+                    Err(DataLoaderError(sampleRes.unwrapErr().message()));
+                }
+                batch.push_back(sampleRes.unwrap());
+            }
 
-    /**
-     * Get feature names if available
-     */
-    [[nodiscard]] ds::Vec<ds::Str> featureNames() const { return _dataset->featureNames(); }
+            _currentIndex += remaining;
+            Ok(std::move(batch));
+        }
 
-    /**
-     * Get label names if available
-     */
-    [[nodiscard]] ds::Vec<ds::Str> labelNames() const { return _dataset->labelNames(); }
+        /**
+         * Check if there are more batches available
+         */
+        [[nodiscard]] bool hasNext() const {
+            if (_dropLast) {
+                return _currentIndex + _batchSize <= _dataset->size();
+            }
+            return _currentIndex < _dataset->size();
+        }
 
-    /**
-     * Get dataset description if available
-     */
-    [[nodiscard]] ds::Str description() const { return _dataset->description(); }
+        /**
+         * Get the total number of batches
+         */
+        [[nodiscard]] size_t numBatches() const {
+            if (_dropLast) {
+                return _dataset->size() / _batchSize;
+            }
+            return (_dataset->size() + _batchSize - 1) / _batchSize;
+        }
 
-private:
-    std::shared_ptr<Dataset<T>> _dataset;
-    size_t _batchSize;
-    bool _shuffle;
-    bool _dropLast;
-    size_t _currentIndex;
-    ds::Vec<size_t> _indices;
-    std::random_device _rd;
-    std::mt19937 _gen{_rd()};
+        /**
+         * Get the batch size
+         */
+        [[nodiscard]] size_t batchSize() const {
+            return _batchSize;
+        }
 
-    /**
-     * Shuffle the indices
-     */
-    void shuffleIndices() {
-      _indices.clear();
-      _indices.reserve(_dataset->size());
-      for (size_t i = 0; i < _dataset->size(); ++i) {
-        _indices.push_back(i);
-      }
-      std::ranges::shuffle(_indices, _gen);
-    }
-  };
+        /**
+         * Get the dataset size
+         */
+        [[nodiscard]] size_t datasetSize() const {
+            return _dataset->size();
+        }
+
+        /**
+         * Get feature dimension
+         */
+        [[nodiscard]] size_t featureDim() const {
+            return _dataset->featureDim();
+        }
+
+        /**
+         * Get label dimension
+         */
+        [[nodiscard]] size_t labelDim() const {
+            return _dataset->labelDim();
+        }
+
+        /**
+         * Set whether to shuffle the data
+         */
+        void setShuffle(bool shuffle) {
+            _shuffle = shuffle;
+            if (_shuffle) {
+                shuffleIndices();
+            }
+        }
+
+        /**
+         * Set whether to drop the last incomplete batch
+         */
+        void setDropLast(bool dropLast) {
+            _dropLast = dropLast;
+        }
+
+        /**
+         * Get feature names if available
+         */
+        [[nodiscard]] ds::Vec<ds::Str> featureNames() const {
+            return _dataset->featureNames();
+        }
+
+        /**
+         * Get label names if available
+         */
+        [[nodiscard]] ds::Vec<ds::Str> labelNames() const {
+            return _dataset->labelNames();
+        }
+
+        /**
+         * Get dataset description if available
+         */
+        [[nodiscard]] ds::Str description() const {
+            return _dataset->description();
+        }
+
+    private:
+        std::shared_ptr<Dataset<T>> _dataset;
+        size_t _batchSize;
+        bool _shuffle;
+        bool _dropLast;
+        size_t _currentIndex;
+        ds::Vec<size_t> _indices;
+        std::random_device _rd;
+        std::mt19937 _gen{_rd()};
+
+        /**
+         * Shuffle the indices
+         */
+        void shuffleIndices() {
+            _indices.clear();
+            _indices.reserve(_dataset->size());
+            for (size_t i = 0; i < _dataset->size(); ++i) {
+                _indices.push_back(i);
+            }
+            std::ranges::shuffle(_indices, _gen);
+        }
+    };
 
 } // namespace hahaha::ml
 
