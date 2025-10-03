@@ -24,7 +24,9 @@
 //
 // class LinearRegressionTest : public ::testing::Test {
 // public:
-//     void SetUp() override;
+//     void SetUp() override {
+//
+//     }
 //     void TearDown() override;
 // };
 //

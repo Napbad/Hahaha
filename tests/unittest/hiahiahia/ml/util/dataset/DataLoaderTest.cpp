@@ -45,7 +45,7 @@ public:
         csvFile.close();
 
         // Create and load dataset
-        dataset  = std::make_shared<CSVDataset<float>>(
+        dataset  = std::make_shared<CSVDataset<f32>>(
             ds::Str("test_dataloader.csv"), ds::Vec<sizeT>{0, 1}, ds::Vec<sizeT>{2}, true, ',', ds::Str());
         auto res = dataset->load();
         ASSERT_TRUE(res.isOk()) << "Failed to load dataset";
@@ -58,12 +58,12 @@ public:
 
 protected:
     std::string csvContent;
-    std::shared_ptr<CSVDataset<float>> dataset;
+    std::shared_ptr<CSVDataset<f32>> dataset;
 };
 
 TEST_F(DataLoaderTest, ConstructorTest) {
     // Create data loader
-    const DataLoader<float> dataLoader(dataset, 2, false, false);
+    const DataLoader<f32> dataLoader(dataset, 2, false, false);
 
     // Check properties
     EXPECT_EQ(dataLoader.datasetSize(), 6);
@@ -74,7 +74,7 @@ TEST_F(DataLoaderTest, ConstructorTest) {
 
 TEST_F(DataLoaderTest, NextBatchTest) {
     // Create data loader
-    DataLoader<float> dataLoader(dataset, 2, false, false);
+    DataLoader<f32> dataLoader(dataset, 2, false, false);
 
     // Get first batch
     auto batchRes = dataLoader.nextBatch();
@@ -97,7 +97,7 @@ TEST_F(DataLoaderTest, NextBatchTest) {
 
 TEST_F(DataLoaderTest, HasNextTest) {
     // Create data loader
-    DataLoader<float> dataLoader(dataset, 2, false, false);
+    DataLoader<f32> dataLoader(dataset, 2, false, false);
 
     // Should have next initially
     EXPECT_TRUE(dataLoader.hasNext());
@@ -119,7 +119,7 @@ TEST_F(DataLoaderTest, HasNextTest) {
 
 TEST_F(DataLoaderTest, DropLastTest) {
     // Create data loader with dropLast=true
-    DataLoader<float> dataLoader(dataset, 4, false, true); // Batch size 4 with 6 samples
+    DataLoader<f32> dataLoader(dataset, 4, false, true); // Batch size 4 with 6 samples
 
     // With 6 samples and batch size 4, we should have 1 batch (dropping the last incomplete batch)
     EXPECT_EQ(dataLoader.numBatches(), 1);
@@ -136,7 +136,7 @@ TEST_F(DataLoaderTest, DropLastTest) {
 
 TEST_F(DataLoaderTest, NoDropLastTest) {
     // Create data loader with dropLast=false
-    DataLoader<float> dataLoader(dataset, 4, false, false); // Batch size 4 with 6 samples
+    DataLoader<f32> dataLoader(dataset, 4, false, false); // Batch size 4 with 6 samples
 
     // With 6 samples and batch size 4, we should have 2 batches (not dropping the last incomplete batch)
     EXPECT_EQ(dataLoader.numBatches(), 2);
@@ -158,7 +158,7 @@ TEST_F(DataLoaderTest, NoDropLastTest) {
 
 TEST_F(DataLoaderTest, ResetTest) {
     // Create data loader
-    DataLoader<float> dataLoader(dataset, 2, false, false);
+    DataLoader<f32> dataLoader(dataset, 2, false, false);
 
     // Get first batch
     auto batch1Res = dataLoader.nextBatch();
@@ -188,7 +188,7 @@ TEST_F(DataLoaderTest, ResetTest) {
 
 TEST_F(DataLoaderTest, ShuffleTest) {
     // Create data loader with shuffle
-    DataLoader<float> dataLoader(dataset, 2, true, false);
+    DataLoader<f32> dataLoader(dataset, 2, true, false);
 
     // Get batch
     auto batchRes = dataLoader.nextBatch();
@@ -197,7 +197,7 @@ TEST_F(DataLoaderTest, ShuffleTest) {
 
 TEST_F(DataLoaderTest, SetShuffleTest) {
     // Create data loader without shuffle
-    DataLoader<float> dataLoader(dataset, 2, false, false);
+    DataLoader<f32> dataLoader(dataset, 2, false, false);
 
     // Enable shuffle
     dataLoader.setShuffle(true);
@@ -216,7 +216,7 @@ TEST_F(DataLoaderTest, SetShuffleTest) {
 
 TEST_F(DataLoaderTest, SetDropLastTest) {
     // Create data loader
-    DataLoader<float> dataLoader(dataset, 4, false, false);
+    DataLoader<f32> dataLoader(dataset, 4, false, false);
 
     // Change to drop last
     dataLoader.setDropLast(true);

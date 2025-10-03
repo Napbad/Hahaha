@@ -26,6 +26,7 @@
 
 using namespace hahaha::ml;
 using namespace hahaha::common;
+using namespace hahaha;
 
 class DatasetTest : public ::testing::Test {
 public:
@@ -54,7 +55,7 @@ protected:
 
 TEST_F(DatasetTest, CSVDatasetLoadTest) {
     // Create dataset
-    CSVDataset<float> dataset(
+    CSVDataset<f32> dataset(
         ds::Str("test_dataset.csv"), ds::Vec<hahaha::sizeT>{1, 2}, ds::Vec<hahaha::sizeT>{3}, true, ',', ds::Str());
 
     // Load dataset
@@ -71,7 +72,7 @@ TEST_F(DatasetTest, CSVDatasetLoadTest) {
 
 TEST_F(DatasetTest, CSVDatasetGetSampleTest) {
     // Create dataset
-    CSVDataset<float> dataset(
+    CSVDataset<f32> dataset(
         ds::Str("test_dataset.csv"), ds::Vec<hahaha::sizeT>{1, 2}, ds::Vec<hahaha::sizeT>{3}, true, ',', ds::Str());
 
     // Load dataset
@@ -92,7 +93,7 @@ TEST_F(DatasetTest, CSVDatasetGetSampleTest) {
 
 TEST_F(DatasetTest, CSVDatasetFeatureAndLabelNamesTest) {
     // Create dataset
-    CSVDataset<float> dataset(
+    CSVDataset<f32> dataset(
         ds::Str("test_dataset.csv"), ds::Vec<hahaha::sizeT>{1, 2}, ds::Vec<hahaha::sizeT>{3}, true, ',', ds::Str());
 
     // Load dataset
@@ -123,7 +124,7 @@ Charlie,45,100000,1)";
     csvFile.close();
 
     // Create dataset without header
-    CSVDataset<float> dataset(
+    CSVDataset<f32> dataset(
         ds::Str("test_noheader.csv"), ds::Vec<hahaha::sizeT>{1, 2}, ds::Vec<hahaha::sizeT>{3}, false, ',', ds::Str());
 
     // Load dataset
@@ -145,7 +146,7 @@ Charlie,45,100000,1)";
 
 TEST_F(DatasetTest, CSVDatasetInvalidIndexTest) {
     // Create dataset
-    CSVDataset<float> dataset(
+    CSVDataset<f32> dataset(
         ds::Str("test_dataset.csv"), ds::Vec<hahaha::sizeT>{1, 2}, ds::Vec<hahaha::sizeT>{3}, true, ',', ds::Str());
 
     // Load dataset
@@ -159,7 +160,7 @@ TEST_F(DatasetTest, CSVDatasetInvalidIndexTest) {
 
 TEST_F(DatasetTest, CSVDatasetDescriptionTest) {
     // Create dataset with description
-    CSVDataset<float> dataset(ds::Str("test_dataset.csv"), ds::Vec<hahaha::sizeT>{1, 2}, ds::Vec<hahaha::sizeT>{3}, true, ',',
+    CSVDataset<f32> dataset(ds::Str("test_dataset.csv"), ds::Vec<hahaha::sizeT>{1, 2}, ds::Vec<hahaha::sizeT>{3}, true, ',',
         ds::Str("Test dataset for unit testing"));
 
     // Check description

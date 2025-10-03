@@ -18,7 +18,7 @@ protected:
 };
 
 // Define type-parameterized tests
-using TestTypes = ::testing::Types<int, float, double>;
+using TestTypes = ::testing::Types<int, hahaha::f32, double>;
 TYPED_TEST_SUITE(VecTest, TestTypes);
 
 TYPED_TEST(VecTest, DefaultConstructor) {

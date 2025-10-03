@@ -33,10 +33,10 @@ namespace hahaha {
         virtual ~Model() = default;
 
         // Train the model with given features and labels
-        virtual void train(const ds::Vec<ds::Vec<float>>& features, const ds::Vec<float>& labels) = 0;
+        virtual void train(const ml::Tensor<f32>& features, const ml::Tensor<f32>& labels) = 0;
 
         // Make a prediction given input features
-        [[nodiscard]] virtual float predict(const ds::Vec<float>& features) const = 0;
+        [[nodiscard]] virtual f32 predict(const ml::Tensor<f32>& features) const = 0;
 
         // Save the model to a file
         [[nodiscard]] virtual bool save(const std::string& filepath) const = 0;

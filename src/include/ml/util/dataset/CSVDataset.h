@@ -228,7 +228,7 @@ using namespace hahaha::common::ds;
 
                 // Parse value
                 try {
-                    if constexpr (std::is_same_v<T, float>) {
+                    if constexpr (std::is_same_v<T, f32>) {
                         values.push_back(std::stof(token));
                     } else if constexpr (std::is_same_v<T, double>) {
                         values.push_back(std::stod(token));

@@ -28,6 +28,7 @@
 
 using namespace hahaha::common;
 using namespace hahaha::ml;
+using namespace hahaha;
 // CSVDataset tests
 class CSVDatasetTest : public ::testing::Test {
 protected:
@@ -67,7 +68,7 @@ TEST_F(CSVDatasetTest, Constructor) {
     const ds::Vec<hahaha::sizeT> featureCols = {0, 1};
     const ds::Vec<hahaha::sizeT> labelCols = {2};
 
-    const CSVDataset<float> dataset(
+    const CSVDataset<f32> dataset(
         ds::Str("test_data.csv"), featureCols, labelCols, true, ',', ds::Str("Test dataset"));
 
     EXPECT_EQ(dataset.featureDim(), 2);
@@ -79,7 +80,7 @@ TEST_F(CSVDatasetTest, LoadSuccess) {
     const ds::Vec<hahaha::sizeT> featureCols = {0, 1};
     const ds::Vec<hahaha::sizeT> labelCols = {2};
 
-    CSVDataset<float> dataset(ds::Str("test_data.csv"), featureCols, labelCols);
+    CSVDataset<f32> dataset(ds::Str("test_data.csv"), featureCols, labelCols);
     const auto result = dataset.load();
 
     EXPECT_TRUE(result.isOk());
@@ -90,7 +91,7 @@ TEST_F(CSVDatasetTest, LoadFailure) {
     const ds::Vec<hahaha::sizeT> featureCols = {0, 1};
     const ds::Vec<hahaha::sizeT> labelCols = {2};
 
-    CSVDataset<float> dataset(ds::Str("nonexistent.csv"), featureCols, labelCols);
+    CSVDataset<f32> dataset(ds::Str("nonexistent.csv"), featureCols, labelCols);
     const auto result = dataset.load();
 
     EXPECT_TRUE(result.isErr());
@@ -100,7 +101,7 @@ TEST_F(CSVDatasetTest, GetData) {
     ds::Vec<hahaha::sizeT> featureCols = {0, 1};
     ds::Vec<hahaha::sizeT> labelCols = {2};
 
-    CSVDataset<float> dataset(ds::Str("test_data.csv"), featureCols, labelCols);
+    CSVDataset<f32> dataset(ds::Str("test_data.csv"), featureCols, labelCols);
     auto loadResult = dataset.load();
     ASSERT_TRUE(loadResult.isOk());
 
@@ -121,7 +122,7 @@ TEST_F(CSVDatasetTest, FeatureAndLabelNames) {
     const ds::Vec<hahaha::sizeT> featureCols = {0, 1};
     const ds::Vec<hahaha::sizeT> labelCols = {2};
 
-    CSVDataset<float> dataset(ds::Str("test_data.csv"), featureCols, labelCols, true);
+    CSVDataset<f32> dataset(ds::Str("test_data.csv"), featureCols, labelCols, true);
     const auto loadResult = dataset.load();
     ASSERT_TRUE(loadResult.isOk());
 
@@ -139,7 +140,7 @@ TEST_F(CSVDatasetTest, NoHeader) {
     const ds::Vec<hahaha::sizeT> featureCols = {0, 1};
     const ds::Vec<hahaha::sizeT> labelCols = {2};
 
-    CSVDataset<float> dataset(ds::Str("test_data_no_header.csv"), featureCols, labelCols, false);
+    CSVDataset<f32> dataset(ds::Str("test_data_no_header.csv"), featureCols, labelCols, false);
     const auto loadResult = dataset.load();
     ASSERT_TRUE(loadResult.isOk());
 
@@ -163,7 +164,7 @@ TEST_F(CSVDatasetTest, DifferentDelimiter) {
     ds::Vec<hahaha::sizeT> featureCols = {0, 1};
     ds::Vec<hahaha::sizeT> labelCols = {2};
 
-    CSVDataset<float> dataset(ds::Str("test_data_semicolon.csv"), featureCols, labelCols, true, ';');
+    CSVDataset<f32> dataset(ds::Str("test_data_semicolon.csv"), featureCols, labelCols, true, ';');
     auto loadResult = dataset.load();
     ASSERT_TRUE(loadResult.isOk());
     EXPECT_EQ(dataset.size(), 2);
@@ -185,7 +186,7 @@ TEST_F(CSVDatasetTest, ParseError) {
     ds::Vec<hahaha::sizeT> featureCols = {0, 1};
     ds::Vec<hahaha::sizeT> labelCols = {2};
 
-    CSVDataset<float> dataset(ds::Str("test_data_invalid.csv"), featureCols, labelCols);
+    CSVDataset<f32> dataset(ds::Str("test_data_invalid.csv"), featureCols, labelCols);
     auto loadResult = dataset.load();
 
     // Should fail due to invalid data

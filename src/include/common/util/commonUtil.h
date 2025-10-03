@@ -139,19 +139,19 @@ namespace hahaha::common::util {
     }
 
     /**
-     * Specialization for float type conversion
+     * Specialization for f32 type conversion
      * @param str Input string to convert
-     * @return Result containing either float value or ConvertErr
+     * @return Result containing either f32 value or ConvertErr
      */
     template <>
-    inline auto strTo<float>(const ds::Str& str) -> Res<float, ConvertErr> {
-        SetRetT(float, ConvertErr) try {
+    inline auto strTo<f32>(const ds::Str& str) -> Res<f32, ConvertErr> {
+        SetRetT(f32, ConvertErr) try {
             const ds::Str trimmed = trim(str);
             size_t pos;
-            const float value = std::stof(trimmed.c_str(), &pos);
+            const f32 value = std::stof(trimmed.c_str(), &pos);
             // Check if the entire string was consumed
             if (pos != trimmed.length()) {
-                Err(ConvertErr("Invalid float format", __func__));
+                Err(ConvertErr("Invalid f32 format", __func__));
             }
             Ok(value);
         } catch (const std::exception& e) {

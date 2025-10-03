@@ -48,7 +48,7 @@ namespace hahaha::common::ds {
 
         explicit Vec(const sizeTp count) : _data(nullptr), _size(0), _capacity(0) {
             if (count > 0) {
-                reserve(count);
+            reserve(count);
                 for (sizeT i = 0; i < count; ++i) {
                     std::allocator_traits<Allocator>::construct(_allocator, _data + i);
                 }
@@ -83,7 +83,7 @@ namespace hahaha::common::ds {
                 _data = _allocator.allocate(_capacity);
                 for (sizeT i = 0; i < _size; ++i) {
                     std::allocator_traits<Allocator>::construct(_allocator, _data + i, other._data[i]);
-                }
+            }
             }
         }
 
@@ -233,7 +233,7 @@ namespace hahaha::common::ds {
                     for (sizeT i = 0; i < _size; ++i) {
                         std::allocator_traits<Allocator>::construct(_allocator, new_data + i, std::move(_data[i]));
                         std::allocator_traits<Allocator>::destroy(_allocator, _data + i);
-                    }
+            }
                 }
                 _allocator.deallocate(_data, _capacity);
                 _data = new_data;
@@ -244,6 +244,18 @@ namespace hahaha::common::ds {
 
         [[nodiscard]] bool empty() const {
             return _size == 0;
+        }
+
+        Vec<T> subVec(const sizeT start, const sizeT length) const {
+            if (start + length > _size) {
+                // Handle error: sub-vector out of bounds
+                throw std::out_of_range("subVec: sub-vector range out of bounds");
+            }
+            Vec<T> res(length);
+            for (sizeT i = 0; i < length; ++i) {
+                res[i] = _data[start + i];
+            }
+            return res;
         }
 
     private:

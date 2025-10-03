@@ -21,5 +21,28 @@
 
 #ifndef HAHAHA_MNIST_H
 #define HAHAHA_MNIST_H
+#include "Dataset.h"
+namespace hahaha::ml {
 
+    class MNIST : public Dataset<f32> {
+    public:
+        MNIST() = default;
+        ~MNIST() override = default;
+
+        [[nodiscard]] size_t size() const override {
+            return _features.size();
+        }
+
+        // [[nodiscard]] const Tensor<f32>& getFeature(size_t index) const {
+        //
+        // }
+        [[nodiscard]] int getLabel(const size_t index) const {
+            return _labels[index];
+        }
+
+    private:
+        Tensor<f32> _features;
+        ds::Vec<int> _labels;
+    };
+}
 #endif // HAHAHA_MNIST_H

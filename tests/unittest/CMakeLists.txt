@@ -20,6 +20,7 @@ add_executable(hahaha_dev_tests_unit_exe
         ${SOURCE_FILES}
         hiahiahia/ml/model/linear_regression/LinearRegressionTest.cpp
         hiahiahia/ml/util/dataset/CSVDatasetTest.cpp
+        hiahiahia/ml/util/dataset/MNISTDatasetTest.cpp
 )
 
 # Link with Google Test and the hahaha library

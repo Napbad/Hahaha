@@ -23,7 +23,7 @@
 #define DATASETITERATOR_H
 #include "common/defines/h3defs.h"
 #include <iterator>
-namespace hahaha {
+namespace hahaha::ml {
 
     template <class SampleType>
     class Dataset;

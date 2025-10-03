@@ -18,6 +18,7 @@
 #ifndef HIAHIAHIA_LINEARREGRESSION_H
 #define HIAHIAHIA_LINEARREGRESSION_H
 
+#include "ml/common/Tensor.h"
 #include <common/ds/Vec.h>
 #include <ml/model/Model.h>
 
@@ -27,12 +28,12 @@ namespace hahaha {
     public:
         LinearRegression() = default;
 
-        void train(const ds::Vec<ds::Vec<float>>& features, const ds::Vec<float>& labels) override;
-        [[nodiscard]] float predict(const ds::Vec<float>& features) const override;
+        void train(const ml::Tensor<f32>& features, const ml::Tensor<f32>& labels) override;
+        [[nodiscard]] f32 predict(const ml::Tensor<f32>& features) const override;
 
     private:
-        ds::Vec<float> _weights;
-        float _bias{0.0f};
+        ml::Tensor<f32> _weights;
+        f32 _bias{0.0f};
     };
 
 } // namespace hahaha

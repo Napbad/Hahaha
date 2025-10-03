@@ -19,8 +19,8 @@
 // Created by napbad on 9/28/25.
 //
 
-#ifndef HAHAHA_VECTORIZE_H
-#define HAHAHA_VECTORIZE_H
+#ifndef HAHAHA_COMMON_UTIL_VECTORIZE_H
+#define HAHAHA_COMMON_UTIL_VECTORIZE_H
 #include "ml/common/Tensor.h"
 namespace hahaha::common::util {
 
@@ -111,4 +111,4 @@ namespace hahaha::common::util {
 
 } // namespace hahaha::common::util
 
-#endif // HAHAHA_VECTORIZE_H
+#endif // HAHAHA_COMMON_UTIL_VECTORIZE_H

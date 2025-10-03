@@ -34,9 +34,9 @@ namespace hahaha::common::util {
 #if defined(__AVX__)
         __m128 data;
 #elif defined(__ARM_NEON)
-        float32x4_t data;
+        f3232x4_t data;
 #else
-        float data[4];
+        f32 data[4];
 #endif
     };
 
@@ -95,7 +95,7 @@ namespace hahaha::common::util {
         return r;
     }
 
-    inline void add_arrays(const float* a, const float* b, float* out, size_t n) {
+    inline void add_arrays(const f32* a, const f32* b, f32* out, size_t n) {
         size_t i = 0;
 
         // process 4 elements at a time
@@ -133,7 +133,7 @@ namespace hahaha::common::util {
     }
 
 
-    inline void sub_arrays(const float* a, const float* b, float* out, size_t n) {
+    inline void sub_arrays(const f32* a, const f32* b, f32* out, size_t n) {
         size_t i = 0;
 
         // process 4 elements at a time
@@ -170,7 +170,7 @@ namespace hahaha::common::util {
         }
     }
 
-    inline void mul_arrays(const float* a, const float* b, float* out, size_t n) {
+    inline void mul_arrays(const f32* a, const f32* b, f32* out, size_t n) {
         size_t i = 0;
 
         // process 4 elements at a time
@@ -207,7 +207,7 @@ namespace hahaha::common::util {
         }
     }
 
-    inline void div_arrays(const float* a, const float* b, float* out, size_t n) {
+    inline void div_arrays(const f32* a, const f32* b, f32* out, size_t n) {
         size_t i = 0;
 
         // process 4 elements at a time

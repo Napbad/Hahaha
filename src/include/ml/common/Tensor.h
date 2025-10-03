@@ -45,9 +45,12 @@ namespace hahaha::ml {
 
         Tensor() = default;
 
-        Tensor(std::initializer_list<sizeT> shape) : _shape(shape), _data(computeSize(shape)) {}
+        Tensor(const std::initializer_list<sizeT> shape) : _shape(shape), _data(computeSize(shape)) {}
 
         explicit Tensor(const ds::Vec<sizeT>& shape) : _shape(shape), _data(computeSize(shape)) {}
+
+        // Constructor for a 0-dimensional tensor (scalar)
+        explicit Tensor(const std::initializer_list<sizeT> shape, std::initializer_list<T> data) : _shape(shape), _data(data) {}
 
         // Access shape
         [[nodiscard]] const ds::Vec<sizeT>& shape() const {
@@ -58,17 +61,17 @@ namespace hahaha::ml {
         }
 
         // Index calculation (flattened)
-        [[nodiscard]] Res<sizeT, BaseErr> index(const ds::Vec<sizeT>& indices) const {
+        [[nodiscard]] Res<sizeT, BaseErr> index(const std::initializer_list<sizeT>  indices) const {
             SetRetT(sizeT, BaseErr)
 
-                if (indices.size() != _shape.size()) Err(BaseErr("Incorrect number of indices"));
+            if (indices.size() != _shape.size()) Err(BaseErr("Incorrect number of indices"));
             sizeT idx    = 0;
             sizeT stride = 1;
             for (int i = static_cast<int>(_shape.size()) - 1; i >= 0; --i) {
-                if (indices[i] >= _shape[i]) {
+                if (indices.begin()[i] >= _shape[i]) {
                     Err(BaseErr("Index out of bounds"));
                 }
-                idx += indices[i] * stride;
+                idx += indices.begin()[i] * stride;
                 stride *= _shape[i];
             }
             Ok(idx);
@@ -83,7 +86,7 @@ namespace hahaha::ml {
         }
 
         // Fill tensor with value
-        void fill(const valueType v) const {
+        void fill(const valueType v) {
             std::ranges::fill(_data, v);
         }
 
@@ -116,6 +119,15 @@ namespace hahaha::ml {
             return result;
         }
 
+        T dot(const Tensor& other) const {
+            checkShape(other);
+            T result = 0;
+            for (sizeT i = 0; i < size(); ++i) {
+                result += _data[i] * other._data[i];
+            }
+            return result;
+        }
+
         // Print
         void printFlat() const {
             for (const auto& v : _data) {
@@ -133,23 +145,116 @@ namespace hahaha::ml {
             return tensor;
         }
 
-        Res<void, TensorErr> copy(const Tensor other) {
-            SetRetT(void, TensorErr) if (other.shape() != _shape) {
-                Err("can not copy value from a tensor with different shape")
+        Res<void, TensorErr> copy(const Tensor& other) {
+            SetRetT(void, TensorErr)
+            if (other.shape() != _shape) {
+                Err(TensorErr("Cannot copy value from a tensor with different shape"))
             }
+            for (sizeT i = 0; i < other.size(); ++i) {
+                _data[i] = other._data[i];
+            }
+            Ok()
+        }
 
-            for (int i = 0; i < other.size(); ++i) {
-                if (auto val = dynamic_cast<Tensor*>(other._data[i])) {
-                    dynamic_cast<Tensor*>(_data[i])->copy(*val);
-                } else {
-                    val = other._data[i];
-                }
+        Res<void, TensorErr> copy(const ds::Vec<T> &other) {
+            SetRetT(void, TensorErr)
+            if (other.size() != this->size()) {
+                Err(TensorErr("Cannot copy value from a tensor with different shape"))
+            }
+            for (sizeT i = 0; i < other.size(); ++i) {
+                _data[i] = other[i];
             }
             Ok()
         }
 
         [[nodiscard]] sizeT dim() const {
             return shape().size();
+        }
+
+        // Element-wise subtraction
+        Tensor operator-(const Tensor& other) const {
+            checkShape(other);
+            Tensor result(_shape);
+            for (sizeT i = 0; i < size(); ++i) {
+                result._data[i] = _data[i] - other._data[i];
+            }
+            return result;
+        }
+
+        // Element-wise division
+        Tensor operator/(const Tensor& other) const {
+            checkShape(other);
+            Tensor result(_shape);
+            for (sizeT i = 0; i < size(); ++i) {
+                // Add check for division by zero if T is a floating-point type
+                if constexpr (std::is_floating_point_v<T>) {
+                    if (other._data[i] == static_cast<T>(0)) {
+                        throw std::runtime_error("Division by zero");
+                    }
+                }
+                result._data[i] = _data[i] / other._data[i];
+            }
+            return result;
+        }
+
+        // Scalar operations (subtraction and division)
+        Tensor operator-(valueType scalar) const {
+            Tensor result(_shape);
+            for (sizeT i = 0; i < size(); ++i) {
+                result._data[i] = _data[i] - scalar;
+            }
+            return result;
+        }
+
+        Tensor operator/(valueType scalar) const {
+            if constexpr (std::is_floating_point_v<T>) {
+                if (scalar == static_cast<T>(0)) {
+                    throw std::runtime_error("Division by zero by scalar");
+                }
+            }
+            Tensor result(_shape);
+            for (sizeT i = 0; i < size(); ++i) {
+                result._data[i] = _data[i] / scalar;
+            }
+            return result;
+        }
+
+        // Compound assignment operators
+        Tensor& operator+=(const Tensor& other) {
+            checkShape(other);
+            for (sizeT i = 0; i < size(); ++i) {
+                _data[i] += other._data[i];
+            }
+            return *this;
+        }
+
+        Tensor& operator-=(const Tensor& other) {
+            checkShape(other);
+            for (sizeT i = 0; i < size(); ++i) {
+                _data[i] -= other._data[i];
+            }
+            return *this;
+        }
+
+        Tensor& operator*=(const Tensor& other) {
+            checkShape(other);
+            for (sizeT i = 0; i < size(); ++i) {
+                _data[i] *= other._data[i];
+            }
+            return *this;
+        }
+
+        Tensor& operator/=(const Tensor& other) {
+            checkShape(other);
+            for (sizeT i = 0; i < size(); ++i) {
+                if constexpr (std::is_floating_point_v<T>) {
+                    if (other._data[i] == static_cast<T>(0)) {
+                        throw std::runtime_error("Division by zero");
+                    }
+                }
+                _data[i] /= other._data[i];
+            }
+            return *this;
         }
 
         [[nodiscard]] auto begin() const {
@@ -161,6 +266,46 @@ namespace hahaha::ml {
 
         [[nodiscard]] auto rawData() const {
             return _data;
+        }
+
+        [[nodiscard]] bool empty() const {
+            return _data.empty();
+        }
+
+        Res<Tensor, IndexOutOfBoundError> at(const std::initializer_list<sizeT>  indices) const {
+            SetRetT(Tensor, IndexOutOfBoundError)
+            if (indices.size() > dim()) {
+                Err("Too many indices for at() method");
+            }
+            if (indices.size() == 0 && dim() != 0) {
+                Err("Cannot access scalar tensor with empty indices")
+            }
+            // calculate start index and tensor size
+            auto idxRes = index(indices);
+            if (idxRes.isErr()) {
+                Err(IndexOutOfBoundError(idxRes.unwrapErr().message()));
+            }
+            
+            sizeT start = idxRes.unwrap();
+            sizeT length = 1;
+
+            if (indices.size() == dim()) {
+                Ok(Tensor({0}, {_data[start]}))
+            }
+
+            ds::Vec<sizeT> newShape;
+            for (sizeT i = indices.size(); i < _shape.size(); ++i) {
+                newShape.push_back(i);
+                length *= _shape[i];
+            }
+
+            if (start + length > _data.size()) {
+                Err(IndexOutOfBoundError("Calculated range out of bounds"));
+            }
+
+            Tensor res(newShape);
+            res.copy(_data.subVec(start, length));
+            Ok(res);
         }
 
     private:

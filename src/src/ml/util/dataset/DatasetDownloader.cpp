@@ -16,6 +16,7 @@
 // GitHub: https://github.com/Napbad
 
 #include <common/util/io/file/fileUtil.h>
+#include <common/util/io/net/HttpClient.h> // Include HttpClient
 #include <curl/curl.h>
 #include <fstream>
 #include <ml/util/dataset/DatasetDownloader.h>
@@ -23,117 +24,101 @@
 
 namespace hahaha::ml {
     using namespace common;
+    using namespace common::util;
     namespace {
 
+        // This writeCallback will now write directly to the output stream provided
         size_t writeCallback(void* contents, const size_t size, size_t nmemb, void* userp) {
-            auto* file            = static_cast<std::ofstream*>(userp);
-            const size_t realSize = size * nmemb;
-            file->write(static_cast<char*>(contents), static_cast<long>(realSize));
-            return realSize;
+            auto* outStream         = static_cast<std::ofstream*>(userp);
+            const size_t bytesToWrite = size * nmemb;
+            outStream->write(static_cast<char*>(contents), static_cast<long>(bytesToWrite));
+            return bytesToWrite;
         }
 
+        // The progress callback can remain as is for now
         int progressCallback(const void* clientp, double dltotal, double dlnow, double ultotal, double ulnow) {
             (void) clientp;
             (void) dltotal;
             (void) dlnow;
             (void) ultotal;
             (void) ulnow;
+            // You can add progress reporting logic here if showProgress is true
             return 0; // Return non-zero to abort transfer
         }
 
     } // namespace
 
     Res<void, DatasetDownloaderError> DatasetDownloader::downloadFromUrl(
-        const ds::Str& url, const ds::Str& outputPath, const bool showProgress) {
+        const Str& url, const Str& outputPath, const bool showProgress) {
         SetRetT(void, DatasetDownloaderError);
 
-        // Initialize CURL
-        CURL* curl = curl_easy_init();
-        if (!curl) {
-            Err(DatasetDownloaderError(ds::Str("Failed to initialize CURL")));
+        // Use HttpRequest to prepare the request
+        HttpRequest request(url, HttpMethod::GET);
+
+        // Create an HttpClient and send the request
+        std::unique_ptr<HttpResponse> response = HttpClient::send(request);
+
+        if (!response) {
+            Err(DatasetDownloaderError(Str("Failed to get HTTP response for URL: ") + url));
+        }
+
+        // Check HTTP status code
+        if (response->getStatusCode() >= 400) {
+            Err(DatasetDownloaderError(
+                Str("HTTP error: ") + Str(std::to_string(response->getStatusCode())) + Str(" for URL: ") + url));
         }
 
         // Open output file
         std::ofstream outFile(outputPath.data(), std::ios::binary);
-        if (!outFile) {
-            curl_easy_cleanup(curl);
-            Err(DatasetDownloaderError(ds::Str("Failed to open output file: ") + outputPath));
+        if (!outFile.is_open()) {
+            Err(DatasetDownloaderError(Str("Failed to open output file: ") + outputPath));
         }
 
-        // Set CURL options
-        curl_easy_setopt(curl, CURLOPT_URL, url.data());
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &outFile);
-        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-
-        if (showProgress) {
-            curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
-            curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, progressCallback);
-        }
-
-        // Perform the request
-        const CURLcode res = curl_easy_perform(curl);
-
-        // Cleanup
+        // Write the response body to the file
+        outFile << response->getBody().c_str();
         outFile.close();
-        curl_easy_cleanup(curl);
-
-        if (res != CURLE_OK) {
-            Err(DatasetDownloaderError(ds::Str("CURL error: ") + ds::Str(curl_easy_strerror(res))));
-        }
 
         Ok();
     }
 
     Res<void, DatasetDownloaderError> DatasetDownloader::downloadFromUCI(
-        const ds::Str& datasetName, const ds::Str& outputPath) {
-        const auto baseUrl = ds::Str("https://archive.ics.uci.edu/ml/machine-learning-databases/");
-        ds::Str url        = baseUrl + datasetName + ds::Str("/") + datasetName + ds::Str(".data");
+        const Str& datasetName, const Str& outputPath) {
+        const auto baseUrl = Str("https://archive.ics.uci.edu/ml/machine-learning-databases/");
+        const Str url        = baseUrl + datasetName + Str("/") + datasetName + Str(".data");
         return downloadFromUrl(url, outputPath);
     }
 
     Res<void, DatasetDownloaderError> DatasetDownloader::downloadFromKaggle(
-        const ds::Str& datasetName, const ds::Str& outputPath, const ds::Str& apiToken) {
+        const Str& datasetName, const Str& outputPath, const Str& apiToken) {
         SetRetT(void, DatasetDownloaderError);
 
-        // Initialize CURL
-        CURL* curl = curl_easy_init();
-        if (!curl) {
-            Err(DatasetDownloaderError(ds::Str("Failed to initialize CURL")));
+        // Use HttpRequest to prepare the request
+        HttpRequest request(Str("https://www.kaggle.com/api/v1/datasets/download/") + datasetName, HttpMethod::GET);
+        request.addHeader(Str("Authorization"), Str("Bearer ") + apiToken);
+
+        // Create an HttpClient and send the request
+        std::unique_ptr<HttpResponse> response = HttpClient::send(request);
+
+        if (!response) {
+            Err(DatasetDownloaderError(Str("Failed to get HTTP response for Kaggle dataset: ") + datasetName));
+        }
+
+        // Check HTTP status code
+        if (response->getStatusCode() >= 400) {
+            Err(DatasetDownloaderError(
+                Str("HTTP error: ") + Str(std::to_string(response->getStatusCode())) + Str(" for Kaggle dataset: ") +
+                datasetName));
         }
 
         // Open output file
         std::ofstream outFile(outputPath.data(), std::ios::binary);
-        if (!outFile) {
-            curl_easy_cleanup(curl);
-            Err(DatasetDownloaderError(ds::Str("Failed to open output file: ") + outputPath));
+        if (!outFile.is_open()) {
+            Err(DatasetDownloaderError(Str("Failed to open output file: ") + outputPath));
         }
 
-        // Set up headers
-        struct curl_slist* headers = nullptr;
-        headers                    = curl_slist_append(headers, ("Authorization: Bearer " + apiToken).data());
-
-        // Set CURL options
-        const ds::Str url = ds::Str("https://www.kaggle.com/api/v1/datasets/download/") + datasetName;
-        curl_easy_setopt(curl, CURLOPT_URL, url.data());
-        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &outFile);
-        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-
-        // Perform the request
-        const CURLcode res = curl_easy_perform(curl);
-
-        // Cleanup
+        // Write the response body to the file
+        outFile << response->getBody().c_str();
         outFile.close();
-        curl_slist_free_all(headers);
-        curl_easy_cleanup(curl);
-
-        if (res != CURLE_OK) {
-            Err(DatasetDownloaderError(ds::Str("CURL error: ") + ds::Str(curl_easy_strerror(res))));
-        }
 
         Ok();
     }

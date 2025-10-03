@@ -16,19 +16,6 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by Napbad on 8/4/25.
+// Created by napbad on 10/3/25.
 //
 
-#ifndef DATASETTYPE_H
-#define DATASETTYPE_H
-
-namespace hahaha {
-    enum class DatasetType {
-        MNIST,
-        CIFAR10,
-        CIFAR100,
-    };
-} // namespace hahaha
-
-
-#endif // DATASETTYPE_H
