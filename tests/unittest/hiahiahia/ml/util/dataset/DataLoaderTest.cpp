@@ -17,8 +17,8 @@
 
 #include "ml/util/dataset/DataLoader.h"
 
-#include "common/ds/Vec.h"
 #include "common/ds/Str.h"
+#include "common/ds/Vec.h"
 #include "ml/util/dataset/CSVDataset.h"
 #include <fstream>
 #include <gtest/gtest.h>
@@ -45,7 +45,7 @@ public:
         csvFile.close();
 
         // Create and load dataset
-        dataset  = std::make_shared<CSVDataset<f32>>(
+        dataset = std::make_shared<CSVDataset<f32>>(
             ds::Str("test_dataloader.csv"), ds::Vec<sizeT>{0, 1}, ds::Vec<sizeT>{2}, true, ',', ds::Str());
         auto res = dataset->load();
         ASSERT_TRUE(res.isOk()) << "Failed to load dataset";
@@ -92,7 +92,6 @@ TEST_F(DataLoaderTest, NextBatchTest) {
     auto& secondSample = batch[1];
     EXPECT_EQ(secondSample.featureDim(), 2);
     EXPECT_EQ(secondSample.labelDim(), 1);
-
 }
 
 TEST_F(DataLoaderTest, HasNextTest) {

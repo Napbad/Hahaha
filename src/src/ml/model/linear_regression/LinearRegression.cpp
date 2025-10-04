@@ -17,6 +17,8 @@
 
 #include <ml/model/linear_regression/LinearRegression.h>
 
+hhh
+
 namespace hahaha {
 
     using namespace hahaha::common;
@@ -27,6 +29,19 @@ namespace hahaha {
 
         return result;
     }
+    bool LinearRegression::save(const Str& filepath) const {
+        return true;
+    }
+    bool LinearRegression::load(const Str& path) {
+        return true;
+    }
+    sizeT LinearRegression::parameterCount() const {
+        return _weights.size() + 1;
+    }
+
+    Str LinearRegression::modelName() const {
+        return Str("LinearRegression");
+    }
 
     ml::Tensor<f32> operator*(f32 lhs, const ml::Tensor<f32>& rhs) {
         auto result = ml::Tensor<f32>(rhs.shape());
@@ -36,29 +51,66 @@ namespace hahaha {
         }
         return result;
     }
-    void LinearRegression::train(const ml::Tensor<f32>& features, const ml::Tensor<f32>& labels) {
-        // Initialize weights if not already done
-        _bias = 0.0f;
-        _weights.fill(0);
+    Res<void, BaseErr> LinearRegression::checkStatus(const ml::Tensor<f32>& features, const ml::Tensor<f32>& labels)
+        const {
+        SetRetT(void, BaseErr)
 
+        if (_weights.empty()) {
+            Err("Weights are not initialized")
+        }
+
+        if (features.shape()[0] != labels.shape()[0]) {
+            Err("Mismatch in number of samples between features and labels")
+        }
+
+        // if (features.shape())
+
+        for (int i = 1; i < features.shape().size(); i++) {
+            if (features.shape()[i] != this->_weights.shape()[i]) {
+                Err("invalid shape of features and weights")
+            }
+        }
+
+        Ok()
+    }
+    Res<ml::TrainStatistics, BaseErr> LinearRegression::train(
+        const ml::Tensor<f32>& features, const ml::Tensor<f32>& labels) {
+        SetRetT(ml::TrainStatistics, ml::BaseErr)
+        // Initialize weights if not already done
+        if (_weights.empty()) {
+            _weights = ml::Tensor<f32>(features.shape().subVec(1, features.shape().size() - 1));
+        }
+        _weights.fill (0);
+        _bias = 0.0f;
+
+        if (auto res = checkStatus(features, labels); res.isErr()) {
+            Err(res.unwrapErr().message());
+        }
+
+        const auto sampleSize = features.shape()[0];
+
+        ml::EmptyTrainStatistics stats;
         // Simple gradient descent
-        const f32 learningRate = 0.01f;
-        const int numEpochs      = 100;
+        const auto numEpochs = _epochs;
+        const auto learningRate = _learningRate;
 
         for (int epoch = 0; epoch < numEpochs; ++epoch) {
-            for (sizeT i = 0; i < features.size(); ++i) {
+            for (sizeT i = 0; i < sampleSize; ++i) {
                 // Forward pass
-                Res<ml::Tensor<f32>, IndexOutOfBoundError> res = features.at({1});
-                const f32 prediction = predict(res.unwrap());
-                const f32 error      = prediction - labels.index({i}).unwrap<f32>();
+                ml::Tensor<f32> feature = features.at({i}).unwrap();
+                // unwarp will return a Tensor with zero dimension
+                const f32 label = labels.at({i}).unwrap().first();
+                const f32 prediction                           = predict(feature);
+                const f32 error                                = prediction - label;
 
                 // Update weights
-                _weights -= learningRate * error * features.at({i}).unwrap();
+                _weights -= learningRate * error * feature;
 
                 // Update bias
                 _bias -= learningRate * error;
             }
         }
+        Ok(stats)
     }
 
 } // namespace hahaha

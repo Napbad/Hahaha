@@ -25,6 +25,6 @@
 namespace hahaha::ml {
 
     class Array {};
-}
+} // namespace hahaha::ml
 
 #endif // HAHAHA_ARRAY_H

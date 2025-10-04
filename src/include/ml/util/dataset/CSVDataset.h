@@ -29,7 +29,7 @@
 
 namespace hahaha::ml {
 
-using namespace hahaha::common::ds;
+    using namespace hahaha::common::ds;
     /**
      * CSV dataset error class
      */
@@ -74,8 +74,8 @@ using namespace hahaha::common::ds;
         CSVDataset(Str filepath, const Vec<sizeT>& featureCols, const Vec<sizeT>& labelCols,
             const bool hasHeader = true, const char delimiter = ',', Str description = Str())
             : _filepath(std::move(filepath)), _featureCols(featureCols.begin(), featureCols.end()),
-        _labelCols(labelCols.begin(), labelCols.end()), _hasHeader(hasHeader),
-              _delimiter(delimiter), _description(std::move(description)) {}
+              _labelCols(labelCols.begin(), labelCols.end()), _hasHeader(hasHeader), _delimiter(delimiter),
+              _description(std::move(description)) {}
 
         ~CSVDataset() override = default;
 

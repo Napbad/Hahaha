@@ -1,6 +1,7 @@
-#include "gtest/gtest.h"
 #include "common/ds/Str.h"
+
 #include "common/error.h"
+#include "gtest/gtest.h"
 #include <sstream>
 
 using namespace hahaha::common::ds;
@@ -46,7 +47,7 @@ TEST_F(StrTest, CopyConstructor) {
 TEST_F(StrTest, MoveConstructor) {
     Str original("moveme");
     char* original_data = original.begin();
-    Str moved = std::move(original);
+    Str moved           = std::move(original);
     ASSERT_EQ(moved.size(), 6);
     ASSERT_STREQ(moved.c_str(), "moveme");
     ASSERT_TRUE(original.empty());
@@ -342,4 +343,4 @@ TEST_F(StrTest, HashSpecialization) {
     std::hash<Str> hasher;
     ASSERT_EQ(hasher(s1), hasher(s2));
     ASSERT_NE(hasher(s1), hasher(s3));
-} 
+}

@@ -48,7 +48,7 @@ namespace hahaha::common::ds {
 
         explicit Vec(const sizeTp count) : _data(nullptr), _size(0), _capacity(0) {
             if (count > 0) {
-            reserve(count);
+                reserve(count);
                 for (sizeT i = 0; i < count; ++i) {
                     std::allocator_traits<Allocator>::construct(_allocator, _data + i);
                 }
@@ -58,7 +58,7 @@ namespace hahaha::common::ds {
 
         Vec(std::initializer_list<T> init) : _data(nullptr), _size(0), _capacity(0) {
             reserve(init.size());
-            _size = init.size();
+            _size     = init.size();
             sizeT idx = 0;
             for (const auto& i : init) {
                 std::allocator_traits<Allocator>::construct(_allocator, _data + idx, i);
@@ -83,7 +83,7 @@ namespace hahaha::common::ds {
                 _data = _allocator.allocate(_capacity);
                 for (sizeT i = 0; i < _size; ++i) {
                     std::allocator_traits<Allocator>::construct(_allocator, _data + i, other._data[i]);
-            }
+                }
             }
         }
 
@@ -220,11 +220,11 @@ namespace hahaha::common::ds {
                 }
 
                 _allocator.deallocate(_data, _capacity);
-                _data = new_data;
+                _data     = new_data;
                 _capacity = newCap;
             }
         }
-        
+
         void shrink_to_fit() {
             if (_capacity > _size) {
                 T* new_data = nullptr;
@@ -233,10 +233,10 @@ namespace hahaha::common::ds {
                     for (sizeT i = 0; i < _size; ++i) {
                         std::allocator_traits<Allocator>::construct(_allocator, new_data + i, std::move(_data[i]));
                         std::allocator_traits<Allocator>::destroy(_allocator, _data + i);
-            }
+                    }
                 }
                 _allocator.deallocate(_data, _capacity);
-                _data = new_data;
+                _data     = new_data;
                 _capacity = _size;
             }
         }

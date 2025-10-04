@@ -37,6 +37,7 @@ add_library(hahaha STATIC
         src/include/ml/common/Array.h
         src/src/common/error.cpp
         src/src/common/ds/Str.cpp
+        src/include/ml/common/trainStatistics.h
 )
 
 # Set C++ as the link language

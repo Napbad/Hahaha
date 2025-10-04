@@ -15,8 +15,8 @@
 // Email: napbad.sen@gmail.com
 // GitHub: https://github.com/Napbad
 
-#include "common/ds/Vec.h"
 #include "common/ds/Str.h"
+#include "common/ds/Vec.h"
 #include "ml/util/dataset/CSVDataset.h"
 #include "ml/util/dataset/DataLoader.h"
 #include <filesystem>
@@ -160,8 +160,8 @@ TEST_F(DatasetTest, CSVDatasetInvalidIndexTest) {
 
 TEST_F(DatasetTest, CSVDatasetDescriptionTest) {
     // Create dataset with description
-    CSVDataset<f32> dataset(ds::Str("test_dataset.csv"), ds::Vec<hahaha::sizeT>{1, 2}, ds::Vec<hahaha::sizeT>{3}, true, ',',
-        ds::Str("Test dataset for unit testing"));
+    CSVDataset<f32> dataset(ds::Str("test_dataset.csv"), ds::Vec<hahaha::sizeT>{1, 2}, ds::Vec<hahaha::sizeT>{3}, true,
+        ',', ds::Str("Test dataset for unit testing"));
 
     // Check description
     // Skip string comparison for now

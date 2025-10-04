@@ -74,7 +74,7 @@ namespace hahaha::ml {
         const Dataset<SampleType>* _dataset;
         size_t _index;
     };
-} // namespace hahaha
+} // namespace hahaha::ml
 
 
 #endif // DATASETITERATOR_H

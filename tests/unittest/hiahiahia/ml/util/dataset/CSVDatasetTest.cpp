@@ -66,10 +66,9 @@ protected:
 
 TEST_F(CSVDatasetTest, Constructor) {
     const ds::Vec<hahaha::sizeT> featureCols = {0, 1};
-    const ds::Vec<hahaha::sizeT> labelCols = {2};
+    const ds::Vec<hahaha::sizeT> labelCols   = {2};
 
-    const CSVDataset<f32> dataset(
-        ds::Str("test_data.csv"), featureCols, labelCols, true, ',', ds::Str("Test dataset"));
+    const CSVDataset<f32> dataset(ds::Str("test_data.csv"), featureCols, labelCols, true, ',', ds::Str("Test dataset"));
 
     EXPECT_EQ(dataset.featureDim(), 2);
     EXPECT_EQ(dataset.labelDim(), 1);
@@ -78,7 +77,7 @@ TEST_F(CSVDatasetTest, Constructor) {
 
 TEST_F(CSVDatasetTest, LoadSuccess) {
     const ds::Vec<hahaha::sizeT> featureCols = {0, 1};
-    const ds::Vec<hahaha::sizeT> labelCols = {2};
+    const ds::Vec<hahaha::sizeT> labelCols   = {2};
 
     CSVDataset<f32> dataset(ds::Str("test_data.csv"), featureCols, labelCols);
     const auto result = dataset.load();
@@ -89,7 +88,7 @@ TEST_F(CSVDatasetTest, LoadSuccess) {
 
 TEST_F(CSVDatasetTest, LoadFailure) {
     const ds::Vec<hahaha::sizeT> featureCols = {0, 1};
-    const ds::Vec<hahaha::sizeT> labelCols = {2};
+    const ds::Vec<hahaha::sizeT> labelCols   = {2};
 
     CSVDataset<f32> dataset(ds::Str("nonexistent.csv"), featureCols, labelCols);
     const auto result = dataset.load();
@@ -99,7 +98,7 @@ TEST_F(CSVDatasetTest, LoadFailure) {
 
 TEST_F(CSVDatasetTest, GetData) {
     ds::Vec<hahaha::sizeT> featureCols = {0, 1};
-    ds::Vec<hahaha::sizeT> labelCols = {2};
+    ds::Vec<hahaha::sizeT> labelCols   = {2};
 
     CSVDataset<f32> dataset(ds::Str("test_data.csv"), featureCols, labelCols);
     auto loadResult = dataset.load();
@@ -120,14 +119,14 @@ TEST_F(CSVDatasetTest, GetData) {
 
 TEST_F(CSVDatasetTest, FeatureAndLabelNames) {
     const ds::Vec<hahaha::sizeT> featureCols = {0, 1};
-    const ds::Vec<hahaha::sizeT> labelCols = {2};
+    const ds::Vec<hahaha::sizeT> labelCols   = {2};
 
     CSVDataset<f32> dataset(ds::Str("test_data.csv"), featureCols, labelCols, true);
     const auto loadResult = dataset.load();
     ASSERT_TRUE(loadResult.isOk());
 
     auto featureNames = dataset.featureNames();
-    auto labelNames = dataset.labelNames();
+    auto labelNames   = dataset.labelNames();
 
     EXPECT_EQ(featureNames.size(), 2);
     EXPECT_EQ(labelNames.size(), 1);
@@ -138,14 +137,14 @@ TEST_F(CSVDatasetTest, FeatureAndLabelNames) {
 
 TEST_F(CSVDatasetTest, NoHeader) {
     const ds::Vec<hahaha::sizeT> featureCols = {0, 1};
-    const ds::Vec<hahaha::sizeT> labelCols = {2};
+    const ds::Vec<hahaha::sizeT> labelCols   = {2};
 
     CSVDataset<f32> dataset(ds::Str("test_data_no_header.csv"), featureCols, labelCols, false);
     const auto loadResult = dataset.load();
     ASSERT_TRUE(loadResult.isOk());
 
     const auto featureNames = dataset.featureNames();
-    const auto labelNames = dataset.labelNames();
+    const auto labelNames   = dataset.labelNames();
 
     EXPECT_TRUE(featureNames.empty());
     EXPECT_TRUE(labelNames.empty());
@@ -162,7 +161,7 @@ TEST_F(CSVDatasetTest, DifferentDelimiter) {
     file.close();
 
     ds::Vec<hahaha::sizeT> featureCols = {0, 1};
-    ds::Vec<hahaha::sizeT> labelCols = {2};
+    ds::Vec<hahaha::sizeT> labelCols   = {2};
 
     CSVDataset<f32> dataset(ds::Str("test_data_semicolon.csv"), featureCols, labelCols, true, ';');
     auto loadResult = dataset.load();
@@ -184,7 +183,7 @@ TEST_F(CSVDatasetTest, ParseError) {
     file.close();
 
     ds::Vec<hahaha::sizeT> featureCols = {0, 1};
-    ds::Vec<hahaha::sizeT> labelCols = {2};
+    ds::Vec<hahaha::sizeT> labelCols   = {2};
 
     CSVDataset<f32> dataset(ds::Str("test_data_invalid.csv"), featureCols, labelCols);
     auto loadResult = dataset.load();

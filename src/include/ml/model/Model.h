@@ -21,9 +21,7 @@
 
 #ifndef MODEL_H
 #define MODEL_H
-
-#include "common/ds/Vec.h"
-#include <string>
+#include "ml/common/trainStatistics.h"
 
 namespace hahaha {
 
@@ -33,22 +31,22 @@ namespace hahaha {
         virtual ~Model() = default;
 
         // Train the model with given features and labels
-        virtual void train(const ml::Tensor<f32>& features, const ml::Tensor<f32>& labels) = 0;
+        virtual Res<ml::TrainStatistics, BaseErr> train(const ml::Tensor<f32>& features, const ml::Tensor<f32>& labels) = 0;
 
         // Make a prediction given input features
         [[nodiscard]] virtual f32 predict(const ml::Tensor<f32>& features) const = 0;
 
         // Save the model to a file
-        [[nodiscard]] virtual bool save(const std::string& filepath) const = 0;
+        [[nodiscard]] virtual bool save(const Str& filepath) const = 0;
 
         // Load the model from a file
-        virtual bool load(const std::string& filepath) = 0;
+        [[nodiscard]] virtual bool load(const Str& filepath) = 0;
 
         // Get the number of parameters in the model
-        [[nodiscard]] virtual size_t parameterCount() const = 0;
+        [[nodiscard]] virtual sizeT parameterCount() const = 0;
 
         // Get a name describing the model type
-        [[nodiscard]] virtual std::string modelName() const = 0;
+        [[nodiscard]] virtual Str modelName() const = 0;
     };
 } // namespace hahaha
 

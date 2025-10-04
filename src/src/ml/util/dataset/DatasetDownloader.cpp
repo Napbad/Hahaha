@@ -29,7 +29,7 @@ namespace hahaha::ml {
 
         // This writeCallback will now write directly to the output stream provided
         size_t writeCallback(void* contents, const size_t size, size_t nmemb, void* userp) {
-            auto* outStream         = static_cast<std::ofstream*>(userp);
+            auto* outStream           = static_cast<std::ofstream*>(userp);
             const size_t bytesToWrite = size * nmemb;
             outStream->write(static_cast<char*>(contents), static_cast<long>(bytesToWrite));
             return bytesToWrite;
@@ -84,7 +84,7 @@ namespace hahaha::ml {
     Res<void, DatasetDownloaderError> DatasetDownloader::downloadFromUCI(
         const Str& datasetName, const Str& outputPath) {
         const auto baseUrl = Str("https://archive.ics.uci.edu/ml/machine-learning-databases/");
-        const Str url        = baseUrl + datasetName + Str("/") + datasetName + Str(".data");
+        const Str url      = baseUrl + datasetName + Str("/") + datasetName + Str(".data");
         return downloadFromUrl(url, outputPath);
     }
 
@@ -105,9 +105,8 @@ namespace hahaha::ml {
 
         // Check HTTP status code
         if (response->getStatusCode() >= 400) {
-            Err(DatasetDownloaderError(
-                Str("HTTP error: ") + Str(std::to_string(response->getStatusCode())) + Str(" for Kaggle dataset: ") +
-                datasetName));
+            Err(DatasetDownloaderError(Str("HTTP error: ") + Str(std::to_string(response->getStatusCode()))
+                                       + Str(" for Kaggle dataset: ") + datasetName));
         }
 
         // Open output file

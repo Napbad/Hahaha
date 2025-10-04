@@ -36,6 +36,7 @@ namespace hahaha::ml {
     public:
         TensorErr() = default;
         explicit TensorErr(const char* msg) : BaseErr(msg) {}
+        explicit TensorErr(const Str& msg) : BaseErr(msg) {}
     };
 
     template <typename T>
@@ -50,7 +51,8 @@ namespace hahaha::ml {
         explicit Tensor(const ds::Vec<sizeT>& shape) : _shape(shape), _data(computeSize(shape)) {}
 
         // Constructor for a 0-dimensional tensor (scalar)
-        explicit Tensor(const std::initializer_list<sizeT> shape, std::initializer_list<T> data) : _shape(shape), _data(data) {}
+        explicit Tensor(const std::initializer_list<sizeT> shape, std::initializer_list<T> data)
+            : _shape(shape), _data(data) {}
 
         // Access shape
         [[nodiscard]] const ds::Vec<sizeT>& shape() const {
@@ -61,10 +63,10 @@ namespace hahaha::ml {
         }
 
         // Index calculation (flattened)
-        [[nodiscard]] Res<sizeT, BaseErr> index(const std::initializer_list<sizeT>  indices) const {
+        [[nodiscard]] Res<sizeT, BaseErr> index(const std::initializer_list<sizeT> indices) const {
             SetRetT(sizeT, BaseErr)
 
-            if (indices.size() != _shape.size()) Err(BaseErr("Incorrect number of indices"));
+                if (indices.size() != _shape.size()) Err(BaseErr("Incorrect number of indices"));
             sizeT idx    = 0;
             sizeT stride = 1;
             for (int i = static_cast<int>(_shape.size()) - 1; i >= 0; --i) {
@@ -136,6 +138,10 @@ namespace hahaha::ml {
             std::cout << "\n";
         }
 
+        T &first() {
+            return _data[0];
+        }
+
         // Static factory methods
         static Tensor fromVector(const ds::Vec<T>& vec) {
             Tensor tensor({vec.size()});
@@ -146,8 +152,7 @@ namespace hahaha::ml {
         }
 
         Res<void, TensorErr> copy(const Tensor& other) {
-            SetRetT(void, TensorErr)
-            if (other.shape() != _shape) {
+            SetRetT(void, TensorErr) if (other.shape() != _shape) {
                 Err(TensorErr("Cannot copy value from a tensor with different shape"))
             }
             for (sizeT i = 0; i < other.size(); ++i) {
@@ -156,9 +161,8 @@ namespace hahaha::ml {
             Ok()
         }
 
-        Res<void, TensorErr> copy(const ds::Vec<T> &other) {
-            SetRetT(void, TensorErr)
-            if (other.size() != this->size()) {
+        Res<void, TensorErr> copy(const ds::Vec<T>& other) {
+            SetRetT(void, TensorErr) if (other.size() != this->size()) {
                 Err(TensorErr("Cannot copy value from a tensor with different shape"))
             }
             for (sizeT i = 0; i < other.size(); ++i) {
@@ -272,9 +276,8 @@ namespace hahaha::ml {
             return _data.empty();
         }
 
-        Res<Tensor, IndexOutOfBoundError> at(const std::initializer_list<sizeT>  indices) const {
-            SetRetT(Tensor, IndexOutOfBoundError)
-            if (indices.size() > dim()) {
+        Res<Tensor, IndexOutOfBoundError> at(const std::initializer_list<sizeT> indices) const {
+            SetRetT(Tensor, IndexOutOfBoundError) if (indices.size() > dim()) {
                 Err("Too many indices for at() method");
             }
             if (indices.size() == 0 && dim() != 0) {
@@ -285,8 +288,8 @@ namespace hahaha::ml {
             if (idxRes.isErr()) {
                 Err(IndexOutOfBoundError(idxRes.unwrapErr().message()));
             }
-            
-            sizeT start = idxRes.unwrap();
+
+            sizeT start  = idxRes.unwrap();
             sizeT length = 1;
 
             if (indices.size() == dim()) {
@@ -304,8 +307,26 @@ namespace hahaha::ml {
             }
 
             Tensor res(newShape);
+            // res.replaceSelf(_data.begin() + start, _data.begin() + start + length);
             res.copy(_data.subVec(start, length));
             Ok(res);
+        }
+
+        Res<void, IndexOutOfBoundError> set(const std::initializer_list<sizeT> indices, T value) {
+            SetRetT(void, IndexOutOfBoundError) if (indices.size() > dim()) {
+                Err("Too many indices for set() method");
+            }
+            if (indices.size() == 0 && dim() != 0) {
+                Err("Cannot access scalar tensor with empty indices")
+            }
+            // calculate start index and tensor size
+            auto idxRes = index(indices);
+            if (idxRes.isErr()) {
+                Err(IndexOutOfBoundError(idxRes.unwrapErr().message()));
+            }
+
+            _data[idxRes.unwrap()] = value;
+            Ok()
         }
 
     private:

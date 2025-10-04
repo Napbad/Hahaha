@@ -1,5 +1,6 @@
-#include "gtest/gtest.h"
 #include "common/ds/Vec.h"
+
+#include "gtest/gtest.h"
 
 using namespace hahaha::common::ds;
 
@@ -36,7 +37,8 @@ TYPED_TEST(VecTest, CountConstructor) {
 }
 
 TYPED_TEST(VecTest, InitializerListConstructor) {
-    Vec<TypeParam> vec = {static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3), static_cast<TypeParam>(4), static_cast<TypeParam>(5)};
+    Vec<TypeParam> vec = {static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3),
+        static_cast<TypeParam>(4), static_cast<TypeParam>(5)};
     ASSERT_EQ(vec.size(), 5);
     ASSERT_EQ(vec.capacity(), 5);
     ASSERT_FALSE(vec.empty());
@@ -56,7 +58,7 @@ TYPED_TEST(VecTest, IteratorConstructor) {
 
 TYPED_TEST(VecTest, CopyConstructor) {
     Vec<TypeParam> original = {static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3)};
-    Vec<TypeParam> copied = original;
+    Vec<TypeParam> copied   = original;
     ASSERT_EQ(copied.size(), 3);
     ASSERT_EQ(copied.capacity(), 3);
     ASSERT_EQ(copied[0], static_cast<TypeParam>(1));
@@ -68,9 +70,9 @@ TYPED_TEST(VecTest, CopyConstructor) {
 }
 
 TYPED_TEST(VecTest, MoveConstructor) {
-    Vec<TypeParam> original = {static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3)};
+    Vec<TypeParam> original  = {static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3)};
     TypeParam* original_data = original.begin();
-    Vec<TypeParam> moved = std::move(original);
+    Vec<TypeParam> moved     = std::move(original);
     ASSERT_EQ(moved.size(), 3);
     ASSERT_EQ(moved.capacity(), 3);
     ASSERT_EQ(moved[0], static_cast<TypeParam>(1));
@@ -90,7 +92,7 @@ TYPED_TEST(VecTest, CopyAssignment) {
 }
 
 TYPED_TEST(VecTest, MoveAssignment) {
-    Vec<TypeParam> original = {static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3)};
+    Vec<TypeParam> original  = {static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3)};
     TypeParam* original_data = original.begin();
     Vec<TypeParam> assigned;
     assigned = std::move(original);
@@ -166,4 +168,4 @@ TYPED_TEST(VecTest, ShrinkToFit) {
     empty_vec.shrink_to_fit();
     ASSERT_EQ(empty_vec.size(), 0);
     ASSERT_EQ(empty_vec.capacity(), 0);
-} 
+}

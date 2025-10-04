@@ -194,7 +194,7 @@ namespace hahaha::common::ds {
             reserve(_size + len);
             std::strcat(_data, s);
             _size += len;
-            _data[_size] = '\0'; 
+            _data[_size] = '\0';
             return *this;
         }
 
@@ -238,7 +238,7 @@ namespace hahaha::common::ds {
                 pos = _size;
             }
             reserve(_size + 1);
-            std::memmove(_data + pos + 1, _data + pos, _size - pos + 1); 
+            std::memmove(_data + pos + 1, _data + pos, _size - pos + 1);
             _data[pos] = c;
             _size++;
             return *this;
@@ -266,7 +266,8 @@ namespace hahaha::common::ds {
             }
             const sizeT actual_count = std::min(count, _size - pos);
 
-            std::memmove(_data + pos, _data + pos + actual_count, _size - pos - actual_count + 1); // +1 for null terminator
+            std::memmove(
+                _data + pos, _data + pos + actual_count, _size - pos - actual_count + 1); // +1 for null terminator
             _size -= actual_count;
             return *this;
         }
@@ -286,13 +287,13 @@ namespace hahaha::common::ds {
             if (n >= _capacity) { // Use >= to handle resizing to current capacity if needed for null terminator
                 sizeT new_capacity = std::max(n, _capacity == 0 ? 1 : _capacity * 2);
                 char* new_data     = new char[new_capacity + 1]; // +1 for null terminator
-                
+
                 if (_data) {
                     std::strcpy(new_data, _data);
                     delete[] _data;
                 }
-                _data     = new_data;
-                _capacity = new_capacity;
+                _data        = new_data;
+                _capacity    = new_capacity;
                 _data[_size] = '\0'; // Ensure null termination
             }
         }
@@ -370,4 +371,3 @@ namespace std {
 } // namespace std
 
 #endif // STR_H
-

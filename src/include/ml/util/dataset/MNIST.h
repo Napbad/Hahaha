@@ -26,7 +26,7 @@ namespace hahaha::ml {
 
     class MNIST : public Dataset<f32> {
     public:
-        MNIST() = default;
+        MNIST()           = default;
         ~MNIST() override = default;
 
         [[nodiscard]] size_t size() const override {
@@ -44,5 +44,5 @@ namespace hahaha::ml {
         Tensor<f32> _features;
         ds::Vec<int> _labels;
     };
-}
+} // namespace hahaha::ml
 #endif // HAHAHA_MNIST_H

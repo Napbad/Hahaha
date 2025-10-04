@@ -49,8 +49,12 @@ namespace hahaha {
     typedef long ptrDiffT;
 } // namespace hahaha
 
-#define hhh \
-    using namespace hahaha; \
-    using namespace hahaha::common;
+// Quick import macro for common hahaha namespaces
+// Use sparingly and avoid in header files
+#define hhh                     \
+namespace hahaha {}         \
+using namespace hahaha;     \
+namespace hahaha::common {} \
+using namespace hahaha::common;
 
 #endif // H3DEFS_H

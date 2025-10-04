@@ -16,22 +16,27 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by napbad on 10/2/25.
+// Created by root on 10/4/25.
 //
 
-#include "common/ds/Str.h"
+#ifndef HAHAHA_TRAINSTATISTICS_H
+#define HAHAHA_TRAINSTATISTICS_H
+#include "common/defines/h3defs.h"
 
-#include "common/Res.h"
-#include "common/error.h"
-namespace hahaha {
-    class IndexOutOfBoundError;
+hhh
+
+    namespace hahaha::ml {
+
+    class TrainStatistics {};
+
+    class EmptyTrainStatistics : public TrainStatistics {};
+
+    class LossTrainStatistics : public TrainStatistics {
+    public:
+
+    private:
+
+    };
 }
 
-namespace hahaha::common::ds {
-    Res<char, IndexOutOfBoundError> Str::at(sizeT i) const {
-        SetRetT(char, IndexOutOfBoundError) if (i >= _size) {
-            Err("Index out of bound");
-        }
-        Ok(_data[i]);
-    }
-} // namespace hahaha::common::ds
+#endif // HAHAHA_TRAINSTATISTICS_H

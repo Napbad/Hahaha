@@ -4,7 +4,8 @@
  * @LastEditors: napbad sen napbad.sen@gmail.com
  * @LastEditTime: 2025-10-02 22:43:56
  * @FilePath: /hahaha-dev/src/include/common/Error.h
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置:
+ * https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 // Copyright (c) 2025 Napbad
 //
@@ -84,7 +85,9 @@ namespace hahaha::common {
         explicit IndexOutOfBoundError(const char* msg) : BaseErr(Str(msg), Str("IndexOutOfBoundError")) {}
         explicit IndexOutOfBoundError(const char* msg, const char* loc) : BaseErr(Str(msg), Str(loc)) {}
 
-        [[nodiscard]] Str typeName() const override { return Str("IndexOutOfBoundError"); }
+        [[nodiscard]] Str typeName() const override {
+            return Str("IndexOutOfBoundError");
+        }
     };
 
     // Add other common error types here as needed
