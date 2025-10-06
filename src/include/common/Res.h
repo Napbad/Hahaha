@@ -275,6 +275,7 @@ namespace hahaha {
     using ErrType   = E;         \
     using ValueType = T;
 #define Ok(Val)           return RetType::ok(Val);
+#define OkVoid()          return RetType::ok();
 #define Err(Error)        return RetType::err(ErrType(Error));
 #define newE(ErrorT, ...) (new ErrorT(__VA_ARGS__))
 
