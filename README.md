@@ -36,7 +36,7 @@ git clone https://github.com/Napbad/Hahaha.git && cd Hahaha
 
 ◦ IDE Container Configuration: Directly load the project container configuration via IDEs that support .devcontainer (e.g., VS Code or Clion).
 
-Basic Usage
+## Basic Usage
 
 1. Compile the project:
 ```bash
