@@ -51,9 +51,11 @@ namespace hahaha {
 
 // Quick import macro for common hahaha namespaces
 // Use sparingly and avoid in header files
-#define hhh                     \
+#define HHHNamespaceImport                     \
 namespace hahaha {}         \
 using namespace hahaha;     \
+namespace hahaha::math {}         \
+using namespace hahaha::math;     \
 namespace hahaha::common {} \
 using namespace hahaha::common;
 

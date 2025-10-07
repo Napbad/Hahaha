@@ -113,6 +113,14 @@ namespace hahaha::ml {
         }
 
         // Scalar operations
+        Tensor operator+(valueType scalar) const {
+            Tensor result(_shape);
+            for (sizeT i = 0; i < size(); ++i) {
+                result._data[i] = _data[i] + scalar;
+            }
+            return result;
+        }
+
         Tensor operator*(valueType scalar) const {
             Tensor result(_shape);
             for (sizeT i = 0; i < size(); ++i) {
@@ -276,6 +284,25 @@ namespace hahaha::ml {
             return _data.empty();
         }
 
+        // Array-style element access (read-only)
+        const T& operator[](sizeT index) const {
+            return _data[index];
+        }
+
+        // Array-style element access (read-write)
+        T& operator[](sizeT index) {
+            return _data[index];
+        }
+
+        // Sum all elements in the tensor
+        T sum() const {
+            T result = static_cast<T>(0);
+            for (sizeT i = 0; i < size(); ++i) {
+                result += _data[i];
+            }
+            return result;
+        }
+
         Res<Tensor, IndexOutOfBoundError> at(const std::initializer_list<sizeT> indices) const {
             SetRetT(Tensor, IndexOutOfBoundError) if (indices.size() > dim()) {
                 Err("Too many indices for at() method");
@@ -298,7 +325,7 @@ namespace hahaha::ml {
 
             ds::Vec<sizeT> newShape;
             for (sizeT i = indices.size(); i < _shape.size(); ++i) {
-                newShape.push_back(i);
+                newShape.push_back(_shape[i]);
                 length *= _shape[i];
             }
 

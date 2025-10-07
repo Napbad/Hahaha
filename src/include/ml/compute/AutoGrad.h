@@ -16,27 +16,12 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by root on 10/4/25.
+// Created by napbad on 10/6/25.
 //
 
-#ifndef HAHAHA_TRAINSTATISTICS_H
-#define HAHAHA_TRAINSTATISTICS_H
-#include "common/defines/h3defs.h"
+#ifndef HAHAHA_AUTOGRAD_H
+#define HAHAHA_AUTOGRAD_H
 
-HHHNamespaceImport
 
-    namespace hahaha::ml {
 
-    class TrainStatistics {};
-
-    class EmptyTrainStatistics : public TrainStatistics {};
-
-    class LossTrainStatistics : public TrainStatistics {
-    public:
-
-    private:
-
-    };
-}
-
-#endif // HAHAHA_TRAINSTATISTICS_H
+#endif // HAHAHA_AUTOGRAD_H

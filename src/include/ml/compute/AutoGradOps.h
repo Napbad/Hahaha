@@ -16,30 +16,41 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by Napbad on 7/19/25.
+// Created by napbad on 10/6/25.
 //
 
-#ifndef LOSS_H
-#define LOSS_H
+#ifndef HAHAHA_AUTOGRADOPS_H
+#define HAHAHA_AUTOGRADOPS_H
+#include "Variable.h"
 #include "common/defines/h3defs.h"
-#include "ml/common/Tensor.h"
 
 HHHNamespaceImport
 
-    namespace hahaha::ml {
-
+namespace hahaha::ml {
     template<typename T>
-    class Loss {
-        public:
-            Loss() = default;
-            virtual ~Loss() = default;
+    class AutogradOps {
+    public:
+        static Variable<T> add(const Variable<T>& a, const Variable<T>& b) {
+            return a + b;
+        }
 
-        virtual Tensor<T> forward(const Tensor<T>& input, const Tensor<T>& target) = 0;
+        static Variable<T> mul(const Variable<T>& a, const Variable<T>& b) {
+            return a * b;
+        }
+
+        static Variable<T> matmul(const Variable<T>& a, const Variable<T>& b) {
+            return a.matmul(b);
+        }
+
+        static Variable<T> relu(const Variable<T>& a) {
+            return a.relu();
+        }
+
+        static Variable<T> sigmoid(const Variable<T>& a) {
+            return a.sigmoid();
+        }
     };
-
-
-
-
+    
 } // namespace hahaha::ml
 
-#endif // LOSS_H
+#endif // HAHAHA_AUTOGRADOPS_H

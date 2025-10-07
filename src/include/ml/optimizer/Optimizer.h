@@ -16,27 +16,35 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by root on 10/4/25.
+// Created by napbad on 10/6/25.
 //
 
-#ifndef HAHAHA_TRAINSTATISTICS_H
-#define HAHAHA_TRAINSTATISTICS_H
+#ifndef HAHAHA_OPTIMIZER_H
+#define HAHAHA_OPTIMIZER_H
 #include "common/defines/h3defs.h"
+#include "common/ds/Vec.h"
+#include "ml/compute/Variable.h"
+
 
 HHHNamespaceImport
 
     namespace hahaha::ml {
+    template <typename T>
+class Optimizer {
 
-    class TrainStatistics {};
-
-    class EmptyTrainStatistics : public TrainStatistics {};
-
-    class LossTrainStatistics : public TrainStatistics {
     public:
-
-    private:
-
-    };
+        virtual ~Optimizer() = default;
+        Optimizer(const ds::Vec<Variable<T>>& parameters, const f64 learningRate) : _parameters(parameters), _learningRate(learningRate) {}
+        virtual void step() = 0;
+        virtual void zero_grad() {
+            for (auto& param : _parameters) {
+                param.zeroGrad();
+            }
+        }
+private:
+    ds::Vec<Variable<T>> _parameters{};
+    f64 _learningRate;
+};
 }
 
-#endif // HAHAHA_TRAINSTATISTICS_H
+#endif // HAHAHA_OPTIMIZER_H

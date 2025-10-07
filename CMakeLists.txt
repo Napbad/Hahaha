@@ -33,11 +33,6 @@ endforeach()
 add_library(hahaha STATIC
     ${SOURCE_FILES}
     ${HEADER_FILES}
-        src/include/ml/util/dataset/MNIST.h
-        src/include/ml/common/Array.h
-        src/src/common/error.cpp
-        src/src/common/ds/Str.cpp
-        src/include/ml/common/trainStatistics.h
 )
 
 # Set C++ as the link language
