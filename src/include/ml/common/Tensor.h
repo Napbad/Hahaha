@@ -20,356 +20,465 @@
 
 #ifndef TENSOR_H
 #define TENSOR_H
-#include "common/Res.h"
-#include "common/defines/h3defs.h"
-#include "common/ds/Vec.h"
-#include "common/error.h"
 #include <initializer_list>
 #include <iostream>
 #include <numeric>
 
-namespace hahaha::ml {
+#include "common/Res.h"
+#include "common/defines/h3defs.h"
+#include "common/ds/Vector.h"
+#include "common/Error.h"
 
-    using namespace hahaha::common;
+namespace hahaha::ml
+{
 
-    class TensorErr final : public BaseErr {
-    public:
-        TensorErr() = default;
-        explicit TensorErr(const char* msg) : BaseErr(msg) {}
-        explicit TensorErr(const Str& msg) : BaseErr(msg) {}
-    };
+using namespace hahaha::common;
 
-    template <typename T>
-    class Tensor {
-    public:
-        using valueType = T;
+class TensorErr final : public BaseError
+{
+  public:
+    TensorErr() = default;
+    explicit TensorErr(const char* msg) : BaseError(msg)
+    {
+    }
+    explicit TensorErr(const ds::String& msg) : BaseError(msg)
+    {
+    }
+};
 
-        Tensor() = default;
+template <typename T> class Tensor
+{
+  public:
+    using ValueType = T;
 
-        Tensor(const std::initializer_list<sizeT> shape) : _shape(shape), _data(computeSize(shape)) {}
+    Tensor() = default;
 
-        explicit Tensor(const ds::Vec<sizeT>& shape) : _shape(shape), _data(computeSize(shape)) {}
+    Tensor(const std::initializer_list<sizeT> shape) : shape_(shape), data_(computeSize(shape))
+    {
+    }
 
-        // Constructor for a 0-dimensional tensor (scalar)
-        explicit Tensor(const std::initializer_list<sizeT> shape, std::initializer_list<T> data)
-            : _shape(shape), _data(data) {}
+    explicit Tensor(const ds::Vector<sizeT>& shape) : shape_(shape), data_(computeSize(shape))
+    {
+    }
 
-        // Access shape
-        [[nodiscard]] const ds::Vec<sizeT>& shape() const {
-            return _shape;
+    // Constructor for a 0-dimensional tensor (scalar)
+    explicit Tensor(const std::initializer_list<sizeT> shape, std::initializer_list<T> data)
+        : shape_(shape), data_(data)
+    {
+    }
+
+    // Access shape
+    [[nodiscard]] const ds::Vector<sizeT>& shape() const
+    {
+        return shape_;
+    }
+    [[nodiscard]] sizeT size() const
+    {
+        return data_.size();
+    }
+
+    // Index calculation (flattened)
+    [[nodiscard]] Res<sizeT, BaseError> index(const std::initializer_list<sizeT> indices) const
+    {
+        SetRetT(sizeT, BaseError)
+
+            if (indices.size() != shape_.size()) Err(BaseError("Incorrect number of indices"));
+        sizeT idx = 0;
+        sizeT stride = 1;
+        for (int i = static_cast<int>(shape_.size()) - 1; i >= 0; --i)
+        {
+            if (indices.begin()[i] >= shape_[i])
+            {
+                Err(BaseError("Index out of bounds"));
+            }
+            idx += indices.begin()[i] * stride;
+            stride *= shape_[i];
         }
-        [[nodiscard]] sizeT size() const {
-            return _data.size();
+        Ok(idx);
+    }
+
+    [[nodiscard]] Res<sizeT, BaseError> index(const ds::Vector<sizeT>& indices) const
+    {
+        SetRetT(sizeT, BaseError)
+
+        if (indices.size() != shape_.size())
+        {
+            Err(BaseError("Incorrect number of indices"));
         }
+        sizeT idx = 0;
+        sizeT stride = 1;
+        for (int i = static_cast<int>(shape_.size()) - 1; i >= 0; --i)
+        {
+            if (indices[i] >= shape_[i])
+            {
+                Err(BaseError("Index out of bounds"));
+            }
+            idx += indices[i] * stride;
+            stride *= shape_[i];
+        }
+        Ok(idx);
+    }
 
-        // Index calculation (flattened)
-        [[nodiscard]] Res<sizeT, BaseErr> index(const std::initializer_list<sizeT> indices) const {
-            SetRetT(sizeT, BaseErr)
+    // Element access
+    ValueType& operator()(const ds::Vector<sizeT>& indices)
+    {
+        return data_[index(indices).unwrap()];
+    }
+    const ValueType& operator()(const ds::Vector<sizeT>& indices) const
+    {
+        return data_[index(indices).unwrap()];
+    }
 
-                if (indices.size() != _shape.size()) Err(BaseErr("Incorrect number of indices"));
-            sizeT idx    = 0;
-            sizeT stride = 1;
-            for (int i = static_cast<int>(_shape.size()) - 1; i >= 0; --i) {
-                if (indices.begin()[i] >= _shape[i]) {
-                    Err(BaseErr("Index out of bounds"));
+    // Fill tensor with value
+    void fill(const ValueType v)
+    {
+        std::ranges::fill(data_, v);
+    }
+
+    // Element-wise addition
+    Tensor operator+(const Tensor& other) const
+    {
+        checkShape(other);
+        Tensor result(shape_);
+        for (sizeT i = 0; i < size(); ++i)
+        {
+            result.data_[i] = data_[i] + other.data_[i];
+        }
+        return result;
+    }
+
+    // Element-wise multiplication
+    Tensor operator*(const Tensor& other) const
+    {
+        checkShape(other);
+        Tensor result(shape_);
+        for (sizeT i = 0; i < size(); ++i)
+        {
+            result.data_[i] = data_[i] * other.data_[i];
+        }
+        return result;
+    }
+
+    // Scalar operations
+    Tensor operator+(ValueType scalar) const
+    {
+        Tensor result(shape_);
+        for (sizeT i = 0; i < size(); ++i)
+        {
+            result.data_[i] = data_[i] + scalar;
+        }
+        return result;
+    }
+
+    Tensor operator*(ValueType scalar) const
+    {
+        Tensor result(shape_);
+        for (sizeT i = 0; i < size(); ++i)
+        {
+            result.data_[i] = data_[i] * scalar;
+        }
+        return result;
+    }
+
+    T dot(const Tensor& other) const
+    {
+        checkShape(other);
+        T result = 0;
+        for (sizeT i = 0; i < size(); ++i)
+        {
+            result += data_[i] * other.data_[i];
+        }
+        return result;
+    }
+
+    // Print
+    void printFlat() const
+    {
+        for (const auto& v : data_)
+        {
+            std::cout << v << " ";
+        }
+        std::cout << "\n";
+    }
+
+    T& first()
+    {
+        return data_[0];
+    }
+
+    // Static factory methods
+    static Tensor fromVector(const ds::Vector<T>& vec)
+    {
+        Tensor tensor({vec.size()});
+        for (sizeT i = 0; i < vec.size(); ++i)
+        {
+            tensor.data_[i] = vec[i];
+        }
+        return tensor;
+    }
+
+    Res<void, TensorErr> copy(const Tensor& other)
+    {
+        SetRetT(void, TensorErr) if (other.shape() != shape_)
+        {
+            Err(TensorErr("Cannot copy value from a tensor with different shape"))
+        }
+        for (sizeT i = 0; i < other.size(); ++i)
+        {
+            data_[i] = other.data_[i];
+        }
+        Ok()
+    }
+
+    Res<void, TensorErr> copy(const ds::Vector<T>& other)
+    {
+        SetRetT(void, TensorErr) if (other.size() != this->size())
+        {
+            Err(TensorErr("Cannot copy value from a tensor with different shape"))
+        }
+        for (sizeT i = 0; i < other.size(); ++i)
+        {
+            data_[i] = other[i];
+        }
+        Ok()
+    }
+
+    [[nodiscard]] sizeT dim() const
+    {
+        return shape().size();
+    }
+
+    // Element-wise subtraction
+    Tensor operator-(const Tensor& other) const
+    {
+        checkShape(other);
+        Tensor result(shape_);
+        for (sizeT i = 0; i < size(); ++i)
+        {
+            result.data_[i] = data_[i] - other.data_[i];
+        }
+        return result;
+    }
+
+    // Element-wise division
+    Tensor operator/(const Tensor& other) const
+    {
+        checkShape(other);
+        Tensor result(shape_);
+        for (sizeT i = 0; i < size(); ++i)
+        {
+            // Add check for division by zero if T is a floating-point type
+            if constexpr (std::is_floating_point_v<T>)
+            {
+                if (other.data_[i] == static_cast<T>(0))
+                {
+                    throw std::runtime_error("Division by zero");
                 }
-                idx += indices.begin()[i] * stride;
-                stride *= _shape[i];
             }
-            Ok(idx);
+            result.data_[i] = data_[i] / other.data_[i];
         }
+        return result;
+    }
 
-        // Element access
-        valueType& operator()(const ds::Vec<sizeT>& indices) {
-            return _data[index(indices).unwrap()];
+    // Scalar operations (subtraction and division)
+    Tensor operator-(ValueType scalar) const
+    {
+        Tensor result(shape_);
+        for (sizeT i = 0; i < size(); ++i)
+        {
+            result.data_[i] = data_[i] - scalar;
         }
-        const valueType& operator()(const ds::Vec<sizeT>& indices) const {
-            return _data[index(indices).unwrap()];
-        }
+        return result;
+    }
 
-        // Fill tensor with value
-        void fill(const valueType v) {
-            std::ranges::fill(_data, v);
-        }
-
-        // Element-wise addition
-        Tensor operator+(const Tensor& other) const {
-            checkShape(other);
-            Tensor result(_shape);
-            for (sizeT i = 0; i < size(); ++i) {
-                result._data[i] = _data[i] + other._data[i];
+    Tensor operator/(ValueType scalar) const
+    {
+        if constexpr (std::is_floating_point_v<T>)
+        {
+            if (scalar == static_cast<T>(0))
+            {
+                throw std::runtime_error("Division by zero by scalar");
             }
-            return result;
         }
-
-        // Element-wise multiplication
-        Tensor operator*(const Tensor& other) const {
-            checkShape(other);
-            Tensor result(_shape);
-            for (sizeT i = 0; i < size(); ++i) {
-                result._data[i] = _data[i] * other._data[i];
-            }
-            return result;
+        Tensor result(shape_);
+        for (sizeT i = 0; i < size(); ++i)
+        {
+            result.data_[i] = data_[i] / scalar;
         }
+        return result;
+    }
 
-        // Scalar operations
-        Tensor operator+(valueType scalar) const {
-            Tensor result(_shape);
-            for (sizeT i = 0; i < size(); ++i) {
-                result._data[i] = _data[i] + scalar;
-            }
-            return result;
+    // Compound assignment operators
+    Tensor& operator+=(const Tensor& other)
+    {
+        checkShape(other);
+        for (sizeT i = 0; i < size(); ++i)
+        {
+            data_[i] += other.data_[i];
         }
+        return *this;
+    }
 
-        Tensor operator*(valueType scalar) const {
-            Tensor result(_shape);
-            for (sizeT i = 0; i < size(); ++i) {
-                result._data[i] = _data[i] * scalar;
-            }
-            return result;
+    Tensor& operator-=(const Tensor& other)
+    {
+        checkShape(other);
+        for (sizeT i = 0; i < size(); ++i)
+        {
+            data_[i] -= other.data_[i];
         }
+        return *this;
+    }
 
-        T dot(const Tensor& other) const {
-            checkShape(other);
-            T result = 0;
-            for (sizeT i = 0; i < size(); ++i) {
-                result += _data[i] * other._data[i];
-            }
-            return result;
+    Tensor& operator*=(const Tensor& other)
+    {
+        checkShape(other);
+        for (sizeT i = 0; i < size(); ++i)
+        {
+            data_[i] *= other.data_[i];
         }
+        return *this;
+    }
 
-        // Print
-        void printFlat() const {
-            for (const auto& v : _data) {
-                std::cout << v << " ";
-            }
-            std::cout << "\n";
-        }
-
-        T &first() {
-            return _data[0];
-        }
-
-        // Static factory methods
-        static Tensor fromVector(const ds::Vec<T>& vec) {
-            Tensor tensor({vec.size()});
-            for (sizeT i = 0; i < vec.size(); ++i) {
-                tensor._data[i] = vec[i];
-            }
-            return tensor;
-        }
-
-        Res<void, TensorErr> copy(const Tensor& other) {
-            SetRetT(void, TensorErr) if (other.shape() != _shape) {
-                Err(TensorErr("Cannot copy value from a tensor with different shape"))
-            }
-            for (sizeT i = 0; i < other.size(); ++i) {
-                _data[i] = other._data[i];
-            }
-            Ok()
-        }
-
-        Res<void, TensorErr> copy(const ds::Vec<T>& other) {
-            SetRetT(void, TensorErr) if (other.size() != this->size()) {
-                Err(TensorErr("Cannot copy value from a tensor with different shape"))
-            }
-            for (sizeT i = 0; i < other.size(); ++i) {
-                _data[i] = other[i];
-            }
-            Ok()
-        }
-
-        [[nodiscard]] sizeT dim() const {
-            return shape().size();
-        }
-
-        // Element-wise subtraction
-        Tensor operator-(const Tensor& other) const {
-            checkShape(other);
-            Tensor result(_shape);
-            for (sizeT i = 0; i < size(); ++i) {
-                result._data[i] = _data[i] - other._data[i];
-            }
-            return result;
-        }
-
-        // Element-wise division
-        Tensor operator/(const Tensor& other) const {
-            checkShape(other);
-            Tensor result(_shape);
-            for (sizeT i = 0; i < size(); ++i) {
-                // Add check for division by zero if T is a floating-point type
-                if constexpr (std::is_floating_point_v<T>) {
-                    if (other._data[i] == static_cast<T>(0)) {
-                        throw std::runtime_error("Division by zero");
-                    }
-                }
-                result._data[i] = _data[i] / other._data[i];
-            }
-            return result;
-        }
-
-        // Scalar operations (subtraction and division)
-        Tensor operator-(valueType scalar) const {
-            Tensor result(_shape);
-            for (sizeT i = 0; i < size(); ++i) {
-                result._data[i] = _data[i] - scalar;
-            }
-            return result;
-        }
-
-        Tensor operator/(valueType scalar) const {
-            if constexpr (std::is_floating_point_v<T>) {
-                if (scalar == static_cast<T>(0)) {
-                    throw std::runtime_error("Division by zero by scalar");
+    Tensor& operator/=(const Tensor& other)
+    {
+        checkShape(other);
+        for (sizeT i = 0; i < size(); ++i)
+        {
+            if constexpr (std::is_floating_point_v<T>)
+            {
+                if (other.data_[i] == static_cast<T>(0))
+                {
+                    throw std::runtime_error("Division by zero");
                 }
             }
-            Tensor result(_shape);
-            for (sizeT i = 0; i < size(); ++i) {
-                result._data[i] = _data[i] / scalar;
-            }
-            return result;
+            data_[i] /= other.data_[i];
+        }
+        return *this;
+    }
+
+    [[nodiscard]] auto begin() const
+    {
+        return data_.begin();
+    }
+    [[nodiscard]] auto end() const
+    {
+        return data_.end();
+    }
+
+    [[nodiscard]] auto rawData() const
+    {
+        return data_;
+    }
+
+    [[nodiscard]] bool empty() const
+    {
+        return data_.empty();
+    }
+
+    // Array-style element access (read-only)
+    const T& operator[](sizeT index) const
+    {
+        return data_[index];
+    }
+
+    // Array-style element access (read-write)
+    T& operator[](sizeT index)
+    {
+        return data_[index];
+    }
+
+    // Sum all elements in the tensor
+    T sum() const
+    {
+        T result = static_cast<T>(0);
+        for (sizeT i = 0; i < size(); ++i)
+        {
+            result += data_[i];
+        }
+        return result;
+    }
+
+    Res<Tensor, IndexOutOfBoundError> at(const std::initializer_list<sizeT> indices) const
+    {
+        SetRetT(Tensor, IndexOutOfBoundError) if (indices.size() > dim())
+        {
+            Err("Too many indices for at() method");
+        }
+        if (indices.size() == 0 && dim() != 0)
+        {
+            Err("Cannot access scalar tensor with empty indices")
+        }
+        // calculate start index and tensor size
+        auto idxRes = index(indices);
+        if (idxRes.isErr())
+        {
+            Err(IndexOutOfBoundError(idxRes.unwrapErr().message()));
         }
 
-        // Compound assignment operators
-        Tensor& operator+=(const Tensor& other) {
-            checkShape(other);
-            for (sizeT i = 0; i < size(); ++i) {
-                _data[i] += other._data[i];
-            }
-            return *this;
+        sizeT start = idxRes.unwrap();
+        sizeT length = 1;
+
+        if (indices.size() == dim())
+        {
+            Ok(Tensor({0}, {data_[start]}))
         }
 
-        Tensor& operator-=(const Tensor& other) {
-            checkShape(other);
-            for (sizeT i = 0; i < size(); ++i) {
-                _data[i] -= other._data[i];
-            }
-            return *this;
+        ds::Vector<sizeT> newShape;
+        for (sizeT i = indices.size(); i < shape_.size(); ++i)
+        {
+            newShape.pushBack(shape_[i]);
+            length *= shape_[i];
         }
 
-        Tensor& operator*=(const Tensor& other) {
-            checkShape(other);
-            for (sizeT i = 0; i < size(); ++i) {
-                _data[i] *= other._data[i];
-            }
-            return *this;
+        if (start + length > data_.size())
+        {
+            Err(IndexOutOfBoundError("Calculated range out of bounds"));
         }
 
-        Tensor& operator/=(const Tensor& other) {
-            checkShape(other);
-            for (sizeT i = 0; i < size(); ++i) {
-                if constexpr (std::is_floating_point_v<T>) {
-                    if (other._data[i] == static_cast<T>(0)) {
-                        throw std::runtime_error("Division by zero");
-                    }
-                }
-                _data[i] /= other._data[i];
-            }
-            return *this;
+        Tensor res(newShape);
+        // res.replaceSelf(data_.begin() + start, data_.begin() + start + length);
+        res.copy(data_.subVector(start, length));
+        Ok(res);
+    }
+
+    Res<void, IndexOutOfBoundError> set(const std::initializer_list<sizeT> indices, T value)
+    {
+        SetRetT(void, IndexOutOfBoundError) if (indices.size() > dim())
+        {
+            Err("Too many indices for set() method");
+        }
+        if (indices.size() == 0 && dim() != 0)
+        {
+            Err("Cannot access scalar tensor with empty indices")
+        }
+        // calculate start index and tensor size
+        auto idxRes = index(indices);
+        if (idxRes.isErr())
+        {
+            Err(IndexOutOfBoundError(idxRes.unwrapErr().message()));
         }
 
-        [[nodiscard]] auto begin() const {
-            return _data.begin();
+        data_[idxRes.unwrap()] = value;
+        Ok()
+    }
+
+  private:
+    ds::Vector<sizeT> shape_;
+    ds::Vector<ValueType> data_;
+
+    static sizeT computeSize(const ds::Vector<sizeT>& shape)
+    {
+        return std::accumulate(shape.begin(), shape.end(), sizeT{1}, std::multiplies<>());
+    }
+
+    void checkShape(const Tensor& other) const
+    {
+        if (shape_ != other.shape_)
+        {
+            throw std::runtime_error("Shape mismatch");
         }
-        [[nodiscard]] auto end() const {
-            return _data.end();
-        }
-
-        [[nodiscard]] auto rawData() const {
-            return _data;
-        }
-
-        [[nodiscard]] bool empty() const {
-            return _data.empty();
-        }
-
-        // Array-style element access (read-only)
-        const T& operator[](sizeT index) const {
-            return _data[index];
-        }
-
-        // Array-style element access (read-write)
-        T& operator[](sizeT index) {
-            return _data[index];
-        }
-
-        // Sum all elements in the tensor
-        T sum() const {
-            T result = static_cast<T>(0);
-            for (sizeT i = 0; i < size(); ++i) {
-                result += _data[i];
-            }
-            return result;
-        }
-
-        Res<Tensor, IndexOutOfBoundError> at(const std::initializer_list<sizeT> indices) const {
-            SetRetT(Tensor, IndexOutOfBoundError) if (indices.size() > dim()) {
-                Err("Too many indices for at() method");
-            }
-            if (indices.size() == 0 && dim() != 0) {
-                Err("Cannot access scalar tensor with empty indices")
-            }
-            // calculate start index and tensor size
-            auto idxRes = index(indices);
-            if (idxRes.isErr()) {
-                Err(IndexOutOfBoundError(idxRes.unwrapErr().message()));
-            }
-
-            sizeT start  = idxRes.unwrap();
-            sizeT length = 1;
-
-            if (indices.size() == dim()) {
-                Ok(Tensor({0}, {_data[start]}))
-            }
-
-            ds::Vec<sizeT> newShape;
-            for (sizeT i = indices.size(); i < _shape.size(); ++i) {
-                newShape.push_back(_shape[i]);
-                length *= _shape[i];
-            }
-
-            if (start + length > _data.size()) {
-                Err(IndexOutOfBoundError("Calculated range out of bounds"));
-            }
-
-            Tensor res(newShape);
-            // res.replaceSelf(_data.begin() + start, _data.begin() + start + length);
-            res.copy(_data.subVec(start, length));
-            Ok(res);
-        }
-
-        Res<void, IndexOutOfBoundError> set(const std::initializer_list<sizeT> indices, T value) {
-            SetRetT(void, IndexOutOfBoundError) if (indices.size() > dim()) {
-                Err("Too many indices for set() method");
-            }
-            if (indices.size() == 0 && dim() != 0) {
-                Err("Cannot access scalar tensor with empty indices")
-            }
-            // calculate start index and tensor size
-            auto idxRes = index(indices);
-            if (idxRes.isErr()) {
-                Err(IndexOutOfBoundError(idxRes.unwrapErr().message()));
-            }
-
-            _data[idxRes.unwrap()] = value;
-            Ok()
-        }
-
-    private:
-        ds::Vec<sizeT> _shape;
-        ds::Vec<valueType> _data;
-
-        static sizeT computeSize(const ds::Vec<sizeT>& shape) {
-            return std::accumulate(shape.begin(), shape.end(), sizeT{1}, std::multiplies<>());
-        }
-
-        void checkShape(const Tensor& other) const {
-            if (_shape != other._shape) {
-                throw std::runtime_error("Shape mismatch");
-            }
-        }
-    };
+    }
+};
 
 } // namespace hahaha::ml
 #endif // TENSOR_H

@@ -3,29 +3,33 @@ project(hahaha_dev_tests_unit)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-include_directories(../../src/include)
 
 # Enable testing
 enable_testing()
-file(GLOB_RECURSE SOURCE_FILES
-       *.cpp
-)
 
+file(GLOB_RECURSE TEST_SOURCE_FILES
+    "hahaha/**/*.cpp"
+    "unittest_main.cpp"
+)
 
 # Find Google Test package
 find_package(GTest REQUIRED)
 
 # Create the test executable
 add_executable(hahaha_dev_tests_unit_exe
-        ${SOURCE_FILES}
-        hiahiahia/ml/common/TensorTest.cpp
-        hiahiahia/ml/model/linear_regression/LinearRegressionTest.cpp
-        hiahiahia/ml/util/dataset/CSVDatasetTest.cpp
-        hiahiahia/ml/util/dataset/MNISTDatasetTest.cpp
+    ${TEST_SOURCE_FILES}
 )
 
-# Link with Google Test and the hahaha library
-target_link_libraries(hahaha_dev_tests_unit_exe GTest::GTest GTest::Main pthread hahaha)
+target_include_directories(hahaha_dev_tests_unit_exe PUBLIC
+    ${CMAKE_SOURCE_DIR}/src/core
+    ${CMAKE_SOURCE_DIR}/src/datasets
+    ${CMAKE_SOURCE_DIR}/src/models
+    ${CMAKE_SOURCE_DIR}/src/optimizers
+    ${CMAKE_SOURCE_DIR}/src/utils
+)
+
+# Link libraries
+target_link_libraries(hahaha_dev_tests_unit_exe PRIVATE hahaha gtest gtest_main)
 
 # Add test
 add_test(NAME hahaha_unit_tests COMMAND hahaha_dev_tests_unit_exe)

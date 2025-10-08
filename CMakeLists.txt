@@ -8,31 +8,38 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Add include directories
-include_directories(${CMAKE_SOURCE_DIR}/src/include)
+include_directories(
+    ${CMAKE_SOURCE_DIR}/src/core
+    ${CMAKE_SOURCE_DIR}/src/datasets
+    ${CMAKE_SOURCE_DIR}/src/models
+    ${CMAKE_SOURCE_DIR}/src/optimizers
+    ${CMAKE_SOURCE_DIR}/src/utils
+)
 
 # Find required packages
 find_package(CURL REQUIRED)
 include_directories(${CURL_INCLUDE_DIRS})
 
-# Collect source files
-file(GLOB_RECURSE HEADER_FILES 
-    "${CMAKE_SOURCE_DIR}/src/include/*.h"
+# Source files
+set(SOURCE_FILES
+    src/core/Error.cpp
+    src/core/ds/String.cpp
+    src/utils/io/file/fileUtil.cpp
+    src/utils/io/net/HttpClient.cpp
+    src/utils/io/net/HttpRequest.cpp
+    src/utils/io/net/HttpResponse.cpp
+    src/models/knn/KNN.cpp
+    src/models/linear_regression/LinearRegression.cpp
+    src/datasets/dataset/DatasetDownloader.cpp
 )
 
-file(GLOB_RECURSE SOURCE_FILES 
-    "${CMAKE_SOURCE_DIR}/src/src/*.cpp"
-)
-
-# Print debug information to check if files are found
-message(STATUS "Found source files:")
-foreach(src ${SOURCE_FILES})
-    message(STATUS "  ${src}")
-endforeach()
+file(GLOB_RECURSE HEADER_FILES
+        "${CMAKE_SOURCE_DIR}/src/*.h")
 
 # Main library
 add_library(hahaha STATIC
-    ${SOURCE_FILES}
     ${HEADER_FILES}
+    ${SOURCE_FILES}
 )
 
 # Set C++ as the link language
