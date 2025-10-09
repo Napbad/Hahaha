@@ -97,6 +97,12 @@ template <typename T> class Tensor
     }
 
     // Constructor for a 0-dimensional tensor (scalar)
+    explicit Tensor(T scalar) : shape_({})
+    {
+        data_.pushBack(scalar);
+    }
+
+    // Constructor for a 0-dimensional tensor (scalar)
     explicit Tensor(const std::initializer_list<sizeT> shape, std::initializer_list<T> data)
         : shape_(shape), data_(data)
     {
@@ -185,6 +191,25 @@ template <typename T> class Tensor
         return data_[index(indices).unwrap()];
     }
 
+    operator T() const
+    {
+        if (!isScalar())
+        {
+            throw std::runtime_error("Cannot convert non-scalar Tensor to a scalar value.");
+        }
+        return data_[0];
+    }
+
+    Tensor& operator=(const T& scalar)
+    {
+        if (!isScalar())
+        {
+            throw std::runtime_error("Cannot assign a scalar value to a non-scalar Tensor.");
+        }
+        data_[0] = scalar;
+        return *this;
+    }
+
     // Fill tensor with value
     void fill(const ValueType v)
     {
@@ -256,6 +281,8 @@ template <typename T> class Tensor
     // Matrix multiplication
     Tensor matmul(const Tensor& other) const
     {
+        std::cout << "Matmul called. Left shape: " << this->shape_.toString()
+                  << ", Right shape: " << other.shape_.toString() << std::endl;
         if (this->dim() != 2 || other.dim() != 2)
         {
             throw std::runtime_error("matmul is only supported for 2D tensors (matrices).");
@@ -285,14 +312,37 @@ template <typename T> class Tensor
         return result;
     }
 
-    // Print
-    void printFlat() const
-    {
-        for (const auto& v : data_)
-        {
-            std::cout << v << " ";
+    // Transpose a 2D tensor (matrix)
+    Tensor transpose() const {
+        if (dim() != 2) {
+            throw std::runtime_error("Transpose is only supported for 2D tensors.");
         }
-        std::cout << "\n";
+        sizeT rows = shape_[0];
+        sizeT cols = shape_[1];
+        Tensor result({cols, rows});
+        for (sizeT i = 0; i < rows; ++i) {
+            for (sizeT j = 0; j < cols; ++j) {
+                result({j, i}) = (*this)({i, j});
+            }
+        }
+        return result;
+    }
+
+    // Print the tensor with formatting
+    void print() const
+    {
+        if (isScalar()) {
+            std::cout << "Tensor(" << data_[0] << ")" << std::endl;
+            return;
+        }
+
+        std::cout << "Tensor(shape: " << shape_.toString() << ", data:" << std::endl;
+        if (data_.empty()) {
+            std::cout << "[]" << std::endl;
+            return;
+        }
+        printRecursive(std::cout, 0, 0);
+        std::cout << std::endl << ")" << std::endl;
     }
 
     T& first()
@@ -568,7 +618,7 @@ template <typename T> class Tensor
 
         if (indices.size() == dim())
         {
-            Ok(Tensor({0}, {data_[start]}))
+            Ok(Tensor(data_[start]))
         }
 
         ds::Vector<sizeT> newShape;
@@ -645,6 +695,35 @@ template <typename T> class Tensor
             }
             std::cout << "warn: same size but different shape tensors multiply: " << shape_.toString() << " and " << other.shape_.toString() << std::endl;
         }
+    }
+private:
+    void printRecursive(std::ostream& os, sizeT dim, sizeT offset) const {
+        os << std::string(dim, ' ') << "[";
+        if (dim == shape_.size() - 1) {
+            for (sizeT i = 0; i < shape_[dim]; ++i) {
+                os << data_[offset + i];
+                if (i < shape_[dim] - 1) {
+                    os << ", ";
+                }
+            }
+        } else {
+            sizeT stride = 1;
+            for (sizeT i = dim + 1; i < shape_.size(); ++i) {
+                stride *= shape_[i];
+            }
+            for (sizeT i = 0; i < shape_[dim]; ++i) {
+                if (i > 0) {
+                    os << ",\n";
+                }
+                printRecursive(os, dim + 1, offset + i * stride);
+            }
+        }
+        os << "]";
+    }
+
+    [[nodiscard]] bool isScalar() const
+    {
+        return dim() == 0;
     }
 };
 

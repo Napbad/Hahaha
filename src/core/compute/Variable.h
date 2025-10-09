@@ -43,7 +43,7 @@ HHH_NAMESPACE_IMPORT
             grad_.fill(static_cast<T>(0));
         }
 
-        explicit Variable(const ds::Vector<sizeT>& shape)
+        explicit Variable(const ds::Vector<sizeT>& shape) : Tensor<T>(shape)
         {
             grad_ = Tensor<T>(shape);
         }
@@ -108,30 +108,9 @@ HHH_NAMESPACE_IMPORT
 
         Variable matmul(const Variable& other) const
         {
-            // Simple matrix multiplication for 2D tensors
-
-            if (this->shape().size() > 2 || other.shape().size() > 2)
-            {
-                throw std::invalid_argument("Input tensors must be 2D or lower for matrix multiplication.");
-            }
-
-            if (this->shape()[1] != other.shape()[1])
-            {
-                throw std::invalid_argument("Matrix dimensions do not match for matrix multiplication.");
-            }
-
-            Variable result(this->shape()[0], other.shape()[1]);
-
-            for (sizeT i  = 0; i < this->shape()[0]; i++)
-            {
-                for (sizeT j  = 0; j < other.shape()[1]; j++)
-                {
-                    T val = 0;
-                    for (sizeT k = 0; k < this->shape()[1]; k++)
-                        val += this->at(i,k) * other.at(j,k);
-                    result.set({i, j}, val);
-                }
-            }
+            Tensor<T> result_tensor = static_cast<const Tensor<T>&>(*this).matmul(other);
+            Variable result(result_tensor, requiresGrad_ || other.requiresGrad_);
+            // TODO: Add backward function for autograd
             return result;
         }
 
@@ -201,7 +180,7 @@ HHH_NAMESPACE_IMPORT
             return grad_;
         }
 
-        bool requiresGrad() const
+        [[nodiscard]] bool requiresGrad() const
         {
             return requiresGrad_;
         }

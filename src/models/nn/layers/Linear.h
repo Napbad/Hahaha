@@ -37,7 +37,7 @@ public:
     }
 
     Variable<T> forward(const Variable<T>& input) override {
-        return weights_.matmul(input) + bias_;
+        return input.matmul(weights_) + bias_;
     }
 
     ds::Vector<Variable<T>*> parameters() override {

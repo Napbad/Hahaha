@@ -686,6 +686,60 @@ TYPED_TEST(TensorTest, VariadicOperatorParenthesesAccess)
     EXPECT_THROW(mat(0ul, 1ul, 2ul), std::runtime_error);
 }
 
+// Test scalar constructor and conversion
+TYPED_TEST(TensorTest, ScalarConstructorAndConversion)
+{
+    TypeParam scalar_value = static_cast<TypeParam>(42);
+    Tensor<TypeParam> scalar_tensor(scalar_value);
+
+    EXPECT_EQ(scalar_tensor.dim(), 0);
+    EXPECT_EQ(scalar_tensor.size(), 1);
+    EXPECT_EQ(scalar_tensor.first(), scalar_value);
+
+    // Test conversion back to scalar
+    TypeParam converted_value = scalar_tensor;
+    EXPECT_EQ(converted_value, scalar_value);
+
+    // Test print method for scalar
+    std::cout << "Testing print for scalar:" << std::endl;
+    scalar_tensor.print();
+}
+
+// Test scalar assignment
+TYPED_TEST(TensorTest, ScalarAssignment)
+{
+    Tensor<TypeParam> scalar_tensor(static_cast<TypeParam>(10));
+    EXPECT_EQ(scalar_tensor.first(), static_cast<TypeParam>(10));
+
+    scalar_tensor = static_cast<TypeParam>(25);
+    EXPECT_EQ(scalar_tensor.first(), static_cast<TypeParam>(25));
+}
+
+// Test transpose method
+TYPED_TEST(TensorTest, Transpose)
+{
+    Tensor<TypeParam> mat({2, 3}, {1, 2, 3, 4, 5, 6});
+    Tensor<TypeParam> transposed = mat.transpose();
+
+    const auto& transposed_shape = transposed.shape();
+    EXPECT_EQ(transposed_shape.size(), 2);
+    EXPECT_EQ(transposed_shape[0], 3);
+    EXPECT_EQ(transposed_shape[1], 2);
+
+    EXPECT_EQ(transposed(0, 0), static_cast<TypeParam>(1));
+    EXPECT_EQ(transposed(0, 1), static_cast<TypeParam>(4));
+    EXPECT_EQ(transposed(1, 0), static_cast<TypeParam>(2));
+    EXPECT_EQ(transposed(1, 1), static_cast<TypeParam>(5));
+    EXPECT_EQ(transposed(2, 0), static_cast<TypeParam>(3));
+    EXPECT_EQ(transposed(2, 1), static_cast<TypeParam>(6));
+
+    // Test print method for matrix
+    std::cout << "Testing print for matrix:" << std::endl;
+    mat.print();
+    std::cout << "Testing print for transposed matrix:" << std::endl;
+    transposed.print();
+}
+
 // Test reshape method
 TYPED_TEST(TensorTest, Reshape)
 {
