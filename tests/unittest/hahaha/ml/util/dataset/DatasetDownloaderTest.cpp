@@ -47,7 +47,7 @@ TEST_F(DatasetDownloaderTest, DownloadFromUrlTest)
     // For unit testing purposes, we'll test with a known invalid URL to verify error handling
 
     auto res = DatasetDownloader::downloadFromUrl(
-        ds::String("http://invalid-url-that-does-not-exist-12345.com/test.txt"), ds::String("test_download.txt"), false);
+        String("http://invalid-url-that-does-not-exist-12345.com/test.txt"), String("test_download.txt"), false);
 
     // Should fail with an error
     EXPECT_TRUE(res.isErr());
@@ -61,14 +61,14 @@ TEST_F(DatasetDownloaderTest, DownloadFromUrlTest)
     }
 }
 
-// TEST_F(DatasetDownloaderTest, DownloadFromUCITest)
-// {
-//     // Test with a non-existent UCI dataset to verify error handling
-//     const auto res = DatasetDownloader::downloadFromUCI(ds::String("non-existent-dataset"), ds::String("test_download.txt"));
-//
-//     // Should fail with an error
-//     EXPECT_TRUE(res.isErr());
-// }
+TEST_F(DatasetDownloaderTest, DownloadFromUCITest)
+{
+    // Test with a non-existent UCI dataset to verify error handling
+    const auto res = DatasetDownloader::downloadFromUCI(ds::String("non-existent-dataset"), ds::String("test_download.txt"));
+
+    // Should fail with an error
+    EXPECT_TRUE(res.isErr());
+}
 
 TEST_F(DatasetDownloaderTest, DownloadFromKaggleTest)
 {

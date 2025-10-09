@@ -774,6 +774,58 @@ TYPED_TEST(TensorTest, FactoryMethods)
         EXPECT_LE(val, static_cast<TypeParam>(1));
     }
 }
+
+// Test scalar tensor operations
+TYPED_TEST(TensorTest, ScalarTensorOperations)
+{
+    Tensor<TypeParam> scalar1({}, {5});
+    Tensor<TypeParam> scalar2({}, {3});
+
+    // Addition
+    Tensor<TypeParam> sum = scalar1 + scalar2;
+    EXPECT_EQ(sum.dim(), 0);
+    EXPECT_EQ(sum.first(), static_cast<TypeParam>(8));
+
+    // Multiplication
+    Tensor<TypeParam> prod = scalar1 * scalar2;
+    EXPECT_EQ(prod.dim(), 0);
+    EXPECT_EQ(prod.first(), static_cast<TypeParam>(15));
+
+    std::cout << "scalar1: " << &scalar1 << std::endl;
+    std::cout << "scalar2: " << &scalar2 << std::endl;
+    std::cout << "sum: " << &sum << std::endl;
+    std::cout << "prod: " << &prod << std::endl;
+}
+
+TYPED_TEST(TensorTest, ReshapeDataIntegrity)
+{
+    Tensor<TypeParam> tensor({2, 4}, {1, 2, 3, 4, 5, 6, 7, 8});
+    tensor.reshape({4, 2});
+
+    EXPECT_EQ(tensor(0, 0), static_cast<TypeParam>(1));
+    EXPECT_EQ(tensor(0, 1), static_cast<TypeParam>(2));
+    EXPECT_EQ(tensor(1, 0), static_cast<TypeParam>(3));
+    EXPECT_EQ(tensor(1, 1), static_cast<TypeParam>(4));
+    EXPECT_EQ(tensor(3, 1), static_cast<TypeParam>(8));
+}
+
+TYPED_TEST(TensorTest, MatmulEdgeCases)
+{
+    // Identity matrix
+    Tensor<TypeParam> mat({2, 2}, {1, 0, 0, 1});
+    Tensor<TypeParam> other({2, 2}, {5, 6, 7, 8});
+    Tensor<TypeParam> result = mat.matmul(other);
+    EXPECT_TRUE(result == other);
+
+    // Non-commutative
+    Tensor<TypeParam> mat1({2, 2}, {1, 2, 3, 4});
+    Tensor<TypeParam> mat2({2, 2}, {5, 6, 7, 8});
+    Tensor<TypeParam> result1 = mat1.matmul(mat2);
+    Tensor<TypeParam> result2 = mat2.matmul(mat1);
+    EXPECT_FALSE(result1 == result2);
+}
+
+
 //
 // // Test tensor slicing with at() method
 // TEST_F(TensorFloatTest, TensorSlicing3D)

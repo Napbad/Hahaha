@@ -1,0 +1,71 @@
+// Copyright (c) 2025 Napbad
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Email: napbad.sen@gmail.com
+// GitHub: https://github.com/Napbad
+
+//
+// Created by Napbad on 8/3/25.
+//
+
+#ifndef DEVICE_H
+#define DEVICE_H
+#include "common/Res.h"
+#include "common/defines/h3defs.h"
+#include "common/ds/String.h"
+#include "ml/util/device/CPUDevice.h"
+#include "ml/util/device/GPUDevice.h"
+#include <map>
+#include <memory>
+
+namespace hahaha
+{
+
+enum class DeviceType
+{
+    CPU = 0,
+    GPU = 1
+};
+
+using ds::String;
+
+class Device
+{
+  public:
+    virtual ~Device() = default;
+
+    [[nodiscard]] virtual DeviceType type() const = 0;
+
+    [[nodiscard]] virtual int id() const = 0;
+
+    [[nodiscard]] virtual String toString() const = 0;
+
+    [[nodiscard]] virtual bool isAvailable() const = 0;
+
+    virtual void activate() const = 0;
+
+    bool operator==(const Device& other) const
+    {
+        return type() == other.type() && id() == other.id();
+    }
+
+    bool operator!=(const Device& other) const
+    {
+        return !(*this == other);
+    }
+};
+
+} // namespace hahaha
+
+#endif // DEVICE_H
