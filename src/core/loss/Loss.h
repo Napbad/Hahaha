@@ -21,8 +21,8 @@
 
 #ifndef LOSS_H
 #define LOSS_H
-#include "common/defines/h3defs.h"
-#include "ml/common/Tensor.h"
+#include "core/defines/h3defs.h"
+#include "core/ml/Tensor.h"
 
 HHH_NAMESPACE_IMPORT
 

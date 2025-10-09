@@ -22,8 +22,8 @@
 #ifndef HAHAHA_MSELOSS_H
 #define HAHAHA_MSELOSS_H
 #include "Loss.h"
-#include "common/defines/h3defs.h"
-#include "ml/common/Tensor.h"
+#include "core/defines/h3defs.h"
+#include "core/ml/Tensor.h"
 
 HHH_NAMESPACE_IMPORT
 

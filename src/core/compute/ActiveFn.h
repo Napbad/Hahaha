@@ -21,9 +21,10 @@
 
 #ifndef HAHAHA_ACTIVEFN_H
 #define HAHAHA_ACTIVEFN_H
-#include "common/defines/h3defs.h"
-#include "math/Math.h"
-#include "ml/common/Tensor.h"
+#include <cmath>
+
+#include "core/defines/h3defs.h"
+#include "core/ml/Tensor.h"
 
 HHH_NAMESPACE_IMPORT
 
@@ -35,7 +36,7 @@ HHH_NAMESPACE_IMPORT
       public:
         static f32 sigmoid(const f32 x)
         {
-            return 1.0f / (1.0f + Math::exp(-x));
+            return 1.0f / (1.0f + std::exp(-x));
         }
 
         static f32 relu(const f32 x)
@@ -45,7 +46,7 @@ HHH_NAMESPACE_IMPORT
 
         static f32 tanh(const f32 x)
         {
-            return Math::tanh(x);
+            return std::tanh(x);
         }
 
         static f32 linear(const f32 x)
@@ -59,7 +60,7 @@ HHH_NAMESPACE_IMPORT
             result.fill(0);
             for (sizeT i = 0; i < x.size(); ++i)
             {
-                result[i] = Math::exp(x[i]);
+                result[i] = std::exp(x[i]);
             }
             return result / result.sum();
         }

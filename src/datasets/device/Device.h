@@ -22,7 +22,7 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 #include "common/Res.h"
-#include "common/defines/h3defs.h"
+#include "core/defines/h3defs.h"
 #include "common/ds/String.h"
 #include "ml/util/device/CPUDevice.h"
 #include "ml/util/device/GPUDevice.h"

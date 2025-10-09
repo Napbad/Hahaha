@@ -22,7 +22,6 @@
 #ifndef HAHAHA_RELU_H
 #define HAHAHA_RELU_H
 
-
 #include <nn/layers/Layer.h>
 
 namespace hahaha::ml
@@ -30,8 +29,8 @@ namespace hahaha::ml
 template <typename T>
 class ReLU final : public Layer<T> {
 public:
-    Tensor<T> forward(const Tensor<T>& input) override {
-        Tensor<T> result(input.shape());
+    Variable<T> forward(const Variable<T>& input) override {
+        Variable<T> result(input.shape());
         for (sizeT i = 0; i < input.size(); ++i) {
             result[i] = std::max(static_cast<T>(0), input[i]);
         }

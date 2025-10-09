@@ -624,7 +624,7 @@ template <typename T> class Tensor
         Ok()
     }
 
-  private:
+  protected:
     ds::Vector<sizeT> shape_;
     ds::Vector<ValueType> data_;
 

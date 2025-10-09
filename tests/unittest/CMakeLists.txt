@@ -8,7 +8,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 enable_testing()
 
 file(GLOB_RECURSE TEST_SOURCE_FILES
-    "hahaha/**/*.cpp"
+    "core/**/*.cpp"
+    "datasets/**/*.cpp"
+    "models/**/*.cpp"
+    "optimizers/**/*.cpp"
     "unittest_main.cpp"
 )
 

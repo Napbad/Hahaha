@@ -21,8 +21,8 @@
 
 #ifndef MEMORY_H
 #define MEMORY_H
-#include "common/defines/h3defs.h"
-#include "ml/common/defines.h"
+#include "core/defines/h3defs.h"
+#include "core/ml/defines.h"
 
 namespace hahaha
 {

@@ -21,10 +21,9 @@
 
 #ifndef SEQUENTIAL_H
 #define SEQUENTIAL_H
-
+#include "compute/Variable.h"
 #include "ds/Vector.h"
 #include "layers/Layer.h"
-#include "ml/Tensor.h"
 
 namespace hahaha::ml {
 
@@ -38,18 +37,19 @@ public:
         layers_.pushBack(layer);
     }
 
-    Tensor<T> forward(const Tensor<T>& input) override {
-        Tensor<T> current_output = input;
+    Variable<T> forward(const Variable<T>& input) override {
+        Variable<T> current_output = input;
         for (auto& layer : layers_) {
             current_output = layer->forward(current_output);
         }
         return current_output;
     }
 
-    ds::Vector<Tensor<T>*> parameters() override {
-        ds::Vector<Tensor<T>*> params;
+    ds::Vector<Variable<T>*> parameters() override {
+        ds::Vector<Variable<T>*> params;
         for (auto& layer : layers_) {
-            for (auto layer_params = layer->parameters(); auto* p : layer_params) {
+            auto layer_params = layer->parameters();
+            for(auto* p : layer_params) {
                 params.pushBack(p);
             }
         }

@@ -24,6 +24,7 @@
 
 #include <ml/Tensor.h>
 
+#include "compute/Variable.h"
 
 namespace hahaha::ml
 {
@@ -35,10 +36,10 @@ public:
     virtual ~Layer() = default;
 
     // Perform the forward pass
-    virtual Tensor<T> forward(const Tensor<T>& input) = 0;
+    virtual Variable<T> forward(const Variable<T>& input) = 0;
 
     // Get the layer's parameters (weights, biases, etc.)
-    virtual ds::Vector<Tensor<T>*> parameters() {
+    virtual ds::Vector<Variable<T>*> parameters() {
         return {};
     }
 

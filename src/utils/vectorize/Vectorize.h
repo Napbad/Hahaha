@@ -21,7 +21,7 @@
 
 #ifndef HAHAHA_COMMON_UTIL_VECTORIZE_H
 #define HAHAHA_COMMON_UTIL_VECTORIZE_H
-#include "ml/common/Tensor.h"
+#include "core/ml/Tensor.h"
 namespace hahaha::common::util
 {
 

@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Add include directories
 include_directories(
+    ${CMAKE_SOURCE_DIR}/src/
     ${CMAKE_SOURCE_DIR}/src/core
     ${CMAKE_SOURCE_DIR}/src/datasets
     ${CMAKE_SOURCE_DIR}/src/models
@@ -31,10 +32,6 @@ set(SOURCE_FILES
     src/models/knn/KNN.cpp
     src/models/linear_regression/LinearRegression.cpp
     src/datasets/dataset/DatasetDownloader.cpp
-        src/optimizers/SGDOptimizer.h
-        src/models/nn/layers/Linear.h
-        src/models/nn/layers/ReLU.h
-        src/models/nn/layers/Layer.h
 )
 
 file(GLOB_RECURSE HEADER_FILES
@@ -58,3 +55,7 @@ target_link_libraries(hahaha
 
 # Add tests
 add_subdirectory(tests)
+
+# Add example
+add_executable(simple_nn examples/simple_nn.cpp)
+target_link_libraries(simple_nn hahaha)

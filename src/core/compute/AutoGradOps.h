@@ -22,7 +22,7 @@
 #ifndef HAHAHA_AUTOGRADOPS_H
 #define HAHAHA_AUTOGRADOPS_H
 #include "Variable.h"
-#include "common/defines/h3defs.h"
+#include "core/defines/h3defs.h"
 
 HHH_NAMESPACE_IMPORT
 

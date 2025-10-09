@@ -30,23 +30,23 @@ class Linear final : public Layer<T>
 {
 public:
     Linear(sizeT inputSize, sizeT outputSize)
-        : weights_(Tensor<T>::rand({inputSize, outputSize})),
-          bias_(Tensor<T>::rand({inputSize, outputSize}))
+        : weights_(Variable<T>::rand({inputSize, outputSize})),
+          bias_(Variable<T>::rand({1, outputSize}))
     {
 
     }
 
-    Tensor<T> forward(const Tensor<T>& input) override {
-        return input.matmul(weights_) + bias_;
+    Variable<T> forward(const Variable<T>& input) override {
+        return weights_.matmul(input) + bias_;
     }
 
-    ds::Vector<Tensor<T>*> parameters() override {
+    ds::Vector<Variable<T>*> parameters() override {
         return {&weights_, &bias_};
     }
 
 private:
-    Tensor<T> weights_;
-    Tensor<T> bias_;
+    Variable<T> weights_;
+    Variable<T> bias_;
 };
 }
 

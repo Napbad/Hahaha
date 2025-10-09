@@ -44,12 +44,12 @@ HHH_NAMESPACE_IMPORT
         {
             for (auto& param : _parameters)
             {
-                param.zeroGrad();
+                param->zeroGrad();
             }
         }
 
-      private:
-        ds::Vector<Variable<T>> _parameters{};
+      protected:
+        ds::Vector<Variable<T>*> _parameters{};
         f64 _learningRate;
     };
 }

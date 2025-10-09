@@ -23,7 +23,7 @@
 #define STRFINDER_H
 #include <memory>
 
-#include "common/defines/h3defs.h"
+#include "core/defines/h3defs.h"
 #include "common/ds/String.h"
 
 using hahaha::common::ds::String;
