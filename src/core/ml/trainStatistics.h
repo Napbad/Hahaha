@@ -16,7 +16,7 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by root on 10/4/25.
+// Created by Napbad on 10/4/25.
 //
 
 #ifndef HIAHIAHIA_TRAINSTATISTICS_H

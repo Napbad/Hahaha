@@ -16,34 +16,18 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by Napbad on 10/2/25.
+// Created by Napbad on 10/9/25.
 //
 
-#ifndef HAHAHA_ARRAY_H
-#define HAHAHA_ARRAY_H
+#ifndef HAHAHA_SGDOPTIMIZER_H
+#define HAHAHA_SGDOPTIMIZER_H
 
-namespace hahaha::ml
-{
-
-template <class T, int len> class Array
+class SGDOptimizer
 {
   public:
-    void set(int i, T val)
-    {
-        if (i < 0 || i >= len)
-        {
-        }
-        data[i] = val;
-    }
 
-    T get(int i)
-    {
-        return data[i];
-    }
 
-  private:
-    T data[len];
+private:
 };
-} // namespace hahaha::ml
 
-#endif // HAHAHA_ARRAY_H
+#endif // HAHAHA_SGDOPTIMIZER_H

@@ -21,11 +21,10 @@
 
 #ifndef HAHAHA_OPTIMIZER_H
 #define HAHAHA_OPTIMIZER_H
-#include <vector>
 
+#include "compute/Variable.h"
 #include "defines/h3defs.h"
 #include "ds/Vector.h"
-#include "compute/Variable.h"
 
 HHH_NAMESPACE_IMPORT
 

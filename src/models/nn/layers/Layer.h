@@ -16,34 +16,33 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by Napbad on 10/2/25.
+// Created by Napbad on 10/9/25.
 //
 
-#ifndef HAHAHA_ARRAY_H
-#define HAHAHA_ARRAY_H
+#ifndef HAHAHA_LAYER_H
+#define HAHAHA_LAYER_H
+
+#include <ml/Tensor.h>
+
 
 namespace hahaha::ml
 {
-
-template <class T, int len> class Array
+template<typename T>
+class Layer
 {
-  public:
-    void set(int i, T val)
-    {
-        if (i < 0 || i >= len)
-        {
-        }
-        data[i] = val;
+public:
+
+    virtual ~Layer() = default;
+
+    // Perform the forward pass
+    virtual Tensor<T> forward(const Tensor<T>& input) = 0;
+
+    // Get the layer's parameters (weights, biases, etc.)
+    virtual ds::Vector<Tensor<T>*> parameters() {
+        return {};
     }
 
-    T get(int i)
-    {
-        return data[i];
-    }
-
-  private:
-    T data[len];
 };
-} // namespace hahaha::ml
+}
 
-#endif // HAHAHA_ARRAY_H
+#endif // HAHAHA_LAYER_H

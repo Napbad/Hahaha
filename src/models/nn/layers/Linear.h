@@ -16,34 +16,38 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by Napbad on 10/2/25.
+// Created by Napbad on 10/9/25.
 //
 
-#ifndef HAHAHA_ARRAY_H
-#define HAHAHA_ARRAY_H
+#ifndef HAHAHA_LINEAR_H
+#define HAHAHA_LINEAR_H
+#include <nn/layers/Layer.h>
 
 namespace hahaha::ml
 {
-
-template <class T, int len> class Array
+template<typename T>
+class Linear final : public Layer<T>
 {
-  public:
-    void set(int i, T val)
+public:
+    Linear(sizeT inputSize, sizeT outputSize)
+        : weights_(Tensor<T>::rand({inputSize, outputSize})),
+          bias_(Tensor<T>::rand({inputSize, outputSize}))
     {
-        if (i < 0 || i >= len)
-        {
-        }
-        data[i] = val;
+
     }
 
-    T get(int i)
-    {
-        return data[i];
+    Tensor<T> forward(const Tensor<T>& input) override {
+        return input.matmul(weights_) + bias_;
     }
 
-  private:
-    T data[len];
+    ds::Vector<Tensor<T>*> parameters() override {
+        return {&weights_, &bias_};
+    }
+
+private:
+    Tensor<T> weights_;
+    Tensor<T> bias_;
 };
-} // namespace hahaha::ml
+}
 
-#endif // HAHAHA_ARRAY_H
+#endif // HAHAHA_LINEAR_H

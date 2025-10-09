@@ -19,8 +19,10 @@
 // Created by napbad on 10/2/25.
 //
 
-#include <sstream>
 #include "ds/String.h"
+
+#include <sstream>
+
 #include "Error.h"
 
 namespace hahaha::common::ds

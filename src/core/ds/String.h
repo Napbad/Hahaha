@@ -21,10 +21,13 @@
 
 #ifndef STRING_H
 #define STRING_H
+
+// Standard Library
 #include <algorithm>
 #include <cstring>
 #include <sstream>
 
+// Project
 #include "Res.h"
 #include "defines/h3defs.h"
 

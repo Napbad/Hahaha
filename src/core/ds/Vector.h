@@ -21,12 +21,17 @@
 
 #ifndef VEC_H
 #define VEC_H
+
+// Standard Library
 #include <algorithm>
-#include <gtest/gtest-assertion-result.h>
 #include <initializer_list>
 #include <memory>
 #include <sstream>
 
+// Third-Party
+#include <gtest/gtest-assertion-result.h>
+
+// Project
 #include "defines/h3defs.h"
 #include "ds/String.h"
 

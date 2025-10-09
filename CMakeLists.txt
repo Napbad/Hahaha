@@ -31,6 +31,10 @@ set(SOURCE_FILES
     src/models/knn/KNN.cpp
     src/models/linear_regression/LinearRegression.cpp
     src/datasets/dataset/DatasetDownloader.cpp
+        src/optimizers/SGDOptimizer.h
+        src/models/nn/layers/Linear.h
+        src/models/nn/layers/ReLU.h
+        src/models/nn/layers/Layer.h
 )
 
 file(GLOB_RECURSE HEADER_FILES

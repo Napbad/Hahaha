@@ -24,10 +24,10 @@
 #include <iostream>
 #include <numeric>
 
-#include "common/Res.h"
-#include "common/defines/h3defs.h"
-#include "common/ds/Vector.h"
-#include "common/Error.h"
+#include "Res.h"
+#include "defines/h3defs.h"
+#include "ds/Vector.h"
+#include "Error.h"
 
 namespace hahaha::ml
 {

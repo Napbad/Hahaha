@@ -16,7 +16,7 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by root on 10/2/25.
+// Created by Napbad on 10/2/25.
 //
 
 #ifndef HAHAHA_MNIST_H

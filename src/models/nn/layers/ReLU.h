@@ -16,34 +16,28 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by Napbad on 10/2/25.
+// Created by Napbad on 10/9/25.
 //
 
-#ifndef HAHAHA_ARRAY_H
-#define HAHAHA_ARRAY_H
+#ifndef HAHAHA_RELU_H
+#define HAHAHA_RELU_H
+
+
+#include <nn/layers/Layer.h>
 
 namespace hahaha::ml
 {
-
-template <class T, int len> class Array
-{
-  public:
-    void set(int i, T val)
-    {
-        if (i < 0 || i >= len)
-        {
+template <typename T>
+class ReLU final : public Layer<T> {
+public:
+    Tensor<T> forward(const Tensor<T>& input) override {
+        Tensor<T> result(input.shape());
+        for (sizeT i = 0; i < input.size(); ++i) {
+            result[i] = std::max(static_cast<T>(0), input[i]);
         }
-        data[i] = val;
+        return result;
     }
-
-    T get(int i)
-    {
-        return data[i];
-    }
-
-  private:
-    T data[len];
 };
-} // namespace hahaha::ml
+}
 
-#endif // HAHAHA_ARRAY_H
+#endif // HAHAHA_RELU_H

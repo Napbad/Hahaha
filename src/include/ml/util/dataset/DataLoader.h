@@ -18,12 +18,12 @@
 #ifndef HIAHIAHIA_DATALOADER_H
 #define HIAHIAHIA_DATALOADER_H
 
-#include <common/Res.h>
-#include <common/ds/Vector.h>
-#include <common/Error.h>
+#include <Res.h>
+#include <ds/Vector.h>
+#include <Error.h>
 #include <memory>
-#include <ml/util/dataset/Dataset.h>
-#include <ml/util/dataset/Sample.h>
+#include <dataset/Dataset.h>
+#include <dataset/Sample.h>
 #include <random>
 
 namespace hahaha::ml

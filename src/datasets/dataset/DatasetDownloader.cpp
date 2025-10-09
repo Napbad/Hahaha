@@ -17,10 +17,14 @@
 
 #include "dataset/DatasetDownloader.h"
 
-#include <curl/curl.h>
+// Standard Library
 #include <fstream>
 #include <sstream>
 
+// Third-Party
+#include <curl/curl.h>
+
+// Project
 #include "Error.h"
 #include "Res.h"
 #include "ds/String.h"
