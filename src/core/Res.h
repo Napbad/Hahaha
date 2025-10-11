@@ -334,12 +334,12 @@ template <typename T, typename E> class Res
 
 // Macros for easier use
 #define SetRetT(T, E)                                                                                                  \
-    using RetType = Res<T, E>;                                                                                         \
-    using ErrType = E;                                                                                                 \
-    using ValueType = T;
-#define Ok(Val) return RetType::ok(Val);
-#define OkVoid() return RetType::ok();
-#define Err(Error) return RetType::err(ErrType(Error));
+    using RetTypeForReturnMacroUse = Res<T, E>;                                                                                         \
+    using ErrTypeForReturnMacroUse = E;                                                                                                 \
+    using ValueTypeForReturnMacroUse = T;
+#define Ok(Val) return RetTypeForReturnMacroUse::ok(Val);
+#define OkVoid() return RetTypeForReturnMacroUse::ok();
+#define Err(Error) return RetTypeForReturnMacroUse::err(ErrTypeForReturnMacroUse(Error));
 #define newE(ErrorT, ...) (new ErrorT(__VA_ARGS__))
 
 } // namespace hahaha
