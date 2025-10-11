@@ -26,7 +26,6 @@
 
 // Project
 #include "Error.h"
-#include "Res.h"
 #include "ds/String.h"
 #include "io/file/fileUtil.h"
 
@@ -41,21 +40,19 @@ size_t write_data(const void* ptr, const size_t size, const size_t nmemb, FILE* 
     return written;
 }
 
-Res<void, DatasetDownloaderError> DatasetDownloader::downloadFromUrl(const String& url,
+void DatasetDownloader::downloadFromUrl(const String& url,
                                                                            const String& outputPath,
                                                                            const bool redownload)
 {
-    SetRetT(void, DatasetDownloaderError);
-
     if (util::io::fileExists(outputPath) && !redownload)
     {
-        Ok();
+        return;
     }
 
     FILE* fp = fopen(outputPath.cStr(), "wb");
     if (fp == nullptr)
     {
-        Err(DatasetDownloaderError("Failed to open file for writing"));
+        throw std::runtime_error("Failed to open file for writing");
     }
 
     if (CURL* curl = curl_easy_init())
@@ -68,7 +65,7 @@ Res<void, DatasetDownloaderError> DatasetDownloader::downloadFromUrl(const Strin
         {
             fclose(fp);
             curl_easy_cleanup(curl);
-            Err(DatasetDownloaderError(curl_easy_strerror(res)));
+            throw std::runtime_error(curl_easy_strerror(res));
         }
         curl_easy_cleanup(curl);
     }
@@ -82,31 +79,27 @@ Res<void, DatasetDownloaderError> DatasetDownloader::downloadFromUrl(const Strin
         {
             checkFile.close();
             std::remove(outputPath.cStr());
-            Err(DatasetDownloaderError("File not found on server (content starts with 'NOT FOUND')"));
+            throw std::runtime_error("File not found on server (content starts with 'NOT FOUND')");
         }
         checkFile.close();
     }
-
-    Ok();
 }
 
-Res<void, DatasetDownloaderError> DatasetDownloader::downloadFromUCI(const String& dataset_name,
+void DatasetDownloader::downloadFromUCI(const String& dataset_name,
                                                                            const String& save_path,
                                                                            const bool redownload)
 {
-
     const String base_url("https://archive.ics.uci.edu/ml/machine-learning-databases/");
     const String url = base_url + dataset_name + "/" + dataset_name + ".data";
-    return downloadFromUrl(url, save_path, redownload);
+    downloadFromUrl(url, save_path, redownload);
 }
 
-Res<void, DatasetDownloaderError> DatasetDownloader::downloadFromKaggle(const String& dataset_name,
+void DatasetDownloader::downloadFromKaggle(const String& dataset_name,
                                                                               const String& save_path,
                                                                               const String& api_token,
                                                                               const bool redownload)
 {
-    SetRetT(void, DatasetDownloaderError);
-    Err(DatasetDownloaderError("Not implemented"));
+    throw std::runtime_error("Not implemented");
 }
 
 } // namespace hahaha::ml

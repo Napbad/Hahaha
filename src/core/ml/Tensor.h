@@ -120,55 +120,50 @@ template <typename T> class Tensor
     [[nodiscard]] const ds::Vector<ValueType>& data() const { return data_; }
 
     // Index calculation (flattened)
-    [[nodiscard]] Res<sizeT, BaseError> index(const std::initializer_list<sizeT> indices) const
+    [[nodiscard]] sizeT index(const std::initializer_list<sizeT> indices) const
     {
-        SetRetT(sizeT, BaseError)
-
-            if (indices.size() != shape_.size()) Err(BaseError("Incorrect number of indices"));
         sizeT idx = 0;
         sizeT stride = 1;
         for (int i = static_cast<int>(shape_.size()) - 1; i >= 0; --i)
         {
-            if (indices.begin()[i] >= shape_[i])
-            {
-                Err(BaseError("Index out of bounds"));
+            if (i < indices.size()) {
+                if (indices.begin()[i] >= shape_[i])
+                {
+                    throw IndexOutOfBoundError("Index out of bounds");
+                }
+                idx += indices.begin()[i] * stride;
             }
-            idx += indices.begin()[i] * stride;
             stride *= shape_[i];
         }
-        Ok(idx);
+        return idx;
     }
 
-    [[nodiscard]] Res<sizeT, BaseError> index(const ds::Vector<sizeT>& indices) const
+    [[nodiscard]] sizeT index(const ds::Vector<sizeT>& indices) const
     {
-        SetRetT(sizeT, BaseError)
-
-        if (indices.size() != shape_.size())
-        {
-            Err(BaseError("Incorrect number of indices"));
-        }
         sizeT idx = 0;
         sizeT stride = 1;
         for (int i = static_cast<int>(shape_.size()) - 1; i >= 0; --i)
         {
-            if (indices[i] >= shape_[i])
-            {
-                Err(BaseError("Index out of bounds"));
+            if (i < indices.size()) {
+                if (indices[i] >= shape_[i])
+                {
+                    throw IndexOutOfBoundError("Index out of bounds");
+                }
+                idx += indices[i] * stride;
             }
-            idx += indices[i] * stride;
             stride *= shape_[i];
         }
-        Ok(idx);
+        return idx;
     }
 
     // Element access
     ValueType& operator()(const ds::Vector<sizeT>& indices)
     {
-        return data_[index(indices).unwrap()];
+        return data_[index(indices)];
     }
     const ValueType& operator()(const ds::Vector<sizeT>& indices) const
     {
-        return data_[index(indices).unwrap()];
+        return data_[index(indices)];
     }
 
     template <typename... Dims>
@@ -178,7 +173,7 @@ template <typename T> class Tensor
         if (indices.size() != shape_.size()) {
             throw std::runtime_error("Incorrect number of indices");
         }
-        return data_[index(indices).unwrap()];
+        return data_[index(indices)];
     }
 
     template <typename... Dims>
@@ -188,7 +183,7 @@ template <typename T> class Tensor
         if (indices.size() != shape_.size()) {
             throw std::runtime_error("Incorrect number of indices");
         }
-        return data_[index(indices).unwrap()];
+        return data_[index(indices)];
     }
 
     operator T() const
@@ -385,30 +380,28 @@ template <typename T> class Tensor
         return tensor;
     }
 
-    Res<void, TensorErr> copy(const Tensor& other)
+    void copy(const Tensor& other)
     {
-        SetRetT(void, TensorErr) if (other.shape() != shape_)
+        if (other.shape() != shape_)
         {
-            Err(TensorErr("Cannot copy value from a tensor with different shape"))
+            throw TensorErr("Cannot copy value from a tensor with different shape");
         }
         for (sizeT i = 0; i < other.size(); ++i)
         {
             data_[i] = other.data_[i];
         }
-        Ok()
     }
 
-    Res<void, TensorErr> copy(const ds::Vector<T>& other)
+    void copy(const ds::Vector<T>& other)
     {
-        SetRetT(void, TensorErr) if (other.size() != this->size())
+        if (other.size() != this->size())
         {
-            Err(TensorErr("Cannot copy value from a tensor with different shape"))
+            throw TensorErr("Cannot copy value from a vector with different size");
         }
         for (sizeT i = 0; i < other.size(); ++i)
         {
             data_[i] = other[i];
         }
-        Ok()
     }
 
     [[nodiscard]] sizeT dim() const
@@ -595,30 +588,23 @@ template <typename T> class Tensor
         return result;
     }
 
-    Res<Tensor, IndexOutOfBoundError> at(const std::initializer_list<sizeT> indices) const
+    Tensor at(const std::initializer_list<sizeT> indices) const
     {
-        SetRetT(Tensor, IndexOutOfBoundError)
         if (indices.size() > dim())
         {
-            Err("Too many indices for at() method");
+            throw IndexOutOfBoundError("Too many indices for at() method");
         }
         if (indices.size() == 0 && dim() != 0)
         {
-            Err("Cannot access scalar tensor with empty indices")
+            throw IndexOutOfBoundError("Cannot access elements with empty indices");
         }
-        // calculate start index and tensor size
-        auto idxRes = index(indices);
-        if (idxRes.isErr())
-        {
-            Err(IndexOutOfBoundError(idxRes.unwrapErr().message()));
-        }
-
-        sizeT start = idxRes.unwrap();
+        
+        sizeT start = index(indices);
         sizeT length = 1;
 
         if (indices.size() == dim())
         {
-            Ok(Tensor(data_[start]))
+            return Tensor(data_[start]);
         }
 
         ds::Vector<sizeT> newShape;
@@ -630,48 +616,43 @@ template <typename T> class Tensor
 
         if (start + length > data_.size())
         {
-            Err(IndexOutOfBoundError("Calculated range out of bounds"));
+            throw IndexOutOfBoundError("Calculated range out of bounds");
         }
 
         Tensor res(newShape);
-        // res.replaceSelf(data_.begin() + start, data_.begin() + start + length);
         res.copy(data_.subVector(start, length));
-        Ok(res);
+        return res;
     }
 
-    Res<void, IndexOutOfBoundError> set(const std::initializer_list<sizeT> indices, T value)
+    void set(const std::initializer_list<sizeT> indices, T value)
     {
-        SetRetT(void, IndexOutOfBoundError)
         if (dim() == 0)
         {
             if (indices.size() != 0 && *indices.begin() != 0)
             {
-                Err(String("Cannot access scalar tensor with more indices, only {} or {0} is available, now you use a [") +
-                    static_cast<char>(*indices.begin()) + String(", ...]"))
+                throw IndexOutOfBoundError(
+                    String("Cannot access scalar tensor with more indices, only {} or {0} is available, now you use a [") +
+                    static_cast<char>(*indices.begin()) + String(", ...]"));
             }
             data_[0] = value;
+            return;
         }
         if (indices.size() > dim())
         {
-            Err("Too many indices for set() method");
+            throw IndexOutOfBoundError("Too many indices for set() method");
         }
         if (indices.size() == 0 && dim() != 0)
         {
-            Err("Cannot access scalar tensor with empty indices")
-        }
-        // calculate start index and tensor size
-        auto idxRes = index(indices);
-        if (idxRes.isErr())
-        {
-            Err(IndexOutOfBoundError(idxRes.unwrapErr().message()));
+            throw IndexOutOfBoundError("Cannot access elements with empty indices");
         }
 
-        if (data_.size() < idxRes.unwrap())
+        sizeT idx = index(indices);
+
+        if (data_.size() < idx)
         {
-            data_.resize(idxRes.unwrap());
+            data_.resize(idx + 1);
         }
-        data_[idxRes.unwrap()] = value;
-        Ok()
+        data_[idx] = value;
     }
 
   protected:

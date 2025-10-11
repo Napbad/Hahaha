@@ -19,25 +19,29 @@
 // Created by Napbad on 7/19/25.
 //
 
-#ifndef LOSS_H
-#define LOSS_H
+#ifndef HAHAHA_LOSS_H
+#define HAHAHA_LOSS_H
+#include "compute/Variable.h"
 #include "core/defines/h3defs.h"
 #include "core/ml/Tensor.h"
 
 HHH_NAMESPACE_IMPORT
 
-    namespace hahaha::ml
+namespace hahaha::ml
 {
+template <typename T> class Loss
+{
+  public:
+    virtual ~Loss() = default;
+    virtual Tensor<T> forward(const Tensor<T>& input, const Tensor<T>& target) = 0;
 
-    template <typename T> class Loss
+    Variable<T> operator()(Variable<T>& input, Variable<T>& target)
     {
-      public:
-        Loss() = default;
-        virtual ~Loss() = default;
-
-        virtual Tensor<T> forward(const Tensor<T>& input, const Tensor<T>& target) = 0;
-    };
+        Tensor<T> result_tensor = forward(input, target);
+        return Variable<T>(result_tensor, input.requiresGrad() || target.requiresGrad());
+    }
+};
 
 } // namespace hahaha::ml
 
-#endif // LOSS_H
+#endif // HAHAHA_LOSS_H

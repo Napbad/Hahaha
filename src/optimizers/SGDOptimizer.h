@@ -22,12 +22,28 @@
 #ifndef HAHAHA_SGDOPTIMIZER_H
 #define HAHAHA_SGDOPTIMIZER_H
 
-class SGDOptimizer
+#include "Optimizer.h"
+#include "compute/Variable.h"
+#include "ds/Vector.h"
+
+HHH_NAMESPACE_IMPORT
+
+namespace hahaha::ml
+{
+template <typename T> class SGDOptimizer final : public Optimizer<T>
 {
   public:
-
-
-private:
+    SGDOptimizer(const ds::Vector<Variable<T>*>& parameters, const f64 learningRate)
+        : Optimizer<T>(parameters, learningRate)
+    {
+    }
+    void step() override
+    {
+        for (auto& param : this->_parameters)
+        {
+            *param -= param->grad() * this->_learningRate;
+        }
+    }
 };
-
+}
 #endif // HAHAHA_SGDOPTIMIZER_H

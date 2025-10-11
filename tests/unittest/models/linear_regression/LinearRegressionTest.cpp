@@ -105,8 +105,7 @@ TEST_F(LinearRegressionTest, TrainSimple2DTest)
     LinearRegression lr;
 
     // Train the model
-    const auto result = lr.train(features_2d, labels_2d);
-    ASSERT_TRUE(result.isOk()) << "Training should succeed";
+    ASSERT_NO_THROW(lr.train(features_2d, labels_2d));
 
     f32 learning_rate = lr.learningRate();
     std::cout << "Learning rate: " << learning_rate << std::endl;
@@ -115,20 +114,16 @@ TEST_F(LinearRegressionTest, TrainSimple2DTest)
     EXPECT_EQ(lr.parameterCount(), 2);
 
     // Test predictions on training data
-    ml::Tensor<f32> test_feature({});
-    auto res = test_feature.set({0}, 1.0f);
-    if (res.isErr())
-    {
-        std::cout << "Error setting feature value : " << res.unwrapErr().message() << std::endl;
-    }
+    ml::Tensor<f32> test_feature({1});
+    test_feature.set({0}, 1.0f);
     const f32 pred1 = lr.predict(test_feature);
     std::cout << "Prediction for x=1: " << pred1 << std::endl;
 
     EXPECT_TRUE(isApproxEqual(pred1, 3.0f, 0.5f)) << "Prediction for x=1 should be close to 3";
 
-    // test_feature.set({0}, 2.0f);
-    // f32 pred2 = lr.predict(test_feature);
-    // EXPECT_TRUE(isApproxEqual(pred2, 5.0f, 0.5f)) << "Prediction for x=2 should be close to 5";
+    test_feature.set({0}, 2.0f);
+    f32 pred2 = lr.predict(test_feature);
+    EXPECT_TRUE(isApproxEqual(pred2, 5.0f, 0.5f)) << "Prediction for x=2 should be close to 5";
 }
 
 // Test training with multi-dimensional data
@@ -137,8 +132,7 @@ TEST_F(LinearRegressionTest, TrainMultiDimensionalTest)
     LinearRegression lr;
 
     // Train the model
-    auto result = lr.train(features_multi, labels_multi);
-    ASSERT_TRUE(result.isOk()) << "Training should succeed";
+    ASSERT_NO_THROW(lr.train(features_multi, labels_multi));
 
     auto weights = lr.weights();
 
@@ -166,38 +160,32 @@ TEST_F(LinearRegressionTest, PredictBeforeTrainingTest)
     EXPECT_EQ(pred, 0.0f);
 }
 
-// // Test checkStatus method
-// TEST_F(LinearRegressionTest, CheckStatusTest)
-// {
-//     LinearRegression lr;
-//
-//     // Before training, weights are empty - should return error
-//     auto status = LinearRegression::checkStatus(features_2d, labels_2d);
-//     EXPECT_TRUE(status.isErr()) << "Should fail when weights are not initialized";
-//
-//     // Train first
-//     lr.train(features_2d, labels_2d);
-//
-//     // Now status should be OK
-//     status = lr.checkStatus(features_2d, labels_2d);
-//     EXPECT_TRUE(status.isOk()) << "Should succeed after training";
-//
-//     // Test with mismatched sample sizes
-//     ml::Tensor<f32> bad_labels({2, 1}); // Different number of samples
-//     bad_labels.fill(1.0f);
-//     status = lr.checkStatus(features_2d, bad_labels);
-//     EXPECT_TRUE(status.isErr()) << "Should fail with mismatched sample sizes";
-// }
-//
-// // Test save and load functionality (currently stubs)
-// TEST_F(LinearRegressionTest, SaveLoadTest)
-// {
-//     LinearRegression lr;
-//
-//     // Current implementation just returns true
-//     EXPECT_TRUE(lr.save(ds::String("test_model.bin")));
-//     EXPECT_TRUE(lr.load(ds::String("test_model.bin")));
-// }
+// Test checkStatus method
+TEST_F(LinearRegressionTest, CheckStatusTest)
+{
+    LinearRegression lr;
+
+    // Train first
+    lr.train(features_2d, labels_2d);
+
+    // Now status should be OK
+    EXPECT_NO_THROW(lr.checkStatus(features_2d, labels_2d));
+
+    // Test with mismatched sample sizes
+    ml::Tensor<f32> bad_labels({2, 1}); // Different number of samples
+    bad_labels.fill(1.0f);
+    EXPECT_THROW(lr.checkStatus(features_2d, bad_labels), std::runtime_error);
+}
+
+// Test save and load functionality (currently stubs)
+TEST_F(LinearRegressionTest, SaveLoadTest)
+{
+    LinearRegression lr;
+
+    // Current implementation just returns true
+    EXPECT_TRUE(lr.save(ds::String("test_model.bin")));
+    EXPECT_TRUE(lr.load(ds::String("test_model.bin")));
+}
 
 // Test edge cases
 TEST_F(LinearRegressionTest, EdgeCasesTest)
@@ -210,8 +198,7 @@ TEST_F(LinearRegressionTest, EdgeCasesTest)
     single_feature.set({0, 0}, 5.0f);
     single_label.set({0, 0}, 10.0f);
 
-    auto result = lr.train(single_feature, single_label);
-    EXPECT_TRUE(result.isOk()) << "Should handle single sample training";
+    EXPECT_NO_THROW(lr.train(single_feature, single_label));
 
     // Test prediction with the same input
     ml::Tensor<f32> test_feature({1});
@@ -220,22 +207,17 @@ TEST_F(LinearRegressionTest, EdgeCasesTest)
     EXPECT_TRUE(isApproxEqual(pred, 10.0f, 1.0f)) << "Should predict close to training value";
 }
 
-// // Test multiple training sessions (retraining)
-// TEST_F(LinearRegressionTest, RetrainingTest)
-// {
-//     LinearRegression lr;
-//
-//     // First training
-//     auto result1 = lr.train(features_2d, labels_2d);
-//     EXPECT_TRUE(result1.isOk());
-//
-//     // Second training (should reinitialize weights)
-//     auto result2 = lr.train(features_multi, labels_multi);
-//     EXPECT_TRUE(result2.isOk());
-//
-//     // Parameter count should reflect the new training data dimensions
-//     EXPECT_EQ(lr.parameterCount(), 3); // 2 weights + 1 bias for multi-dimensional data
-// }
+// Test multiple training sessions (retraining)
+TEST_F(LinearRegressionTest, RetrainingTest)
+{
+    LinearRegression lr;
+
+    // First training
+    EXPECT_NO_THROW(lr.train(features_2d, labels_2d));
+
+    // Second training with incompatible features should throw an error
+    EXPECT_THROW(lr.train(features_multi, labels_multi), std::runtime_error);
+}
 
 // Performance test with larger dataset
 TEST_F(LinearRegressionTest, LargerDatasetTest)
@@ -255,8 +237,7 @@ TEST_F(LinearRegressionTest, LargerDatasetTest)
         large_labels.set({i, 0}, 3.0f * x + 2.0f);
     }
 
-    auto result = lr.train(large_features, large_labels);
-    EXPECT_TRUE(result.isOk()) << "Should handle larger datasets";
+    EXPECT_NO_THROW(lr.train(large_features, large_labels));
 
     // Test prediction accuracy
     ml::Tensor<f32> test_feature({1});

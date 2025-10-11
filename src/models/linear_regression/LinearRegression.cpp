@@ -51,47 +51,59 @@ ds::String LinearRegression::modelName() const
     return ds::String("LinearRegression");
 }
 
-Res<void, BaseError> LinearRegression::checkStatus(const ml::Tensor<f32>& features, const ml::Tensor<f32>& labels)
+void LinearRegression::checkStatus(const ml::Tensor<f32>& features, const ml::Tensor<f32>& labels) const
 {
-    return Res<void, BaseError>();
+    // Basic checks for tensor dimensions and sizes
+    if (features.dim() != 2 || labels.dim() != 2)
+    {
+        throw std::runtime_error("Features and labels must be 2D tensors.");
+    }
+    if (features.shape()[0] != labels.shape()[0])
+    {
+        throw std::runtime_error("Number of samples in features and labels must match.");
+    }
+    if (labels.shape()[1] != 1)
+    {
+        throw std::runtime_error("Labels tensor must have a single column.");
+    }
+    if (!weights_.empty() && features.shape()[1] != weights_.shape()[0])
+    {
+        throw std::runtime_error("Feature dimensions are inconsistent with model weights.");
+    }
 }
-Res<TrainStatistics, BaseError> LinearRegression::train(const Tensor<f32>& features,
-                                                        const Tensor<f32>& labels)
+TrainStatistics LinearRegression::train(const Tensor<f32>& features,
+                                                    const Tensor<f32>& labels)
 {
-    SetRetT(TrainStatistics, BaseError);
+    checkStatus(features, labels);
 
     if (weights_.empty())
     {
-        weights_ = Tensor<f32>(features.shape().subVector(1, features.shape().size() - 1));
+        weights_ = Tensor<f32>({features.shape()[1]});
+        weights_.fill(1);
+        bias_ = 0.0f;
     }
-    weights_.fill(1);
-    bias_ = 0.0f;
 
     TrainStatistics stats;
-    const auto numEpochs = epochs_;
-    const auto learningRate = learningRate_;
-    for (sizeT epoch = 0; epoch < numEpochs; ++epoch)
+    for (sizeT epoch = 0; epoch < epochs_; ++epoch)
     {
         f32 totalLoss = 0.0f;
         for (sizeT i = 0; i < features.shape()[0]; ++i)
         {
             auto feature_vec = features.data().subVector(i * features.shape()[1], features.shape()[1]);
-            Tensor feature(features.shape().subVector(1, features.shape().size() - 1),
-                                feature_vec.begin());
+            Tensor feature({features.shape()[1]}, feature_vec.begin());
             auto label_vec = labels.data().subVector(i, 1);
             const auto label = label_vec[0];
 
             const auto y_pred = predict(feature);
             const f32 error = y_pred - label;
 
-
-            weights_ -= feature * (learningRate * error);
-            bias_ -= learningRate * error;
+            weights_ -= feature * (learningRate_ * error);
+            bias_ -= learningRate_ * error;
 
             totalLoss += error * error;
         }
         stats.losses.pushBack(totalLoss / static_cast<f32>(features.shape()[0]));
     }
-    Ok(stats);
+    return stats;
 }
 } // namespace hahaha::ml

@@ -23,7 +23,6 @@
 
 // Project
 #include "Error.h"
-#include "Res.h"
 #include "ds/String.h"
 
 namespace hahaha::ml
@@ -82,20 +81,20 @@ class DatasetDownloader
     /**
      * Download a dataset from a direct URL
      */
-    static Res<void, DatasetDownloaderError>
-    downloadFromUrl(const ds::String& url, const ds::String& outputPath, bool redownload = false);
+    static void downloadFromUrl(const ds::String& url, const ds::String& outputPath, bool redownload = false);
 
     /**
      * Download a dataset from UCI Machine Learning Repository
      */
-    static Res<void, DatasetDownloaderError>
-    downloadFromUCI(const ds::String& datasetName, const ds::String& outputPath, bool redownload = false);
+    static void downloadFromUCI(const ds::String& datasetName, const ds::String& outputPath, bool redownload = false);
 
     /**
      * Download a dataset from Kaggle
      */
-    static Res<void, DatasetDownloaderError>
-    downloadFromKaggle(const ds::String& datasetName, const ds::String& outputPath, const ds::String& apiToken, bool redownload = false);
+    static void downloadFromKaggle(const ds::String& datasetName,
+                                 const ds::String& outputPath,
+                                 const ds::String& apiToken,
+                                 bool redownload = false);
 };
 
 } // namespace hahaha::ml

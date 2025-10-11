@@ -151,7 +151,7 @@ TYPED_TEST(VectorTest, At)
     Vector<TypeParam> vec = {static_cast<TypeParam>(10), static_cast<TypeParam>(20)};
     ASSERT_EQ(vec.at(0), static_cast<TypeParam>(10));
     ASSERT_EQ(vec.at(1), static_cast<TypeParam>(20));
-    ASSERT_THROW(vec.at(2), std::out_of_range); // Check for out-of-bounds
+    ASSERT_THROW((void)vec.at(2), std::out_of_range); // Check for out-of-bounds
 }
 
 TYPED_TEST(VectorTest, OperatorSquareBrackets)
@@ -314,7 +314,7 @@ TYPED_TEST(VectorTest, EraseRange)
 TYPED_TEST(VectorTest, EmptyVectorAccess)
 {
     Vector<TypeParam> vec;
-    ASSERT_THROW(vec.front(), std::out_of_range);
-    ASSERT_THROW(vec.back(), std::out_of_range);
+    ASSERT_THROW((void)vec.front(), std::out_of_range);
+    ASSERT_THROW((void)vec.back(), std::out_of_range);
     ASSERT_NO_THROW(vec.popBack()); // Should be safe
 }

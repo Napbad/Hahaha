@@ -38,7 +38,7 @@ class Model
     virtual ~Model() = default;
 
     // Train the model with given features and labels
-    virtual Res<ml::TrainStatistics, BaseError> train(const ml::Tensor<f32>& features,
+    virtual ml::TrainStatistics train(const ml::Tensor<f32>& features,
                                                       const ml::Tensor<f32>& labels) = 0;
 
     // Make a prediction given input features

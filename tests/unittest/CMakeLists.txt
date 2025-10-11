@@ -17,6 +17,7 @@ file(GLOB_RECURSE TEST_SOURCE_FILES
 
 # Find Google Test package
 find_package(GTest REQUIRED)
+include(GoogleTest)
 
 # Create the test executable
 add_executable(hahaha_dev_tests_unit_exe
@@ -32,9 +33,9 @@ target_include_directories(hahaha_dev_tests_unit_exe PUBLIC
 )
 
 # Link libraries
-target_link_libraries(hahaha_dev_tests_unit_exe PRIVATE hahaha gtest gtest_main)
+target_link_libraries(hahaha_dev_tests_unit_exe PRIVATE hahaha GTest::gtest GTest::gtest_main)
 
 # Add test
-add_test(NAME hahaha_unit_tests COMMAND hahaha_dev_tests_unit_exe)
+gtest_discover_tests(hahaha_dev_tests_unit_exe)
 
 message(STATUS "Unit tests configured successfully")

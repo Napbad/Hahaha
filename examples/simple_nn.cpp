@@ -53,11 +53,12 @@ int main() {
 
     // 6. Print final parameters
     auto params = model.parameters();
-    auto* weights = static_cast<Tensor<float>*>(params[0]);
-    auto* bias = static_cast<Tensor<float>*>(params[1]);
+    // Assuming the first layer is the Linear layer we added
+    auto& weight_var = *params[0];
+    auto& bias_var = *params[1];
 
-    std::cout << "Learned weights: " << (*weights)[0] << std::endl;
-    std::cout << "Learned bias: " << (*bias)[0] << std::endl;
+    std::cout << "Learned weights: " << weight_var.data()[0] << std::endl;
+    std::cout << "Learned bias: " << bias_var.data()[0] << std::endl;
 
     return 0;
 }

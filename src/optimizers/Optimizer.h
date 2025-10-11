@@ -35,7 +35,7 @@ HHH_NAMESPACE_IMPORT
 
       public:
         virtual ~Optimizer() = default;
-        Optimizer(const ds::Vector<Variable<T>>& parameters, const f64 learningRate)
+        Optimizer(const ds::Vector<Variable<T>*>& parameters, const f64 learningRate)
             : _parameters(parameters), _learningRate(learningRate)
         {
         }

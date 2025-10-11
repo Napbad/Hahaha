@@ -36,6 +36,34 @@
 
 namespace hahaha::common::util
 {
+// ANSI escape codes for colors
+const ds::String RESET = "\033[0m";
+const ds::String BLACK = "\033[30m";
+const ds::String RED = "\033[31m";
+const ds::String GREEN = "\033[32m";
+const ds::String YELLOW = "\033[33m";
+const ds::String BLUE = "\033[34m";
+const ds::String MAGENTA = "\033[35m";
+const ds::String CYAN = "\033[36m";
+const ds::String WHITE = "\033[37m";
+
+inline ds::String getLogLevelColor(const LogLevel level) {
+    switch (level) {
+        case LogLevel::DEBUG:
+            return CYAN;
+        case LogLevel::INFO:
+            return GREEN;
+        case LogLevel::WARNING:
+            return YELLOW;
+        case LogLevel::ERROR:
+            return RED;
+        case LogLevel::FATAL:
+            return MAGENTA;
+        default:
+            return RESET;
+    }
+}
+
 enum class LogLevel
 {
     DEBUG,
@@ -112,7 +140,7 @@ struct LogEntry
 
     [[nodiscard]] ds::String toStr() const
     {
-        return ds::String("[") + logLevelToStr(level) + "]" + "(" + formatTimePoint(timestamp) + ")" + message + "\n";
+        return ds::String("[") + logLevelToStr(level) + "]" + "(" + formatTimePoint(timestamp) + ")" + message;
     }
 };
 
@@ -156,7 +184,8 @@ class ConsoleOutput final : public LogOutput
   public:
     void write(const LogEntry& entry) override
     {
-        std::cout << entry.toStr() << std::endl;
+        ds::String color = getLogLevelColor(entry.level);
+        std::cout << color << entry.toStr() << RESET << std::endl;
     }
 };
 

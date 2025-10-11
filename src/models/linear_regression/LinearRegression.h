@@ -33,9 +33,8 @@ class LinearRegression : public Model
     {
     }
 
-    [[nodiscard]] static Res<void, BaseError> checkStatus(const Tensor<f32>& features,
-                                                     const Tensor<f32>& labels);
-    Res<ml::TrainStatistics, BaseError> train(const Tensor<f32>& features,
+    void checkStatus(const Tensor<f32>& features, const Tensor<f32>& labels) const;
+    ml::TrainStatistics train(const Tensor<f32>& features,
                                               const Tensor<f32>& labels) override;
     [[nodiscard]] f32 predict(const Tensor<f32>& features) const override;
     [[nodiscard]] bool save(const String& filepath) const override;

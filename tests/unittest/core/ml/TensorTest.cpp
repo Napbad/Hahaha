@@ -131,36 +131,18 @@ TYPED_TEST(TensorTest, IndexCalculation)
     Tensor<TypeParam> tensor({2, 3});
 
     // Test valid indices
-    auto idx1 = tensor.index({0, 0});
-    EXPECT_TRUE(idx1.isOk());
-    EXPECT_EQ(idx1.unwrap(), 0);
-
-    auto idx2 = tensor.index({0, 1});
-    EXPECT_TRUE(idx2.isOk());
-    EXPECT_EQ(idx2.unwrap(), 1);
-
-    auto idx3 = tensor.index({1, 0});
-    EXPECT_TRUE(idx3.isOk());
-    EXPECT_EQ(idx3.unwrap(), 3);
-
-    auto idx4 = tensor.index({1, 2});
-    EXPECT_TRUE(idx4.isOk());
-    EXPECT_EQ(idx4.unwrap(), 5);
+    EXPECT_EQ(tensor.index({0, 0}), 0);
+    EXPECT_EQ(tensor.index({0, 1}), 1);
+    EXPECT_EQ(tensor.index({1, 0}), 3);
+    EXPECT_EQ(tensor.index({1, 2}), 5);
 }
 
 // Test index out of bounds
 TYPED_TEST(TensorTest, IndexOutOfBounds)
 {
     Tensor<TypeParam> tensor({2, 3});
-
-    auto idx1 = tensor.index({2, 0});
-    EXPECT_TRUE(idx1.isErr());
-
-    auto idx2 = tensor.index({0, 3});
-    EXPECT_TRUE(idx2.isErr());
-
-    auto idx3 = tensor.index({0}); // Wrong number of indices
-    EXPECT_TRUE(idx3.isErr());
+    EXPECT_THROW((void)tensor.index({2, 0}), IndexOutOfBoundError);
+    EXPECT_THROW((void)tensor.index({0, 3}), IndexOutOfBoundError);
 }
 
 // Test set and at methods
@@ -169,27 +151,14 @@ TYPED_TEST(TensorTest, SetAndAtMethods)
     Tensor<TypeParam> tensor({2, 3});
 
     // Set values
-    auto res1 = tensor.set({0, 0}, static_cast<TypeParam>(1));
-    EXPECT_TRUE(res1.isOk());
-
-    auto res2 = tensor.set({0, 1}, static_cast<TypeParam>(2));
-    EXPECT_TRUE(res2.isOk());
-
-    auto res3 = tensor.set({1, 2}, static_cast<TypeParam>(6));
-    EXPECT_TRUE(res3.isOk());
+    tensor.set({0, 0}, static_cast<TypeParam>(1));
+    tensor.set({0, 1}, static_cast<TypeParam>(2));
+    tensor.set({1, 2}, static_cast<TypeParam>(6));
 
     // Get values using at
-    auto val1 = tensor.at({0, 0});
-    EXPECT_TRUE(val1.isOk());
-    EXPECT_EQ(val1.unwrap().first(), static_cast<TypeParam>(1));
-
-    auto val2 = tensor.at({0, 1});
-    EXPECT_TRUE(val2.isOk());
-    EXPECT_EQ(val2.unwrap().first(), static_cast<TypeParam>(2));
-
-    auto val3 = tensor.at({1, 2});
-    EXPECT_TRUE(val3.isOk());
-    EXPECT_EQ(val3.unwrap().first(), static_cast<TypeParam>(6));
+    EXPECT_EQ(tensor.at({0, 0}).first(), static_cast<TypeParam>(1));
+    EXPECT_EQ(tensor.at({0, 1}).first(), static_cast<TypeParam>(2));
+    EXPECT_EQ(tensor.at({1, 2}).first(), static_cast<TypeParam>(6));
 }
 
 // Test element-wise addition
@@ -413,13 +382,8 @@ TYPED_TEST(TensorTest, FromVector)
     EXPECT_EQ(tensor.size(), 3);
     EXPECT_EQ(tensor.dim(), 1);
 
-    auto val0 = tensor.at({0});
-    EXPECT_TRUE(val0.isOk());
-    EXPECT_EQ(val0.unwrap().first(), static_cast<TypeParam>(1));
-
-    auto val2 = tensor.at({2});
-    EXPECT_TRUE(val2.isOk());
-    EXPECT_EQ(val2.unwrap().first(), static_cast<TypeParam>(3));
+    EXPECT_EQ(tensor.at({0}).first(), static_cast<TypeParam>(1));
+    EXPECT_EQ(tensor.at({2}).first(), static_cast<TypeParam>(3));
 }
 
 // Test copy from tensor
@@ -429,9 +393,7 @@ TYPED_TEST(TensorTest, CopyFromTensor)
     source.fill(static_cast<TypeParam>(5));
 
     Tensor<TypeParam> dest({2, 2});
-    auto result = dest.copy(source);
-
-    EXPECT_TRUE(result.isOk());
+    dest.copy(source);
 
     for (const auto& val : dest)
     {
@@ -449,15 +411,10 @@ TYPED_TEST(TensorTest, CopyFromVector)
     vec.pushBack(static_cast<TypeParam>(4));
 
     Tensor<TypeParam> tensor({2, 2});
-    auto result = tensor.copy(vec);
+    tensor.copy(vec);
 
-    EXPECT_TRUE(result.isOk());
-
-    auto val0 = tensor.at({0, 0});
-    EXPECT_EQ(val0.unwrap().first(), static_cast<TypeParam>(1));
-
-    auto val3 = tensor.at({1, 1});
-    EXPECT_EQ(val3.unwrap().first(), static_cast<TypeParam>(4));
+    EXPECT_EQ(tensor.at({0, 0}).first(), static_cast<TypeParam>(1));
+    EXPECT_EQ(tensor.at({1, 1}).first(), static_cast<TypeParam>(4));
 }
 
 // Test copy with mismatched shapes
@@ -466,8 +423,7 @@ TYPED_TEST(TensorTest, CopyMismatchedShapes)
     Tensor<TypeParam> source({2, 3});
     Tensor<TypeParam> dest({3, 2});
 
-    auto result = dest.copy(source);
-    EXPECT_TRUE(result.isErr());
+    EXPECT_THROW(dest.copy(source), TensorErr);
 }
 
 // Test iterators
@@ -606,13 +562,8 @@ TEST_F(TensorFloatTest, ComplexIndexing3D)
     Tensor<f32> tensor({2, 3, 4});
 
     // Test corner cases
-    auto idx1 = tensor.index({0, 0, 0});
-    EXPECT_TRUE(idx1.isOk());
-    EXPECT_EQ(idx1.unwrap(), 0);
-
-    auto idx2 = tensor.index({1, 2, 3});
-    EXPECT_TRUE(idx2.isOk());
-    EXPECT_EQ(idx2.unwrap(), 23); // (1*3*4) + (2*4) + 3 = 12 + 8 + 3 = 23
+    EXPECT_EQ(tensor.index({0, 0, 0}), 0);
+    EXPECT_EQ(tensor.index({1, 2, 3}), 23); // (1*3*4) + (2*4) + 3 = 12 + 8 + 3 = 23
 }
 
 // Test sequential operations
@@ -877,92 +828,138 @@ TYPED_TEST(TensorTest, MatmulEdgeCases)
     Tensor<TypeParam> result1 = mat1.matmul(mat2);
     Tensor<TypeParam> result2 = mat2.matmul(mat1);
     EXPECT_FALSE(result1 == result2);
+    EXPECT_TRUE(result1 != result2);
 }
 
 
-//
-// // Test tensor slicing with at() method
-// TEST_F(TensorFloatTest, TensorSlicing3D)
-// {
-//     Tensor<f32> tensor({2, 3, 4});
-//     tensor.fill(5.0f);
-//
-//     // Get a 2D slice by fixing first dimension
-//     auto slice = tensor.at({0});
-//     EXPECT_TRUE(slice.isOk());
-//
-//     auto result = slice.unwrap();
-//     EXPECT_EQ(result.dim(), 2);
-//     EXPECT_EQ(result.size(), 12); // 3 * 4
-//
-//     for (const auto& val : result)
-//     {
-//         EXPECT_FLOAT_EQ(val, 5.0f);
-//     }
-// }
-//
-// // Test tensor slicing with at() method - 2D to 1D
-// TEST_F(TensorFloatTest, TensorSlicing2DTo1D)
-// {
-//     Tensor<f32> tensor({3, 4});
-//
-//     // Fill with sequential values
-//     for (sizeT i = 0; i < 3; ++i)
-//     {
-//         for (sizeT j = 0; j < 4; ++j)
-//         {
-//             tensor.set({i, j}, static_cast<f32>(i * 4 + j));
-//         }
-//     }
-//
-//     // Get the second row
-//     auto row = tensor.at({1});
-//     EXPECT_TRUE(row.isOk());
-//
-//     auto result = row.unwrap();
-//     EXPECT_EQ(result.dim(), 1);
-//     EXPECT_EQ(result.size(), 4);
-//
-//     EXPECT_FLOAT_EQ(result.at({0}).unwrap().first(), 4.0f);
-//     EXPECT_FLOAT_EQ(result.at({1}).unwrap().first(), 5.0f);
-//     EXPECT_FLOAT_EQ(result.at({2}).unwrap().first(), 6.0f);
-//     EXPECT_FLOAT_EQ(result.at({3}).unwrap().first(), 7.0f);
-// }
+// Test sum method
+TYPED_TEST(TensorTest, SumMethod)
+{
+    // 1D Tensor
+    Tensor<TypeParam> vec({4}, {1, 2, 3, 4});
+    EXPECT_EQ(vec.sum(), static_cast<TypeParam>(10));
+
+    // 2D Tensor
+    Tensor<TypeParam> mat({2, 3}, {1, 2, 3, 4, 5, 6});
+    EXPECT_EQ(mat.sum(), static_cast<TypeParam>(21));
+
+    // Tensor with single element
+    Tensor<TypeParam> single({1}, {42});
+    EXPECT_EQ(single.sum(), static_cast<TypeParam>(42));
+
+    // Tensor with zeros
+    Tensor<TypeParam> zeros = Tensor<TypeParam>::zeros({3, 3});
+    EXPECT_EQ(zeros.sum(), static_cast<TypeParam>(0));
+}
+
+// Test scalar multiplication commutativity
+TYPED_TEST(TensorTest, ScalarMultiplicationCommutativity)
+{
+    Tensor<TypeParam> tensor({2, 2});
+    tensor.fill(static_cast<TypeParam>(3));
+    TypeParam scalar = static_cast<TypeParam>(4);
+
+    auto result1 = tensor * scalar;
+    auto result2 = scalar * tensor;
+
+    EXPECT_EQ(result1, result2);
+}
+
+// Test operator[] access
+TYPED_TEST(TensorTest, OperatorBracketAccess)
+{
+    Tensor<TypeParam> tensor({2, 3}, {1, 2, 3, 4, 5, 6});
+
+    // Read access
+    EXPECT_EQ(tensor[0], static_cast<TypeParam>(1));
+    EXPECT_EQ(tensor[5], static_cast<TypeParam>(6));
+
+    // Write access
+    tensor[1] = static_cast<TypeParam>(22);
+    EXPECT_EQ(tensor[1], static_cast<TypeParam>(22));
+}
+
+// Test tensor slicing with at() method
+TEST_F(TensorFloatTest, TensorSlicing3D)
+{
+    Tensor<f32> tensor({2, 3, 4});
+    tensor.fill(5.0f);
+
+    // Get a 2D slice by fixing first dimension
+    auto result = tensor.at({0});
+    EXPECT_EQ(result.dim(), 2);
+    EXPECT_EQ(result.size(), 12); // 3 * 4
+
+    for (const auto& val : result)
+    {
+        EXPECT_FLOAT_EQ(val, 5.0f);
+    }
+}
+
+// Test tensor slicing with at() method - 2D to 1D
+TEST_F(TensorFloatTest, TensorSlicing2DTo1D)
+{
+    Tensor<f32> tensor({3, 4});
+
+    // Fill with sequential values
+    for (sizeT i = 0; i < 3; ++i)
+    {
+        for (sizeT j = 0; j < 4; ++j)
+        {
+            tensor.set({i, j}, static_cast<f32>(i * 4 + j));
+        }
+    }
+
+    // Get the second row
+    auto result = tensor.at({1});
+    EXPECT_EQ(result.dim(), 1);
+    EXPECT_EQ(result.size(), 4);
+
+    EXPECT_FLOAT_EQ(result.at({0}).first(), 4.0f);
+    EXPECT_FLOAT_EQ(result.at({1}).first(), 5.0f);
+    EXPECT_FLOAT_EQ(result.at({2}).first(), 6.0f);
+    EXPECT_FLOAT_EQ(result.at({3}).first(), 7.0f);
+}
+
+// Test tensor slicing with at() method - 2D to 0D (scalar)
+TEST_F(TensorFloatTest, TensorSlicing2DTo0D)
+{
+    Tensor<f32> tensor({3, 4});
+    tensor.fill(0.0f);
+    tensor.set({1, 2}, 42.0f);
+
+    auto scalar_tensor = tensor.at({1, 2});
+    EXPECT_EQ(scalar_tensor.dim(), 0);
+    EXPECT_EQ(scalar_tensor.size(), 1);
+    EXPECT_FLOAT_EQ(scalar_tensor.first(), 42.0f);
+}
 
 // Test at() with wrong number of indices
 TEST_F(TensorFloatTest, AtMethodTooManyIndices)
 {
     Tensor<f32> tensor({2, 3});
-
-    auto result = tensor.at({0, 1, 2});
-    EXPECT_TRUE(result.isErr());
+    EXPECT_THROW((void)tensor.at({0, 1, 2}), IndexOutOfBoundError);
 }
 
 // Test at() with empty indices on non-empty tensor
 TEST_F(TensorFloatTest, AtMethodEmptyIndices)
 {
     Tensor<f32> tensor({2, 3});
-
-    auto result = tensor.at({});
-    EXPECT_TRUE(result.isErr());
+    EXPECT_THROW((void)tensor.at({}), IndexOutOfBoundError);
 }
 
 // Test set() with wrong number of indices
 TEST_F(TensorFloatTest, SetMethodTooManyIndices)
 {
     Tensor<f32> tensor({2, 3});
-
-    auto result = tensor.set({0, 1, 2}, 5.0f);
-    EXPECT_TRUE(result.isErr());
+    EXPECT_THROW(tensor.set({0, 1, 2}, 5.0f), IndexOutOfBoundError);
 }
 
 // Test set() with empty indices on non-empty tensor
 TEST_F(TensorFloatTest, SetMethodEmptyIndices)
 {
     Tensor<f32> tensor({2, 3});
-
-    auto result = tensor.set({}, 5.0f);
-    EXPECT_TRUE(result.isErr());
+    EXPECT_THROW(tensor.set({}, 5.0f), IndexOutOfBoundError);
 }
 
 // Test copy with Vector size mismatch
@@ -974,9 +971,45 @@ TEST_F(TensorFloatTest, CopyFromVecSizeMismatch)
     vec.pushBack(3.0f);
 
     Tensor<f32> tensor({2, 2}); // Size 4, but vec has size 3
-    auto result = tensor.copy(vec);
+    EXPECT_THROW(tensor.copy(vec), TensorErr);
+}
 
-    EXPECT_TRUE(result.isErr());
+// Test TensorErr is returned for invalid copy
+TEST_F(TensorFloatTest, InvalidCopyReturnsTensorErr)
+{
+    Tensor<f32> source({2, 3});
+    Tensor<f32> dest({3, 2});
+
+    EXPECT_THROW(dest.copy(source), TensorErr);
+}
+
+// Test checkShape logic with same size, different shape
+TYPED_TEST(TensorTest, CheckShapeSameSizeDifferentShape)
+{
+    Tensor<TypeParam> tensor1({2, 6});
+    Tensor<TypeParam> tensor2({3, 4});
+
+    tensor1.fill(static_cast<TypeParam>(2));
+    tensor2.fill(static_cast<TypeParam>(3));
+
+    // Redirect cout to a stringstream to capture the warning
+    std::stringstream buffer;
+    std::streambuf* old_cout = std::cout.rdbuf(buffer.rdbuf());
+
+    // This should not throw, but should print a warning
+    Tensor<TypeParam> result = tensor1 * tensor2;
+
+    // Restore cout
+    std::cout.rdbuf(old_cout);
+
+    std::string output = buffer.str();
+    EXPECT_NE(output.find("warn: same size but different shape tensors multiply"), std::string::npos);
+
+    // Verify the result is as expected (element-wise multiplication)
+    for (const auto& val : result)
+    {
+        EXPECT_EQ(val, static_cast<TypeParam>(6));
+    }
 }
 
 // Test computeSize with 0D tensor
@@ -1108,14 +1141,9 @@ TEST_F(TensorFloatTest, IndexCalculation4D)
     Tensor<f32> tensor({2, 3, 4, 5});
 
     // Test corner indices
-    auto idx1 = tensor.index({0, 0, 0, 0});
-    EXPECT_TRUE(idx1.isOk());
-    EXPECT_EQ(idx1.unwrap(), 0);
-
-    auto idx2 = tensor.index({1, 2, 3, 4});
-    EXPECT_TRUE(idx2.isOk());
+    EXPECT_EQ(tensor.index({0, 0, 0, 0}), 0);
     // (1*3*4*5) + (2*4*5) + (3*5) + 4 = 60 + 40 + 15 + 4 = 119
-    EXPECT_EQ(idx2.unwrap(), 119);
+    EXPECT_EQ(tensor.index({1, 2, 3, 4}), 119);
 }
 
 // Test rawData returns correct data
@@ -1153,7 +1181,7 @@ TEST_F(TensorFloatTest, FromVectorLarge)
 
     for (sizeT i = 0; i < 100; ++i)
     {
-        EXPECT_FLOAT_EQ(tensor.at({i}).unwrap().first(), static_cast<f32>(i));
+        EXPECT_FLOAT_EQ(tensor.at({i}).first(), static_cast<f32>(i));
     }
 }
 
@@ -1218,7 +1246,7 @@ TEST_F(TensorIntTest, IntegerArithmetic)
 
     auto result = (tensor + 50) * 2 - 100;
 
-    EXPECT_EQ(result.at({0}).unwrap().first(), 200); // (100+50)*2-100 = 200
-    EXPECT_EQ(result.at({1}).unwrap().first(), 400); // (200+50)*2-100 = 400
-    EXPECT_EQ(result.at({2}).unwrap().first(), 600); // (300+50)*2-100 = 600
+    EXPECT_EQ(result.at({0}).first(), 200); // (100+50)*2-100 = 200
+    EXPECT_EQ(result.at({1}).first(), 400); // (200+50)*2-100 = 400
+    EXPECT_EQ(result.at({2}).first(), 600); // (300+50)*2-100 = 600
 }

@@ -53,6 +53,10 @@ target_link_libraries(hahaha
     ${CURL_LIBRARIES}
 )
 
+# Add testing support
+include(CTest)
+enable_testing()
+
 # Add tests
 add_subdirectory(tests)
 
