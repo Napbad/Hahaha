@@ -64,10 +64,17 @@ void DatasetDownloader::downloadFromUrl(const String& url,
         if (const CURLcode res = curl_easy_perform(curl); res != CURLE_OK)
         {
             fclose(fp);
+            std::remove(outputPath.cStr()); // Clean up the empty file
             curl_easy_cleanup(curl);
             throw std::runtime_error(curl_easy_strerror(res));
         }
         curl_easy_cleanup(curl);
+    }
+    else
+    {
+        fclose(fp);
+        std::remove(outputPath.cStr()); // Clean up the empty file
+        throw std::runtime_error("curl_easy_init() failed");
     }
     fclose(fp);
 

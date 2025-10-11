@@ -108,9 +108,22 @@ HHH_NAMESPACE_IMPORT
 
         Variable matmul(const Variable& other) const
         {
-            Tensor<T> result_tensor = static_cast<const Tensor<T>&>(*this).matmul(other);
-            Variable result(result_tensor, requiresGrad_ || other.requiresGrad_);
-            // TODO: Add backward function for autograd
+            Tensor<T> resultTensor = static_cast<const Tensor<T>&>(*this).matmul(other);
+            Variable result(resultTensor, requiresGrad_ || other.requiresGrad_);
+            // Backward function needs to handle both inputs
+            if (result.requiresGrad()) {
+                result.backwardFn_ = [this, other_ref = other](const Tensor<T>& grad) mutable {
+                    // Calculate and accumulate gradient for `this` if needed
+                    if (this->requiresGrad()) {
+                        this->grad() += grad.matmul(other_ref.transpose());
+                    }
+                    // Calculate and accumulate gradient for `other` if needed
+                    if (other_ref.requiresGrad()) {
+                        other_ref.grad() += this->transpose().matmul(grad);
+                    }
+                };
+            }
+
             return result;
         }
 
@@ -175,7 +188,7 @@ HHH_NAMESPACE_IMPORT
             grad_.fill(static_cast<T>(0));
         }
 
-        const Tensor<T>& grad() const
+        Tensor<T>& grad() const
         {
             return grad_;
         }
@@ -186,7 +199,7 @@ HHH_NAMESPACE_IMPORT
         }
 
       private:
-        Tensor<T> grad_;
+        mutable Tensor<T> grad_;
         bool requiresGrad_ = false;
         std::function<void(const Tensor<T>&)> backwardFn_;
         ds::Vector<std::shared_ptr<Variable>> children_;

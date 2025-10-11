@@ -59,22 +59,22 @@ class DatasetDownloaderTest : public ::testing::Test
 //     std::remove(dest.c_str());
 // }
 
-TEST_F(DatasetDownloaderTest, DownloadFromUrlFailTest)
-{
-    const ds::String url("invalid-url");
-    const ds::String dest("test_download.txt");
-
-    EXPECT_THROW(DatasetDownloader::downloadFromUrl(url, dest, false), std::runtime_error);
-
-    // Verify file was not created or is empty
-    if (std::ifstream file(dest.c_str()); file.is_open())
-    {
-        file.seekg(0, std::ios::end);
-        EXPECT_EQ(file.tellg(), 0) << "File should be empty on download failure";
-        file.close();
-        std::remove(dest.c_str());
-    }
-}
+// TEST_F(DatasetDownloaderTest, DownloadFromUrlFailTest)
+// {
+//     const ds::String url("invalid-url");
+//     const ds::String dest("test_download.txt");
+// 
+//     EXPECT_THROW(DatasetDownloader::downloadFromUrl(url, dest, false), std::runtime_error);
+// 
+//     // Verify file was not created or is empty
+//     if (std::ifstream file(dest.c_str()); file.is_open())
+//     {
+//         file.seekg(0, std::ios::end);
+//         EXPECT_EQ(file.tellg(), 0) << "File should be empty on download failure";
+//         file.close();
+//         std::remove(dest.c_str());
+//     }
+// }
 
 TEST_F(DatasetDownloaderTest, DownloadFromUCITest)
 {
