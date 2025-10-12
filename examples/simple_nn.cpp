@@ -14,7 +14,7 @@ int main() {
     auto model = Sequential<float>();
     model.add(new Linear<float>(1, 1));
 
-    // 2. Create the Optimizer
+    // 2. Create the SGOptimizer
     auto optimizer = SGDOptimizer(model.parameters(), 0.01);
 
     // 3. Create the Loss Function
