@@ -648,7 +648,7 @@ TYPED_TEST(TensorTest, ScalarConstructorAndConversion)
     EXPECT_EQ(scalar_tensor.first(), scalar_value);
 
     // Test conversion back to scalar
-    TypeParam converted_value = scalar_tensor;
+    TypeParam converted_value = static_cast<TypeParam>(scalar_tensor);
     EXPECT_EQ(converted_value, scalar_value);
 
     // Test print method for scalar
@@ -852,6 +852,88 @@ TYPED_TEST(TensorTest, SumMethod)
     EXPECT_EQ(zeros.sum(), static_cast<TypeParam>(0));
 }
 
+// Test broadcasting operations
+TYPED_TEST(TensorTest, BroadcastingOperations)
+{
+    Tensor<TypeParam> tensor({2, 2});
+    tensor.fill(static_cast<TypeParam>(10));
+    
+    Tensor<TypeParam> scalar_tensor(static_cast<TypeParam>(5));
+
+    // Test tensor + scalar_tensor
+    auto result_add = tensor + scalar_tensor;
+    for (const auto& val : result_add) {
+        EXPECT_EQ(val, static_cast<TypeParam>(15));
+    }
+
+    // Test scalar_tensor + tensor
+    auto result_add_rev = scalar_tensor + tensor;
+    for (const auto& val : result_add_rev) {
+        EXPECT_EQ(val, static_cast<TypeParam>(15));
+    }
+
+    // Test tensor - scalar_tensor
+    auto result_sub = tensor - scalar_tensor;
+    for (const auto& val : result_sub) {
+        EXPECT_EQ(val, static_cast<TypeParam>(5));
+    }
+
+    // Test scalar_tensor - tensor
+    auto result_sub_rev = scalar_tensor - tensor;
+    for (const auto& val : result_sub_rev) {
+        EXPECT_EQ(val, static_cast<TypeParam>(-5));
+    }
+
+    // Test tensor * scalar_tensor
+    auto result_mul = tensor * scalar_tensor;
+    for (const auto& val : result_mul) {
+        EXPECT_EQ(val, static_cast<TypeParam>(50));
+    }
+
+    // Test scalar_tensor * tensor
+    auto result_mul_rev = scalar_tensor * tensor;
+    for (const auto& val : result_mul_rev) {
+        EXPECT_EQ(val, static_cast<TypeParam>(50));
+    }
+    
+    // Test tensor / scalar_tensor
+    auto result_div = tensor / scalar_tensor;
+    for (const auto& val : result_div) {
+        EXPECT_EQ(val, static_cast<TypeParam>(2));
+    }
+
+    // Test scalar_tensor / tensor
+    Tensor<TypeParam> tensor_for_div({2, 2});
+    tensor_for_div.fill(static_cast<TypeParam>(2));
+    Tensor<TypeParam> scalar_for_div(static_cast<TypeParam>(10));
+    auto result_div_rev = scalar_for_div / tensor_for_div;
+    for (const auto& val : result_div_rev) {
+        EXPECT_EQ(val, static_cast<TypeParam>(5));
+    }
+}
+
+// Test broadcasting with single-element, non-scalar tensor
+TYPED_TEST(TensorTest, BroadcastingSingleElementTensor)
+{
+    Tensor<TypeParam> tensor({2, 2});
+    tensor.fill(static_cast<TypeParam>(10));
+    
+    Tensor<TypeParam> single_element_tensor({1, 1}, { static_cast<TypeParam>(5) });
+
+    EXPECT_FALSE(single_element_tensor.isScalar());
+    EXPECT_TRUE(single_element_tensor.hasOnlyOneVal());
+
+    auto result_add = tensor + single_element_tensor;
+    for (const auto& val : result_add) {
+        EXPECT_EQ(val, static_cast<TypeParam>(15));
+    }
+
+    auto result_mul = single_element_tensor * tensor;
+    for (const auto& val : result_mul) {
+        EXPECT_EQ(val, static_cast<TypeParam>(50));
+    }
+}
+
 // Test scalar multiplication commutativity
 TYPED_TEST(TensorTest, ScalarMultiplicationCommutativity)
 {
@@ -863,6 +945,35 @@ TYPED_TEST(TensorTest, ScalarMultiplicationCommutativity)
     auto result2 = scalar * tensor;
 
     EXPECT_EQ(result1, result2);
+}
+
+// Test commutative scalar operations
+TYPED_TEST(TensorTest, CommutativeScalarOperations)
+{
+    Tensor<TypeParam> tensor({2, 2});
+    tensor.fill(static_cast<TypeParam>(10));
+    TypeParam scalar = static_cast<TypeParam>(5);
+
+    // Test scalar + tensor
+    auto result_add = scalar + tensor;
+    for (const auto& val : result_add) {
+        EXPECT_EQ(val, static_cast<TypeParam>(15));
+    }
+
+    // Test scalar - tensor
+    auto result_sub = scalar - tensor;
+    for (const auto& val : result_sub) {
+        EXPECT_EQ(val, static_cast<TypeParam>(-5));
+    }
+    
+    // Test scalar / tensor
+    Tensor<TypeParam> tensor_for_div({2, 2});
+    tensor_for_div.fill(static_cast<TypeParam>(2));
+    TypeParam scalar_for_div = static_cast<TypeParam>(10);
+    auto result_div = scalar_for_div / tensor_for_div;
+    for (const auto& val : result_div) {
+        EXPECT_EQ(val, static_cast<TypeParam>(5));
+    }
 }
 
 // Test operator[] access

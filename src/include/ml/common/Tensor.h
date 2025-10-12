@@ -82,7 +82,7 @@ template <typename T> class Tensor
     {
         SetRetT(sizeT, BaseError)
 
-            if (indices.size() != shape_.size()) Err(BaseError("Incorrect number of indices"));
+        if (indices.size() != shape_.size()) Err(BaseError("Incorrect number of indices"));
         sizeT idx = 0;
         sizeT stride = 1;
         for (int i = static_cast<int>(shape_.size()) - 1; i >= 0; --i)
@@ -138,7 +138,7 @@ template <typename T> class Tensor
     // Element-wise addition
     Tensor operator+(const Tensor& other) const
     {
-        checkShape(other);
+        checkShapeAndSizeNotEqual(other);
         Tensor result(shape_);
         for (sizeT i = 0; i < size(); ++i)
         {
@@ -150,7 +150,7 @@ template <typename T> class Tensor
     // Element-wise multiplication
     Tensor operator*(const Tensor& other) const
     {
-        checkShape(other);
+        checkShapeAndSizeNotEqual(other);
         Tensor result(shape_);
         for (sizeT i = 0; i < size(); ++i)
         {
@@ -182,7 +182,7 @@ template <typename T> class Tensor
 
     T dot(const Tensor& other) const
     {
-        checkShape(other);
+        checkShapeAndSizeNotEqual(other);
         T result = 0;
         for (sizeT i = 0; i < size(); ++i)
         {
@@ -251,7 +251,7 @@ template <typename T> class Tensor
     // Element-wise subtraction
     Tensor operator-(const Tensor& other) const
     {
-        checkShape(other);
+        checkShapeAndSizeNotEqual(other);
         Tensor result(shape_);
         for (sizeT i = 0; i < size(); ++i)
         {
@@ -263,7 +263,7 @@ template <typename T> class Tensor
     // Element-wise division
     Tensor operator/(const Tensor& other) const
     {
-        checkShape(other);
+        checkShapeAndSizeNotEqual(other);
         Tensor result(shape_);
         for (sizeT i = 0; i < size(); ++i)
         {
@@ -311,7 +311,7 @@ template <typename T> class Tensor
     // Compound assignment operators
     Tensor& operator+=(const Tensor& other)
     {
-        checkShape(other);
+        checkShapeAndSizeNotEqual(other);
         for (sizeT i = 0; i < size(); ++i)
         {
             data_[i] += other.data_[i];
@@ -321,7 +321,7 @@ template <typename T> class Tensor
 
     Tensor& operator-=(const Tensor& other)
     {
-        checkShape(other);
+        checkShapeAndSizeNotEqual(other);
         for (sizeT i = 0; i < size(); ++i)
         {
             data_[i] -= other.data_[i];
@@ -331,7 +331,7 @@ template <typename T> class Tensor
 
     Tensor& operator*=(const Tensor& other)
     {
-        checkShape(other);
+        checkShapeAndSizeNotEqual(other);
         for (sizeT i = 0; i < size(); ++i)
         {
             data_[i] *= other.data_[i];
@@ -341,7 +341,7 @@ template <typename T> class Tensor
 
     Tensor& operator/=(const Tensor& other)
     {
-        checkShape(other);
+        checkShapeAndSizeNotEqual(other);
         for (sizeT i = 0; i < size(); ++i)
         {
             if constexpr (std::is_floating_point_v<T>)
@@ -471,7 +471,7 @@ template <typename T> class Tensor
         return std::accumulate(shape.begin(), shape.end(), sizeT{1}, std::multiplies<>());
     }
 
-    void checkShape(const Tensor& other) const
+    void checkShapeAndSizeNotEqual(const Tensor& other) const
     {
         if (shape_ != other.shape_)
         {

@@ -31,10 +31,10 @@ class String;
 }
 using ds::String;
 
-class Error
+class Error : std::exception
 {
   public:
-    virtual ~Error() = default;
+    ~Error() override = default;
 
     // Get the error type name
     [[nodiscard]] virtual String typeName() const = 0;

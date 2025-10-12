@@ -48,8 +48,7 @@ public:
     ds::Vector<Variable<T>*> parameters() override {
         ds::Vector<Variable<T>*> params;
         for (auto& layer : layers_) {
-            auto layer_params = layer->parameters();
-            for(auto* p : layer_params) {
+            for (auto layer_params = layer->parameters(); auto* p : layer_params) {
                 params.pushBack(p);
             }
         }

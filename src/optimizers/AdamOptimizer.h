@@ -16,34 +16,14 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by Napbad on 10/9/25.
+// Created by root on 10/12/25.
 //
 
-#ifndef HAHAHA_SGDOPTIMIZER_H
-#define HAHAHA_SGDOPTIMIZER_H
+#ifndef HAHAHA_ADAMOPTIMIZER_H
+#define HAHAHA_ADAMOPTIMIZER_H
 
-#include "Optimizer.h"
-#include "compute/Variable.h"
-#include "ds/Vector.h"
+namespace hahaha::ml {
 
-HHH_NAMESPACE_IMPORT
-
-namespace hahaha::ml
-{
-template <typename T> class SGDOptimizer final : public Optimizer<T>
-{
-  public:
-    SGDOptimizer(const ds::Vector<Variable<T>*>& parameters, const f64 learningRate)
-        : Optimizer<T>(parameters, learningRate)
-    {
-    }
-    void step() override
-    {
-        for (auto& param : this->_parameters)
-        {
-            *param -= param->grad() * static_cast<T>(this->_learningRate);
-        }
-    }
-};
 }
-#endif // HAHAHA_SGDOPTIMIZER_H
+
+#endif // HAHAHA_ADAMOPTIMIZER_H

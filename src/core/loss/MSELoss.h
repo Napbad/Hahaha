@@ -49,7 +49,7 @@ HHH_NAMESPACE_IMPORT
 
             // Return mean as a scalar tensor
             T mean_value = squared.sum() / static_cast<T>(squared.size());
-            Tensor<T> result({1});
+            Tensor<T> result({});
             result.set({0}, mean_value);
 
             return result;

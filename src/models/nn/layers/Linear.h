@@ -37,7 +37,12 @@ public:
     }
 
     Variable<T> forward(const Variable<T>& input) override {
-        return input.matmul(weights_) + bias_;
+
+        auto selfShape = weights_.shape();
+        auto inputShape = input.shape();
+        auto mm = input.matmul(weights_);
+        auto mmShape = mm.shape();
+       return mm + bias_;
     }
 
     ds::Vector<Variable<T>*> parameters() override {

@@ -32,6 +32,7 @@ set(SOURCE_FILES
     src/models/knn/KNN.cpp
     src/models/linear_regression/LinearRegression.cpp
     src/datasets/dataset/DatasetDownloader.cpp
+        src/optimizers/AdamOptimizer.h
 )
 
 file(GLOB_RECURSE HEADER_FILES
@@ -60,6 +61,5 @@ enable_testing()
 # Add tests
 add_subdirectory(tests)
 
-# Add example
-add_executable(simple_nn examples/simple_nn.cpp)
-target_link_libraries(simple_nn hahaha)
+# Add examples
+add_subdirectory(examples)

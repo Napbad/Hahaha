@@ -15,7 +15,7 @@ int main() {
     model.add(new Linear<float>(1, 1));
 
     // 2. Create the Optimizer
-    auto optimizer = SGDOptimizer<float>(model.parameters(), 0.01);
+    auto optimizer = SGDOptimizer(model.parameters(), 0.01);
 
     // 3. Create the Loss Function
     auto loss_fn = MSELoss<float>();
@@ -24,8 +24,8 @@ int main() {
     Tensor<float> x_train({10, 1}, {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
     Tensor<float> y_train({10, 1}, {1, 3, 5, 7, 9, 11, 13, 15, 17, 19});
     
-    auto x_var = Variable<float>(x_train);
-    auto y_var = Variable<float>(y_train);
+    auto x_var = Variable(x_train);
+    auto y_var = Variable(y_train);
 
     // 5. Training Loop
     std::cout << "Starting training..." << std::endl;

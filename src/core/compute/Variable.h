@@ -113,11 +113,9 @@ HHH_NAMESPACE_IMPORT
             // Backward function needs to handle both inputs
             if (result.requiresGrad()) {
                 result.backwardFn_ = [this, other_ref = other](const Tensor<T>& grad) mutable {
-                    // Calculate and accumulate gradient for `this` if needed
                     if (this->requiresGrad()) {
                         this->grad() += grad.matmul(other_ref.transpose());
                     }
-                    // Calculate and accumulate gradient for `other` if needed
                     if (other_ref.requiresGrad()) {
                         other_ref.grad() += this->transpose().matmul(grad);
                     }
