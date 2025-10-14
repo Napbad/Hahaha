@@ -30,7 +30,7 @@
 namespace hahaha::util::io
 {
 
-using namespace hahaha::common;
+using namespace hahaha::core;
 
 void deleteFile(const ds::String& path)
 {

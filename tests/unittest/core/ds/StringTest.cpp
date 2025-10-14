@@ -6,8 +6,8 @@
 #include <Error.h>
 #include <ds/String.h>
 
-using namespace hahaha::common;
-using namespace hahaha::common::ds;
+using namespace hahaha::core;
+using namespace hahaha::core::ds;
 using hahaha::sizeT;
 
 // Test fixture for String
@@ -16,12 +16,12 @@ class StringTest : public ::testing::Test
   protected:
     void SetUp() override
     {
-        // Common setup for tests
+        // core setup for tests
     }
 
     void TearDown() override
     {
-        // Common teardown for tests
+        // core teardown for tests
     }
 };
 

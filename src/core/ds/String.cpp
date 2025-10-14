@@ -25,7 +25,7 @@
 
 #include "Error.h"
 
-namespace hahaha::common::ds
+namespace hahaha::core::ds
 {
 Res<char, IndexOutOfBoundError> String::at(sizeT i) const
 {
@@ -36,4 +36,4 @@ Res<char, IndexOutOfBoundError> String::at(sizeT i) const
 
     Ok(data_[i]);
 }
-} // namespace hahaha::common::ds
+} // namespace hahaha::core::ds

@@ -3,8 +3,8 @@
 
 #include <ds/Vector.h>
 
-using namespace hahaha::common;
-using namespace hahaha::common::ds;
+using namespace hahaha::core;
+using namespace hahaha::core::ds;
 
 // Test fixture for Vector
 template <typename T> class VectorTest : public ::testing::Test
@@ -13,12 +13,12 @@ template <typename T> class VectorTest : public ::testing::Test
     // You can add shared setup/teardown logic here if needed
     void SetUp() override
     {
-        // Common setup for tests
+        // core setup for tests
     }
 
     void TearDown() override
     {
-        // Common teardown for tests
+        // core teardown for tests
     }
 };
 

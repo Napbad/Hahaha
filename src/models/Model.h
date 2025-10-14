@@ -31,7 +31,7 @@
 namespace hahaha::ml
 {
 
-using namespace hahaha::common;
+using namespace hahaha::core;
 class Model
 {
   public:

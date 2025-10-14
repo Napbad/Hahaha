@@ -27,7 +27,7 @@
 
 #include "core/defines/h3defs.h"
 
-namespace hahaha::common::util
+namespace hahaha::core::util
 {
 
 template <class T> class Allocator
@@ -111,7 +111,7 @@ template <class T> class Allocator
         return !(*this == other);
     }
 };
-} // namespace hahaha::common::util
+} // namespace hahaha::core::util
 
 template <class T> class Allocator
 {

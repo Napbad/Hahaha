@@ -26,7 +26,7 @@
 #include "defines/h3defs.h"
 #include "io/net/HttpRequest.h"
 
-namespace hahaha::common::util
+namespace hahaha::core::util
 {
 
 sizeT WriteCallback(void* dataBuffer, const sizeT blockSize, const sizeT blockCount, void* userData)
@@ -107,4 +107,4 @@ std::unique_ptr<HttpResponse> HttpClient::send(const HttpRequest& request)
     return response;
 }
 
-} // namespace hahaha::common::util
+} // namespace hahaha::core::util

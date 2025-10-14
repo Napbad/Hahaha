@@ -27,11 +27,11 @@
 #include "Res.h"
 #include "Error.h"
 
-namespace hahaha::common::ds
+namespace hahaha::core::ds
 {
 class String;
 }
-namespace hahaha::common::util
+namespace hahaha::core::util
 {
 
 class ConvertErr final : public Error
@@ -188,6 +188,6 @@ template <> inline auto strTo<f32>(const String& str) -> Res<f32, ConvertErr>
     }
 }
 
-} // namespace hahaha::common::util
+} // namespace hahaha::core::util
 
 #endif // COMMONUTIL_H

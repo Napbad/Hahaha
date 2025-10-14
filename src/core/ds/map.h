@@ -46,7 +46,7 @@
 #include "String.h"
 #include "Vector.h"
 
-namespace hahaha::common::ds
+namespace hahaha::core::ds
 {
 template <typename Key,
           typename T,
@@ -132,6 +132,6 @@ class Map
     std::map<Key, T, Compare, Allocator> _data;
 };
 
-} // namespace hahaha::common::ds
+} // namespace hahaha::core::ds
 
 #endif // MAP_H

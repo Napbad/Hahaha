@@ -23,7 +23,7 @@
 
 #include <utility>
 
-namespace hahaha::common
+namespace hahaha::core
 {
 BaseError::BaseError(String msg) : msg_(std::move(msg))
 {
@@ -56,4 +56,4 @@ String BaseError::toString() const
 {
     return String("Error: ") + msg_ + " at " + loc_;
 }
-} // namespace hahaha::common
+} // namespace hahaha::core

@@ -24,7 +24,7 @@
 #include "ds/map.h"
 #include "ds/String.h"
 
-namespace hahaha::common::util
+namespace hahaha::core::util
 {
 
 class HttpResponse
@@ -63,5 +63,5 @@ class HttpResponse
     ds::String body_;
 };
 
-} // namespace hahaha::common::util
+} // namespace hahaha::core::util
 #endif // HIAHIAHIA_HTTPRESPONSE_H

@@ -27,7 +27,7 @@
 
 #include "Vector.h"
 
-namespace hahaha::common::ds
+namespace hahaha::core::ds
 {
 
 template <class T, class Allocator = std::allocator<T>> class queue
@@ -153,6 +153,6 @@ template <class T, class Allocator = std::allocator<T>> class queue
     }
 };
 
-} // namespace hahaha::common::ds
+} // namespace hahaha::core::ds
 
 #endif // QUEUE_H

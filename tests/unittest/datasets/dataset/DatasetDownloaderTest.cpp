@@ -23,7 +23,7 @@
 #include <dataset/DatasetDownloader.h>
 
 using namespace hahaha::ml;
-using namespace hahaha::common;
+using namespace hahaha::core;
 
 class DatasetDownloaderTest : public ::testing::Test
 {

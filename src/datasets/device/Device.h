@@ -21,9 +21,9 @@
 
 #ifndef DEVICE_H
 #define DEVICE_H
-#include "common/Res.h"
+#include "core/Res.h"
 #include "core/defines/h3defs.h"
-#include "common/ds/String.h"
+#include "core/ds/String.h"
 #include "ml/util/device/CPUDevice.h"
 #include "ml/util/device/GPUDevice.h"
 #include <map>

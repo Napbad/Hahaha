@@ -22,7 +22,7 @@
 
 using namespace hahaha;
 using namespace hahaha::ml;
-using namespace hahaha::common;
+using namespace hahaha::core;
 
 // Test fixture for Tensor
 template <typename T> class TensorTest : public ::testing::Test
@@ -30,12 +30,12 @@ template <typename T> class TensorTest : public ::testing::Test
   protected:
     void SetUp() override
     {
-        // Common setup for tests
+        // core setup for tests
     }
 
     void TearDown() override
     {
-        // Common teardown for tests
+        // core teardown for tests
     }
 
     // Helper function to check if two floats are approximately equal

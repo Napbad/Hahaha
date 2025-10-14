@@ -3,7 +3,7 @@
 #include "core/compute/Variable.h"
 
 using namespace hahaha::ml;
-using namespace hahaha::common::ds;
+using namespace hahaha::core::ds;
 
 TEST(SGDOptimizerTest, Step) {
     // 1. Setup

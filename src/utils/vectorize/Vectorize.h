@@ -22,7 +22,7 @@
 #ifndef HAHAHA_COMMON_UTIL_VECTORIZE_H
 #define HAHAHA_COMMON_UTIL_VECTORIZE_H
 #include "core/ml/Tensor.h"
-namespace hahaha::common::util
+namespace hahaha::core::util
 {
 
 using ml::Tensor;
@@ -126,6 +126,6 @@ class Vectorize
     }
 };
 
-} // namespace hahaha::common::util
+} // namespace hahaha::core::util
 
 #endif // HAHAHA_COMMON_UTIL_VECTORIZE_H

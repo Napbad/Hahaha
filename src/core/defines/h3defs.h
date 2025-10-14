@@ -50,7 +50,7 @@ typedef unsigned int sizeT;
 typedef long ptrDiffT;
 } // namespace hahaha
 
-// Quick import macro for common hahaha namespaces
+// Quick import macro for core hahaha namespaces
 #define HHH_NAMESPACE_IMPORT                                                                                             \
     namespace hahaha                                                                                                   \
     {                                                                                                                  \
@@ -60,9 +60,9 @@ typedef long ptrDiffT;
     {                                                                                                                  \
     }                                                                                                                  \
     using namespace hahaha::math;                                                                                      \
-    namespace hahaha::common                                                                                           \
+    namespace hahaha::core                                                                                           \
     {                                                                                                                  \
     }                                                                                                                  \
-    using namespace hahaha::common;
+    using namespace hahaha::core;
 
 #endif // H3DEFS_H

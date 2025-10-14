@@ -24,9 +24,9 @@
 
 #include <vector>
 
-#include "common/ds/Vector.h"
+#include "core/ds/Vector.h"
 
-namespace hahaha::common::ds
+namespace hahaha::core::ds
 {
 template <typename Key, typename Hash = std::hash<Key>> class HashSet
 {
@@ -112,6 +112,6 @@ template <typename Key, typename Hash = std::hash<Key>> class HashSet
     }
 };
 
-} // namespace hahaha::common::ds
+} // namespace hahaha::core::ds
 
 #endif // HASHSET_H

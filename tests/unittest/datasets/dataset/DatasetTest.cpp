@@ -26,7 +26,7 @@
 // #include <dataset/DataLoader.h>
 //
 // using namespace hahaha::ml;
-// using namespace hahaha::common;
+// using namespace hahaha::core;
 // using namespace hahaha;
 //
 // class DatasetTest : public ::testing::Test

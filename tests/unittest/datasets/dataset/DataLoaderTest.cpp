@@ -26,7 +26,7 @@
 
 using namespace hahaha::ml;
 using namespace hahaha;
-using namespace hahaha::common;
+using namespace hahaha::core;
 
 class DataLoaderTest : public ::testing::Test
 {

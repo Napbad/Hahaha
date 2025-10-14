@@ -23,7 +23,7 @@
 
 #include "ds/String.h"
 
-namespace hahaha::common::util
+namespace hahaha::core::util
 {
 
 void HttpResponse::setHeader(const ds::String& key, const ds::String& value)
@@ -31,4 +31,4 @@ void HttpResponse::setHeader(const ds::String& key, const ds::String& value)
     headers_[key] = value;
 }
 
-} // namespace hahaha::common::util
+} // namespace hahaha::core::util

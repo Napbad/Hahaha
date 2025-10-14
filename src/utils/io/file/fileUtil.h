@@ -32,54 +32,54 @@ namespace hahaha::util::io
 /**
  * File error class
  */
-class FileError final : public hahaha::common::Error
+class FileError final : public hahaha::core::Error
 {
   public:
-    explicit FileError(const common::ds::String& message,
-                       const common::ds::String& location = common::ds::String("FileUtil"))
+    explicit FileError(const core::ds::String& message,
+                       const core::ds::String& location = core::ds::String("FileUtil"))
         : message_(message), location_(location)
     {
     }
 
-    explicit FileError(const char* message, const common::ds::String& location = common::ds::String("FileUtil"))
-        : message_(common::ds::String(message)), location_(location)
+    explicit FileError(const char* message, const core::ds::String& location = core::ds::String("FileUtil"))
+        : message_(core::ds::String(message)), location_(location)
     {
     }
 
-    [[nodiscard]] common::ds::String typeName() const override
+    [[nodiscard]] core::ds::String typeName() const override
     {
-        return common::ds::String("FileError");
+        return core::ds::String("FileError");
     }
-    [[nodiscard]] common::ds::String message() const override
+    [[nodiscard]] core::ds::String message() const override
     {
         return message_;
     }
-    [[nodiscard]] common::ds::String location() const override
+    [[nodiscard]] core::ds::String location() const override
     {
         return location_;
     }
-    [[nodiscard]] common::ds::String toString() const override
+    [[nodiscard]] core::ds::String toString() const override
     {
-        return typeName() + common::ds::String(": ") + message() + common::ds::String(" at ") + location();
+        return typeName() + core::ds::String(": ") + message() + core::ds::String(" at ") + location();
     }
 
   private:
-    common::ds::String message_;
-    common::ds::String location_;
+    core::ds::String message_;
+    core::ds::String location_;
 };
 
 /**
  * Read a file into a string
  */
-hahaha::Res<hahaha::common::ds::String, FileError> readFile(const hahaha::common::ds::String& path);
+hahaha::Res<hahaha::core::ds::String, FileError> readFile(const hahaha::core::ds::String& path);
 
-void deleteFile(const hahaha::common::ds::String& path);
+void deleteFile(const hahaha::core::ds::String& path);
 
-bool fileExists(const common::ds::String& path);
+bool fileExists(const core::ds::String& path);
 
-bool createDir(const common::ds::String& dir);
+bool createDir(const core::ds::String& dir);
 
-bool writeFile(const common::ds::String& path, const common::ds::String& content);
+bool writeFile(const core::ds::String& path, const core::ds::String& content);
 
 } // namespace hahaha::util::io
 

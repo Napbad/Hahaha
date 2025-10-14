@@ -34,7 +34,7 @@
 #include "ds/Vector.h"
 #include "ds/queue.h"
 
-namespace hahaha::common::util
+namespace hahaha::core::util
 {
 // ANSI escape codes for colors
 const ds::String RESET = "\033[0m";
@@ -334,6 +334,6 @@ class Logger
                                        __FILE__,                                                                       \
                                        __LINE__})
 
-} // namespace hahaha::common::util
+} // namespace hahaha::core::util
 
 #endif // LOG_H

@@ -31,12 +31,12 @@
 #include "Res.h"
 #include "defines/h3defs.h"
 
-namespace hahaha::common
+namespace hahaha::core
 {
 class IndexOutOfBoundError;
 }
 
-namespace hahaha::common::ds
+namespace hahaha::core::ds
 {
 class String
 {
@@ -444,12 +444,12 @@ inline String operator+(const std::string& a, const String& b)
 {
     return String(a) + b;
 }
-} // namespace hahaha::common::ds
+} // namespace hahaha::core::ds
 
 // Hash specialization for ds::String
-template <> struct std::hash<hahaha::common::ds::String>
+template <> struct std::hash<hahaha::core::ds::String>
 {
-    size_t operator()(const hahaha::common::ds::String& s) const noexcept
+    size_t operator()(const hahaha::core::ds::String& s) const noexcept
     {
         size_t hash = 5381;
         const char* str = s.cStr();

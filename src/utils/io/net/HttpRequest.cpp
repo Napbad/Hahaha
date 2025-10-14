@@ -25,7 +25,7 @@
 #include "ds/String.h"
 #include "io/net/HttpResponse.h"
 
-namespace hahaha::common::util
+namespace hahaha::core::util
 {
 
 HttpRequest::HttpRequest(const ds::String& url, const HttpMethod method) : url_(url), method_(method)
@@ -41,4 +41,4 @@ void HttpRequest::setBody(const ds::String& body)
 {
     body_ = body;
 }
-} // namespace hahaha::common::util
+} // namespace hahaha::core::util

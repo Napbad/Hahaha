@@ -25,7 +25,7 @@
 #include "HttpMethod.h"
 #include "ds/map.h"
 
-namespace hahaha::common::util
+namespace hahaha::core::util
 {
 class HttpRequest
 {
@@ -59,6 +59,6 @@ class HttpRequest
     ds::String body_;
 };
 
-} // namespace hahaha::common::util
+} // namespace hahaha::core::util
 
 #endif // HIAHIAHIA_HTTPREQUEST_H

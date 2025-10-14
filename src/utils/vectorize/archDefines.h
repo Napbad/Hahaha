@@ -21,7 +21,7 @@
 
 #ifndef HAHAHA_VECTORIZE_H
 #define HAHAHA_VECTORIZE_H
-namespace hahaha::common::util
+namespace hahaha::core::util
 {
 #if defined(__AVX2__)
 #include <immintrin.h>
@@ -273,5 +273,5 @@ inline void div_arrays(const f32* a, const f32* b, f32* out, size_t n)
     }
 }
 
-} // namespace hahaha::common::util
+} // namespace hahaha::core::util
 #endif // HAHAHA_VECTORIZE_H

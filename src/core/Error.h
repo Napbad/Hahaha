@@ -23,7 +23,7 @@
 #define ERROR_H
 #include "ds/String.h"
 
-namespace hahaha::common
+namespace hahaha::core
 {
 namespace ds
 {
@@ -95,8 +95,8 @@ class IndexOutOfBoundError final : public BaseError
     }
 };
 
-// Add other common error types here as needed
+// Add other core error types here as needed
 
-} // namespace hahaha::common
+} // namespace hahaha::core
 
 #endif // ERROR_H

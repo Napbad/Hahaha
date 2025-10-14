@@ -30,7 +30,7 @@
 namespace hahaha::ml
 {
 
-using namespace hahaha::common::ds;
+using namespace hahaha::core::ds;
 /**
  * CSV dataset error class
  */

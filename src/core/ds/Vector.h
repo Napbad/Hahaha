@@ -41,7 +41,7 @@ template<typename T>
     class Tensor;
 }
 
-namespace hahaha::common::ds
+namespace hahaha::core::ds
 {
 template <class T, class Allocator = std::allocator<T>> class Vector
 {
@@ -521,6 +521,6 @@ inline std::ostream& operator<<(std::ostream& os, const Vector<T, Allocator>& ve
     os << vec.toString().c_str();
     return os;
 }
-} // namespace hahaha::common::ds
+} // namespace hahaha::core::ds
 
 #endif // VEC_H

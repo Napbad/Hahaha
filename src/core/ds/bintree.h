@@ -22,4 +22,15 @@
 #ifndef BINTREE_H
 #define BINTREE_H
 
+namespace hahaha
+{
+
+template <typename T>
+class BiTree
+{
+
+};
+
+}
+
 #endif // BINTREE_H

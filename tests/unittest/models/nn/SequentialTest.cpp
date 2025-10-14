@@ -29,5 +29,5 @@ TEST(SequentialTest, ModelConstructionAndForwardPass) {
     auto output = model.forward(input_variable);
 
     // 4. Forward pass assertion
-    EXPECT_EQ(output.shape(), hahaha::common::ds::Vector<sizeT>({1, output_features}));
+    EXPECT_EQ(output.shape(), hahaha::core::ds::Vector<sizeT>({1, output_features}));
 }

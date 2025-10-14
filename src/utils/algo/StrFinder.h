@@ -24,11 +24,11 @@
 #include <memory>
 
 #include "core/defines/h3defs.h"
-#include "common/ds/String.h"
+#include "core/ds/String.h"
 
-using hahaha::common::ds::String;
+using hahaha::core::ds::String;
 
-namespace hahaha::common::ds
+namespace hahaha::core::ds
 {
 
 // KMP
@@ -116,6 +116,6 @@ class StrFinder
     }
 };
 
-} // namespace hahaha::common::ds
+} // namespace hahaha::core::ds
 
 #endif // STRFINDER_H

@@ -24,9 +24,9 @@
 
 #include <vector>
 
-#include "common/ds/Vector.h"
+#include "core/ds/Vector.h"
 
-namespace hahaha::common::ds
+namespace hahaha::core::ds
 {
 
 template <typename Key, typename Value, typename Hash = std::hash<Key>> class HashMap
@@ -117,6 +117,6 @@ template <typename Key, typename Value, typename Hash = std::hash<Key>> class Ha
     }
 };
 
-} // namespace hahaha::common::ds
+} // namespace hahaha::core::ds
 
 #endif // HASHMAP_H

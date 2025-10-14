@@ -32,7 +32,7 @@
 namespace hahaha::ml
 {
 
-using namespace hahaha::common;
+using namespace hahaha::core;
 
 size_t write_data(const void* ptr, const size_t size, const size_t nmemb, FILE* stream)
 {

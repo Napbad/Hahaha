@@ -27,7 +27,7 @@
 #include "defines/h3defs.h"
 #include "ds/String.h"
 
-namespace hahaha::common::util
+namespace hahaha::core::util
 {
 
 /**
@@ -69,6 +69,6 @@ inline ds::String methodToString(const HttpMethod method)
         return ds::String("UNKNOWN");
     }
 }
-} // namespace hahaha::common::util
+} // namespace hahaha::core::util
 
 #endif // HIAHIAHIA_HTTPMETHOD_H

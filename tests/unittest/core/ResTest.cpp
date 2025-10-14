@@ -30,7 +30,7 @@
 namespace hahaha::test
 {
 
-using namespace hahaha::common;
+using namespace hahaha::core;
 
 // Custom error type for testing
 class TestError final : public Error

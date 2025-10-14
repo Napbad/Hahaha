@@ -22,7 +22,7 @@
 #ifndef HIAHIAHIA_RBTREE_H
 #define HIAHIAHIA_RBTREE_H
 
-namespace hahaha::common::ds
+namespace hahaha::core::ds
 {
 
 enum class Color
@@ -137,6 +137,6 @@ template <typename T> class RBTree
   private:
     RBTreeNode<T>* root = nullptr;
 };
-} // namespace hahaha::common::ds
+} // namespace hahaha::core::ds
 
 #endif // HIAHIAHIA_RBTREE_H
