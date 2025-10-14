@@ -31,7 +31,8 @@ namespace hahaha::core::ds
 template <typename Key, typename Hash = std::hash<Key>> class HashSet
 {
   public:
-    HashSet(size_t initialCapacity = 8) : capacity_(initialCapacity), size_(0)
+    explicit HashSet(size_t initialCapacity = 8)
+        : capacity_(initialCapacity), size_(0)
     {
         buckets_.resize(capacity_);
     }
@@ -85,7 +86,7 @@ template <typename Key, typename Hash = std::hash<Key>> class HashSet
         return false;
     }
 
-    size_t size() const
+    [[nodiscard]] sizeT size() const
     {
         return size_;
     }

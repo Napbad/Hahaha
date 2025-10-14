@@ -21,13 +21,14 @@
 
 #ifndef DEVICE_H
 #define DEVICE_H
+#include <map>
+#include <memory>
+
 #include "core/Res.h"
 #include "core/defines/h3defs.h"
 #include "core/ds/String.h"
 #include "ml/util/device/CPUDevice.h"
 #include "ml/util/device/GPUDevice.h"
-#include <map>
-#include <memory>
 
 namespace hahaha
 {

@@ -25,40 +25,50 @@
 #include "ds/Vector.h"
 #include "layers/Layer.h"
 
-namespace hahaha::ml {
+namespace hahaha::ml
+{
 
-template<typename T>
-class Sequential final : public Layer<T> {
-public:
+template <typename T> class Sequential final : public Layer<T>
+{
+  public:
     Sequential() = default;
-    Sequential(std::initializer_list<Layer<T>*> layers) : layers_(layers) {}
+    Sequential(std::initializer_list<Layer<T>*> layers) : layers_(layers)
+    {
+    }
 
-    void add(Layer<T>* layer) {
+    void add(Layer<T>* layer)
+    {
         layers_.pushBack(layer);
     }
 
-    Variable<T> forward(const Variable<T>& input) override {
+    Variable<T> forward(const Variable<T>& input) override
+    {
         Variable<T> current_output = input;
-        for (auto& layer : layers_) {
+        for (auto& layer : layers_)
+        {
             current_output = layer->forward(current_output);
         }
         return current_output;
     }
 
-    ds::Vector<Variable<T>*> parameters() override {
+    ds::Vector<Variable<T>*> parameters() override
+    {
         ds::Vector<Variable<T>*> params;
-        for (auto& layer : layers_) {
-            for (auto layer_params = layer->parameters(); auto* p : layer_params) {
+        for (auto& layer : layers_)
+        {
+            for (auto layer_params = layer->parameters();
+                 auto* p : layer_params)
+            {
                 params.pushBack(p);
             }
         }
         return params;
     }
 
-private:
+  private:
     ds::Vector<Layer<T>*> layers_;
 };
 
 } // namespace hahaha::ml
 
-#endif //SEQUENTIAL_H
+#endif // SEQUENTIAL_H

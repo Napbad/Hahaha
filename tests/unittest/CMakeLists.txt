@@ -13,6 +13,17 @@ file(GLOB_RECURSE TEST_SOURCE_FILES
     "models/**/*.cpp"
     "optimizers/**/*.cpp"
     "unittest_main.cpp"
+    "core/ds/StringTest.cpp"
+    "core/ds/VectorTest.cpp"
+    "core/ds/StackTest.cpp"
+    "core/ds/RBTreeTest.cpp"
+    "core/ds/AVLTreeTest.cpp"
+    "core/ds/MapTest.cpp"
+    "core/ds/SetTest.cpp"
+    "core/ds/DequeTest.cpp"
+    "core/ml/TensorTest.cpp"
+    "datasets/dataset/CSVDatasetTest.cpp"
+    "datasets/dataset/DataLoaderTest.cpp"
 )
 
 # Find Google Test package

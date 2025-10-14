@@ -28,13 +28,15 @@ namespace hahaha::core
 BaseError::BaseError(String msg) : msg_(std::move(msg))
 {
 }
-BaseError::BaseError(String msg, String loc) : msg_(std::move(msg)), loc_(std::move(loc))
+BaseError::BaseError(String msg, String loc)
+    : msg_(std::move(msg)), loc_(std::move(loc))
 {
 }
 BaseError::BaseError(const char* msg) : msg_(String(msg))
 {
 }
-BaseError::BaseError(const char* msg, const char* loc) : msg_(String(msg)), loc_(String(loc))
+BaseError::BaseError(const char* msg, const char* loc)
+    : msg_(String(msg)), loc_(String(loc))
 {
 }
 BaseError::BaseError() : msg_(String("")), loc_(String(""))

@@ -29,9 +29,13 @@
 namespace hahaha::core::util
 {
 
-sizeT WriteCallback(void* dataBuffer, const sizeT blockSize, const sizeT blockCount, void* userData)
+sizeT WriteCallback(void* dataBuffer,
+                    const sizeT blockSize,
+                    const sizeT blockCount,
+                    void* userData)
 {
-    static_cast<ds::String*>(userData)->append(static_cast<char*>(dataBuffer), blockSize * blockCount);
+    static_cast<ds::String*>(userData)->append(static_cast<char*>(dataBuffer),
+                                               blockSize * blockCount);
     return blockSize * blockCount;
 }
 
@@ -77,7 +81,8 @@ std::unique_ptr<HttpResponse> HttpClient::send(const HttpRequest& request)
         // Set request body if present
         if (!request.getBody().empty())
         {
-            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, request.getBody().cStr());
+            curl_easy_setopt(
+                curl, CURLOPT_POSTFIELDS, request.getBody().cStr());
         }
 
         // Capture response

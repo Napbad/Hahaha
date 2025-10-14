@@ -21,6 +21,11 @@ include_directories(
 find_package(CURL REQUIRED)
 include_directories(${CURL_INCLUDE_DIRS})
 
+file(
+        GLOB HEADER_FILES
+        src/*.h
+)
+
 # Source files
 set(SOURCE_FILES
     src/core/Error.cpp
@@ -32,7 +37,6 @@ set(SOURCE_FILES
     src/models/knn/KNN.cpp
     src/models/linear_regression/LinearRegression.cpp
     src/datasets/dataset/DatasetDownloader.cpp
-        src/optimizers/AdamOptimizer.h
 )
 
 file(GLOB_RECURSE HEADER_FILES
@@ -40,8 +44,8 @@ file(GLOB_RECURSE HEADER_FILES
 
 # Main library
 add_library(hahaha STATIC
-    ${HEADER_FILES}
     ${SOURCE_FILES}
+    ${HEADER_FILES}
 )
 
 # Set C++ as the link language

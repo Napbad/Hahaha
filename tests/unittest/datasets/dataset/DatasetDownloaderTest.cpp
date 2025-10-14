@@ -15,12 +15,11 @@
 // Email: napbad.sen@gmail.com
 // GitHub: https://github.com/Napbad
 
-#include <gtest/gtest.h>
+#include <dataset/DatasetDownloader.h>
+#include <ds/String.h>
 #include <filesystem>
 #include <fstream>
-
-#include <ds/String.h>
-#include <dataset/DatasetDownloader.h>
+#include <gtest/gtest.h>
 
 using namespace hahaha::ml;
 using namespace hahaha::core;
@@ -46,15 +45,15 @@ class DatasetDownloaderTest : public ::testing::Test
 // {
 //     const ds::String url = "https://example.com";
 //     const ds::String dest = "example.html";
-// 
+//
 //     auto result = DatasetDownloader::downloadFromUrl(url, dest);
 //     ASSERT_TRUE(result.isOk()) << "Download should succeed";
-// 
+//
 //     // Check if file exists
 //     std::ifstream file(dest.c_str());
 //     EXPECT_TRUE(file.good()) << "Destination file should be created";
 //     file.close();
-// 
+//
 //     // Clean up
 //     std::remove(dest.c_str());
 // }
@@ -63,39 +62,40 @@ class DatasetDownloaderTest : public ::testing::Test
 // {
 //     const ds::String url("invalid-url");
 //     const ds::String dest("test_download.txt");
-// 
-//     EXPECT_THROW(DatasetDownloader::downloadFromUrl(url, dest, false), std::runtime_error);
-// 
+//
+//     EXPECT_THROW(DatasetDownloader::downloadFromUrl(url, dest, false),
+//     std::runtime_error);
+//
 //     // Verify file was not created or is empty
 //     if (std::ifstream file(dest.c_str()); file.is_open())
 //     {
 //         file.seekg(0, std::ios::end);
-//         EXPECT_EQ(file.tellg(), 0) << "File should be empty on download failure";
-//         file.close();
-//         std::remove(dest.c_str());
+//         EXPECT_EQ(file.tellg(), 0) << "File should be empty on download
+//         failure"; file.close(); std::remove(dest.c_str());
 //     }
 // }
 
 TEST_F(DatasetDownloaderTest, DownloadFromUCITest)
 {
-    EXPECT_THROW(DatasetDownloader::downloadFromUCI(ds::String("non-existent-dataset"), ds::String("test_download.txt")), std::runtime_error);
+    EXPECT_THROW(
+        DatasetDownloader::downloadFromUCI(ds::String("non-existent-dataset"),
+                                           ds::String("test_download.txt")),
+        std::runtime_error);
 }
 
 TEST_F(DatasetDownloaderTest, DownloadFromKaggleTest)
 {
     EXPECT_THROW(
-        DatasetDownloader::downloadFromKaggle(
-            ds::String("some-dataset"),
-            ds::String("test_download.txt"),
-            ds::String("fake-api-token")),
+        DatasetDownloader::downloadFromKaggle(ds::String("some-dataset"),
+                                              ds::String("test_download.txt"),
+                                              ds::String("fake-api-token")),
         std::runtime_error);
 }
 
 TEST_F(DatasetDownloaderTest, DownloadToInvalidPathTest)
 {
-    EXPECT_THROW(
-        DatasetDownloader::downloadFromUrl(
-            ds::String("http://example.com"),
-            ds::String("/non_existent_dir/test.txt")),
-        std::runtime_error);
+    EXPECT_THROW(DatasetDownloader::downloadFromUrl(
+                     ds::String("http://example.com"),
+                     ds::String("/non_existent_dir/test.txt")),
+                 std::runtime_error);
 }

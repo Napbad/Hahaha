@@ -76,16 +76,20 @@ class BaseError : public Error
 class IndexOutOfBoundError final : public BaseError
 {
   public:
-    explicit IndexOutOfBoundError(String msg) : BaseError(std::move(msg), String("IndexOutOfBoundError"))
+    explicit IndexOutOfBoundError(String msg)
+        : BaseError(std::move(msg), String("IndexOutOfBoundError"))
     {
     }
-    explicit IndexOutOfBoundError(String msg, String loc) : BaseError(std::move(msg), std::move(loc))
+    explicit IndexOutOfBoundError(String msg, String loc)
+        : BaseError(std::move(msg), std::move(loc))
     {
     }
-    explicit IndexOutOfBoundError(const char* msg) : BaseError(String(msg), String("IndexOutOfBoundError"))
+    explicit IndexOutOfBoundError(const char* msg)
+        : BaseError(String(msg), String("IndexOutOfBoundError"))
     {
     }
-    explicit IndexOutOfBoundError(const char* msg, const char* loc) : BaseError(String(msg), String(loc))
+    explicit IndexOutOfBoundError(const char* msg, const char* loc)
+        : BaseError(String(msg), String(loc))
     {
     }
 

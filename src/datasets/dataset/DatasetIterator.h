@@ -38,7 +38,8 @@ template <typename SampleType> class DatasetIterator
     using pointer = const SampleType*;
     using reference = const SampleType&;
 
-    DatasetIterator(const Dataset<SampleType>* dataset, size_t index) : _dataset(dataset), _index(index)
+    DatasetIterator(const Dataset<SampleType>* dataset, size_t index)
+        : _dataset(dataset), _index(index)
     {
     }
 

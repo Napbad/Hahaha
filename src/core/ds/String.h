@@ -64,35 +64,40 @@ class String
     }
 
     // Move constructor
-    String(String&& other) noexcept : data_(other.data_), size_(other.size_), capacity_(other.capacity_)
+    String(String&& other) noexcept
+        : data_(other.data_), size_(other.size_), capacity_(other.capacity_)
     {
         other.data_ = nullptr;
         other.size_ = 0;
         other.capacity_ = 0;
     }
 
-    String(const char* begin, const char* end) : size_(end - begin), capacity_(size_)
+    String(const char* begin, const char* end)
+        : size_(end - begin), capacity_(size_)
     {
         data_ = new char[capacity_ + 1];
         std::memcpy(data_, begin, size_);
         data_[size_] = '\0';
     }
 
-    explicit String(const std::string& string) : size_(string.size()), capacity_(size_)
+    explicit String(const std::string& string)
+        : size_(string.size()), capacity_(size_)
     {
         data_ = new char[capacity_ + 1];
         std::strcpy(data_, string.c_str());
         data_[size_] = '\0';
     }
 
-    explicit String(const std::stringstream& ss) : size_(ss.str().size()), capacity_(size_)
+    explicit String(const std::stringstream& ss)
+        : size_(ss.str().size()), capacity_(size_)
     {
         data_ = new char[capacity_ + 1];
         std::strcpy(data_, ss.str().c_str());
         data_[size_] = '\0';
     }
 
-    explicit String(const std::ostringstream& oss) : size_(oss.str().size()), capacity_(size_)
+    explicit String(const std::ostringstream& oss)
+        : size_(oss.str().size()), capacity_(size_)
     {
         data_ = new char[capacity_ + 1];
         std::strcpy(data_, oss.str().c_str());
@@ -281,7 +286,7 @@ class String
         return !(*this < other);
     }
 
-    bool startsWith(const String& prefix) const
+    [[nodiscard]] bool startsWith(const String& prefix) const
     {
         if (prefix.size() > this->size())
         {
@@ -290,13 +295,16 @@ class String
         return std::strncmp(this->data_, prefix.data_, prefix.size()) == 0;
     }
 
-    bool endsWith(const String& suffix) const
+    [[nodiscard]] bool endsWith(const String& suffix) const
     {
         if (suffix.size() > this->size())
         {
             return false;
         }
-        return std::strncmp(this->data_ + this->size() - suffix.size(), suffix.data_, suffix.size()) == 0;
+        return std::strncmp(this->data_ + this->size() - suffix.size(),
+                            suffix.data_,
+                            suffix.size())
+            == 0;
     }
 
     void push_back(const char c)
@@ -330,7 +338,9 @@ class String
 
         reserve(size_ + o.size());
         // Move existing characters to make space
-        std::memmove(data_ + pos + o.size(), data_ + pos, size_ - pos + 1); // +1 for null terminator
+        std::memmove(data_ + pos + o.size(),
+                     data_ + pos,
+                     size_ - pos + 1); // +1 for null terminator
         std::ranges::copy(o, data_ + pos);
         size_ += o.size();
         return *this;
@@ -344,7 +354,9 @@ class String
         }
         const sizeT actual_count = std::min(count, size_ - pos);
 
-        std::memmove(data_ + pos, data_ + pos + actual_count, size_ - pos - actual_count + 1); // +1 for null terminator
+        std::memmove(data_ + pos,
+                     data_ + pos + actual_count,
+                     size_ - pos - actual_count + 1); // +1 for null terminator
         size_ -= actual_count;
         return *this;
     }
@@ -366,9 +378,12 @@ class String
     void reserve(const sizeT n)
     {
         if (n >= capacity_)
-        { // Use >= to handle resizing to current capacity if needed for null terminator
-            const sizeT new_capacity = std::max(n, capacity_ == 0 ? 1 : capacity_ * 2);
-            const auto new_data = new char[new_capacity + 1]; // +1 for null terminator
+        { // Use >= to handle resizing to current capacity if needed for null
+          // terminator
+            const sizeT new_capacity =
+                std::max(n, capacity_ == 0 ? 1 : capacity_ * 2);
+            const auto new_data =
+                new char[new_capacity + 1]; // +1 for null terminator
 
             if (data_)
             {
@@ -387,6 +402,7 @@ class String
         size_ += size;
         data_[size_] = '\0';
     }
+
   private:
     char* data_;
     sizeT size_;

@@ -51,18 +51,18 @@ typedef long ptrDiffT;
 } // namespace hahaha
 
 // Quick import macro for core hahaha namespaces
-#define HHH_NAMESPACE_IMPORT                                                                                             \
-    namespace hahaha                                                                                                   \
-    {                                                                                                                  \
-    }                                                                                                                  \
-    using namespace hahaha;                                                                                            \
-    namespace hahaha::math                                                                                             \
-    {                                                                                                                  \
-    }                                                                                                                  \
-    using namespace hahaha::math;                                                                                      \
-    namespace hahaha::core                                                                                           \
-    {                                                                                                                  \
-    }                                                                                                                  \
+#define HHH_NAMESPACE_IMPORT                                                   \
+    namespace hahaha                                                           \
+    {                                                                          \
+    }                                                                          \
+    using namespace hahaha;                                                    \
+    namespace hahaha::math                                                     \
+    {                                                                          \
+    }                                                                          \
+    using namespace hahaha::math;                                              \
+    namespace hahaha::core                                                     \
+    {                                                                          \
+    }                                                                          \
     using namespace hahaha::core;
 
 #endif // H3DEFS_H

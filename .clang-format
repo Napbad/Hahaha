@@ -3,7 +3,10 @@ BasedOnStyle: LLVM
 IndentWidth: 4
 UseTab: Never
 BreakBeforeBraces: Allman
-AllowShortBlocksOnASingleLine: false
+BreakBeforeBinaryOperators: NonAssignment
+ContinuationIndentWidth: 4
+AlignOperands: false
+AllowShortBlocksOnASingleLine: Never
 AllowShortCaseLabelsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: None
 AllowShortIfStatementsOnASingleLine: false
@@ -16,7 +19,7 @@ SpacesInAngles: false
 SpacesInCStyleCastParentheses: false
 SpacesInContainerLiterals: false
 SpacesInParentheses: false
-ColumnLimit: 120
+ColumnLimit: 80
 AllowAllParametersOfDeclarationOnNextLine: false
 BinPackParameters: false
 BinPackArguments: false

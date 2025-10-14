@@ -19,11 +19,10 @@
 // Created by Napbad on 10/2/25.
 //
 
-#include <gtest/gtest.h>
-#include <fstream>
-
-#include <ds/Vector.h>
 #include <dataset/CSVDataset.h>
+#include <ds/Vector.h>
+#include <fstream>
+#include <gtest/gtest.h>
 
 using namespace hahaha::ml;
 using namespace hahaha;
@@ -70,7 +69,12 @@ TEST_F(CSVDatasetTest, Constructor)
     const ds::Vector<hahaha::sizeT> featureCols = {0, 1};
     const ds::Vector<hahaha::sizeT> labelCols = {2};
 
-    const CSVDataset<f32> dataset(ds::String("test_data.csv"), featureCols, labelCols, true, ',', ds::String("Test dataset"));
+    const CSVDataset<f32> dataset(ds::String("test_data.csv"),
+                                  featureCols,
+                                  labelCols,
+                                  true,
+                                  ',',
+                                  ds::String("Test dataset"));
 
     EXPECT_EQ(dataset.featureDim(), 2);
     EXPECT_EQ(dataset.labelDim(), 1);
@@ -82,7 +86,8 @@ TEST_F(CSVDatasetTest, LoadSuccess)
     const ds::Vector<hahaha::sizeT> featureCols = {0, 1};
     const ds::Vector<hahaha::sizeT> labelCols = {2};
 
-    CSVDataset<f32> dataset(ds::String("test_data.csv"), featureCols, labelCols);
+    CSVDataset<f32> dataset(
+        ds::String("test_data.csv"), featureCols, labelCols);
     const auto result = dataset.load();
 
     EXPECT_TRUE(result.isOk());
@@ -94,7 +99,8 @@ TEST_F(CSVDatasetTest, LoadFailure)
     const ds::Vector<hahaha::sizeT> featureCols = {0, 1};
     const ds::Vector<hahaha::sizeT> labelCols = {2};
 
-    CSVDataset<f32> dataset(ds::String("nonexistent.csv"), featureCols, labelCols);
+    CSVDataset<f32> dataset(
+        ds::String("nonexistent.csv"), featureCols, labelCols);
     const auto result = dataset.load();
 
     EXPECT_TRUE(result.isErr());
@@ -105,7 +111,8 @@ TEST_F(CSVDatasetTest, GetData)
     ds::Vector<hahaha::sizeT> featureCols = {0, 1};
     ds::Vector<hahaha::sizeT> labelCols = {2};
 
-    CSVDataset<f32> dataset(ds::String("test_data.csv"), featureCols, labelCols);
+    CSVDataset<f32> dataset(
+        ds::String("test_data.csv"), featureCols, labelCols);
     auto loadResult = dataset.load();
     ASSERT_TRUE(loadResult.isOk());
 
@@ -127,7 +134,8 @@ TEST_F(CSVDatasetTest, FeatureAndLabelNames)
     const ds::Vector<hahaha::sizeT> featureCols = {0, 1};
     const ds::Vector<hahaha::sizeT> labelCols = {2};
 
-    CSVDataset<f32> dataset(ds::String("test_data.csv"), featureCols, labelCols, true);
+    CSVDataset<f32> dataset(
+        ds::String("test_data.csv"), featureCols, labelCols, true);
     const auto loadResult = dataset.load();
     ASSERT_TRUE(loadResult.isOk());
 
@@ -146,7 +154,8 @@ TEST_F(CSVDatasetTest, NoHeader)
     const ds::Vector<hahaha::sizeT> featureCols = {0, 1};
     const ds::Vector<hahaha::sizeT> labelCols = {2};
 
-    CSVDataset<f32> dataset(ds::String("test_data_no_header.csv"), featureCols, labelCols, false);
+    CSVDataset<f32> dataset(
+        ds::String("test_data_no_header.csv"), featureCols, labelCols, false);
     const auto loadResult = dataset.load();
     ASSERT_TRUE(loadResult.isOk());
 
@@ -171,7 +180,11 @@ TEST_F(CSVDatasetTest, DifferentDelimiter)
     ds::Vector<hahaha::sizeT> featureCols = {0, 1};
     ds::Vector<hahaha::sizeT> labelCols = {2};
 
-    CSVDataset<f32> dataset(ds::String("test_data_semicolon.csv"), featureCols, labelCols, true, ';');
+    CSVDataset<f32> dataset(ds::String("test_data_semicolon.csv"),
+                            featureCols,
+                            labelCols,
+                            true,
+                            ';');
     auto loadResult = dataset.load();
     ASSERT_TRUE(loadResult.isOk());
     EXPECT_EQ(dataset.size(), 2);
@@ -194,7 +207,8 @@ TEST_F(CSVDatasetTest, ParseError)
     ds::Vector<hahaha::sizeT> featureCols = {0, 1};
     ds::Vector<hahaha::sizeT> labelCols = {2};
 
-    CSVDataset<f32> dataset(ds::String("test_data_invalid.csv"), featureCols, labelCols);
+    CSVDataset<f32> dataset(
+        ds::String("test_data_invalid.csv"), featureCols, labelCols);
     auto loadResult = dataset.load();
 
     // Should fail due to invalid data
@@ -206,20 +220,25 @@ TEST_F(CSVDatasetTest, ParseError)
 
 TEST(DatasetErrorTest, ErrorHandling)
 {
-    const DatasetError error(ds::String("Test error"), ds::String("test_location"));
+    const DatasetError error(ds::String("Test error"),
+                             ds::String("test_location"));
 
     EXPECT_EQ(error.typeName(), ds::String("DatasetError"));
     EXPECT_EQ(error.message(), ds::String("Test error"));
     EXPECT_EQ(error.location(), ds::String("test_location"));
-    EXPECT_EQ(error.toString(), ds::String("DatasetError: Test error at test_location"));
+    EXPECT_EQ(error.toString(),
+              ds::String("DatasetError: Test error at test_location"));
 }
 
 TEST(CSVDatasetErrorTest, ErrorHandling)
 {
-    const CSVDatasetError error(ds::String("CSV Test error"), ds::String("csv_test_location"));
+    const CSVDatasetError error(ds::String("CSV Test error"),
+                                ds::String("csv_test_location"));
 
     EXPECT_EQ(error.typeName(), ds::String("CSVDatasetError"));
     EXPECT_EQ(error.message(), ds::String("CSV Test error"));
     EXPECT_EQ(error.location(), ds::String("csv_test_location"));
-    EXPECT_EQ(error.toString(), ds::String("CSVDatasetError: CSV Test error at csv_test_location"));
+    EXPECT_EQ(
+        error.toString(),
+        ds::String("CSVDatasetError: CSV Test error at csv_test_location"));
 }

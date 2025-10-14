@@ -26,17 +26,19 @@
 
 namespace hahaha::ml
 {
-template <typename T>
-class ReLU final : public Layer<T> {
-public:
-    Variable<T> forward(const Variable<T>& input) override {
+template <typename T> class ReLU final : public Layer<T>
+{
+  public:
+    Variable<T> forward(const Variable<T>& input) override
+    {
         Variable<T> result(input.shape());
-        for (sizeT i = 0; i < input.size(); ++i) {
+        for (sizeT i = 0; i < input.size(); ++i)
+        {
             result[i] = std::max(static_cast<T>(0), input[i]);
         }
         return result;
     }
 };
-}
+} // namespace hahaha::ml
 
 #endif // HAHAHA_RELU_H

@@ -86,7 +86,8 @@ template <class T> class Allocator
         }
     }
 
-    template <typename U, typename... Args> void construct(U* ptr, Args&&... args)
+    template <typename U, typename... Args>
+    void construct(U* ptr, Args&&... args)
     {
         ::new (static_cast<void*>(ptr)) U(std::forward<Args>(args)...);
     }
@@ -128,7 +129,8 @@ template <class T> class Allocator
     {
     }
 
-    template <typename U, typename... Args> void construct(U* ptr, Args&&... args)
+    template <typename U, typename... Args>
+    void construct(U* ptr, Args&&... args)
     {
         ::new (static_cast<void*>(ptr)) U(std::forward<Args>(args)...);
     }

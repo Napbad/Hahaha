@@ -24,10 +24,10 @@
 #include <iostream>
 #include <numeric>
 
+#include "Error.h"
 #include "Res.h"
 #include "defines/h3defs.h"
 #include "ds/Vector.h"
-#include "Error.h"
 
 namespace hahaha::ml
 {
@@ -92,7 +92,8 @@ template <typename T> class Tensor
         }
     }
 
-    explicit Tensor(const ds::Vector<sizeT>& shape, const T* data) : shape_(shape), data_(data, data + computeSize(shape))
+    explicit Tensor(const ds::Vector<sizeT>& shape, const T* data)
+        : shape_(shape), data_(data, data + computeSize(shape))
     {
     }
 
@@ -103,7 +104,8 @@ template <typename T> class Tensor
     }
 
     // Constructor for a 0-dimensional tensor (scalar)
-    explicit Tensor(const std::initializer_list<sizeT> shape, std::initializer_list<T> data)
+    explicit Tensor(const std::initializer_list<sizeT> shape,
+                    std::initializer_list<T> data)
         : shape_(shape), data_(data)
     {
     }
@@ -120,7 +122,10 @@ template <typename T> class Tensor
     {
         return data_.size();
     }
-    [[nodiscard]] const ds::Vector<ValueType>& data() const { return data_; }
+    [[nodiscard]] const ds::Vector<ValueType>& data() const
+    {
+        return data_;
+    }
 
     [[nodiscard]] sizeT dim() const
     {
@@ -153,7 +158,8 @@ template <typename T> class Tensor
         sizeT stride = 1;
         for (int i = static_cast<int>(shape_.size()) - 1; i >= 0; --i)
         {
-            if (i < indices.size()) {
+            if (i < indices.size())
+            {
                 if (indices.begin()[i] >= shape_[i])
                 {
                     throw IndexOutOfBoundError("Index out of bounds");
@@ -171,7 +177,8 @@ template <typename T> class Tensor
         sizeT stride = 1;
         for (int i = static_cast<int>(shape_.size()) - 1; i >= 0; --i)
         {
-            if (i < indices.size()) {
+            if (i < indices.size())
+            {
                 if (indices[i] >= shape_[i])
                 {
                     throw IndexOutOfBoundError("Index out of bounds");
@@ -193,26 +200,30 @@ template <typename T> class Tensor
         return data_[index(indices)];
     }
 
-    template <typename... Dims>
-    T& operator()(Dims... dims) {
-        static_assert((std::is_integral_v<Dims> && ...), "Indices must be of integral type");
+    template <typename... Dims> T& operator()(Dims... dims)
+    {
+        static_assert((std::is_integral_v<Dims> && ...),
+                      "Indices must be of integral type");
         std::initializer_list<sizeT> indices = {static_cast<sizeT>(dims)...};
-        if (indices.size() != shape_.size()) {
+        if (indices.size() != shape_.size())
+        {
             throw std::runtime_error("Incorrect number of indices");
         }
         return data_[index(indices)];
     }
 
-    template <typename... Dims>
-    const T& operator()(Dims... dims) const {
-        static_assert((std::is_integral_v<Dims> && ...), "Indices must be of integral type");
+    template <typename... Dims> const T& operator()(Dims... dims) const
+    {
+        static_assert((std::is_integral_v<Dims> && ...),
+                      "Indices must be of integral type");
         std::initializer_list<sizeT> indices = {static_cast<sizeT>(dims)...};
-        if (indices.size() != shape_.size()) {
+        if (indices.size() != shape_.size())
+        {
             throw std::runtime_error("Incorrect number of indices");
         }
         return data_[index(indices)];
     }
-    
+
     // Element access by flat index
     const T& operator[](sizeT index) const
     {
@@ -223,7 +234,7 @@ template <typename T> class Tensor
     {
         return data_[index];
     }
-    
+
     // Slicing
     Tensor at(const std::initializer_list<sizeT> indices) const
     {
@@ -233,9 +244,10 @@ template <typename T> class Tensor
         }
         if (indices.size() == 0 && dim() != 0)
         {
-            throw IndexOutOfBoundError("Cannot access elements with empty indices");
+            throw IndexOutOfBoundError(
+                "Cannot access elements with empty indices");
         }
-        
+
         sizeT start = index(indices);
         sizeT length = 1;
 
@@ -269,8 +281,9 @@ template <typename T> class Tensor
             if (indices.size() != 0 && *indices.begin() != 0)
             {
                 throw IndexOutOfBoundError(
-                    String("Cannot access scalar tensor with more indices, only {} or {0} is available, now you use a [") +
-                    static_cast<char>(*indices.begin()) + String(", ...]"));
+                    String("Cannot access scalar tensor with more indices, "
+                           "only {} or {0} is available, now you use a [")
+                    + static_cast<char>(*indices.begin()) + String(", ...]"));
             }
             data_[0] = value;
             return;
@@ -281,7 +294,8 @@ template <typename T> class Tensor
         }
         if (indices.size() == 0 && dim() != 0)
         {
-            throw IndexOutOfBoundError("Cannot access elements with empty indices");
+            throw IndexOutOfBoundError(
+                "Cannot access elements with empty indices");
         }
 
         sizeT idx = index(indices);
@@ -298,19 +312,20 @@ template <typename T> class Tensor
     {
         return data_[0];
     }
-    
+
     // Fill tensor with a single value
     void fill(const ValueType v)
     {
         std::ranges::fill(data_, v);
     }
-    
+
     // Copy data from another tensor or vector
     void copy(const Tensor& other)
     {
         if (other.shape() != shape_)
         {
-            throw TensorErr("Cannot copy value from a tensor with different shape");
+            throw TensorErr(
+                "Cannot copy value from a tensor with different shape");
         }
         for (sizeT i = 0; i < other.size(); ++i)
         {
@@ -322,29 +337,32 @@ template <typename T> class Tensor
     {
         if (other.size() != this->size())
         {
-            throw TensorErr("Cannot copy value from a vector with different size");
+            throw TensorErr(
+                "Cannot copy value from a vector with different size");
         }
         for (sizeT i = 0; i < other.size(); ++i)
         {
             data_[i] = other[i];
         }
     }
-    
+
     // Conversion to scalar
     explicit operator T() const
     {
         if (!isScalar())
         {
-            throw std::runtime_error("Cannot convert non-scalar Tensor to a scalar value.");
+            throw std::runtime_error(
+                "Cannot convert non-scalar Tensor to a scalar value.");
         }
         return data_[0];
     }
-    
+
     Tensor& operator=(const T& scalar)
     {
         if (!isScalar())
         {
-            throw std::runtime_error("Cannot assign a scalar value to a non-scalar Tensor.");
+            throw std::runtime_error(
+                "Cannot assign a scalar value to a non-scalar Tensor.");
         }
         data_[0] = scalar;
         return *this;
@@ -369,7 +387,7 @@ template <typename T> class Tensor
         }
         return result;
     }
-    
+
     Tensor operator+(ValueType scalar) const
     {
         Tensor result(shape_);
@@ -379,7 +397,7 @@ template <typename T> class Tensor
         }
         return result;
     }
-    
+
     // Element-wise subtraction
     Tensor operator-(const Tensor& other) const
     {
@@ -395,7 +413,7 @@ template <typename T> class Tensor
         }
         return result;
     }
-    
+
     Tensor operator-(ValueType scalar) const
     {
         Tensor result(shape_);
@@ -421,7 +439,7 @@ template <typename T> class Tensor
         }
         return result;
     }
-    
+
     Tensor operator*(ValueType scalar) const
     {
         Tensor result(shape_);
@@ -431,14 +449,15 @@ template <typename T> class Tensor
         }
         return result;
     }
-    
+
     // Element-wise division
     Tensor operator/(const Tensor& other) const
     {
         if (this->hasOnlyOneVal())
         {
             Tensor result(other.shape());
-            for (sizeT i = 0; i < other.size(); ++i) {
+            for (sizeT i = 0; i < other.size(); ++i)
+            {
                 result[i] = data_[0] / other[i];
             }
             return result;
@@ -461,7 +480,7 @@ template <typename T> class Tensor
         }
         return result;
     }
-    
+
     Tensor operator/(ValueType scalar) const
     {
         if constexpr (std::is_floating_point_v<T>)
@@ -478,7 +497,7 @@ template <typename T> class Tensor
         }
         return result;
     }
-    
+
     // =================================================================================
     // Compound Assignment Operators
     // =================================================================================
@@ -530,7 +549,7 @@ template <typename T> class Tensor
         }
         return *this;
     }
-    
+
     Tensor<ValueType>& operator*=(const ValueType& scalar)
     {
         for (sizeT i = 0; i < data_.size(); ++i)
@@ -562,7 +581,7 @@ template <typename T> class Tensor
         }
         return *this;
     }
-    
+
     // =================================================================================
     // Comparison Operators
     // =================================================================================
@@ -576,7 +595,7 @@ template <typename T> class Tensor
     {
         return !(*this == other);
     }
-    
+
     // =================================================================================
     // Linear Algebra and Other Operations
     // =================================================================================
@@ -603,11 +622,13 @@ template <typename T> class Tensor
     {
         if (this->dim() != 2 || other.dim() != 2)
         {
-            throw std::runtime_error("matmul is only supported for 2D tensors (matrices).");
+            throw std::runtime_error(
+                "matmul is only supported for 2D tensors (matrices).");
         }
         if (this->shape_[1] != other.shape_[0])
         {
-            throw std::runtime_error("Matrix dimensions are not compatible for multiplication.");
+            throw std::runtime_error(
+                "Matrix dimensions are not compatible for multiplication.");
         }
 
         sizeT m = this->shape_[0];
@@ -631,27 +652,33 @@ template <typename T> class Tensor
     }
 
     // Transpose a 2D tensor (matrix)
-    Tensor transpose() const {
-        if (dim() != 2) {
-            throw std::runtime_error("Transpose is only supported for 2D tensors.");
+    Tensor transpose() const
+    {
+        if (dim() != 2)
+        {
+            throw std::runtime_error(
+                "Transpose is only supported for 2D tensors.");
         }
         sizeT rows = shape_[0];
         sizeT cols = shape_[1];
         Tensor result({cols, rows});
-        for (sizeT i = 0; i < rows; ++i) {
-            for (sizeT j = 0; j < cols; ++j) {
+        for (sizeT i = 0; i < rows; ++i)
+        {
+            for (sizeT j = 0; j < cols; ++j)
+            {
                 result({j, i}) = (*this)({i, j});
             }
         }
         return result;
     }
-    
+
     // Reshape the tensor
     void reshape(const ds::Vector<sizeT>& new_shape)
     {
         if (computeSize(new_shape) != data_.size())
         {
-            throw std::runtime_error("Cannot reshape: total number of elements must remain the same.");
+            throw std::runtime_error("Cannot reshape: total number of elements "
+                                     "must remain the same.");
         }
         shape_ = new_shape;
     }
@@ -666,7 +693,7 @@ template <typename T> class Tensor
         }
         return result;
     }
-    
+
     // =================================================================================
     // Static Factory Methods
     // =================================================================================
@@ -704,21 +731,24 @@ template <typename T> class Tensor
         }
         return tensor;
     }
-    
+
     // =================================================================================
     // Utility Methods
     // =================================================================================
-    
+
     // Print the tensor with formatting
     void print() const
     {
-        if (isScalar()) {
+        if (isScalar())
+        {
             std::cout << "Tensor(" << data_[0] << ")" << std::endl;
             return;
         }
 
-        std::cout << "Tensor(shape: " << shape_.toString() << ", data:" << std::endl;
-        if (data_.empty()) {
+        std::cout << "Tensor(shape: " << shape_.toString()
+                  << ", data:" << std::endl;
+        if (data_.empty())
+        {
             std::cout << "[]" << std::endl;
             return;
         }
@@ -730,7 +760,7 @@ template <typename T> class Tensor
     {
         return data_.empty();
     }
-    
+
     // Iterators
     [[nodiscard]] auto begin() const
     {
@@ -740,7 +770,6 @@ template <typename T> class Tensor
     {
         return data_.end();
     }
-    
 
   protected:
     ds::Vector<sizeT> shape_;
@@ -748,7 +777,8 @@ template <typename T> class Tensor
 
     static sizeT computeSize(const ds::Vector<sizeT>& shape)
     {
-        return std::accumulate(shape.begin(), shape.end(), sizeT{1}, std::multiplies<>());
+        return std::accumulate(
+            shape.begin(), shape.end(), sizeT{1}, std::multiplies<>());
     }
 
     void checkShapeAndSizeNotEqual(const Tensor& other) const
@@ -757,28 +787,44 @@ template <typename T> class Tensor
         {
             if (size() != other.size())
             {
-            throw std::runtime_error(("Shapes must be equal, current shapes are: " + shape_.toString() + " != " + other.shape_.toString()).c_str());
+                throw std::runtime_error(
+                    ("Shapes must be equal, current shapes are: "
+                     + shape_.toString() + " != " + other.shape_.toString())
+                        .c_str());
             }
-            std::cout << "warn: same size but different shape tensors multiply: " << shape_.toString() << " and " << other.shape_.toString() << std::endl;
+            std::cout
+                << "warn: same size but different shape tensors multiply: "
+                << shape_.toString() << " and " << other.shape_.toString()
+                << std::endl;
         }
     }
-private:
-    void printRecursive(std::ostream& os, sizeT dim, sizeT offset) const {
+
+  private:
+    void printRecursive(std::ostream& os, sizeT dim, sizeT offset) const
+    {
         os << std::string(dim, ' ') << "[";
-        if (dim == shape_.size() - 1) {
-            for (sizeT i = 0; i < shape_[dim]; ++i) {
+        if (dim == shape_.size() - 1)
+        {
+            for (sizeT i = 0; i < shape_[dim]; ++i)
+            {
                 os << data_[offset + i];
-                if (i < shape_[dim] - 1) {
+                if (i < shape_[dim] - 1)
+                {
                     os << ", ";
                 }
             }
-        } else {
+        }
+        else
+        {
             sizeT stride = 1;
-            for (sizeT i = dim + 1; i < shape_.size(); ++i) {
+            for (sizeT i = dim + 1; i < shape_.size(); ++i)
+            {
                 stride *= shape_[i];
             }
-            for (sizeT i = 0; i < shape_[dim]; ++i) {
-                if (i > 0) {
+            for (sizeT i = 0; i < shape_[dim]; ++i)
+            {
+                if (i > 0)
+                {
                     os << ",\n";
                 }
                 printRecursive(os, dim + 1, offset + i * stride);
@@ -792,41 +838,41 @@ private:
 
 namespace hahaha::ml
 {
-    template <typename T>
-    Tensor<T> operator+(const T& scalar, const Tensor<T>& tensor)
-    {
-        return tensor + scalar;
-    }
-    
-    template <typename T>
-    Tensor<T> operator-(const T& scalar, const Tensor<T>& tensor)
-    {
-        return (tensor * static_cast<T>(-1)) + scalar;
-    }
-    
-    template <typename T>
-    Tensor<T> operator/(const T& scalar, const Tensor<T>& tensor)
-    {
-        Tensor<T> result(tensor.shape());
-        for (sizeT i = 0; i < tensor.size(); ++i)
-        {
-            if constexpr (std::is_floating_point_v<T>)
-            {
-                if (tensor[i] == static_cast<T>(0))
-                {
-                    throw std::runtime_error("Division by zero");
-                }
-            }
-            result[i] = scalar / tensor[i];
-        }
-        return result;
-    }
-
-    template <typename T>
-    Tensor<T> operator*(const T& scalar, const Tensor<T>& tensor)
-    {
-        return tensor * scalar;
-    }
+template <typename T>
+Tensor<T> operator+(const T& scalar, const Tensor<T>& tensor)
+{
+    return tensor + scalar;
 }
+
+template <typename T>
+Tensor<T> operator-(const T& scalar, const Tensor<T>& tensor)
+{
+    return (tensor * static_cast<T>(-1)) + scalar;
+}
+
+template <typename T>
+Tensor<T> operator/(const T& scalar, const Tensor<T>& tensor)
+{
+    Tensor<T> result(tensor.shape());
+    for (sizeT i = 0; i < tensor.size(); ++i)
+    {
+        if constexpr (std::is_floating_point_v<T>)
+        {
+            if (tensor[i] == static_cast<T>(0))
+            {
+                throw std::runtime_error("Division by zero");
+            }
+        }
+        result[i] = scalar / tensor[i];
+    }
+    return result;
+}
+
+template <typename T>
+Tensor<T> operator*(const T& scalar, const Tensor<T>& tensor)
+{
+    return tensor * scalar;
+}
+} // namespace hahaha::ml
 
 #endif // TENSOR_H

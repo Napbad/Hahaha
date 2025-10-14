@@ -1,10 +1,9 @@
+#include <Error.h>
+#include <ds/String.h>
 #include <gtest/gtest.h>
 #include <sstream>
 #include <string>
 #include <vector>
-
-#include <Error.h>
-#include <ds/String.h>
 
 using namespace hahaha::core;
 using namespace hahaha::core::ds;
@@ -330,9 +329,10 @@ TEST_F(StringTest, Find)
     ASSERT_EQ(s.find(String("hello")), 0);
     ASSERT_EQ(s.find(String("lo")), 3);
     ASSERT_EQ(s.find(String("foo")), String::npos);
-    ASSERT_EQ(s.find(String("o"), 5), 7);             // Find 'o' starting from index 5
-    ASSERT_EQ(s.find(String("world"), 7), String::npos); // 'world' not found from index 7
-    ASSERT_EQ(s.find(String("")), String::npos);         // Empty string search
+    ASSERT_EQ(s.find(String("o"), 5), 7); // Find 'o' starting from index 5
+    ASSERT_EQ(s.find(String("world"), 7),
+              String::npos); // 'world' not found from index 7
+    ASSERT_EQ(s.find(String("")), String::npos); // Empty string search
     ASSERT_EQ(s.find(String("hello"), s.size()), String::npos);
 }
 

@@ -19,10 +19,8 @@
 // Created by Napbad on 10/2/25.
 //
 
-#include <gtest/gtest.h>
-
 #include <cmath>
-
+#include <gtest/gtest.h>
 #include <linear_regression/LinearRegression.h>
 #include <ml/Tensor.h>
 
@@ -81,7 +79,8 @@ class LinearRegressionTest : public ::testing::Test
     ml::Tensor<f32> labels_multi;
 
     // Helper function to check if two floats are approximately equal
-    static bool isApproxEqual(const f32 a, const f32 b, const f32 tolerance = 0.1f)
+    static bool
+    isApproxEqual(const f32 a, const f32 b, const f32 tolerance = 0.1f)
     {
         return std::abs(a - b) < tolerance;
     }
@@ -95,7 +94,8 @@ TEST_F(LinearRegressionTest, BasicPropertiesTest)
     // Test model name
     EXPECT_EQ(lr.modelName(), ds::String("LinearRegression"));
 
-    // Test parameter count before training (should be 0 since weights are empty)
+    // Test parameter count before training (should be 0 since weights are
+    // empty)
     EXPECT_EQ(lr.parameterCount(), 1); // Only bias initially
 }
 
@@ -119,11 +119,13 @@ TEST_F(LinearRegressionTest, TrainSimple2DTest)
     const f32 pred1 = lr.predict(test_feature);
     std::cout << "Prediction for x=1: " << pred1 << std::endl;
 
-    EXPECT_TRUE(isApproxEqual(pred1, 3.0f, 0.5f)) << "Prediction for x=1 should be close to 3";
+    EXPECT_TRUE(isApproxEqual(pred1, 3.0f, 0.5f))
+        << "Prediction for x=1 should be close to 3";
 
     test_feature.set({0}, 2.0f);
     f32 pred2 = lr.predict(test_feature);
-    EXPECT_TRUE(isApproxEqual(pred2, 5.0f, 0.5f)) << "Prediction for x=2 should be close to 5";
+    EXPECT_TRUE(isApproxEqual(pred2, 5.0f, 0.5f))
+        << "Prediction for x=2 should be close to 5";
 }
 
 // Test training with multi-dimensional data
@@ -144,7 +146,8 @@ TEST_F(LinearRegressionTest, TrainMultiDimensionalTest)
     test_feature.set({0}, 1.0f);
     test_feature.set({1}, 1.0f);
     f32 pred = lr.predict(test_feature);
-    EXPECT_TRUE(isApproxEqual(pred, 6.0f, 1.0f)) << "Prediction should be reasonably close to expected value";
+    EXPECT_TRUE(isApproxEqual(pred, 6.0f, 1.0f))
+        << "Prediction should be reasonably close to expected value";
 }
 
 // Test prediction before training (should handle gracefully)
@@ -204,7 +207,8 @@ TEST_F(LinearRegressionTest, EdgeCasesTest)
     ml::Tensor<f32> test_feature({1});
     test_feature.set({0}, 5.0f);
     f32 pred = lr.predict(test_feature);
-    EXPECT_TRUE(isApproxEqual(pred, 10.0f, 1.0f)) << "Should predict close to training value";
+    EXPECT_TRUE(isApproxEqual(pred, 10.0f, 1.0f))
+        << "Should predict close to training value";
 }
 
 // Test multiple training sessions (retraining)
@@ -244,5 +248,6 @@ TEST_F(LinearRegressionTest, LargerDatasetTest)
     test_feature.set({0}, 5.0f);
     f32 pred = lr.predict(test_feature);
     f32 expected = 3.0f * 5.0f + 2.0f; // 17.0f
-    EXPECT_TRUE(isApproxEqual(pred, expected, 2.0f)) << "Should learn the underlying pattern reasonably well";
+    EXPECT_TRUE(isApproxEqual(pred, expected, 2.0f))
+        << "Should learn the underlying pattern reasonably well";
 }

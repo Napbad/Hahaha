@@ -5,9 +5,11 @@
 #include "optimizers/SGDOptimizer.h"
 #include "core/loss/MSELoss.h"
 #include "core/compute/Variable.h"
+#include "utils/log.h"
 
+using namespace hahaha;
+using namespace hahaha::core::ds;
 using namespace hahaha::ml;
-using namespace hahaha::common::ds;
 
 int main() {
     // 1. Define the Model

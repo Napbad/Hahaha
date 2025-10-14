@@ -24,8 +24,8 @@
 #include <functional>
 #include <utility>
 
-#include "Res.h"
 #include "Error.h"
+#include "Res.h"
 
 namespace hahaha::core::ds
 {
@@ -38,7 +38,8 @@ class ConvertErr final : public Error
 {
 
   public:
-    explicit ConvertErr(const String& msg, String loca = String("Unknown")) : _location(std::move(loca))
+    explicit ConvertErr(const String& msg, String loca = String("Unknown"))
+        : _location(std::move(loca))
     {
         _message = "ConvertErr: " + msg;
     }
@@ -125,7 +126,8 @@ template <> inline auto strTo<int>(const String& str) -> Res<int, ConvertErr>
         // Check if the entire string was consumed
         if (pos != trimmed.length())
         {
-            return RetType::err(newE(ConvertErr, "Invalid integer format", __func__));
+            return RetType::err(
+                newE(ConvertErr, "Invalid integer format", __func__));
         }
         Ok(value);
     }
@@ -141,7 +143,8 @@ template <> inline auto strTo<int>(const String& str) -> Res<int, ConvertErr>
  * @param str Input string to convert
  * @return Result containing either double value or ConvertErr
  */
-template <> inline auto strTo<double>(const String& str) -> Res<double, ConvertErr>
+template <>
+inline auto strTo<double>(const String& str) -> Res<double, ConvertErr>
 {
     SetRetT(double, ConvertErr)
     try

@@ -27,34 +27,35 @@
 
 HHH_NAMESPACE_IMPORT
 
-    namespace hahaha::ml
+namespace hahaha::ml
 {
 
-    template <typename T> class MSELoss final : public Loss<T>
+template <typename T> class MSELoss final : public Loss<T>
+{
+  public:
+    MSELoss() = default;
+    ~MSELoss() override = default;
+
+    Tensor<T> forward(const Tensor<T>& input, const Tensor<T>& target) override
     {
-      public:
-        MSELoss() = default;
-        ~MSELoss() override = default;
-
-        Tensor<T> forward(const Tensor<T>& input, const Tensor<T>& target) override
+        // MSE = mean((input - target)^2)
+        if (input.shape() != target.shape())
         {
-            // MSE = mean((input - target)^2)
-            if (input.shape() != target.shape())
-            {
-                throw std::runtime_error("Input and target shapes must match for MSE loss");
-            }
-
-            auto diff = input - target;
-            auto squared = diff * diff;
-
-            // Return mean as a scalar tensor
-            T mean_value = squared.sum() / static_cast<T>(squared.size());
-            Tensor<T> result({});
-            result.set({0}, mean_value);
-
-            return result;
+            throw std::runtime_error(
+                "Input and target shapes must match for MSE loss");
         }
-    };
+
+        auto diff = input - target;
+        auto squared = diff * diff;
+
+        // Return mean as a scalar tensor
+        T mean_value = squared.sum() / static_cast<T>(squared.size());
+        Tensor<T> result({});
+        result.set({0}, mean_value);
+
+        return result;
+    }
+};
 
 } // namespace hahaha::ml
 

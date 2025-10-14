@@ -15,9 +15,8 @@
 // Email: napbad.sen@gmail.com
 // GitHub: https://github.com/Napbad
 
-#include <gtest/gtest.h>
-
 #include <ds/Vector.h>
+#include <gtest/gtest.h>
 #include <ml/Tensor.h>
 
 using namespace hahaha;
@@ -39,7 +38,9 @@ template <typename T> class TensorTest : public ::testing::Test
     }
 
     // Helper function to check if two floats are approximately equal
-    static bool isApproxEqual(const T a, const T b, const T tolerance = static_cast<T>(0.0001))
+    static bool isApproxEqual(const T a,
+                              const T b,
+                              const T tolerance = static_cast<T>(0.0001))
     {
         if constexpr (std::is_floating_point_v<T>)
         {
@@ -81,9 +82,11 @@ TYPED_TEST(TensorTest, ShapeConstructor)
 // Test constructor with shape and data
 TYPED_TEST(TensorTest, ShapeDataConstructor)
 {
-    Tensor<TypeParam> tensor(
-        {2, 2},
-        {static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3), static_cast<TypeParam>(4)});
+    Tensor<TypeParam> tensor({2, 2},
+                             {static_cast<TypeParam>(1),
+                              static_cast<TypeParam>(2),
+                              static_cast<TypeParam>(3),
+                              static_cast<TypeParam>(4)});
 
     EXPECT_EQ(tensor.dim(), 2);
     EXPECT_EQ(tensor.size(), 4);
@@ -141,8 +144,8 @@ TYPED_TEST(TensorTest, IndexCalculation)
 TYPED_TEST(TensorTest, IndexOutOfBounds)
 {
     Tensor<TypeParam> tensor({2, 3});
-    EXPECT_THROW((void)tensor.index({2, 0}), IndexOutOfBoundError);
-    EXPECT_THROW((void)tensor.index({0, 3}), IndexOutOfBoundError);
+    EXPECT_THROW((void) tensor.index({2, 0}), IndexOutOfBoundError);
+    EXPECT_THROW((void) tensor.index({0, 3}), IndexOutOfBoundError);
 }
 
 // Test set and at methods
@@ -563,7 +566,8 @@ TEST_F(TensorFloatTest, ComplexIndexing3D)
 
     // Test corner cases
     EXPECT_EQ(tensor.index({0, 0, 0}), 0);
-    EXPECT_EQ(tensor.index({1, 2, 3}), 23); // (1*3*4) + (2*4) + 3 = 12 + 8 + 3 = 23
+    EXPECT_EQ(tensor.index({1, 2, 3}),
+              23); // (1*3*4) + (2*4) + 3 = 12 + 8 + 3 = 23
 }
 
 // Test sequential operations
@@ -695,7 +699,7 @@ TYPED_TEST(TensorTest, Transpose)
 TYPED_TEST(TensorTest, Reshape)
 {
     Tensor<TypeParam> tensor({2, 6}, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});
-    
+
     // Valid reshape
     tensor.reshape({3, 4});
     const auto& new_shape = tensor.shape();
@@ -732,10 +736,10 @@ TYPED_TEST(TensorTest, Matmul)
     EXPECT_EQ(result_shape[0], 2);
     EXPECT_EQ(result_shape[1], 2);
 
-    EXPECT_EQ(result(0, 0), 58);   // 1*7 + 2*9 + 3*11
-    EXPECT_EQ(result(0, 1), 64);   // 1*8 + 2*10 + 3*12
-    EXPECT_EQ(result(1, 0), 139);  // 4*7 + 5*9 + 6*11
-    EXPECT_EQ(result(1, 1), 154);  // 4*8 + 5*10 + 6*12
+    EXPECT_EQ(result(0, 0), 58);  // 1*7 + 2*9 + 3*11
+    EXPECT_EQ(result(0, 1), 64);  // 1*8 + 2*10 + 3*12
+    EXPECT_EQ(result(1, 0), 139); // 4*7 + 5*9 + 6*11
+    EXPECT_EQ(result(1, 1), 154); // 4*8 + 5*10 + 6*12
 
     // Matrix-vector multiplication
     Tensor<TypeParam> mat_vec({3, 1}, {1, 2, 3});
@@ -831,7 +835,6 @@ TYPED_TEST(TensorTest, MatmulEdgeCases)
     EXPECT_TRUE(result1 != result2);
 }
 
-
 // Test sum method
 TYPED_TEST(TensorTest, SumMethod)
 {
@@ -857,48 +860,55 @@ TYPED_TEST(TensorTest, BroadcastingOperations)
 {
     Tensor<TypeParam> tensor({2, 2});
     tensor.fill(static_cast<TypeParam>(10));
-    
+
     Tensor<TypeParam> scalar_tensor(static_cast<TypeParam>(5));
 
     // Test tensor + scalar_tensor
     auto result_add = tensor + scalar_tensor;
-    for (const auto& val : result_add) {
+    for (const auto& val : result_add)
+    {
         EXPECT_EQ(val, static_cast<TypeParam>(15));
     }
 
     // Test scalar_tensor + tensor
     auto result_add_rev = scalar_tensor + tensor;
-    for (const auto& val : result_add_rev) {
+    for (const auto& val : result_add_rev)
+    {
         EXPECT_EQ(val, static_cast<TypeParam>(15));
     }
 
     // Test tensor - scalar_tensor
     auto result_sub = tensor - scalar_tensor;
-    for (const auto& val : result_sub) {
+    for (const auto& val : result_sub)
+    {
         EXPECT_EQ(val, static_cast<TypeParam>(5));
     }
 
     // Test scalar_tensor - tensor
     auto result_sub_rev = scalar_tensor - tensor;
-    for (const auto& val : result_sub_rev) {
+    for (const auto& val : result_sub_rev)
+    {
         EXPECT_EQ(val, static_cast<TypeParam>(-5));
     }
 
     // Test tensor * scalar_tensor
     auto result_mul = tensor * scalar_tensor;
-    for (const auto& val : result_mul) {
+    for (const auto& val : result_mul)
+    {
         EXPECT_EQ(val, static_cast<TypeParam>(50));
     }
 
     // Test scalar_tensor * tensor
     auto result_mul_rev = scalar_tensor * tensor;
-    for (const auto& val : result_mul_rev) {
+    for (const auto& val : result_mul_rev)
+    {
         EXPECT_EQ(val, static_cast<TypeParam>(50));
     }
-    
+
     // Test tensor / scalar_tensor
     auto result_div = tensor / scalar_tensor;
-    for (const auto& val : result_div) {
+    for (const auto& val : result_div)
+    {
         EXPECT_EQ(val, static_cast<TypeParam>(2));
     }
 
@@ -907,7 +917,8 @@ TYPED_TEST(TensorTest, BroadcastingOperations)
     tensor_for_div.fill(static_cast<TypeParam>(2));
     Tensor<TypeParam> scalar_for_div(static_cast<TypeParam>(10));
     auto result_div_rev = scalar_for_div / tensor_for_div;
-    for (const auto& val : result_div_rev) {
+    for (const auto& val : result_div_rev)
+    {
         EXPECT_EQ(val, static_cast<TypeParam>(5));
     }
 }
@@ -917,19 +928,22 @@ TYPED_TEST(TensorTest, BroadcastingSingleElementTensor)
 {
     Tensor<TypeParam> tensor({2, 2});
     tensor.fill(static_cast<TypeParam>(10));
-    
-    Tensor<TypeParam> single_element_tensor({1, 1}, { static_cast<TypeParam>(5) });
+
+    Tensor<TypeParam> single_element_tensor({1, 1},
+                                            {static_cast<TypeParam>(5)});
 
     EXPECT_FALSE(single_element_tensor.isScalar());
     EXPECT_TRUE(single_element_tensor.hasOnlyOneVal());
 
     auto result_add = tensor + single_element_tensor;
-    for (const auto& val : result_add) {
+    for (const auto& val : result_add)
+    {
         EXPECT_EQ(val, static_cast<TypeParam>(15));
     }
 
     auto result_mul = single_element_tensor * tensor;
-    for (const auto& val : result_mul) {
+    for (const auto& val : result_mul)
+    {
         EXPECT_EQ(val, static_cast<TypeParam>(50));
     }
 }
@@ -956,22 +970,25 @@ TYPED_TEST(TensorTest, CommutativeScalarOperations)
 
     // Test scalar + tensor
     auto result_add = scalar + tensor;
-    for (const auto& val : result_add) {
+    for (const auto& val : result_add)
+    {
         EXPECT_EQ(val, static_cast<TypeParam>(15));
     }
 
     // Test scalar - tensor
     auto result_sub = scalar - tensor;
-    for (const auto& val : result_sub) {
+    for (const auto& val : result_sub)
+    {
         EXPECT_EQ(val, static_cast<TypeParam>(-5));
     }
-    
+
     // Test scalar / tensor
     Tensor<TypeParam> tensor_for_div({2, 2});
     tensor_for_div.fill(static_cast<TypeParam>(2));
     TypeParam scalar_for_div = static_cast<TypeParam>(10);
     auto result_div = scalar_for_div / tensor_for_div;
-    for (const auto& val : result_div) {
+    for (const auto& val : result_div)
+    {
         EXPECT_EQ(val, static_cast<TypeParam>(5));
     }
 }
@@ -1049,14 +1066,14 @@ TEST_F(TensorFloatTest, TensorSlicing2DTo0D)
 TEST_F(TensorFloatTest, AtMethodTooManyIndices)
 {
     Tensor<f32> tensor({2, 3});
-    EXPECT_THROW((void)tensor.at({0, 1, 2}), IndexOutOfBoundError);
+    EXPECT_THROW((void) tensor.at({0, 1, 2}), IndexOutOfBoundError);
 }
 
 // Test at() with empty indices on non-empty tensor
 TEST_F(TensorFloatTest, AtMethodEmptyIndices)
 {
     Tensor<f32> tensor({2, 3});
-    EXPECT_THROW((void)tensor.at({}), IndexOutOfBoundError);
+    EXPECT_THROW((void) tensor.at({}), IndexOutOfBoundError);
 }
 
 // Test set() with wrong number of indices
@@ -1114,7 +1131,9 @@ TYPED_TEST(TensorTest, CheckShapeSameSizeDifferentShape)
     std::cout.rdbuf(old_cout);
 
     std::string output = buffer.str();
-    EXPECT_NE(output.find("warn: same size but different shape tensors multiply"), std::string::npos);
+    EXPECT_NE(
+        output.find("warn: same size but different shape tensors multiply"),
+        std::string::npos);
 
     // Verify the result is as expected (element-wise multiplication)
     for (const auto& val : result)

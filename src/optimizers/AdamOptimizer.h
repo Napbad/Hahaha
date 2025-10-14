@@ -22,7 +22,8 @@
 #ifndef HAHAHA_ADAMOPTIMIZER_H
 #define HAHAHA_ADAMOPTIMIZER_H
 
-namespace hahaha::ml {
+namespace hahaha::ml
+{
 
 }
 

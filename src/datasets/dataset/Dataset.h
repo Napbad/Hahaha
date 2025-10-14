@@ -18,10 +18,10 @@
 #ifndef HIAHIAHIA_DATASET_H
 #define HIAHIAHIA_DATASET_H
 
+#include <Error.h>
 #include <Res.h>
 #include <ds/String.h>
 #include <ds/Vector.h>
-#include <Error.h>
 #include <ml/Tensor.h>
 
 #include "Sample.h"
@@ -35,7 +35,8 @@ namespace hahaha::ml
 class DatasetError final : public Error
 {
   public:
-    explicit DatasetError(ds::String message, ds::String location = ds::String("dataset"))
+    explicit DatasetError(ds::String message,
+                          ds::String location = ds::String("dataset"))
         : message_(std::move(message)), location_(std::move(location))
     {
     }
@@ -54,7 +55,8 @@ class DatasetError final : public Error
     }
     [[nodiscard]] ds::String toString() const override
     {
-        return typeName() + ds::String(": ") + message() + ds::String(" at ") + location();
+        return typeName() + ds::String(": ") + message() + ds::String(" at ")
+            + location();
     }
 
   private:
@@ -85,7 +87,8 @@ template <typename T> class Dataset
     /**
      * Get a sample by index
      */
-    [[nodiscard]] virtual Res<Sample<T>, DatasetError> get(size_t index) const = 0;
+    [[nodiscard]] virtual Res<Sample<T>, DatasetError>
+    get(size_t index) const = 0;
 
     /**
      * Get the feature dimension

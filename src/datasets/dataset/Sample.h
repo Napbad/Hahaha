@@ -34,7 +34,8 @@ template <typename T> class Sample
     /**
      * Create a new sample
      */
-    explicit Sample(Tensor<T> features, Tensor<T> labels) : _features(std::move(features)), _labels(std::move(labels))
+    explicit Sample(Tensor<T> features, Tensor<T> labels)
+        : _features(std::move(features)), _labels(std::move(labels))
     {
     }
 

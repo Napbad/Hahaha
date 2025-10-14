@@ -21,30 +21,31 @@
 
 #ifndef HIAHIAHIA_TRAINSTATISTICS_H
 #define HIAHIAHIA_TRAINSTATISTICS_H
+#include <ds/Vector.h>
+
 #include "defines/h3defs.h"
 #include "ds/map.h"
-#include <ds/Vector.h>
 
 HHH_NAMESPACE_IMPORT
 
-    namespace hahaha::ml
+namespace hahaha::ml
 {
 
-    class TrainStatistics
-    {
-      public:
-        ds::Vector<f32> losses;
-    };
+class TrainStatistics
+{
+  public:
+    ds::Vector<f32> losses;
+};
 
-    class EmptyTrainStatistics : public TrainStatistics
-    {
-    };
+class EmptyTrainStatistics : public TrainStatistics
+{
+};
 
-    class LossTrainStatistics : public TrainStatistics
-    {
-      public:
-      private:
-    };
-}
+class LossTrainStatistics : public TrainStatistics
+{
+  public:
+  private:
+};
+} // namespace hahaha::ml
 
 #endif // HIAHIAHIA_TRAINSTATISTICS_H

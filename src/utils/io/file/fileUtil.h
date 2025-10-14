@@ -22,9 +22,9 @@
 #ifndef HIAHIAHIA_FILEUTIL_H
 #define HIAHIAHIA_FILEUTIL_H
 
-#include <ds/String.h>
 #include <Error.h>
 #include <Res.h>
+#include <ds/String.h>
 
 namespace hahaha::util::io
 {
@@ -35,13 +35,16 @@ namespace hahaha::util::io
 class FileError final : public hahaha::core::Error
 {
   public:
-    explicit FileError(const core::ds::String& message,
-                       const core::ds::String& location = core::ds::String("FileUtil"))
+    explicit FileError(
+        const core::ds::String& message,
+        const core::ds::String& location = core::ds::String("FileUtil"))
         : message_(message), location_(location)
     {
     }
 
-    explicit FileError(const char* message, const core::ds::String& location = core::ds::String("FileUtil"))
+    explicit FileError(
+        const char* message,
+        const core::ds::String& location = core::ds::String("FileUtil"))
         : message_(core::ds::String(message)), location_(location)
     {
     }
@@ -60,7 +63,8 @@ class FileError final : public hahaha::core::Error
     }
     [[nodiscard]] core::ds::String toString() const override
     {
-        return typeName() + core::ds::String(": ") + message() + core::ds::String(" at ") + location();
+        return typeName() + core::ds::String(": ") + message()
+            + core::ds::String(" at ") + location();
     }
 
   private:
@@ -71,7 +75,8 @@ class FileError final : public hahaha::core::Error
 /**
  * Read a file into a string
  */
-hahaha::Res<hahaha::core::ds::String, FileError> readFile(const hahaha::core::ds::String& path);
+hahaha::Res<hahaha::core::ds::String, FileError>
+readFile(const hahaha::core::ds::String& path);
 
 void deleteFile(const hahaha::core::ds::String& path);
 

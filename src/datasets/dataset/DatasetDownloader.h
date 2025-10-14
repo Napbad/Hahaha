@@ -35,12 +35,16 @@ using namespace hahaha::core;
 class DatasetDownloaderError final : public Error
 {
   public:
-    explicit DatasetDownloaderError(ds::String message, ds::String location = ds::String("DatasetDownloader"))
+    explicit DatasetDownloaderError(
+        ds::String message,
+        ds::String location = ds::String("DatasetDownloader"))
         : message_(std::move(message)), location_(std::move(location))
     {
     }
 
-    explicit DatasetDownloaderError(const char* message, ds::String location = ds::String("DatasetDownloader"))
+    explicit DatasetDownloaderError(
+        const char* message,
+        ds::String location = ds::String("DatasetDownloader"))
         : message_(ds::String(message)), location_(std::move(location))
     {
     }
@@ -59,7 +63,8 @@ class DatasetDownloaderError final : public Error
     }
     [[nodiscard]] ds::String toString() const override
     {
-        return typeName() + ds::String(": ") + message() + ds::String(" at ") + location();
+        return typeName() + ds::String(": ") + message() + ds::String(" at ")
+            + location();
     }
 
   private:
@@ -81,20 +86,24 @@ class DatasetDownloader
     /**
      * Download a dataset from a direct URL
      */
-    static void downloadFromUrl(const ds::String& url, const ds::String& outputPath, bool redownload = false);
+    static void downloadFromUrl(const ds::String& url,
+                                const ds::String& outputPath,
+                                bool redownload = false);
 
     /**
      * Download a dataset from UCI Machine Learning Repository
      */
-    static void downloadFromUCI(const ds::String& datasetName, const ds::String& outputPath, bool redownload = false);
+    static void downloadFromUCI(const ds::String& datasetName,
+                                const ds::String& outputPath,
+                                bool redownload = false);
 
     /**
      * Download a dataset from Kaggle
      */
     static void downloadFromKaggle(const ds::String& datasetName,
-                                 const ds::String& outputPath,
-                                 const ds::String& apiToken,
-                                 bool redownload = false);
+                                   const ds::String& outputPath,
+                                   const ds::String& apiToken,
+                                   bool redownload = false);
 };
 
 } // namespace hahaha::ml

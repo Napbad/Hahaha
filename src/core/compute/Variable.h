@@ -29,187 +29,201 @@
 
 HHH_NAMESPACE_IMPORT
 
-    namespace hahaha::ml
+namespace hahaha::ml
 {
-    template <typename T> class Variable : public Tensor<T>
+template <typename T> class Variable : public Tensor<T>
+{
+
+  public:
+    Variable() = default;
+
+    explicit Variable(Tensor<T> tensor, const bool requiresGrad = true)
+        : Tensor<T>(tensor), grad_(tensor.shape()), requiresGrad_(requiresGrad)
     {
+        grad_.fill(static_cast<T>(0));
+    }
 
-      public:
-        Variable() = default;
+    explicit Variable(const ds::Vector<sizeT>& shape) : Tensor<T>(shape)
+    {
+        grad_ = Tensor<T>(shape);
+    }
 
-        explicit Variable(Tensor<T> tensor, const bool requiresGrad = true)
-            : Tensor<T>(tensor), grad_(tensor.shape()), requiresGrad_(requiresGrad)
+    // Copy constructor
+    Variable(const Variable& other)
+        : Tensor<T>(other), grad_(other.grad_),
+          requiresGrad_(other.requiresGrad_), backwardFn_(other.backwardFn_),
+          children_(other.children_)
+    {
+    }
+
+    Variable& operator=(const Variable& other) = default;
+    Variable(Variable&& other) = default;
+    Variable& operator=(Variable&& other) = default;
+    ~Variable() = default;
+
+    Variable operator+(Variable& other)
+    {
+        Variable result(static_cast<Tensor<T>>(*this)
+                            + static_cast<Tensor<T>>(other),
+                        requiresGrad_ || other.requiresGrad_);
+        children_.pushBack(std::make_shared<Variable>(result));
+        grad_.fill(1);
+        other.grad_.fill(1);
+        return result;
+    }
+
+    Variable operator-(Variable& other)
+    {
+        Variable result(static_cast<Tensor<T>>(*this)
+                            - static_cast<Tensor<T>>(other),
+                        requiresGrad_ || other.requiresGrad_);
+        children_.pushBack(std::make_shared<Variable>(other));
+        grad_.fill(1);
+        other.grad_.fill(-1);
+        return result;
+    }
+
+    Variable operator*(Variable& other)
+    {
+        Variable result(static_cast<Tensor<T>>(*this)
+                            * static_cast<Tensor<T>>(other),
+                        requiresGrad_ || other.requiresGrad_);
+        children_.pushBack(std::make_shared<Variable>(other));
+        grad_.copy(other);
+        other.grad_.copy(this);
+        return result;
+    }
+
+    Variable operator/(Variable& other)
+    {
+        Variable result(static_cast<Tensor<T>>(*this)
+                            / static_cast<Tensor<T>>(other),
+                        requiresGrad_ || other.requiresGrad_);
+        children_.pushBack(std::make_shared<Variable>(other));
+        grad_.fill(1);
+        for (sizeT i = 0; i < other.shape().size(); i++)
+            grad_[i] /= other.shape()[i];
+
+        other.grad_.copy(this);
+        other.grad_ *= -1;
+        other.grad_ = other.grad_ / this / this;
+
+        return result;
+    }
+
+    Variable matmul(const Variable& other) const
+    {
+        Tensor<T> resultTensor =
+            static_cast<const Tensor<T>&>(*this).matmul(other);
+        Variable result(resultTensor, requiresGrad_ || other.requiresGrad_);
+        // Backward function needs to handle both inputs
+        if (result.requiresGrad())
         {
-            grad_.fill(static_cast<T>(0));
-        }
-
-        explicit Variable(const ds::Vector<sizeT>& shape) : Tensor<T>(shape)
-        {
-            grad_ = Tensor<T>(shape);
-        }
-
-        // Copy constructor
-        Variable(const Variable& other)
-            : Tensor<T>(other), grad_(other.grad_), requiresGrad_(other.requiresGrad_),
-              backwardFn_(other.backwardFn_), children_(other.children_)
-        {
-        }
-
-        Variable& operator=(const Variable& other) = default;
-        Variable(Variable&& other) = default;
-        Variable& operator=(Variable&& other) = default;
-        ~Variable() = default;
-
-        Variable operator+(Variable& other)
-        {
-            Variable result(static_cast<Tensor<T>>(*this) + static_cast<Tensor<T>>(other),
-                            requiresGrad_ || other.requiresGrad_);
-            children_.pushBack(std::make_shared<Variable>(result));
-            grad_.fill(1);
-            other.grad_.fill(1);
-            return result;
-        }
-
-        Variable operator-(Variable& other)
-        {
-            Variable result(static_cast<Tensor<T>>(*this) - static_cast<Tensor<T>>(other),
-                            requiresGrad_ || other.requiresGrad_);
-            children_.pushBack(std::make_shared<Variable>(other));
-            grad_.fill(1);
-            other.grad_.fill(-1);
-            return result;
-        }
-
-        Variable operator*(Variable& other)
-        {
-            Variable result(static_cast<Tensor<T>>(*this) * static_cast<Tensor<T>>(other),
-                            requiresGrad_ || other.requiresGrad_);
-            children_.pushBack(std::make_shared<Variable>(other));
-            grad_.copy(other);
-            other.grad_.copy(this);
-            return result;
-        }
-
-        Variable operator/(Variable& other)
-        {
-            Variable result(static_cast<Tensor<T>>(*this) / static_cast<Tensor<T>>(other),
-                            requiresGrad_ || other.requiresGrad_);
-            children_.pushBack(std::make_shared<Variable>(other));
-            grad_.fill(1);
-            for (sizeT i = 0; i < other.shape().size(); i++)
-                grad_[i] /= other.shape()[i];
-
-            other.grad_.copy(this);
-            other.grad_ *= -1;
-            other.grad_ = other.grad_ / this / this;
-
-            return result;
-        }
-
-        Variable matmul(const Variable& other) const
-        {
-            Tensor<T> resultTensor = static_cast<const Tensor<T>&>(*this).matmul(other);
-            Variable result(resultTensor, requiresGrad_ || other.requiresGrad_);
-            // Backward function needs to handle both inputs
-            if (result.requiresGrad()) {
-                result.backwardFn_ = [this, other_ref = other](const Tensor<T>& grad) mutable {
-                    if (this->requiresGrad()) {
-                        this->grad() += grad.matmul(other_ref.transpose());
-                    }
-                    if (other_ref.requiresGrad()) {
-                        other_ref.grad() += this->transpose().matmul(grad);
-                    }
-                };
-            }
-
-            return result;
-        }
-
-        Variable relu() const
-        {
-            Tensor<T> resultTensor(this->shape());
-            for (sizeT i = 0; i < this->size(); ++i)
-                resultTensor[i] = (*this)[i] > static_cast<T>(0) ? (*this)[i] : static_cast<T>(0);
-
-            Variable result(resultTensor, requiresGrad_);
-
-            if (requiresGrad_)
-                for (sizeT i = 0; i < this->grad().size(); ++i)
-                    this->grad()[i] = (*this)[i] > static_cast<T>(0) ? static_cast<T>(1) : static_cast<T>(0);
-
-            return result;
-        }
-
-        Variable sigmoid() const
-        {
-            Tensor<T> resultTensor(this->shape());
-            for (sizeT i = 0; i < this->size(); ++i)
+            result.backwardFn_ =
+                [this, other_ref = other](const Tensor<T>& grad) mutable
             {
-                T val = (*this)[i];
-                if constexpr (std::is_floating_point_v<T>)
-                    resultTensor[i] = static_cast<T>(1) / (static_cast<T>(1) + std::exp(-val));
-            }
-            Variable result(resultTensor, requiresGrad_);
-            grad_ = (resultTensor - 1) * resultTensor;
-            return result;
+                if (this->requiresGrad())
+                {
+                    this->grad() += grad.matmul(other_ref.transpose());
+                }
+                if (other_ref.requiresGrad())
+                {
+                    other_ref.grad() += this->transpose().matmul(grad);
+                }
+            };
         }
 
-        void backward(const Tensor<T>& grad = {})
+        return result;
+    }
+
+    Variable relu() const
+    {
+        Tensor<T> resultTensor(this->shape());
+        for (sizeT i = 0; i < this->size(); ++i)
+            resultTensor[i] =
+                (*this)[i] > static_cast<T>(0) ? (*this)[i] : static_cast<T>(0);
+
+        Variable result(resultTensor, requiresGrad_);
+
+        if (requiresGrad_)
+            for (sizeT i = 0; i < this->grad().size(); ++i)
+                this->grad()[i] = (*this)[i] > static_cast<T>(0)
+                    ? static_cast<T>(1)
+                    : static_cast<T>(0);
+
+        return result;
+    }
+
+    Variable sigmoid() const
+    {
+        Tensor<T> resultTensor(this->shape());
+        for (sizeT i = 0; i < this->size(); ++i)
         {
-            // Simple backward pass (placeholder implementation)
-            if (requiresGrad_)
+            T val = (*this)[i];
+            if constexpr (std::is_floating_point_v<T>)
+                resultTensor[i] =
+                    static_cast<T>(1) / (static_cast<T>(1) + std::exp(-val));
+        }
+        Variable result(resultTensor, requiresGrad_);
+        grad_ = (resultTensor - 1) * resultTensor;
+        return result;
+    }
+
+    void backward(const Tensor<T>& grad = {})
+    {
+        // Simple backward pass (placeholder implementation)
+        if (requiresGrad_)
+        {
+            if (grad.empty())
             {
-                if (grad.empty())
-                {
-                    // Initialize gradient to ones
-                    grad_.fill(static_cast<T>(1));
-                }
-                else
-                {
-                    grad_ = grad;
-                }
-
-                // Call backward function if it exists
-                if (backwardFn_)
-                    backwardFn_(grad_);
-
-                // Propagate to children
-                for (auto& child : children_)
-                    if (child)
-                        child->backward(grad_);
+                // Initialize gradient to ones
+                grad_.fill(static_cast<T>(1));
             }
+            else
+            {
+                grad_ = grad;
+            }
+
+            // Call backward function if it exists
+            if (backwardFn_)
+                backwardFn_(grad_);
+
+            // Propagate to children
+            for (auto& child : children_)
+                if (child)
+                    child->backward(grad_);
         }
+    }
 
+    void zeroGrad()
+    {
+        grad_.fill(static_cast<T>(0));
+    }
 
-        void zeroGrad()
-        {
-            grad_.fill(static_cast<T>(0));
-        }
+    Tensor<T>& grad() const
+    {
+        return grad_;
+    }
 
-        Tensor<T>& grad() const
-        {
-            return grad_;
-        }
+    [[nodiscard]] bool requiresGrad() const
+    {
+        return requiresGrad_;
+    }
 
-        [[nodiscard]] bool requiresGrad() const
-        {
-            return requiresGrad_;
-        }
+  private:
+    mutable Tensor<T> grad_;
+    bool requiresGrad_ = false;
+    std::function<void(const Tensor<T>&)> backwardFn_;
+    ds::Vector<std::shared_ptr<Variable>> children_;
 
-      private:
-        mutable Tensor<T> grad_;
-        bool requiresGrad_ = false;
-        std::function<void(const Tensor<T>&)> backwardFn_;
-        ds::Vector<std::shared_ptr<Variable>> children_;
-
-        void buildGraph(const ds::Vector<std::shared_ptr<Variable>>& children,
-                        std::function<Tensor<T>(const Tensor<T>&)> forwardFn,
-                        std::function<void(const Tensor<T>&)> backwardFn)
-        {
-            children_ = children;
-            backwardFn_ = backwardFn;
-        }
-    };
+    void buildGraph(const ds::Vector<std::shared_ptr<Variable>>& children,
+                    std::function<Tensor<T>(const Tensor<T>&)> forwardFn,
+                    std::function<void(const Tensor<T>&)> backwardFn)
+    {
+        children_ = children;
+        backwardFn_ = backwardFn;
+    }
+};
 
 } // namespace hahaha::ml
 

@@ -1,10 +1,13 @@
-#include <gtest/gtest.h>
 #include "models/nn/layers/ReLU.h"
+
+#include <gtest/gtest.h>
+
 #include "core/compute/Variable.h"
 
 using namespace hahaha::ml;
 
-TEST(ReLUTest, ForwardPass) {
+TEST(ReLUTest, ForwardPass)
+{
     // 1. Setup
     ReLU<float> relu_layer;
     auto input_tensor = Tensor<float>({4}, {-2.0f, -0.5f, 0.0f, 3.0f});

@@ -26,36 +26,36 @@
 
 HHH_NAMESPACE_IMPORT
 
-    namespace hahaha::ml
+namespace hahaha::ml
 {
-    template <typename T> class AutogradOps
+template <typename T> class AutogradOps
+{
+  public:
+    static Variable<T> add(const Variable<T>& a, const Variable<T>& b)
     {
-      public:
-        static Variable<T> add(const Variable<T>& a, const Variable<T>& b)
-        {
-            return a + b;
-        }
+        return a + b;
+    }
 
-        static Variable<T> mul(const Variable<T>& a, const Variable<T>& b)
-        {
-            return a * b;
-        }
+    static Variable<T> mul(const Variable<T>& a, const Variable<T>& b)
+    {
+        return a * b;
+    }
 
-        static Variable<T> matmul(const Variable<T>& a, const Variable<T>& b)
-        {
-            return a.matmul(b);
-        }
+    static Variable<T> matmul(const Variable<T>& a, const Variable<T>& b)
+    {
+        return a.matmul(b);
+    }
 
-        static Variable<T> relu(const Variable<T>& a)
-        {
-            return a.relu();
-        }
+    static Variable<T> relu(const Variable<T>& a)
+    {
+        return a.relu();
+    }
 
-        static Variable<T> sigmoid(const Variable<T>& a)
-        {
-            return a.sigmoid();
-        }
-    };
+    static Variable<T> sigmoid(const Variable<T>& a)
+    {
+        return a.sigmoid();
+    }
+};
 
 } // namespace hahaha::ml
 

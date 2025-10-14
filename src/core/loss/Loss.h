@@ -33,12 +33,14 @@ template <typename T> class Loss
 {
   public:
     virtual ~Loss() = default;
-    virtual Tensor<T> forward(const Tensor<T>& input, const Tensor<T>& target) = 0;
+    virtual Tensor<T> forward(const Tensor<T>& input,
+                              const Tensor<T>& target) = 0;
 
     Variable<T> operator()(Variable<T>& input, Variable<T>& target)
     {
         Tensor<T> result_tensor = forward(input, target);
-        return Variable<T>(result_tensor, input.requiresGrad() || target.requiresGrad());
+        return Variable<T>(result_tensor,
+                           input.requiresGrad() || target.requiresGrad());
     }
 };
 

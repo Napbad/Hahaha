@@ -29,13 +29,15 @@ class LinearRegression : public Model
   public:
     LinearRegression() = default;
 
-    LinearRegression(const f32 learningRate, const sizeT epochs) : learningRate_(learningRate), epochs_(epochs)
+    LinearRegression(const f32 learningRate, const sizeT epochs)
+        : learningRate_(learningRate), epochs_(epochs)
     {
     }
 
-    void checkStatus(const Tensor<f32>& features, const Tensor<f32>& labels) const;
+    void checkStatus(const Tensor<f32>& features,
+                     const Tensor<f32>& labels) const;
     ml::TrainStatistics train(const Tensor<f32>& features,
-                                              const Tensor<f32>& labels) override;
+                              const Tensor<f32>& labels) override;
     [[nodiscard]] f32 predict(const Tensor<f32>& features) const override;
     [[nodiscard]] bool save(const String& filepath) const override;
     bool load(const String& path) override;
@@ -77,7 +79,6 @@ class LinearRegression : public Model
         return bias_;
     }
 
-
   private:
     Tensor<f32> weights_;
     f32 bias_{0.0f};
@@ -86,6 +87,6 @@ class LinearRegression : public Model
     sizeT epochs_{1000};
 };
 
-} // namespace hahaha
+} // namespace hahaha::ml
 
 #endif // HIAHIAHIA_LINEARREGRESSION_H

@@ -18,13 +18,13 @@
 #ifndef HIAHIAHIA_CSVDATASET_H
 #define HIAHIAHIA_CSVDATASET_H
 
-#include <Res.h>
-#include <ds/String.h>
-#include <ds/Vector.h>
 #include <Error.h>
-#include <fstream>
+#include <Res.h>
 #include <dataset/Dataset.h>
 #include <dataset/Sample.h>
+#include <ds/String.h>
+#include <ds/Vector.h>
+#include <fstream>
 #include <sstream>
 
 namespace hahaha::ml
@@ -37,7 +37,8 @@ using namespace hahaha::core::ds;
 class CSVDatasetError final : public Error
 {
   public:
-    explicit CSVDatasetError(ds::String message, ds::String location = ds::String("CSVDataset"))
+    explicit CSVDatasetError(ds::String message,
+                             ds::String location = ds::String("CSVDataset"))
         : message_(std::move(message)), location_(std::move(location))
     {
     }
@@ -56,7 +57,8 @@ class CSVDatasetError final : public Error
     }
     [[nodiscard]] ds::String toString() const override
     {
-        return typeName() + ds::String(": ") + message() + ds::String(" at ") + location();
+        return typeName() + ds::String(": ") + message() + ds::String(" at ")
+            + location();
     }
 
   private:
@@ -85,9 +87,10 @@ template <typename T> class CSVDataset : public Dataset<T>
                const bool hasHeader = true,
                const char delimiter = ',',
                ds::String description = ds::String())
-        : filepath_(std::move(filepath)), featureCols_(featureCols.begin(), featureCols.end()),
-          labelCols_(labelCols.begin(), labelCols.end()), hasHeader_(hasHeader), delimiter_(delimiter),
-          description_(std::move(description))
+        : filepath_(std::move(filepath)),
+          featureCols_(featureCols.begin(), featureCols.end()),
+          labelCols_(labelCols.begin(), labelCols.end()), hasHeader_(hasHeader),
+          delimiter_(delimiter), description_(std::move(description))
     {
     }
 
@@ -286,15 +289,17 @@ template <typename T> class CSVDataset : public Dataset<T>
             catch (const std::exception& e)
             {
                 std::ostringstream errMsg;
-                errMsg << "Failed to parse value at row " << row << ", column " << col;
+                errMsg << "Failed to parse value at row " << row << ", column "
+                       << col;
                 Err(DatasetError(ds::String(errMsg.str())));
             }
             col++;
         }
 
         // Check if we have enough columns
-        if (col < std::max(*std::max_element(featureCols_.begin(), featureCols_.end()),
-                           *std::max_element(labelCols_.begin(), labelCols_.end())))
+        if (col < std::max(
+                *std::max_element(featureCols_.begin(), featureCols_.end()),
+                *std::max_element(labelCols_.begin(), labelCols_.end())))
         {
             std::ostringstream errMsg;
             errMsg << "Not enough columns at row " << row;

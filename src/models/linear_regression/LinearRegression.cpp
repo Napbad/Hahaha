@@ -51,7 +51,8 @@ ds::String LinearRegression::modelName() const
     return ds::String("LinearRegression");
 }
 
-void LinearRegression::checkStatus(const ml::Tensor<f32>& features, const ml::Tensor<f32>& labels) const
+void LinearRegression::checkStatus(const ml::Tensor<f32>& features,
+                                   const ml::Tensor<f32>& labels) const
 {
     // Basic checks for tensor dimensions and sizes
     if (features.dim() != 2 || labels.dim() != 2)
@@ -60,7 +61,8 @@ void LinearRegression::checkStatus(const ml::Tensor<f32>& features, const ml::Te
     }
     if (features.shape()[0] != labels.shape()[0])
     {
-        throw std::runtime_error("Number of samples in features and labels must match.");
+        throw std::runtime_error(
+            "Number of samples in features and labels must match.");
     }
     if (labels.shape()[1] != 1)
     {
@@ -68,11 +70,12 @@ void LinearRegression::checkStatus(const ml::Tensor<f32>& features, const ml::Te
     }
     if (!weights_.empty() && features.shape()[1] != weights_.shape()[0])
     {
-        throw std::runtime_error("Feature dimensions are inconsistent with model weights.");
+        throw std::runtime_error(
+            "Feature dimensions are inconsistent with model weights.");
     }
 }
 TrainStatistics LinearRegression::train(const Tensor<f32>& features,
-                                                    const Tensor<f32>& labels)
+                                        const Tensor<f32>& labels)
 {
     checkStatus(features, labels);
 
@@ -89,7 +92,8 @@ TrainStatistics LinearRegression::train(const Tensor<f32>& features,
         f32 totalLoss = 0.0f;
         for (sizeT i = 0; i < features.shape()[0]; ++i)
         {
-            auto feature_vec = features.data().subVector(i * features.shape()[1], features.shape()[1]);
+            auto feature_vec = features.data().subVector(
+                i * features.shape()[1], features.shape()[1]);
             Tensor feature({features.shape()[1]}, feature_vec.begin());
             auto label_vec = labels.data().subVector(i, 1);
             const auto label = label_vec[0];
@@ -102,7 +106,8 @@ TrainStatistics LinearRegression::train(const Tensor<f32>& features,
 
             totalLoss += error * error;
         }
-        stats.losses.pushBack(totalLoss / static_cast<f32>(features.shape()[0]));
+        stats.losses.pushBack(totalLoss
+                              / static_cast<f32>(features.shape()[0]));
     }
     return stats;
 }

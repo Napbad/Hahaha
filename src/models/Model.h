@@ -39,10 +39,11 @@ class Model
 
     // Train the model with given features and labels
     virtual ml::TrainStatistics train(const ml::Tensor<f32>& features,
-                                                      const ml::Tensor<f32>& labels) = 0;
+                                      const ml::Tensor<f32>& labels) = 0;
 
     // Make a prediction given input features
-    [[nodiscard]] virtual f32 predict(const ml::Tensor<f32>& features) const = 0;
+    [[nodiscard]] virtual f32
+    predict(const ml::Tensor<f32>& features) const = 0;
 
     // Save the model to a file
     [[nodiscard]] virtual bool save(const ds::String& filepath) const = 0;
@@ -58,4 +59,4 @@ class Model
 };
 } // namespace hahaha::ml
 
-#endif //HIAHIAHIA_MODEL_H
+#endif // HIAHIAHIA_MODEL_H

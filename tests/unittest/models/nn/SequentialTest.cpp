@@ -1,12 +1,15 @@
-#include <gtest/gtest.h>
 #include "models/nn/Sequential.h"
+
+#include <gtest/gtest.h>
+
+#include "core/compute/Variable.h"
 #include "models/nn/layers/Linear.h"
 #include "models/nn/layers/ReLU.h"
-#include "core/compute/Variable.h"
 
 using namespace hahaha::ml;
 
-TEST(SequentialTest, ModelConstructionAndForwardPass) {
+TEST(SequentialTest, ModelConstructionAndForwardPass)
+{
     // 1. Setup
     sizeT input_features = 10;
     sizeT hidden_features = 8;
@@ -20,7 +23,7 @@ TEST(SequentialTest, ModelConstructionAndForwardPass) {
     // 2. Parameters assertion
     auto params = model.parameters();
     // Linear1 (weights, bias) + Linear2 (weights, bias)
-    ASSERT_EQ(params.size(), 4); 
+    ASSERT_EQ(params.size(), 4);
 
     // 3. Forward pass
     auto input_tensor = Tensor<float>::ones({1, input_features});
@@ -29,5 +32,6 @@ TEST(SequentialTest, ModelConstructionAndForwardPass) {
     auto output = model.forward(input_variable);
 
     // 4. Forward pass assertion
-    EXPECT_EQ(output.shape(), hahaha::core::ds::Vector<sizeT>({1, output_features}));
+    EXPECT_EQ(output.shape(),
+              hahaha::core::ds::Vector<sizeT>({1, output_features}));
 }

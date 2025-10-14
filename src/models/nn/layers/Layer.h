@@ -28,22 +28,20 @@
 
 namespace hahaha::ml
 {
-template<typename T>
-class Layer
+template <typename T> class Layer
 {
-public:
-
+  public:
     virtual ~Layer() = default;
 
     // Perform the forward pass
     virtual Variable<T> forward(const Variable<T>& input) = 0;
 
     // Get the layer's parameters (weights, biases, etc.)
-    virtual ds::Vector<Variable<T>*> parameters() {
+    virtual ds::Vector<Variable<T>*> parameters()
+    {
         return {};
     }
-
 };
-}
+} // namespace hahaha::ml
 
 #endif // HAHAHA_LAYER_H

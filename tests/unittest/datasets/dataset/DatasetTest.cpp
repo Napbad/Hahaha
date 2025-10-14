@@ -61,11 +61,13 @@
 // {
 //     // Create dataset
 //     CSVDataset<f32> dataset(
-//         ds::String("test_dataset.csv"), ds::Vector<hahaha::sizeT>{1, 2}, ds::Vector<hahaha::sizeT>{3}, true, ',', ds::String());
+//         ds::String("test_dataset.csv"), ds::Vector<hahaha::sizeT>{1, 2},
+//         ds::Vector<hahaha::sizeT>{3}, true, ',', ds::String());
 //
 //     // Load dataset
 //     auto res = dataset.load();
-//     EXPECT_TRUE(res.isOk()) << "Failed to load dataset: " << res.unwrapErr().toString();
+//     EXPECT_TRUE(res.isOk()) << "Failed to load dataset: " <<
+//     res.unwrapErr().toString();
 //
 //     // Check size
 //     EXPECT_EQ(dataset.size(), 5);
@@ -79,7 +81,8 @@
 // {
 //     // Create dataset
 //     CSVDataset<f32> dataset(
-//         ds::String("test_dataset.csv"), ds::Vector<hahaha::sizeT>{1, 2}, ds::Vector<hahaha::sizeT>{3}, true, ',', ds::String());
+//         ds::String("test_dataset.csv"), ds::Vector<hahaha::sizeT>{1, 2},
+//         ds::Vector<hahaha::sizeT>{3}, true, ',', ds::String());
 //
 //     // Load dataset
 //     auto res = dataset.load();
@@ -87,7 +90,8 @@
 //
 //     // Get first sample
 //     auto sampleRes = dataset.get(0);
-//     ASSERT_TRUE(sampleRes.isOk()) << "Failed to get sample: " << sampleRes.unwrapErr().toString();
+//     ASSERT_TRUE(sampleRes.isOk()) << "Failed to get sample: " <<
+//     sampleRes.unwrapErr().toString();
 //
 //     auto sample = sampleRes.unwrap();
 //     EXPECT_EQ(sample.featureDim(), 2);
@@ -101,7 +105,8 @@
 // {
 //     // Create dataset
 //     CSVDataset<f32> dataset(
-//         ds::String("test_dataset.csv"), ds::Vector<hahaha::sizeT>{1, 2}, ds::Vector<hahaha::sizeT>{3}, true, ',', ds::String());
+//         ds::String("test_dataset.csv"), ds::Vector<hahaha::sizeT>{1, 2},
+//         ds::Vector<hahaha::sizeT>{3}, true, ',', ds::String());
 //
 //     // Load dataset
 //     auto res = dataset.load();
@@ -133,7 +138,8 @@
 //
 //     // Create dataset without header
 //     CSVDataset<f32> dataset(
-//         ds::String("test_noheader.csv"), ds::Vector<hahaha::sizeT>{1, 2}, ds::Vector<hahaha::sizeT>{3}, false, ',', ds::String());
+//         ds::String("test_noheader.csv"), ds::Vector<hahaha::sizeT>{1, 2},
+//         ds::Vector<hahaha::sizeT>{3}, false, ',', ds::String());
 //
 //     // Load dataset
 //     auto res = dataset.load();
@@ -156,7 +162,8 @@
 // {
 //     // Create dataset
 //     CSVDataset<f32> dataset(
-//         ds::String("test_dataset.csv"), ds::Vector<hahaha::sizeT>{1, 2}, ds::Vector<hahaha::sizeT>{3}, true, ',', ds::String());
+//         ds::String("test_dataset.csv"), ds::Vector<hahaha::sizeT>{1, 2},
+//         ds::Vector<hahaha::sizeT>{3}, true, ',', ds::String());
 //
 //     // Load dataset
 //     auto res = dataset.load();

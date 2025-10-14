@@ -1,15 +1,18 @@
-#include <gtest/gtest.h>
 #include "optimizers/SGDOptimizer.h"
+
+#include <gtest/gtest.h>
+
 #include "core/compute/Variable.h"
 
 using namespace hahaha::ml;
 using namespace hahaha::core::ds;
 
-TEST(SGDOptimizerTest, Step) {
+TEST(SGDOptimizerTest, Step)
+{
     // 1. Setup
     auto initial_data = Tensor<float>({2}, {10.0f, -5.0f});
     auto grad_data = Tensor<float>({2}, {2.0f, -4.0f});
-    
+
     auto param = Variable<float>(initial_data, true);
     // Manually set the gradient for the test
     param.grad() = grad_data;
@@ -27,7 +30,8 @@ TEST(SGDOptimizerTest, Step) {
     EXPECT_FLOAT_EQ(updated_data[1], -5.0f - (0.1f * -4.0f));
 }
 
-TEST(SGDOptimizerTest, ZeroGrad) {
+TEST(SGDOptimizerTest, ZeroGrad)
+{
     // 1. Setup
     auto initial_data = Tensor<float>({2}, {10.0f, -5.0f});
     auto grad_data = Tensor<float>({2}, {2.0f, -4.0f});
@@ -37,7 +41,7 @@ TEST(SGDOptimizerTest, ZeroGrad) {
 
     ds::Vector<Variable<float>*> params = {&param};
     SGDOptimizer<float> optimizer(params, 0.1);
-    
+
     // Ensure gradient is not zero initially
     ASSERT_NE(param.grad()[0], 0.0f);
 

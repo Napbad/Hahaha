@@ -15,14 +15,13 @@
 // Email: napbad.sen@gmail.com
 // GitHub: https://github.com/Napbad
 
-#include <gtest/gtest.h>
-#include <fstream>
-#include <memory>
-
-#include <ds/String.h>
-#include <ds/Vector.h>
 #include <dataset/CSVDataset.h>
 #include <dataset/DataLoader.h>
+#include <ds/String.h>
+#include <ds/Vector.h>
+#include <fstream>
+#include <gtest/gtest.h>
+#include <memory>
 
 using namespace hahaha::ml;
 using namespace hahaha;
@@ -47,8 +46,13 @@ class DataLoaderTest : public ::testing::Test
         csvFile.close();
 
         // Create and load dataset
-        dataset = std::make_shared<CSVDataset<f32>>(
-            ds::String("test_dataloader.csv"), ds::Vector<sizeT>{0, 1}, ds::Vector<sizeT>{2}, true, ',', ds::String());
+        dataset =
+            std::make_shared<CSVDataset<f32>>(ds::String("test_dataloader.csv"),
+                                              ds::Vector<sizeT>{0, 1},
+                                              ds::Vector<sizeT>{2},
+                                              true,
+                                              ',',
+                                              ds::String());
         auto res = dataset->load();
         ASSERT_TRUE(res.isOk()) << "Failed to load dataset";
     }
@@ -72,7 +76,8 @@ TEST_F(DataLoaderTest, ConstructorTest)
     // Check properties
     EXPECT_EQ(dataLoader.datasetSize(), 6);
     EXPECT_EQ(dataLoader.batchSize(), 2);
-    EXPECT_EQ(dataLoader.numBatches(), 3); // 6 samples with batch size 2 = 3 batches
+    EXPECT_EQ(dataLoader.numBatches(),
+              3); // 6 samples with batch size 2 = 3 batches
     EXPECT_TRUE(dataLoader.hasNext());
 }
 
@@ -125,9 +130,11 @@ TEST_F(DataLoaderTest, HasNextTest)
 TEST_F(DataLoaderTest, DropLastTest)
 {
     // Create data loader with dropLast=true
-    DataLoader<f32> dataLoader(dataset, 4, false, true); // Batch size 4 with 6 samples
+    DataLoader<f32> dataLoader(
+        dataset, 4, false, true); // Batch size 4 with 6 samples
 
-    // With 6 samples and batch size 4, we should have 1 batch (dropping the last incomplete batch)
+    // With 6 samples and batch size 4, we should have 1 batch (dropping the
+    // last incomplete batch)
     EXPECT_EQ(dataLoader.numBatches(), 1);
 
     // Get first batch
@@ -135,7 +142,8 @@ TEST_F(DataLoaderTest, DropLastTest)
     ASSERT_TRUE(batch1Res.isOk());
     EXPECT_EQ(batch1Res.unwrap().size(), 4);
 
-    // Try to get second batch (should fail because we dropped the last incomplete batch)
+    // Try to get second batch (should fail because we dropped the last
+    // incomplete batch)
     auto batch2Res = dataLoader.nextBatch();
     EXPECT_TRUE(batch2Res.isErr());
 }
@@ -143,9 +151,11 @@ TEST_F(DataLoaderTest, DropLastTest)
 TEST_F(DataLoaderTest, NoDropLastTest)
 {
     // Create data loader with dropLast=false
-    DataLoader<f32> dataLoader(dataset, 4, false, false); // Batch size 4 with 6 samples
+    DataLoader<f32> dataLoader(
+        dataset, 4, false, false); // Batch size 4 with 6 samples
 
-    // With 6 samples and batch size 4, we should have 2 batches (not dropping the last incomplete batch)
+    // With 6 samples and batch size 4, we should have 2 batches (not dropping
+    // the last incomplete batch)
     EXPECT_EQ(dataLoader.numBatches(), 2);
 
     // Get first batch

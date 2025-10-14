@@ -42,12 +42,12 @@ template <class T, class Allocator = std::allocator<T>> class queue
     using size_type = size_t;
 
     // Default constructor
-    queue() noexcept : _container(), _start(0)
+    queue() noexcept : container_(), start_(0)
     {
     }
 
     // Constructor with initializer list
-    queue(std::initializer_list<T> init) : _container(init), _start(0)
+    queue(std::initializer_list<T> init) : container_(init), start_(0)
     {
     }
 
@@ -60,7 +60,7 @@ template <class T, class Allocator = std::allocator<T>> class queue
     // Get the number of elements in the queue
     [[nodiscard]] size_type size() const noexcept
     {
-        return _container.size() - _start;
+        return container_.size() - start_;
     }
 
     // Access the first element (modifiable)
@@ -70,7 +70,7 @@ template <class T, class Allocator = std::allocator<T>> class queue
         {
             throw std::out_of_range("queue is empty: cannot access front");
         }
-        return _container[_start];
+        return container_[start_];
     }
 
     // Access the first element (const)
@@ -80,7 +80,7 @@ template <class T, class Allocator = std::allocator<T>> class queue
         {
             throw std::out_of_range("queue is empty: cannot access front");
         }
-        return _container[_start];
+        return container_[start_];
     }
 
     // Access the last element (modifiable)
@@ -90,7 +90,7 @@ template <class T, class Allocator = std::allocator<T>> class queue
         {
             throw std::out_of_range("queue is empty: cannot access back");
         }
-        return _container[_container.size() - 1];
+        return container_[container_.size() - 1];
     }
 
     // Access the last element (const)
@@ -100,13 +100,13 @@ template <class T, class Allocator = std::allocator<T>> class queue
         {
             throw std::out_of_range("queue is empty: cannot access back");
         }
-        return _container[_container.size() - 1];
+        return container_[container_.size() - 1];
     }
 
     // Add an element to the end of the queue
     void push(const T& value)
     {
-        _container.pushBack(value);
+        container_.pushBack(value);
     }
 
     // Remove the first element from the queue
@@ -116,10 +116,10 @@ template <class T, class Allocator = std::allocator<T>> class queue
         {
             throw std::out_of_range("queue is empty: cannot pop");
         }
-        ++_start;
+        ++start_;
 
         // Rebase to free memory if _start is more than half the container size
-        if (_start > _container.size() / 2)
+        if (start_ > container_.size() / 2)
         {
             rebase();
         }
@@ -128,14 +128,15 @@ template <class T, class Allocator = std::allocator<T>> class queue
     // Clear all elements from the queue
     void clear() noexcept
     {
-        _start = _container.size(); // Effectively marks all elements as popped
+        start_ = container_.size(); // Effectively marks all elements as popped
     }
 
   private:
-    Vector<T, Allocator> _container; // Underlying storage
-    size_type _start;             // Index of the first active element
+    Vector<T, Allocator> container_; // Underlying storage
+    size_type start_;                // Index of the first active element
 
-    // Rebase: move remaining elements to the start of the container to free space
+    // Rebase: move remaining elements to the start of the container to free
+    // space
     void rebase()
     {
         const size_type new_size = size();
@@ -144,12 +145,12 @@ template <class T, class Allocator = std::allocator<T>> class queue
         // Copy active elements (from _start to end) to the new container
         for (size_type i = 0; i < new_size; ++i)
         {
-            new_container.pushBack(_container[_start + i]);
+            new_container.pushBack(container_[start_ + i]);
         }
 
         // Replace old container with the new one and reset _start
-        _container = std::move(new_container);
-        _start = 0;
+        container_ = std::move(new_container);
+        start_ = 0;
     }
 };
 

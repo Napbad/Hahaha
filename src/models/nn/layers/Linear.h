@@ -25,34 +25,34 @@
 
 namespace hahaha::ml
 {
-template<typename T>
-class Linear final : public Layer<T>
+template <typename T> class Linear final : public Layer<T>
 {
-public:
+  public:
     Linear(sizeT inputSize, sizeT outputSize)
         : weights_(Variable<T>::rand({inputSize, outputSize})),
           bias_(Variable<T>::rand({1, outputSize}))
     {
-
     }
 
-    Variable<T> forward(const Variable<T>& input) override {
+    Variable<T> forward(const Variable<T>& input) override
+    {
 
         auto selfShape = weights_.shape();
         auto inputShape = input.shape();
         auto mm = input.matmul(weights_);
         auto mmShape = mm.shape();
-       return mm + bias_;
+        return mm + bias_;
     }
 
-    ds::Vector<Variable<T>*> parameters() override {
+    ds::Vector<Variable<T>*> parameters() override
+    {
         return {&weights_, &bias_};
     }
 
-private:
+  private:
     Variable<T> weights_;
     Variable<T> bias_;
 };
-}
+} // namespace hahaha::ml
 
 #endif // HAHAHA_LINEAR_H

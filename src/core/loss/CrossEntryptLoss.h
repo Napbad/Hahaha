@@ -23,50 +23,52 @@
 #define HAHAHA_CROSSENTROPYLOSS_H
 #include "Loss.h"
 #include "core/defines/h3defs.h"
-#include "math/Math.h"
 #include "core/ml/Tensor.h"
+#include "math/Math.h"
 
 HHH_NAMESPACE_IMPORT
 
-    namespace hahaha::ml
+namespace hahaha::ml
 {
 
-    template <typename T> class CrossEntropyLoss final : public Loss<T>
+template <typename T> class CrossEntropyLoss final : public Loss<T>
+{
+  public:
+    CrossEntropyLoss() = default;
+    ~CrossEntropyLoss() override = default;
+
+    Tensor<T> forward(const Tensor<T>& input, const Tensor<T>& target) override
     {
-      public:
-        CrossEntropyLoss() = default;
-        ~CrossEntropyLoss() override = default;
+        // Cross Entropy = -sum(target * log(input))
+        // Assumes input is already probabilities (after softmax)
+        // and target is one-hot encoded
 
-        Tensor<T> forward(const Tensor<T>& input, const Tensor<T>& target) override
+        if (input.shape() != target.shape())
         {
-            // Cross Entropy = -sum(target * log(input))
-            // Assumes input is already probabilities (after softmax)
-            // and target is one-hot encoded
-
-            if (input.shape() != target.shape())
-            {
-                throw std::runtime_error("Input and target shapes must match for Cross Entropy loss");
-            }
-
-            Tensor<T> result({1});
-            T loss = static_cast<T>(0);
-
-            // Compute -sum(target * log(input + epsilon)) where epsilon prevents log(0)
-            constexpr T epsilon = static_cast<T>(1e-7);
-
-            for (sizeT i = 0; i < input.size(); ++i)
-            {
-                if constexpr (std::is_floating_point_v<T>)
-                {
-                    T input_val = input[i] + epsilon; // Avoid log(0)
-                    loss += target[i] * Math::log(input_val);
-                }
-            }
-
-            result.set({0}, -loss / static_cast<T>(input.size()));
-            return result;
+            throw std::runtime_error(
+                "Input and target shapes must match for Cross Entropy loss");
         }
-    };
+
+        Tensor<T> result({1});
+        T loss = static_cast<T>(0);
+
+        // Compute -sum(target * log(input + epsilon)) where epsilon prevents
+        // log(0)
+        constexpr T epsilon = static_cast<T>(1e-7);
+
+        for (sizeT i = 0; i < input.size(); ++i)
+        {
+            if constexpr (std::is_floating_point_v<T>)
+            {
+                T input_val = input[i] + epsilon; // Avoid log(0)
+                loss += target[i] * Math::log(input_val);
+            }
+        }
+
+        result.set({0}, -loss / static_cast<T>(input.size()));
+        return result;
+    }
+};
 
 } // namespace hahaha::ml
 

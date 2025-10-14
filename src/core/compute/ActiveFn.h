@@ -28,43 +28,43 @@
 
 HHH_NAMESPACE_IMPORT
 
-    namespace hahaha::ml
+namespace hahaha::ml
 {
 
-    class ActiveFn
+class ActiveFn
+{
+  public:
+    static f32 sigmoid(const f32 x)
     {
-      public:
-        static f32 sigmoid(const f32 x)
-        {
-            return 1.0f / (1.0f + std::exp(-x));
-        }
+        return 1.0f / (1.0f + std::exp(-x));
+    }
 
-        static f32 relu(const f32 x)
-        {
-            return x > 0.0f ? x : 0.0f;
-        }
+    static f32 relu(const f32 x)
+    {
+        return x > 0.0f ? x : 0.0f;
+    }
 
-        static f32 tanh(const f32 x)
-        {
-            return std::tanh(x);
-        }
+    static f32 tanh(const f32 x)
+    {
+        return std::tanh(x);
+    }
 
-        static f32 linear(const f32 x)
-        {
-            return x;
-        }
+    static f32 linear(const f32 x)
+    {
+        return x;
+    }
 
-        static Tensor<f32> softmax(const Tensor<f32>& x)
+    static Tensor<f32> softmax(const Tensor<f32>& x)
+    {
+        Tensor<f32> result(x.shape());
+        result.fill(0);
+        for (sizeT i = 0; i < x.size(); ++i)
         {
-            Tensor<f32> result(x.shape());
-            result.fill(0);
-            for (sizeT i = 0; i < x.size(); ++i)
-            {
-                result[i] = std::exp(x[i]);
-            }
-            return result / result.sum();
+            result[i] = std::exp(x[i]);
         }
-    };
-}
+        return result / result.sum();
+    }
+};
+} // namespace hahaha::ml
 
 #endif // HAHAHA_ACTIVEFN_H

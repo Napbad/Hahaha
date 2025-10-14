@@ -1,7 +1,6 @@
+#include <ds/Vector.h>
 #include <gtest/gtest.h>
 #include <vector>
-
-#include <ds/Vector.h>
 
 using namespace hahaha::core;
 using namespace hahaha::core::ds;
@@ -59,7 +58,9 @@ TYPED_TEST(VectorTest, InitializerListConstructor)
 
 TYPED_TEST(VectorTest, IteratorConstructor)
 {
-    Vector<TypeParam> original = {static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3)};
+    Vector<TypeParam> original = {static_cast<TypeParam>(1),
+                                  static_cast<TypeParam>(2),
+                                  static_cast<TypeParam>(3)};
     Vector<TypeParam> vec(original.begin(), original.end());
     ASSERT_EQ(vec.size(), 3);
     ASSERT_EQ(vec.capacity(), 3);
@@ -70,7 +71,9 @@ TYPED_TEST(VectorTest, IteratorConstructor)
 
 TYPED_TEST(VectorTest, CopyConstructor)
 {
-    Vector<TypeParam> original = {static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3)};
+    Vector<TypeParam> original = {static_cast<TypeParam>(1),
+                                  static_cast<TypeParam>(2),
+                                  static_cast<TypeParam>(3)};
     Vector<TypeParam> copied = original;
 
     ASSERT_EQ(copied.size(), original.size());
@@ -89,7 +92,9 @@ TYPED_TEST(VectorTest, CopyConstructor)
 
 TYPED_TEST(VectorTest, MoveConstructor)
 {
-    Vector<TypeParam> original = {static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3)};
+    Vector<TypeParam> original = {static_cast<TypeParam>(1),
+                                  static_cast<TypeParam>(2),
+                                  static_cast<TypeParam>(3)};
     auto original_data = original.data();
     auto original_size = original.size();
     auto original_capacity = original.capacity();
@@ -107,7 +112,9 @@ TYPED_TEST(VectorTest, MoveConstructor)
 
 TYPED_TEST(VectorTest, CopyAssignment)
 {
-    Vector<TypeParam> original = {static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3)};
+    Vector<TypeParam> original = {static_cast<TypeParam>(1),
+                                  static_cast<TypeParam>(2),
+                                  static_cast<TypeParam>(3)};
     Vector<TypeParam> assigned;
     assigned = original;
 
@@ -130,7 +137,9 @@ TYPED_TEST(VectorTest, CopyAssignment)
 
 TYPED_TEST(VectorTest, MoveAssignment)
 {
-    Vector<TypeParam> original = {static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3)};
+    Vector<TypeParam> original = {static_cast<TypeParam>(1),
+                                  static_cast<TypeParam>(2),
+                                  static_cast<TypeParam>(3)};
     auto original_data = original.data();
     auto original_size = original.size();
     Vector<TypeParam> moved;
@@ -148,10 +157,12 @@ TYPED_TEST(VectorTest, MoveAssignment)
 
 TYPED_TEST(VectorTest, At)
 {
-    Vector<TypeParam> vec = {static_cast<TypeParam>(10), static_cast<TypeParam>(20)};
+    Vector<TypeParam> vec = {static_cast<TypeParam>(10),
+                             static_cast<TypeParam>(20)};
     ASSERT_EQ(vec.at(0), static_cast<TypeParam>(10));
     ASSERT_EQ(vec.at(1), static_cast<TypeParam>(20));
-    ASSERT_THROW((void)vec.at(2), std::out_of_range); // Check for out-of-bounds
+    ASSERT_THROW((void) vec.at(2),
+                 std::out_of_range); // Check for out-of-bounds
 }
 
 TYPED_TEST(VectorTest, OperatorSquareBrackets)
@@ -164,7 +175,9 @@ TYPED_TEST(VectorTest, OperatorSquareBrackets)
 
 TYPED_TEST(VectorTest, FrontBack)
 {
-    Vector<TypeParam> vec = {static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3)};
+    Vector<TypeParam> vec = {static_cast<TypeParam>(1),
+                             static_cast<TypeParam>(2),
+                             static_cast<TypeParam>(3)};
     ASSERT_EQ(vec.front(), static_cast<TypeParam>(1));
     ASSERT_EQ(vec.back(), static_cast<TypeParam>(3));
 }
@@ -178,7 +191,8 @@ TYPED_TEST(VectorTest, Data)
 
 TYPED_TEST(VectorTest, BeginEnd)
 {
-    Vector<TypeParam> vec = {static_cast<TypeParam>(1), static_cast<TypeParam>(2)};
+    Vector<TypeParam> vec = {static_cast<TypeParam>(1),
+                             static_cast<TypeParam>(2)};
     auto it = vec.begin();
     ASSERT_EQ(*it, static_cast<TypeParam>(1));
     ++it;
@@ -213,7 +227,8 @@ TYPED_TEST(VectorTest, Capacity)
 
 TYPED_TEST(VectorTest, Clear)
 {
-    Vector<TypeParam> vec = {static_cast<TypeParam>(1), static_cast<TypeParam>(2)};
+    Vector<TypeParam> vec = {static_cast<TypeParam>(1),
+                             static_cast<TypeParam>(2)};
     vec.clear();
     ASSERT_TRUE(vec.empty());
     ASSERT_EQ(vec.size(), 0);
@@ -222,7 +237,8 @@ TYPED_TEST(VectorTest, Clear)
 
 TYPED_TEST(VectorTest, insert)
 {
-    Vector<TypeParam> vec = {static_cast<TypeParam>(1), static_cast<TypeParam>(3)};
+    Vector<TypeParam> vec = {static_cast<TypeParam>(1),
+                             static_cast<TypeParam>(3)};
     vec.insert(vec.begin() + 1, static_cast<TypeParam>(2));
     ASSERT_EQ(vec.size(), 3);
     ASSERT_EQ(vec[1], static_cast<TypeParam>(2));
@@ -230,7 +246,9 @@ TYPED_TEST(VectorTest, insert)
 
 TYPED_TEST(VectorTest, erase)
 {
-    Vector<TypeParam> vec = {static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3)};
+    Vector<TypeParam> vec = {static_cast<TypeParam>(1),
+                             static_cast<TypeParam>(2),
+                             static_cast<TypeParam>(3)};
     vec.erase(vec.begin() + 1);
     ASSERT_EQ(vec.size(), 2);
     ASSERT_EQ(vec[1], static_cast<TypeParam>(3));
@@ -253,7 +271,8 @@ TYPED_TEST(VectorTest, popBack)
 
 TYPED_TEST(VectorTest, resize)
 {
-     Vector<TypeParam> vec = {static_cast<TypeParam>(1), static_cast<TypeParam>(2)};
+    Vector<TypeParam> vec = {static_cast<TypeParam>(1),
+                             static_cast<TypeParam>(2)};
     vec.resize(5);
     ASSERT_EQ(vec.size(), 5);
     ASSERT_EQ(vec[0], static_cast<TypeParam>(1));
@@ -269,8 +288,11 @@ TYPED_TEST(VectorTest, resize)
 
 TYPED_TEST(VectorTest, swap)
 {
-    Vector<TypeParam> vec1 = {static_cast<TypeParam>(1), static_cast<TypeParam>(2)};
-    Vector<TypeParam> vec2 = {static_cast<TypeParam>(3), static_cast<TypeParam>(4), static_cast<TypeParam>(5)};
+    Vector<TypeParam> vec1 = {static_cast<TypeParam>(1),
+                              static_cast<TypeParam>(2)};
+    Vector<TypeParam> vec2 = {static_cast<TypeParam>(3),
+                              static_cast<TypeParam>(4),
+                              static_cast<TypeParam>(5)};
     vec1.swap(vec2);
     ASSERT_EQ(vec1.size(), 3);
     ASSERT_EQ(vec2.size(), 2);
@@ -314,7 +336,7 @@ TYPED_TEST(VectorTest, EraseRange)
 TYPED_TEST(VectorTest, EmptyVectorAccess)
 {
     Vector<TypeParam> vec;
-    ASSERT_THROW((void)vec.front(), std::out_of_range);
-    ASSERT_THROW((void)vec.back(), std::out_of_range);
+    ASSERT_THROW((void) vec.front(), std::out_of_range);
+    ASSERT_THROW((void) vec.back(), std::out_of_range);
     ASSERT_NO_THROW(vec.popBack()); // Should be safe
 }

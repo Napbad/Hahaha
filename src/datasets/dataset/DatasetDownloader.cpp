@@ -34,15 +34,16 @@ namespace hahaha::ml
 
 using namespace hahaha::core;
 
-size_t write_data(const void* ptr, const size_t size, const size_t nmemb, FILE* stream)
+size_t
+write_data(const void* ptr, const size_t size, const size_t nmemb, FILE* stream)
 {
     const size_t written = fwrite(ptr, size, nmemb, stream);
     return written;
 }
 
 void DatasetDownloader::downloadFromUrl(const String& url,
-                                                                           const String& outputPath,
-                                                                           const bool redownload)
+                                        const String& outputPath,
+                                        const bool redownload)
 {
     if (util::io::fileExists(outputPath) && !redownload)
     {
@@ -86,25 +87,27 @@ void DatasetDownloader::downloadFromUrl(const String& url,
         {
             checkFile.close();
             std::remove(outputPath.cStr());
-            throw std::runtime_error("File not found on server (content starts with 'NOT FOUND')");
+            throw std::runtime_error(
+                "File not found on server (content starts with 'NOT FOUND')");
         }
         checkFile.close();
     }
 }
 
 void DatasetDownloader::downloadFromUCI(const String& dataset_name,
-                                                                           const String& save_path,
-                                                                           const bool redownload)
+                                        const String& save_path,
+                                        const bool redownload)
 {
-    const String base_url("https://archive.ics.uci.edu/ml/machine-learning-databases/");
+    const String base_url(
+        "https://archive.ics.uci.edu/ml/machine-learning-databases/");
     const String url = base_url + dataset_name + "/" + dataset_name + ".data";
     downloadFromUrl(url, save_path, redownload);
 }
 
 void DatasetDownloader::downloadFromKaggle(const String& dataset_name,
-                                                                              const String& save_path,
-                                                                              const String& api_token,
-                                                                              const bool redownload)
+                                           const String& save_path,
+                                           const String& api_token,
+                                           const bool redownload)
 {
     throw std::runtime_error("Not implemented");
 }

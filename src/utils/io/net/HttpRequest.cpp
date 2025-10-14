@@ -20,6 +20,7 @@
 //
 
 #include "io/net/HttpRequest.h"
+
 #include <curl/curl.h>
 
 #include "ds/String.h"
@@ -28,7 +29,8 @@
 namespace hahaha::core::util
 {
 
-HttpRequest::HttpRequest(const ds::String& url, const HttpMethod method) : url_(url), method_(method)
+HttpRequest::HttpRequest(const ds::String& url, const HttpMethod method)
+    : url_(url), method_(method)
 {
 }
 

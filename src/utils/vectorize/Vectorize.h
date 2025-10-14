@@ -40,7 +40,9 @@ class Vectorize
 {
 
   public:
-    template <typename T> static Res<Tensor<T>, VectorizeErr> add(std::initializer_list<Tensor<T>> list)
+    template <typename T>
+    static Res<Tensor<T>, VectorizeErr>
+    add(std::initializer_list<Tensor<T>> list)
     {
         SetRetT(Tensor<T>, VectorizeErr) auto shape = list.begin()->shape();
         for (auto& tensor : list)
@@ -61,7 +63,8 @@ class Vectorize
         Ok(res)
     }
 
-    template <typename T> Res<Tensor<T>, VectorizeErr> sub(std::initializer_list<Tensor<T>> list)
+    template <typename T>
+    Res<Tensor<T>, VectorizeErr> sub(std::initializer_list<Tensor<T>> list)
     {
         SetRetT(Tensor<T>, VectorizeErr) auto shape = list.begin()->shape();
         for (auto& tensor : list)
@@ -83,7 +86,9 @@ class Vectorize
         Ok(res)
     }
 
-    template <typename T> static Res<Tensor<T>, VectorizeErr> mul(std::initializer_list<Tensor<T>> list)
+    template <typename T>
+    static Res<Tensor<T>, VectorizeErr>
+    mul(std::initializer_list<Tensor<T>> list)
     {
         SetRetT(Tensor<T>, VectorizeErr) auto shape = list.begin()->shape();
         for (auto& tensor : list)
@@ -103,7 +108,9 @@ class Vectorize
         Ok(res)
     }
 
-    template <typename T> static Res<Tensor<T>, VectorizeErr> div(std::initializer_list<Tensor<T>> list)
+    template <typename T>
+    static Res<Tensor<T>, VectorizeErr>
+    div(std::initializer_list<Tensor<T>> list)
     {
         SetRetT(Tensor<T>, VectorizeErr) auto shape = list.begin()->shape();
         for (auto& tensor : list)

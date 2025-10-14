@@ -39,7 +39,8 @@ template <typename R, typename... Args> struct function_traits<R(Args...)>
     using return_type = R;
 };
 
-template <typename R, typename... Args> struct function_traits<R (*)(Args...)> : function_traits<R(Args...)>
+template <typename R, typename... Args>
+struct function_traits<R (*)(Args...)> : function_traits<R(Args...)>
 {
 };
 
@@ -53,7 +54,8 @@ struct function_traits<R (C::*)(Args...) const> : function_traits<R(Args...)>
 {
 };
 
-template <typename T> struct function_traits : function_traits<decltype(&T::operator())>
+template <typename T>
+struct function_traits : function_traits<decltype(&T::operator())>
 {
 };
 
@@ -67,33 +69,44 @@ template <typename T, typename E> class Res
     using ErrorType = E;
 
     // Constructors for value
-    template <typename U = T, typename = std::enable_if_t<!std::is_same_v<U, void>>>
-    explicit Res(U&& value) : data(std::in_place_type<ValueType>, std::forward<U>(value))
+    template <typename U = T,
+              typename = std::enable_if_t<!std::is_same_v<U, void>>>
+    explicit Res(U&& value)
+        : data(std::in_place_type<ValueType>, std::forward<U>(value))
     {
     }
 
-    template <typename U = T, typename = std::enable_if_t<!std::is_same_v<U, void>>>
+    template <typename U = T,
+              typename = std::enable_if_t<!std::is_same_v<U, void>>>
     explicit Res(const U& value) : data(std::in_place_type<ValueType>, value)
     {
     }
 
     // Constructor for void
-    template <typename U = T, typename = std::enable_if_t<std::is_same_v<U, void>>>
+    template <typename U = T,
+              typename = std::enable_if_t<std::is_same_v<U, void>>>
     explicit Res() : data(std::in_place_type<VoidType>)
     {
     }
 
     // Constructors for error
-    explicit Res(E&& error) : data(std::in_place_type<std::unique_ptr<E>>, std::make_unique<E>(std::move(error)))
+    explicit Res(E&& error)
+        : data(std::in_place_type<std::unique_ptr<E>>,
+               std::make_unique<E>(std::move(error)))
     {
     }
-    explicit Res(const E& error) : data(std::in_place_type<std::unique_ptr<E>>, std::make_unique<E>(error))
+    explicit Res(const E& error)
+        : data(std::in_place_type<std::unique_ptr<E>>,
+               std::make_unique<E>(error))
     {
     }
-    explicit Res(std::unique_ptr<E>&& error) : data(std::in_place_type<std::unique_ptr<E>>, std::move(error))
+    explicit Res(std::unique_ptr<E>&& error)
+        : data(std::in_place_type<std::unique_ptr<E>>, std::move(error))
     {
     }
-    explicit Res(E* error) : data(std::in_place_type<std::unique_ptr<E>>, std::unique_ptr<E>(error))
+    explicit Res(E* error)
+        : data(std::in_place_type<std::unique_ptr<E>>,
+               std::unique_ptr<E>(error))
     {
     }
 
@@ -102,12 +115,14 @@ template <typename T, typename E> class Res
     {
         if (other.isOk())
         {
-            data = std::variant<ValueType, std::unique_ptr<E>>(std::in_place_index<0>, std::get<ValueType>(other.data));
+            data = std::variant<ValueType, std::unique_ptr<E>>(
+                std::in_place_index<0>, std::get<ValueType>(other.data));
         }
         else
         {
             data = std::variant<ValueType, std::unique_ptr<E>>(
-                std::in_place_index<1>, std::make_unique<E>(*std::get<std::unique_ptr<E>>(other.data)));
+                std::in_place_index<1>,
+                std::make_unique<E>(*std::get<std::unique_ptr<E>>(other.data)));
         }
     }
 
@@ -117,13 +132,15 @@ template <typename T, typename E> class Res
         {
             if (other.isOk())
             {
-                data = std::variant<ValueType, std::unique_ptr<E>>(std::in_place_index<0>,
-                                                                   std::get<ValueType>(other.data));
+                data = std::variant<ValueType, std::unique_ptr<E>>(
+                    std::in_place_index<0>, std::get<ValueType>(other.data));
             }
             else
             {
                 data = std::variant<ValueType, std::unique_ptr<E>>(
-                    std::in_place_index<1>, std::make_unique<E>(*std::get<std::unique_ptr<E>>(other.data)));
+                    std::in_place_index<1>,
+                    std::make_unique<E>(
+                        *std::get<std::unique_ptr<E>>(other.data)));
             }
         }
         return *this;
@@ -134,18 +151,24 @@ template <typename T, typename E> class Res
     Res& operator=(Res&&) noexcept = default;
 
     // Static factory methods for value
-    template <typename U = T, typename = std::enable_if_t<!std::is_same_v<U, void>>> static Res ok(U&& value)
+    template <typename U = T,
+              typename = std::enable_if_t<!std::is_same_v<U, void>>>
+    static Res ok(U&& value)
     {
         return Res(std::forward<U>(value));
     }
 
-    template <typename U = T, typename = std::enable_if_t<!std::is_same_v<U, void>>> static Res ok(const U& value)
+    template <typename U = T,
+              typename = std::enable_if_t<!std::is_same_v<U, void>>>
+    static Res ok(const U& value)
     {
         return Res(value);
     }
 
     // Static factory method for void
-    template <typename U = T, typename = std::enable_if_t<std::is_same_v<U, void>>> static Res ok()
+    template <typename U = T,
+              typename = std::enable_if_t<std::is_same_v<U, void>>>
+    static Res ok()
     {
         return Res();
     }
@@ -179,7 +202,8 @@ template <typename T, typename E> class Res
     }
 
     // Value access
-    template <typename U = T> std::enable_if_t<!std::is_same_v<U, void>, U&> unwrap() &
+    template <typename U = T>
+    std::enable_if_t<!std::is_same_v<U, void>, U&> unwrap() &
     {
         if (!isOk())
         {
@@ -188,7 +212,8 @@ template <typename T, typename E> class Res
         return std::get<ValueType>(data);
     }
 
-    template <typename U = T> std::enable_if_t<std::is_same_v<U, void>> unwrap() &
+    template <typename U = T>
+    std::enable_if_t<std::is_same_v<U, void>> unwrap() &
     {
         if (!isOk())
         {
@@ -196,7 +221,8 @@ template <typename T, typename E> class Res
         }
     }
 
-    template <typename U = T> std::enable_if_t<!std::is_same_v<U, void>, const U&> unwrap() const&
+    template <typename U = T>
+    std::enable_if_t<!std::is_same_v<U, void>, const U&> unwrap() const&
     {
         if (!isOk())
         {
@@ -205,7 +231,8 @@ template <typename T, typename E> class Res
         return std::get<ValueType>(data);
     }
 
-    template <typename U = T> std::enable_if_t<std::is_same_v<U, void>> unwrap() const&
+    template <typename U = T>
+    std::enable_if_t<std::is_same_v<U, void>> unwrap() const&
     {
         if (!isOk())
         {
@@ -213,7 +240,8 @@ template <typename T, typename E> class Res
         }
     }
 
-    template <typename U = T> std::enable_if_t<!std::is_same_v<U, void>, U&&> unwrap() &&
+    template <typename U = T>
+    std::enable_if_t<!std::is_same_v<U, void>, U&&> unwrap() &&
     {
         if (!isOk())
         {
@@ -222,7 +250,8 @@ template <typename T, typename E> class Res
         return std::move(std::get<ValueType>(data));
     }
 
-    template <typename U = T> std::enable_if_t<std::is_same_v<U, void>> unwrap() &&
+    template <typename U = T>
+    std::enable_if_t<std::is_same_v<U, void>> unwrap() &&
     {
         if (!isOk())
         {
@@ -261,7 +290,8 @@ template <typename T, typename E> class Res
     // Map operations
     template <typename F> auto map(F&& f) const&
     {
-        using RetType = function_traits<std::remove_reference_t<F>>::return_type;
+        using RetType =
+            function_traits<std::remove_reference_t<F>>::return_type;
         if (isOk())
         {
             if constexpr (std::is_same_v<T, void>)
@@ -278,7 +308,8 @@ template <typename T, typename E> class Res
 
     template <typename F> auto map(F&& f) &&
     {
-        using RetType = function_traits<std::remove_reference_t<F>>::return_type;
+        using RetType =
+            function_traits<std::remove_reference_t<F>>::return_type;
         if (isOk())
         {
             if constexpr (std::is_same_v<T, void>)
@@ -287,19 +318,23 @@ template <typename T, typename E> class Res
             }
             else
             {
-                return Res<RetType, E>::ok(f(std::move(std::get<ValueType>(data))));
+                return Res<RetType, E>::ok(
+                    f(std::move(std::get<ValueType>(data))));
             }
         }
-        return Res<RetType, E>::err(std::move(*std::get<std::unique_ptr<E>>(data)));
+        return Res<RetType, E>::err(
+            std::move(*std::get<std::unique_ptr<E>>(data)));
     }
 
     // MapErr operations
     template <typename F> auto mapErr(F&& f) const&
     {
-        using NewError = function_traits<std::remove_reference_t<F>>::return_type;
+        using NewError =
+            function_traits<std::remove_reference_t<F>>::return_type;
         if (isErr())
         {
-            return Res<T, NewError>::err(f(*std::get<std::unique_ptr<E>>(data)));
+            return Res<T, NewError>::err(
+                f(*std::get<std::unique_ptr<E>>(data)));
         }
         if constexpr (std::is_same_v<T, void>)
         {
@@ -313,10 +348,12 @@ template <typename T, typename E> class Res
 
     template <typename F> auto mapErr(F&& f) &&
     {
-        using NewError = function_traits<std::remove_reference_t<F>>::return_type;
+        using NewError =
+            function_traits<std::remove_reference_t<F>>::return_type;
         if (isErr())
         {
-            return Res<T, NewError>::err(f(std::move(*std::get<std::unique_ptr<E>>(data))));
+            return Res<T, NewError>::err(
+                f(std::move(*std::get<std::unique_ptr<E>>(data))));
         }
         if constexpr (std::is_same_v<T, void>)
         {
@@ -333,13 +370,14 @@ template <typename T, typename E> class Res
 };
 
 // Macros for easier use
-#define SetRetT(T, E)                                                                                                  \
-    using RetTypeForReturnMacroUse = Res<T, E>;                                                                                         \
-    using ErrTypeForReturnMacroUse = E;                                                                                                 \
+#define SetRetT(T, E)                                                          \
+    using RetTypeForReturnMacroUse = Res<T, E>;                                \
+    using ErrTypeForReturnMacroUse = E;                                        \
     using ValueTypeForReturnMacroUse = T;
 #define Ok(Val) return RetTypeForReturnMacroUse::ok(Val);
 #define OkVoid() return RetTypeForReturnMacroUse::ok();
-#define Err(Error) return RetTypeForReturnMacroUse::err(ErrTypeForReturnMacroUse(Error));
+#define Err(Error)                                                             \
+    return RetTypeForReturnMacroUse::err(ErrTypeForReturnMacroUse(Error));
 #define newE(ErrorT, ...) (new ErrorT(__VA_ARGS__))
 
 } // namespace hahaha

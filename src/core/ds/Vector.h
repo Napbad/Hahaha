@@ -37,8 +37,7 @@
 
 namespace hahaha::ml
 {
-template<typename T>
-    class Tensor;
+template <typename T> class Tensor;
 }
 
 namespace hahaha::core::ds
@@ -65,32 +64,38 @@ template <class T, class Allocator = std::allocator<T>> class Vector
     {
     }
 
-    explicit Vector(const SizeType count) : data_(nullptr), size_(0), capacity_(0)
+    explicit Vector(const SizeType count)
+        : data_(nullptr), size_(0), capacity_(0)
     {
         if (count > 0)
         {
             reserve(count);
             for (sizeT i = 0; i < count; ++i)
             {
-                std::allocator_traits<Allocator>::construct(allocator_, data_ + i);
+                std::allocator_traits<Allocator>::construct(allocator_,
+                                                            data_ + i);
             }
             capacity_ = count;
         }
     }
 
-    Vector(std::initializer_list<T> init) : data_(nullptr), size_(0), capacity_(0)
+    Vector(std::initializer_list<T> init)
+        : data_(nullptr), size_(0), capacity_(0)
     {
         reserve(init.size());
         size_ = init.size();
         sizeT idx = 0;
         for (const auto& i : init)
         {
-            std::allocator_traits<Allocator>::construct(allocator_, data_ + idx, i);
+            std::allocator_traits<Allocator>::construct(
+                allocator_, data_ + idx, i);
             idx++;
         }
     }
 
-    explicit Vector(Vector<T>::ConstIterator begin, Vector<T>::ConstIterator end) : data_(nullptr), size_(0), capacity_(0)
+    explicit Vector(Vector<T>::ConstIterator begin,
+                    Vector<T>::ConstIterator end)
+        : data_(nullptr), size_(0), capacity_(0)
     {
         size_ = end - begin;
         capacity_ = size_;
@@ -99,7 +104,8 @@ template <class T, class Allocator = std::allocator<T>> class Vector
             data_ = allocator_.allocate(capacity_);
             for (auto i = begin; i < end; ++i)
             {
-                std::allocator_traits<Allocator>::construct(allocator_, data_ + (i - begin), *i);
+                std::allocator_traits<Allocator>::construct(
+                    allocator_, data_ + (i - begin), *i);
             }
         }
     }
@@ -112,13 +118,15 @@ template <class T, class Allocator = std::allocator<T>> class Vector
             data_ = allocator_.allocate(capacity_);
             for (sizeT i = 0; i < size_; ++i)
             {
-                std::allocator_traits<Allocator>::construct(allocator_, data_ + i, other.data_[i]);
+                std::allocator_traits<Allocator>::construct(
+                    allocator_, data_ + i, other.data_[i]);
             }
         }
     }
 
     // Move constructor
-    Vector(Vector&& other) noexcept : data_(other.data_), size_(other.size_), capacity_(other.capacity_)
+    Vector(Vector&& other) noexcept
+        : data_(other.data_), size_(other.size_), capacity_(other.capacity_)
     {
         other.data_ = nullptr;
         other.size_ = 0;
@@ -143,7 +151,8 @@ template <class T, class Allocator = std::allocator<T>> class Vector
             // Destroy existing elements
             for (sizeT i = 0; i < size_; ++i)
             {
-                std::allocator_traits<Allocator>::destroy(allocator_, data_ + i);
+                std::allocator_traits<Allocator>::destroy(allocator_,
+                                                          data_ + i);
             }
             // Deallocate old memory if needed
             if (capacity_ < other.size_)
@@ -156,7 +165,8 @@ template <class T, class Allocator = std::allocator<T>> class Vector
             size_ = other.size_;
             for (sizeT i = 0; i < size_; ++i)
             {
-                std::allocator_traits<Allocator>::construct(allocator_, data_ + i, other.data_[i]);
+                std::allocator_traits<Allocator>::construct(
+                    allocator_, data_ + i, other.data_[i]);
             }
         }
         return *this;
@@ -170,7 +180,8 @@ template <class T, class Allocator = std::allocator<T>> class Vector
             // Destroy existing elements
             for (sizeT i = 0; i < size_; ++i)
             {
-                std::allocator_traits<Allocator>::destroy(allocator_, data_ + i);
+                std::allocator_traits<Allocator>::destroy(allocator_,
+                                                          data_ + i);
             }
             allocator_.deallocate(data_, capacity_);
 
@@ -190,7 +201,8 @@ template <class T, class Allocator = std::allocator<T>> class Vector
         {
             reserve(size_ == 0 ? 1 : size_ * 2);
         }
-        std::allocator_traits<Allocator>::construct(allocator_, data_ + size_, value);
+        std::allocator_traits<Allocator>::construct(
+            allocator_, data_ + size_, value);
         size_++;
     }
 
@@ -277,8 +289,10 @@ template <class T, class Allocator = std::allocator<T>> class Vector
             // Move existing elements to new storage
             for (sizeT i = 0; i < size_; ++i)
             {
-                std::allocator_traits<Allocator>::construct(allocator_, new_data + i, std::move(data_[i]));
-                std::allocator_traits<Allocator>::destroy(allocator_, data_ + i);
+                std::allocator_traits<Allocator>::construct(
+                    allocator_, new_data + i, std::move(data_[i]));
+                std::allocator_traits<Allocator>::destroy(allocator_,
+                                                          data_ + i);
             }
 
             allocator_.deallocate(data_, capacity_);
@@ -297,8 +311,10 @@ template <class T, class Allocator = std::allocator<T>> class Vector
                 new_data = allocator_.allocate(size_);
                 for (sizeT i = 0; i < size_; ++i)
                 {
-                    std::allocator_traits<Allocator>::construct(allocator_, new_data + i, std::move(data_[i]));
-                    std::allocator_traits<Allocator>::destroy(allocator_, data_ + i);
+                    std::allocator_traits<Allocator>::construct(
+                        allocator_, new_data + i, std::move(data_[i]));
+                    std::allocator_traits<Allocator>::destroy(allocator_,
+                                                              data_ + i);
                 }
             }
             allocator_.deallocate(data_, capacity_);
@@ -317,7 +333,8 @@ template <class T, class Allocator = std::allocator<T>> class Vector
         if (start + length > size_)
         {
             // Handle error: sub-vector out of bounds
-            throw std::out_of_range("subVector: sub-vector range out of bounds");
+            throw std::out_of_range(
+                "subVector: sub-vector range out of bounds");
         }
         Vector<T> res(length);
         for (sizeT i = 0; i < length; ++i)
@@ -342,7 +359,8 @@ template <class T, class Allocator = std::allocator<T>> class Vector
     {
         if (size_ > 0)
         {
-            std::allocator_traits<Allocator>::destroy(allocator_, data_ + size_ - 1);
+            std::allocator_traits<Allocator>::destroy(allocator_,
+                                                      data_ + size_ - 1);
             size_--;
         }
     }
@@ -357,14 +375,16 @@ template <class T, class Allocator = std::allocator<T>> class Vector
         {
             for (sizeT i = size_; i < newSize; ++i)
             {
-                std::allocator_traits<Allocator>::construct(allocator_, data_ + i);
+                std::allocator_traits<Allocator>::construct(allocator_,
+                                                            data_ + i);
             }
         }
         else if (newSize < size_)
         {
             for (sizeT i = newSize; i < size_; ++i)
             {
-                std::allocator_traits<Allocator>::destroy(allocator_, data_ + i);
+                std::allocator_traits<Allocator>::destroy(allocator_,
+                                                          data_ + i);
             }
         }
         size_ = newSize;
@@ -387,10 +407,13 @@ template <class T, class Allocator = std::allocator<T>> class Vector
         // Shift elements to the right
         for (sizeT i = size_; i > index; --i)
         {
-            std::allocator_traits<Allocator>::construct(allocator_, data_ + i, std::move(data_[i - 1]));
-            std::allocator_traits<Allocator>::destroy(allocator_, data_ + (i - 1));
+            std::allocator_traits<Allocator>::construct(
+                allocator_, data_ + i, std::move(data_[i - 1]));
+            std::allocator_traits<Allocator>::destroy(allocator_,
+                                                      data_ + (i - 1));
         }
-        std::allocator_traits<Allocator>::construct(allocator_, data_ + index, value);
+        std::allocator_traits<Allocator>::construct(
+            allocator_, data_ + index, value);
         size_++;
     }
 
@@ -404,10 +427,13 @@ template <class T, class Allocator = std::allocator<T>> class Vector
         // Shift elements to the left
         for (sizeT i = index; i < size_ - 1; ++i)
         {
-            std::allocator_traits<Allocator>::construct(allocator_, data_ + i, std::move(data_[i + 1]));
-            std::allocator_traits<Allocator>::destroy(allocator_, data_ + (i + 1));
+            std::allocator_traits<Allocator>::construct(
+                allocator_, data_ + i, std::move(data_[i + 1]));
+            std::allocator_traits<Allocator>::destroy(allocator_,
+                                                      data_ + (i + 1));
         }
-        std::allocator_traits<Allocator>::destroy(allocator_, data_ + (size_ - 1));
+        std::allocator_traits<Allocator>::destroy(allocator_,
+                                                  data_ + (size_ - 1));
         size_--;
         return begin() + index;
     }
@@ -424,7 +450,8 @@ template <class T, class Allocator = std::allocator<T>> class Vector
         {
             for (sizeT i = startIdx; i < size_; ++i)
             {
-                std::allocator_traits<Allocator>::destroy(allocator_, data_ + i);
+                std::allocator_traits<Allocator>::destroy(allocator_,
+                                                          data_ + i);
             }
             size_ = startIdx;
             return begin() + startIdx;
@@ -432,8 +459,12 @@ template <class T, class Allocator = std::allocator<T>> class Vector
         // Shift elements to the left
         for (sizeT i = startIdx; i < size_ - (endIdx - startIdx); ++i)
         {
-            std::allocator_traits<Allocator>::construct(allocator_, data_ + i, std::move(data_[i + (endIdx - startIdx)]));
-            std::allocator_traits<Allocator>::destroy(allocator_, data_ + (i + (endIdx - startIdx)));
+            std::allocator_traits<Allocator>::construct(
+                allocator_,
+                data_ + i,
+                std::move(data_[i + (endIdx - startIdx)]));
+            std::allocator_traits<Allocator>::destroy(
+                allocator_, data_ + (i + (endIdx - startIdx)));
         }
         size_ = size_ - (endIdx - startIdx);
         return begin() + startIdx;
@@ -515,8 +546,9 @@ template <class T, class Allocator = std::allocator<T>> class Vector
     sizeT capacity_ = 0;
 };
 
-template<class T, class Allocator>
-inline std::ostream& operator<<(std::ostream& os, const Vector<T, Allocator>& vec)
+template <class T, class Allocator>
+inline std::ostream& operator<<(std::ostream& os,
+                                const Vector<T, Allocator>& vec)
 {
     os << vec.toString().c_str();
     return os;

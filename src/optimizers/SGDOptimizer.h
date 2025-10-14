@@ -33,7 +33,8 @@ namespace hahaha::ml
 template <typename T> class SGDOptimizer final : public Optimizer<T>
 {
   public:
-    SGDOptimizer(const ds::Vector<Variable<T>*>& parameters, const f64 learningRate)
+    SGDOptimizer(const ds::Vector<Variable<T>*>& parameters,
+                 const f64 learningRate)
         : Optimizer<T>(parameters, learningRate)
     {
     }
@@ -45,5 +46,5 @@ template <typename T> class SGDOptimizer final : public Optimizer<T>
         }
     }
 };
-}
+} // namespace hahaha::ml
 #endif // HAHAHA_SGDOPTIMIZER_H

@@ -28,30 +28,31 @@
 
 HHH_NAMESPACE_IMPORT
 
-    namespace hahaha::ml
+namespace hahaha::ml
 {
-    template <typename T> class Optimizer
+template <typename T> class Optimizer
+{
+
+  public:
+    virtual ~Optimizer() = default;
+    Optimizer(const ds::Vector<Variable<T>*>& parameters,
+              const f64 learningRate)
+        : _parameters(parameters), _learningRate(learningRate)
     {
-
-      public:
-        virtual ~Optimizer() = default;
-        Optimizer(const ds::Vector<Variable<T>*>& parameters, const f64 learningRate)
-            : _parameters(parameters), _learningRate(learningRate)
+    }
+    virtual void step() = 0;
+    virtual void zero_grad()
+    {
+        for (auto& param : _parameters)
         {
+            param->zeroGrad();
         }
-        virtual void step() = 0;
-        virtual void zero_grad()
-        {
-            for (auto& param : _parameters)
-            {
-                param->zeroGrad();
-            }
-        }
+    }
 
-      protected:
-        ds::Vector<Variable<T>*> _parameters{};
-        f64 _learningRate;
-    };
-}
+  protected:
+    ds::Vector<Variable<T>*> _parameters{};
+    f64 _learningRate;
+};
+} // namespace hahaha::ml
 
 #endif // HAHAHA_OPTIMIZER_H

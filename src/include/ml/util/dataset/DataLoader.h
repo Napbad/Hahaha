@@ -18,12 +18,12 @@
 #ifndef HIAHIAHIA_DATALOADER_H
 #define HIAHIAHIA_DATALOADER_H
 
-#include <Res.h>
-#include <ds/Vector.h>
 #include <Error.h>
-#include <memory>
+#include <Res.h>
 #include <dataset/Dataset.h>
 #include <dataset/Sample.h>
+#include <ds/Vector.h>
+#include <memory>
 #include <random>
 
 namespace hahaha::ml
@@ -35,7 +35,8 @@ namespace hahaha::ml
 class DataLoaderError : public Error
 {
   public:
-    explicit DataLoaderError(ds::String message, ds::String location = ds::String("DataLoader"))
+    explicit DataLoaderError(ds::String message,
+                             ds::String location = ds::String("DataLoader"))
         : message_(std::move(message)), location_(std::move(location))
     {
     }
@@ -54,7 +55,8 @@ class DataLoaderError : public Error
     }
     [[nodiscard]] ds::String toString() const override
     {
-        return typeName() + ds::String(": ") + message() + ds::String(" at ") + location();
+        return typeName() + ds::String(": ") + message() + ds::String(" at ")
+            + location();
     }
 
   private:
@@ -74,8 +76,12 @@ template <typename T> class DataLoader
     /**
      * Create a new DataLoader
      */
-    DataLoader(std::shared_ptr<Dataset<T>> dataset, size_t batchSize, bool shuffle = true, bool dropLast = false)
-        : dataset_(std::move(dataset)), batchSize_(batchSize), shuffle_(shuffle), dropLast_(dropLast), currentIndex_(0)
+    DataLoader(std::shared_ptr<Dataset<T>> dataset,
+               size_t batchSize,
+               bool shuffle = true,
+               bool dropLast = false)
+        : dataset_(std::move(dataset)), batchSize_(batchSize),
+          shuffle_(shuffle), dropLast_(dropLast), currentIndex_(0)
     {
         if (shuffle_)
         {
@@ -116,9 +122,11 @@ template <typename T> class DataLoader
         }
 
         ds::Vector<Sample<T>> batch;
-        const size_t remaining = std::min(batchSize_, dataset_->size() - currentIndex_);
+        const size_t remaining =
+            std::min(batchSize_, dataset_->size() - currentIndex_);
 
-        // If drop_last is true and this is the last incomplete batch, return error
+        // If drop_last is true and this is the last incomplete batch, return
+        // error
         if (dropLast_ && remaining < batchSize_)
         {
             Err(DataLoaderError(ds::String("Dropping last incomplete batch")));

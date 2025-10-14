@@ -59,7 +59,8 @@ class TestError final : public Error
     }
     [[nodiscard]] String toString() const override
     {
-        return typeName() + String(": ") + message() + String(" at ") + location();
+        return typeName() + String(": ") + message() + String(" at ")
+            + location();
     }
 
     bool operator==(const TestError& other) const
@@ -205,22 +206,27 @@ TEST_F(ResTest, MapErr)
     Res<int, TestError> err = Res<int, TestError>::err(TestError("error"));
 
     // MapErr on Ok value
-    auto mappedOk =
-        ok.mapErr([](const TestError& e) { return TestError(std::string(e.message().cStr()) + "-mapped"); });
+    auto mappedOk = ok.mapErr(
+        [](const TestError& e)
+        { return TestError(std::string(e.message().cStr()) + "-mapped"); });
     EXPECT_TRUE(mappedOk.isOk());
     EXPECT_EQ(mappedOk.unwrap(), 42);
 
     // MapErr on Err value
-    auto mappedErr =
-        err.mapErr([](const TestError& e) { return TestError(std::string(e.message().cStr()) + "-mapped"); });
+    auto mappedErr = err.mapErr(
+        [](const TestError& e)
+        { return TestError(std::string(e.message().cStr()) + "-mapped"); });
     EXPECT_TRUE(mappedErr.isErr());
-    EXPECT_EQ(mappedErr.unwrapErr().message().cStr(), std::string("error-mapped"));
+    EXPECT_EQ(mappedErr.unwrapErr().message().cStr(),
+              std::string("error-mapped"));
 
     // Move semantics with mapErr
-    auto movedMap =
-        std::move(err).mapErr([](TestError&& e) { return TestError(std::string(e.message().cStr()) + "-moved"); });
+    auto movedMap = std::move(err).mapErr(
+        [](TestError&& e)
+        { return TestError(std::string(e.message().cStr()) + "-moved"); });
     EXPECT_TRUE(movedMap.isErr());
-    EXPECT_EQ(movedMap.unwrapErr().message().cStr(), std::string("error-moved"));
+    EXPECT_EQ(movedMap.unwrapErr().message().cStr(),
+              std::string("error-moved"));
 }
 
 // Test the macros
@@ -248,20 +254,23 @@ TEST_F(ResTest, Macros)
     // Test Err case
     auto errResult = testFunc(false);
     EXPECT_TRUE(errResult.isErr());
-    EXPECT_EQ(errResult.unwrapErr().message().cStr(), std::string("macro-error"));
+    EXPECT_EQ(errResult.unwrapErr().message().cStr(),
+              std::string("macro-error"));
 }
 
 // Test with complex types
 TEST_F(ResTest, ComplexTypes)
 {
     // Using string as the value type
-    Res<std::string, TestError> strRes = Res<std::string, TestError>::ok(std::string("hello"));
+    Res<std::string, TestError> strRes =
+        Res<std::string, TestError>::ok(std::string("hello"));
     EXPECT_TRUE(strRes.isOk());
     EXPECT_EQ(strRes.unwrap(), "hello");
 
     // Using unique_ptr as the value type
     auto ptr = std::make_unique<int>(42);
-    Res<std::unique_ptr<int>, TestError> ptrRes = Res<std::unique_ptr<int>, TestError>::ok(std::move(ptr));
+    Res<std::unique_ptr<int>, TestError> ptrRes =
+        Res<std::unique_ptr<int>, TestError>::ok(std::move(ptr));
     EXPECT_TRUE(ptrRes.isOk());
     EXPECT_EQ(*ptrRes.unwrap(), 42);
 }
@@ -272,17 +281,25 @@ TEST_F(ResTest, TypeTransformation)
     Res<int, TestError> intRes = Res<int, TestError>::ok(42);
 
     // Transform int to string
-    auto stringRes = intRes.map([](const int& val) { return std::to_string(val); });
+    auto stringRes =
+        intRes.map([](const int& val) { return std::to_string(val); });
     EXPECT_TRUE(stringRes.isOk());
     EXPECT_EQ(stringRes.unwrap(), "42");
 
     // Transform error type
-    Res<int, TestError> errRes = Res<int, TestError>::err(TestError("old-error"));
+    Res<int, TestError> errRes =
+        Res<int, TestError>::err(TestError("old-error"));
     auto newErrRes = errRes.mapErr(
-        [](const TestError& e) { return TestError(std::string(e.message().cStr()) + "-transformed", "new-location"); });
+        [](const TestError& e)
+        {
+            return TestError(std::string(e.message().cStr()) + "-transformed",
+                             "new-location");
+        });
     EXPECT_TRUE(newErrRes.isErr());
-    EXPECT_EQ(newErrRes.unwrapErr().message().cStr(), std::string("old-error-transformed"));
-    EXPECT_EQ(newErrRes.unwrapErr().location().cStr(), std::string("new-location"));
+    EXPECT_EQ(newErrRes.unwrapErr().message().cStr(),
+              std::string("old-error-transformed"));
+    EXPECT_EQ(newErrRes.unwrapErr().location().cStr(),
+              std::string("new-location"));
 }
 
 } // namespace hahaha::test

@@ -37,32 +37,15 @@
 namespace hahaha::core::util
 {
 // ANSI escape codes for colors
-const ds::String RESET = "\033[0m";
-const ds::String BLACK = "\033[30m";
-const ds::String RED = "\033[31m";
-const ds::String GREEN = "\033[32m";
-const ds::String YELLOW = "\033[33m";
-const ds::String BLUE = "\033[34m";
-const ds::String MAGENTA = "\033[35m";
-const ds::String CYAN = "\033[36m";
-const ds::String WHITE = "\033[37m";
-
-inline ds::String getLogLevelColor(const LogLevel level) {
-    switch (level) {
-        case LogLevel::DEBUG:
-            return CYAN;
-        case LogLevel::INFO:
-            return GREEN;
-        case LogLevel::WARNING:
-            return YELLOW;
-        case LogLevel::ERROR:
-            return RED;
-        case LogLevel::FATAL:
-            return MAGENTA;
-        default:
-            return RESET;
-    }
-}
+const ds::String RESET("\033[0m");
+const ds::String BLACK("\033[30m");
+const ds::String RED("\033[31m");
+const ds::String GREEN("\033[32m");
+const ds::String YELLOW("\033[33m");
+const ds::String BLUE("\033[34m");
+const ds::String MAGENTA("\033[35m");
+const ds::String CYAN("\033[36m");
+const ds::String WHITE("\033[37m");
 
 enum class LogLevel
 {
@@ -72,6 +55,25 @@ enum class LogLevel
     ERROR,
     FATAL
 };
+
+inline ds::String getLogLevelColor(LogLevel level)
+{
+    switch (level)
+    {
+    case LogLevel::DEBUG:
+        return CYAN;
+    case LogLevel::INFO:
+        return GREEN;
+    case LogLevel::WARNING:
+        return YELLOW;
+    case LogLevel::ERROR:
+        return RED;
+    case LogLevel::FATAL:
+        return MAGENTA;
+    default:
+        return RESET;
+    }
+}
 
 static auto _globalLevel = LogLevel::INFO;
 
@@ -102,8 +104,9 @@ enum class TimeFormat
     DATE_ONLY       // 2023-12-07
 };
 
-inline ds::String formatTimePoint(const std::chrono::system_clock::time_point& tp,
-                                  const TimeFormat format = TimeFormat::HUMAN_READABLE)
+inline ds::String
+formatTimePoint(const std::chrono::system_clock::time_point& tp,
+                const TimeFormat format = TimeFormat::HUMAN_READABLE)
 {
     const auto time = std::chrono::system_clock::to_time_t(tp);
     const std::tm tm = *std::localtime(&time);
@@ -140,7 +143,8 @@ struct LogEntry
 
     [[nodiscard]] ds::String toStr() const
     {
-        return ds::String("[") + logLevelToStr(level) + "]" + "(" + formatTimePoint(timestamp) + ")" + message;
+        return ds::String("[") + logLevelToStr(level) + "]" + "("
+            + formatTimePoint(timestamp) + ")" + message;
     }
 };
 
@@ -278,7 +282,9 @@ class Logger
         while (running_.load())
         {
             std::unique_lock lock(_queueMutex);
-            _queueCond.wait(lock, [this] { return !_messageQueue.empty() || !running_.load(); });
+            _queueCond.wait(
+                lock,
+                [this] { return !_messageQueue.empty() || !running_.load(); });
 
             if (!running_.load())
             {
@@ -298,40 +304,40 @@ class Logger
     }
 };
 
-#define info(msg)                                                                                                      \
-    Logger::getInstance().log(LogEntry{LogLevel::INFO,                                                                 \
-                                       ds::String(msg),                                                                   \
-                                       std::this_thread::get_id(),                                                     \
-                                       std::chrono::system_clock::now(),                                               \
-                                       __FILE__,                                                                       \
+#define info(msg)                                                              \
+    Logger::getInstance().log(LogEntry{LogLevel::INFO,                         \
+                                       ds::String(msg),                        \
+                                       std::this_thread::get_id(),             \
+                                       std::chrono::system_clock::now(),       \
+                                       __FILE__,                               \
                                        __LINE__})
-#define debug(msg)                                                                                                     \
-    Logger::getInstance().log(LogEntry{LogLevel::DEBUG,                                                                \
-                                       ds::String(msg),                                                                   \
-                                       std::this_thread::get_id(),                                                     \
-                                       std::chrono::system_clock::now(),                                               \
-                                       __FILE__,                                                                       \
+#define debug(msg)                                                             \
+    Logger::getInstance().log(LogEntry{LogLevel::DEBUG,                        \
+                                       ds::String(msg),                        \
+                                       std::this_thread::get_id(),             \
+                                       std::chrono::system_clock::now(),       \
+                                       __FILE__,                               \
                                        __LINE__})
-#define warning(msg)                                                                                                   \
-    Logger::getInstance().log(LogEntry{LogLevel::WARNING,                                                              \
-                                       ds::String(msg),                                                                   \
-                                       std::this_thread::get_id(),                                                     \
-                                       std::chrono::system_clock::now(),                                               \
-                                       __FILE__,                                                                       \
+#define warning(msg)                                                           \
+    Logger::getInstance().log(LogEntry{LogLevel::WARNING,                      \
+                                       ds::String(msg),                        \
+                                       std::this_thread::get_id(),             \
+                                       std::chrono::system_clock::now(),       \
+                                       __FILE__,                               \
                                        __LINE__})
-#define error(msg)                                                                                                     \
-    Logger::getInstance().log(LogEntry{LogLevel::ERROR,                                                                \
-                                       ds::String(msg),                                                                   \
-                                       std::this_thread::get_id(),                                                     \
-                                       std::chrono::system_clock::now(),                                               \
-                                       __FILE__,                                                                       \
+#define error(msg)                                                             \
+    Logger::getInstance().log(LogEntry{LogLevel::ERROR,                        \
+                                       ds::String(msg),                        \
+                                       std::this_thread::get_id(),             \
+                                       std::chrono::system_clock::now(),       \
+                                       __FILE__,                               \
                                        __LINE__})
-#define fatal(msg)                                                                                                     \
-    Logger::getInstance().log(LogEntry{LogLevel::FATAL,                                                                \
-                                       ds::String(msg),                                                                   \
-                                       std::this_thread::get_id(),                                                     \
-                                       std::chrono::system_clock::now(),                                               \
-                                       __FILE__,                                                                       \
+#define fatal(msg)                                                             \
+    Logger::getInstance().log(LogEntry{LogLevel::FATAL,                        \
+                                       ds::String(msg),                        \
+                                       std::this_thread::get_id(),             \
+                                       std::chrono::system_clock::now(),       \
+                                       __FILE__,                               \
                                        __LINE__})
 
 } // namespace hahaha::core::util

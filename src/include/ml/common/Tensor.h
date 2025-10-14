@@ -24,10 +24,10 @@
 #include <iostream>
 #include <numeric>
 
+#include "Error.h"
 #include "Res.h"
 #include "defines/h3defs.h"
 #include "ds/Vector.h"
-#include "Error.h"
 
 namespace hahaha::ml
 {
@@ -53,16 +53,19 @@ template <typename T> class Tensor
 
     Tensor() = default;
 
-    Tensor(const std::initializer_list<sizeT> shape) : shape_(shape), data_(computeSize(shape))
+    Tensor(const std::initializer_list<sizeT> shape)
+        : shape_(shape), data_(computeSize(shape))
     {
     }
 
-    explicit Tensor(const ds::Vector<sizeT>& shape) : shape_(shape), data_(computeSize(shape))
+    explicit Tensor(const ds::Vector<sizeT>& shape)
+        : shape_(shape), data_(computeSize(shape))
     {
     }
 
     // Constructor for a 0-dimensional tensor (scalar)
-    explicit Tensor(const std::initializer_list<sizeT> shape, std::initializer_list<T> data)
+    explicit Tensor(const std::initializer_list<sizeT> shape,
+                    std::initializer_list<T> data)
         : shape_(shape), data_(data)
     {
     }
@@ -78,11 +81,13 @@ template <typename T> class Tensor
     }
 
     // Index calculation (flattened)
-    [[nodiscard]] Res<sizeT, BaseError> index(const std::initializer_list<sizeT> indices) const
+    [[nodiscard]] Res<sizeT, BaseError>
+    index(const std::initializer_list<sizeT> indices) const
     {
         SetRetT(sizeT, BaseError)
 
-        if (indices.size() != shape_.size()) Err(BaseError("Incorrect number of indices"));
+            if (indices.size() != shape_.size())
+                Err(BaseError("Incorrect number of indices"));
         sizeT idx = 0;
         sizeT stride = 1;
         for (int i = static_cast<int>(shape_.size()) - 1; i >= 0; --i)
@@ -97,11 +102,12 @@ template <typename T> class Tensor
         Ok(idx);
     }
 
-    [[nodiscard]] Res<sizeT, BaseError> index(const ds::Vector<sizeT>& indices) const
+    [[nodiscard]] Res<sizeT, BaseError>
+    index(const ds::Vector<sizeT>& indices) const
     {
         SetRetT(sizeT, BaseError)
 
-        if (indices.size() != shape_.size())
+            if (indices.size() != shape_.size())
         {
             Err(BaseError("Incorrect number of indices"));
         }
@@ -221,7 +227,8 @@ template <typename T> class Tensor
     {
         SetRetT(void, TensorErr) if (other.shape() != shape_)
         {
-            Err(TensorErr("Cannot copy value from a tensor with different shape"))
+            Err(TensorErr(
+                "Cannot copy value from a tensor with different shape"))
         }
         for (sizeT i = 0; i < other.size(); ++i)
         {
@@ -234,7 +241,8 @@ template <typename T> class Tensor
     {
         SetRetT(void, TensorErr) if (other.size() != this->size())
         {
-            Err(TensorErr("Cannot copy value from a tensor with different shape"))
+            Err(TensorErr(
+                "Cannot copy value from a tensor with different shape"))
         }
         for (sizeT i = 0; i < other.size(); ++i)
         {
@@ -398,7 +406,8 @@ template <typename T> class Tensor
         return result;
     }
 
-    Res<Tensor, IndexOutOfBoundError> at(const std::initializer_list<sizeT> indices) const
+    Res<Tensor, IndexOutOfBoundError>
+    at(const std::initializer_list<sizeT> indices) const
     {
         SetRetT(Tensor, IndexOutOfBoundError) if (indices.size() > dim())
         {
@@ -436,12 +445,14 @@ template <typename T> class Tensor
         }
 
         Tensor res(newShape);
-        // res.replaceSelf(data_.begin() + start, data_.begin() + start + length);
+        // res.replaceSelf(data_.begin() + start, data_.begin() + start +
+        // length);
         res.copy(data_.subVector(start, length));
         Ok(res);
     }
 
-    Res<void, IndexOutOfBoundError> set(const std::initializer_list<sizeT> indices, T value)
+    Res<void, IndexOutOfBoundError>
+    set(const std::initializer_list<sizeT> indices, T value)
     {
         SetRetT(void, IndexOutOfBoundError) if (indices.size() > dim())
         {
@@ -468,7 +479,8 @@ template <typename T> class Tensor
 
     static sizeT computeSize(const ds::Vector<sizeT>& shape)
     {
-        return std::accumulate(shape.begin(), shape.end(), sizeT{1}, std::multiplies<>());
+        return std::accumulate(
+            shape.begin(), shape.end(), sizeT{1}, std::multiplies<>());
     }
 
     void checkShapeAndSizeNotEqual(const Tensor& other) const

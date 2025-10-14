@@ -29,12 +29,14 @@
 namespace hahaha::core::ds
 {
 
-template <typename Key, typename Value, typename Hash = std::hash<Key>> class HashMap
+template <typename Key, typename Value, typename Hash = std::hash<Key>>
+class HashMap
 {
   public:
     using Pair = std::pair<const Key, Value>;
 
-    HashMap(size_t initialCapacity = 8) : capacity_(initialCapacity), size_(0)
+    explicit HashMap(const sizeT initialCapacity = 8)
+        : capacity_(initialCapacity), size_(0)
     {
         buckets_.resize(capacity_);
     }
@@ -46,7 +48,7 @@ template <typename Key, typename Value, typename Hash = std::hash<Key>> class Ha
             rehash(2 * capacity_);
         }
 
-        size_t index = hash_(key) % capacity_;
+        sizeT index = hash_(key) % capacity_;
         for (auto& pair : buckets_[index])
         {
             if (pair.first == key)
@@ -62,7 +64,7 @@ template <typename Key, typename Value, typename Hash = std::hash<Key>> class Ha
 
     bool find(const Key& key, Value& value) const
     {
-        size_t index = hash_(key) % capacity_;
+        sizeT index = hash_(key) % capacity_;
         for (const auto& pair : buckets_[index])
         {
             if (pair.first == key)
@@ -76,7 +78,7 @@ template <typename Key, typename Value, typename Hash = std::hash<Key>> class Ha
 
     bool erase(const Key& key)
     {
-        size_t index = hash_(key) % capacity_;
+        sizeT index = hash_(key) % capacity_;
         auto& bucket = buckets_[index];
         for (auto it = bucket.begin(); it != bucket.end(); ++it)
         {
@@ -90,25 +92,25 @@ template <typename Key, typename Value, typename Hash = std::hash<Key>> class Ha
         return false;
     }
 
-    size_t size() const
+    [[nodiscard]] sizeT size() const
     {
         return size_;
     }
 
   private:
     Vector<Vector<Pair>> buckets_;
-    size_t capacity_;
-    size_t size_;
+    sizeT capacity_;
+    sizeT size_;
     Hash hash_;
 
-    void rehash(size_t newCapacity)
+    void rehash(sizeT newCapacity)
     {
         Vector<Vector<Pair>> newBuckets(newCapacity);
         for (const auto& bucket : buckets_)
         {
             for (const auto& pair : bucket)
             {
-                size_t index = hash_(pair.first) % newCapacity;
+                sizeT index = hash_(pair.first) % newCapacity;
                 newBuckets[index].pushBack(pair);
             }
         }
