@@ -35,7 +35,8 @@ template <typename T> class AVLTreeNode
     {
     }
 
-    AVLTreeNode(const T& data, AVLTreeNode* parent) : parent_(parent), data_(data)
+    AVLTreeNode(const T& data, AVLTreeNode* parent)
+        : parent_(parent), data_(data)
     {
     }
 

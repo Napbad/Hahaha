@@ -22,15 +22,15 @@
 #ifndef SET_H
 #define SET_H
 
-#include "rbTree.h"
-#include <vector>
 #include <stdexcept>
+#include <vector>
+
+#include "rbTree.h"
 
 namespace hahaha::core::ds
 {
 
-template <typename T, typename Compare = std::less<T>>
-class Set
+template <typename T, typename Compare = std::less<T>> class Set
 {
   public:
     using value_type = T;
@@ -58,13 +58,12 @@ class Set
         auto existing = tree_.find(value);
         if (existing)
             return false;
-        
+
         tree_.insert(value);
         return true;
     }
 
-    template<typename... Args>
-    bool emplace(Args&&... args)
+    template <typename... Args> bool emplace(Args&&... args)
     {
         T value(std::forward<Args>(args)...);
         return insert(value);
@@ -75,7 +74,7 @@ class Set
         auto node = tree_.find(value);
         if (!node)
             return 0;
-        
+
         tree_.remove(value);
         return 1;
     }
@@ -132,7 +131,7 @@ class Set
         Set result;
         auto thisValues = toVector();
         auto otherValues = other.toVector();
-        
+
         for (const auto& val : thisValues)
         {
             result.insert(val);

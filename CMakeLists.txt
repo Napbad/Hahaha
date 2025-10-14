@@ -2,10 +2,11 @@ cmake_minimum_required(VERSION 3.22)
 project(hahaha)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_CUDA_STANDARD 17)
+set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 
 # Add include directories
 include_directories(
@@ -20,6 +21,10 @@ include_directories(
 # Find required packages
 find_package(CURL REQUIRED)
 include_directories(${CURL_INCLUDE_DIRS})
+
+# cuda setup
+find_package(CUDAToolkit REQUIRED)
+enable_language(CUDA)
 
 file(
         GLOB HEADER_FILES
@@ -37,6 +42,7 @@ set(SOURCE_FILES
     src/models/knn/KNN.cpp
     src/models/linear_regression/LinearRegression.cpp
     src/datasets/dataset/DatasetDownloader.cpp
+    src/core/gpu/calc.cu
 )
 
 file(GLOB_RECURSE HEADER_FILES
@@ -52,11 +58,13 @@ add_library(hahaha STATIC
 set_target_properties(hahaha PROPERTIES
     LINKER_LANGUAGE CXX
 )
-
 # Link dependencies
 target_link_libraries(hahaha
     ${CURL_LIBRARIES}
+    CUDA::cudart
+    CUDA::cuda_driver
 )
+set_property(TARGET hahaha PROPERTY CUDA_SEPARABLE_COMPILATION ON)
 
 # Add testing support
 include(CTest)

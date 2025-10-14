@@ -247,7 +247,8 @@ template <typename T> class RBTree
     // from this node, adjust the tree
     void adjustTree(RBTreeNode<T>* node)
     {
-        // node will never be a nullptr, and the node need to adjust is always be a red node
+        // node will never be a nullptr, and the node need to adjust is always
+        // be a red node
         assert(node != nullptr && node->isRed());
         if (node == root_)
         {
@@ -307,10 +308,8 @@ template <typename T> class RBTree
         // current: node(the new inserted one): red, parent: red, uncle: black,
         // grandparent: black
         rightRotation(node->getParent()->getParent());
-        node->getParent()->setBlack(); // previous parent node
-        node->getParent()
-            ->getRight()
-            ->setRed(); // previous grandparent node
+        node->getParent()->setBlack();           // previous parent node
+        node->getParent()->getRight()->setRed(); // previous grandparent node
     }
 
     void adjustWithBlackUncleAndLR(RBTreeNode<T>* node)
@@ -414,7 +413,8 @@ template <typename T> class RBTree
         delete node;
     }
 
-    void removeBlackNodeWithBlackChild(RBTreeNode<T>* node, RBTreeNode<T>* child)
+    void removeBlackNodeWithBlackChild(RBTreeNode<T>* node,
+                                       RBTreeNode<T>* child)
     {
         auto parent = node->getParent();
         bool wasLeftChild = parent && isLeftChild(parent, node);
@@ -481,7 +481,8 @@ template <typename T> class RBTree
         }
     }
 
-    void handleRedSibling(RBTreeNode<T>* node, RBTreeNode<T>* parent,
+    void handleRedSibling(RBTreeNode<T>* node,
+                          RBTreeNode<T>* parent,
                           RBTreeNode<T>* sibling)
     {
         parent->setRed();
@@ -495,7 +496,8 @@ template <typename T> class RBTree
         fixDoubleBlack(node);
     }
 
-    void handleRedSiblingNull(RBTreeNode<T>* parent, RBTreeNode<T>* sibling,
+    void handleRedSiblingNull(RBTreeNode<T>* parent,
+                              RBTreeNode<T>* sibling,
                               bool nodeIsLeft)
     {
         parent->setRed();
@@ -509,7 +511,8 @@ template <typename T> class RBTree
         fixDoubleBlackNull(parent, nodeIsLeft);
     }
 
-    void handleBlackSibling(RBTreeNode<T>* node, RBTreeNode<T>* parent,
+    void handleBlackSibling(RBTreeNode<T>* node,
+                            RBTreeNode<T>* parent,
                             RBTreeNode<T>* sibling)
     {
         if (hasRedChild(sibling))
@@ -526,7 +529,8 @@ template <typename T> class RBTree
         }
     }
 
-    void handleBlackSiblingNull(RBTreeNode<T>* parent, RBTreeNode<T>* sibling,
+    void handleBlackSiblingNull(RBTreeNode<T>* parent,
+                                RBTreeNode<T>* sibling,
                                 bool nodeIsLeft)
     {
         if (hasRedChild(sibling))
@@ -540,7 +544,8 @@ template <typename T> class RBTree
             {
                 auto grandparent = parent->getParent();
                 if (grandparent)
-                    fixDoubleBlackNull(grandparent, isLeftChild(grandparent, parent));
+                    fixDoubleBlackNull(grandparent,
+                                       isLeftChild(grandparent, parent));
             }
             else
             {
@@ -549,7 +554,8 @@ template <typename T> class RBTree
         }
     }
 
-    void handleBlackSiblingWithRedChild(RBTreeNode<T>* node, RBTreeNode<T>* parent,
+    void handleBlackSiblingWithRedChild(RBTreeNode<T>* node,
+                                        RBTreeNode<T>* parent,
                                         RBTreeNode<T>* sibling)
     {
         bool nodeIsLeft = isLeftChild(parent, node);
@@ -820,8 +826,8 @@ template <typename T> class RBTree
     {
         if (!node)
             return false;
-        return (node->getLeft() && node->getLeft()->isRed()) ||
-               (node->getRight() && node->getRight()->isRed());
+        return (node->getLeft() && node->getLeft()->isRed())
+            || (node->getRight() && node->getRight()->isRed());
     }
 
     bool isLeftChild(RBTreeNode<T>* parent, RBTreeNode<T>* child)

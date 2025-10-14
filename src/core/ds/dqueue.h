@@ -22,16 +22,16 @@
 #ifndef DQUEUE_H
 #define DQUEUE_H
 
-#include "list.h"
-#include <stdexcept>
 #include <initializer_list>
+#include <stdexcept>
+
+#include "list.h"
 
 namespace hahaha::core::ds
 {
 
 // Double-ended queue implementation using a doubly-linked list
-template <typename T>
-class Deque
+template <typename T> class Deque
 {
   private:
     struct Node
@@ -40,7 +40,9 @@ class Deque
         Node* prev;
         Node* next;
 
-        explicit Node(const T& val) : data(val), prev(nullptr), next(nullptr) {}
+        explicit Node(const T& val) : data(val), prev(nullptr), next(nullptr)
+        {
+        }
     };
 
   public:
@@ -50,9 +52,12 @@ class Deque
     using size_type = size_t;
 
     // Constructors
-    Deque() : head_(nullptr), tail_(nullptr), size_(0) {}
+    Deque() : head_(nullptr), tail_(nullptr), size_(0)
+    {
+    }
 
-    Deque(std::initializer_list<T> init) : head_(nullptr), tail_(nullptr), size_(0)
+    Deque(std::initializer_list<T> init)
+        : head_(nullptr), tail_(nullptr), size_(0)
     {
         for (const auto& val : init)
         {
@@ -94,7 +99,7 @@ class Deque
     }
 
     // Move constructor
-    Deque(Deque&& other) noexcept 
+    Deque(Deque&& other) noexcept
         : head_(other.head_), tail_(other.tail_), size_(other.size_)
     {
         other.head_ = nullptr;
@@ -219,15 +224,15 @@ class Deque
     {
         if (empty())
             throw std::out_of_range("Deque::popFront: deque is empty");
-        
+
         Node* oldHead = head_;
         head_ = head_->next;
-        
+
         if (head_)
             head_->prev = nullptr;
         else
             tail_ = nullptr;
-        
+
         delete oldHead;
         --size_;
     }
@@ -239,25 +244,23 @@ class Deque
 
         const Node* oldTail = tail_;
         tail_ = tail_->prev;
-        
+
         if (tail_)
             tail_->next = nullptr;
         else
             head_ = nullptr;
-        
+
         delete oldTail;
         --size_;
     }
 
-    template<typename... Args>
-    void emplaceFront(Args&&... args)
+    template <typename... Args> void emplaceFront(Args&&... args)
     {
         T value(std::forward<Args>(args)...);
         pushFront(value);
     }
 
-    template<typename... Args>
-    void emplaceBack(Args&&... args)
+    template <typename... Args> void emplaceBack(Args&&... args)
     {
         T value(std::forward<Args>(args)...);
         pushBack(value);

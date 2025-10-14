@@ -22,43 +22,46 @@
 #ifndef MAP_H
 #define MAP_H
 
-#include "rbTree.h"
-#include <utility>
 #include <stdexcept>
+#include <utility>
 #include <vector>
+
+#include "rbTree.h"
 
 namespace hahaha::core::ds
 {
 
 // Custom pair that supports comparison by key
-template <typename Key, typename T>
-struct KeyValuePair
+template <typename Key, typename T> struct KeyValuePair
 {
     Key first;
     T second;
-    
-    KeyValuePair(const Key& k, const T& v) : first(k), second(v) {
+
+    KeyValuePair(const Key& k, const T& v) : first(k), second(v)
+    {
     }
-    explicit KeyValuePair(const std::pair<Key, T>& p) : first(p.first), second(p.second) {}
-    
+    explicit KeyValuePair(const std::pair<Key, T>& p)
+        : first(p.first), second(p.second)
+    {
+    }
+
     bool operator<(const KeyValuePair& other) const
     {
         return first < other.first;
     }
-    
+
     bool operator>(const KeyValuePair& other) const
     {
         return first > other.first;
     }
-    
+
     bool operator==(const KeyValuePair& other) const
     {
         return first == other.first;
     }
 };
 
-template <typename Key, typename T, typename Compare = std::less<Key>>
-class Map
+template <typename Key, typename T, typename Compare = std::less<Key>> class Map
 {
   public:
     using key_type = Key;
@@ -70,54 +73,58 @@ class Map
     // Simple iterator for range-based for loops
     class iterator
     {
-    public:
-        iterator(const std::vector<kvpair*>* vec, size_t index) 
-            : vec_(vec), index_(index) {}
-        
+      public:
+        iterator(const std::vector<kvpair*>* vec, size_t index)
+            : vec_(vec), index_(index)
+        {
+        }
+
         std::pair<const Key&, T&> operator*() const
         {
             return {(*vec_)[index_]->first, (*vec_)[index_]->second};
         }
-        
+
         iterator& operator++()
         {
             ++index_;
             return *this;
         }
-        
+
         bool operator!=(const iterator& other) const
         {
             return index_ != other.index_;
         }
-        
-    private:
+
+      private:
         const std::vector<kvpair*>* vec_;
         size_t index_;
     };
 
     class const_iterator
     {
-    public:
-        const_iterator(const std::vector<kvpair*>* vec, size_t index) 
-            : vec_(vec), index_(index) {}
-        
+      public:
+        const_iterator(const std::vector<kvpair*>* vec, size_t index)
+            : vec_(vec), index_(index)
+        {
+        }
+
         std::pair<const Key&, const T&> operator*() const
         {
             return {(*vec_)[index_]->first, (*vec_)[index_]->second};
         }
-        
+
         const_iterator& operator++()
         {
             ++index_;
             return *this;
         }
-        
+
         bool operator!=(const const_iterator& other) const
         {
             return index_ != other.index_;
         }
-        
-    private:
+
+      private:
         const std::vector<kvpair*>* vec_;
         size_t index_;
     };
@@ -174,10 +181,10 @@ class Map
     {
         kvpair searchPair(key, T());
         auto node = tree_.find(searchPair);
-        
+
         if (!node)
             throw std::out_of_range("Map::at: key not found");
-        
+
         return node->getDataRef().second;
     }
 
@@ -185,10 +192,10 @@ class Map
     {
         kvpair searchPair(key, T());
         auto node = tree_.find(searchPair);
-        
+
         if (!node)
             throw std::out_of_range("Map::at: key not found");
-        
+
         return node->getDataConstRef().second;
     }
 
@@ -208,12 +215,12 @@ class Map
     {
         kvpair newPair(key, value);
         auto existing = tree_.find(newPair);
-        
+
         if (existing)
         {
             return {false, &existing->getDataRef().second};
         }
-        
+
         tree_.insert(newPair);
         auto inserted = tree_.find(newPair);
         invalidateIteratorCache();
@@ -225,17 +232,17 @@ class Map
         return insert(pair.first, pair.second);
     }
 
-    template<typename... Args>
+    template <typename... Args>
     std::pair<bool, T*> emplace(const Key& key, Args&&... args)
     {
         kvpair searchPair(key, T());
         auto existing = tree_.find(searchPair);
-        
+
         if (existing)
         {
             return {false, &existing->getDataRef().second};
         }
-        
+
         T value(std::forward<Args>(args)...);
         kvpair newPair(key, value);
         tree_.insert(newPair);
@@ -248,10 +255,10 @@ class Map
     {
         kvpair searchPair(key, T());
         auto node = tree_.find(searchPair);
-        
+
         if (!node)
             return 0;
-        
+
         tree_.remove(searchPair);
         invalidateIteratorCache();
         return 1;
@@ -334,13 +341,14 @@ class Map
         iterCacheValid_ = false;
     }
 
-    void collectNodePointers(RBTreeNode<kvpair>* node, 
-                            std::vector<kvpair*>& pointers) const
+    void collectNodePointers(RBTreeNode<kvpair>* node,
+                             std::vector<kvpair*>& pointers) const
     {
         if (!node)
             return;
         collectNodePointers(node->getLeft(), pointers);
-        pointers.push_back(&const_cast<RBTreeNode<kvpair>*>(node)->getDataRef());
+        pointers.push_back(
+            &const_cast<RBTreeNode<kvpair>*>(node)->getDataRef());
         collectNodePointers(node->getRight(), pointers);
     }
 
@@ -369,8 +377,8 @@ class Map
         collectValues(node->getRight(), values);
     }
 
-    void collectEntries(RBTreeNode<kvpair>* node, 
-                       std::vector<std::pair<Key, T>>& entries) const
+    void collectEntries(RBTreeNode<kvpair>* node,
+                        std::vector<std::pair<Key, T>>& entries) const
     {
         if (!node)
             return;
