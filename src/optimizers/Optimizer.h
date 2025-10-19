@@ -41,7 +41,7 @@ template <typename T> class Optimizer
     {
     }
     virtual void step() = 0;
-    virtual void zero_grad()
+    virtual void zeroGrad()
     {
         for (auto& param : _parameters)
         {

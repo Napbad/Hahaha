@@ -36,7 +36,7 @@ template <typename T> class MSELoss final : public Loss<T>
     MSELoss() = default;
     ~MSELoss() override = default;
 
-    Tensor<T> forward(const Tensor<T>& input, const Tensor<T>& target) override
+    Variable<T>* forward(const Variable<T>& input, const Variable<T>& target) override
     {
         // MSE = mean((input - target)^2)
         if (input.shape() != target.shape())
@@ -48,12 +48,8 @@ template <typename T> class MSELoss final : public Loss<T>
         auto diff = input - target;
         auto squared = diff * diff;
 
-        // Return mean as a scalar tensor
-        T mean_value = squared.sum() / static_cast<T>(squared.size());
-        Tensor<T> result({});
-        result.set({0}, mean_value);
-
-        return result;
+        // Return mean as a scalar variable
+        return new Variable<T>(squared.mean());
     }
 };
 

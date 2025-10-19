@@ -36,4 +36,9 @@ TEST(LinearTest, InitializationAndForwardPass)
 
     // 4. Forward pass assertions
     EXPECT_EQ(output.shape(), Vector<sizeT>({1, output_features}));
+
+    // Backward propagates to parameters
+    output.backward();
+    EXPECT_EQ(weights->grad().shape(), weights->shape());
+    EXPECT_EQ(bias->grad().shape(), bias->shape());
 }

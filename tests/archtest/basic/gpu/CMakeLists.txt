@@ -19,9 +19,10 @@ include(GoogleTest)
 
 # Create the test executable
 add_executable(hahaha_dev_tests_arch_exe
-    ${TEST_SOURCE_FILES}
+        ${TEST_SOURCE_FILES}
         basic/gpu/BasicGPUTest.cpp
         basic/gpu/testDefine.cu
+        basic/gpu/testDefine.cuh
 )
 
 target_include_directories(hahaha_dev_tests_arch_exe PUBLIC
@@ -38,7 +39,7 @@ target_link_libraries(hahaha_dev_tests_arch_exe PRIVATE
 
         "${CUDA_PATH}/lib64/libcudart_static.a"
         "${CUDA_PATH}/lib64/libcudadevrt.a"
-
+        CUDA::cudart
         GTest::gtest
         GTest::gtest_main)
 

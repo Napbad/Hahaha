@@ -1,6 +1,8 @@
 # Add executable for the simple_nn example
 add_executable(simple_nn simple_nn.cpp)
 
+set(CUDA_PATH "/usr/local/cuda-13.0")
+link_directories("${CUDA_PATH}/lib64")
 # Link the example against the main library
 target_link_libraries(simple_nn PRIVATE hahaha)
 

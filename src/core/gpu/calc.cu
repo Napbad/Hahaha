@@ -24,14 +24,10 @@ cudaGetErrorString(err), __FILE__, __LINE__); \
 exit(EXIT_FAILURE); \
 } \
 } while (0)
+#include "defines/h3defs.h"
 
 __global__ void vectorAddKernel(const float* d_a, const float* d_b, float* d_c, int n) {
-    if (const int idx = blockIdx.x * blockDim.x + threadIdx.x; idx < n) {
+    if (const hahaha::sizeT idx = blockIdx.x * blockDim.x + threadIdx.x; idx < n) {
         d_c[idx] = d_a[idx] + d_b[idx];
     }
-}
-
-void vectorAdd(const float* d_a, const float* d_b, float* d_c, int n)
-{
-
 }

@@ -32,18 +32,22 @@ template <typename T> class Sequential final : public Layer<T>
 {
   public:
     Sequential() = default;
-    Sequential(std::initializer_list<Layer<T>*> layers) : layers_(layers)
+    Sequential(std::initializer_list<std::unique_ptr<Layer<T>>> layers)
     {
+        for (auto& ptr : layers)
+        {
+            layers_.pushBack(std::move(ptr));
+        }
     }
 
     void add(Layer<T>* layer)
     {
-        layers_.pushBack(layer);
+        layers_.pushBack(std::move(layer));
     }
 
-    Variable<T> forward(const Variable<T>& input) override
+    Variable<T>* forward(const Variable<T>* input) override
     {
-        Variable<T> current_output = input;
+        auto* current_output = new Variable<T>(*input);
         for (auto& layer : layers_)
         {
             current_output = layer->forward(current_output);

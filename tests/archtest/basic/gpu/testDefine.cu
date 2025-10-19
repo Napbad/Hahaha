@@ -15,10 +15,11 @@
 // Email: napbad.sen@gmail.com
 // GitHub: https://github.com/Napbad
 
+#include <cuda_runtime.h>
+#include "testDefine.cuh"
 
-
-__global__ void vectorAddKernelTest(const float* d_a, const float* d_b, float* d_c, int n) {
-    if (const int idx = blockIdx.x * blockDim.x + threadIdx.x; idx < n) {
-        d_c[idx] = d_a[idx] + d_b[idx];
-    }
-}
+// void vectorAddKernelTest(const float* d_a, const float* d_b, float* d_c, int n) {
+//     if (const int idx = blockIdx.x * blockDim.x + threadIdx.x; idx < n) {
+//         d_c[idx] = d_a[idx] + d_b[idx];
+//     }
+// }

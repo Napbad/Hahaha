@@ -60,12 +60,12 @@ template <class T, class Allocator = std::allocator<T>> class Vector
 
     Allocator allocator_;
 
-    Vector() noexcept : data_(nullptr), size_(0), capacity_(0)
+    Vector() noexcept : data_(nullptr)
     {
     }
 
     explicit Vector(const SizeType count)
-        : data_(nullptr), size_(0), capacity_(0)
+        : data_(nullptr)
     {
         if (count > 0)
         {
@@ -79,19 +79,7 @@ template <class T, class Allocator = std::allocator<T>> class Vector
         }
     }
 
-    Vector(std::initializer_list<T> init)
-        : data_(nullptr), size_(0), capacity_(0)
-    {
-        reserve(init.size());
-        size_ = init.size();
-        sizeT idx = 0;
-        for (const auto& i : init)
-        {
-            std::allocator_traits<Allocator>::construct(
-                allocator_, data_ + idx, i);
-            idx++;
-        }
-    }
+    Vector(std::initializer_list<T> init);
 
     explicit Vector(Vector<T>::ConstIterator begin,
                     Vector<T>::ConstIterator end)
@@ -209,6 +197,22 @@ template <class T, class Allocator = std::allocator<T>> class Vector
     void pushBack(const T& value)
     {
         emplaceBack(value);
+    }
+
+    void emplaceBack(T&& value)
+    {
+        if (size_ == capacity_)
+        {
+            reserve(size_ == 0 ? 1 : size_ * 2);
+        }
+        std::allocator_traits<Allocator>::construct(
+            allocator_, data_ + size_, std::move(value));
+        size_++;
+    }
+
+    void pushBack(T&& value)
+    {
+        emplaceBack(std::move(value));
     }
 
     Iterator begin()
@@ -390,7 +394,7 @@ template <class T, class Allocator = std::allocator<T>> class Vector
         size_ = newSize;
     }
 
-    void swap(Vector& other)
+    void swap(Vector& other) noexcept
     {
         std::swap(data_, other.data_);
         std::swap(size_, other.size_);
@@ -545,9 +549,22 @@ template <class T, class Allocator = std::allocator<T>> class Vector
     sizeT size_ = 0;
     sizeT capacity_ = 0;
 };
+template <class T, class Allocator>
+Vector<T, Allocator>::Vector(std::initializer_list<T> init)
+    : data_(nullptr)
+{
+    reserve(init.size());
+    size_ = init.size();
+    sizeT idx = 0;
+    for (const auto& i : init)
+    {
+        std::allocator_traits<Allocator>::construct(allocator_, data_ + idx, i);
+        idx++;
+    }
+}
 
 template <class T, class Allocator>
-inline std::ostream& operator<<(std::ostream& os,
+std::ostream& operator<<(std::ostream& os,
                                 const Vector<T, Allocator>& vec)
 {
     os << vec.toString().c_str();

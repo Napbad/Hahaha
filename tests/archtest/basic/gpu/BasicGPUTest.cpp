@@ -19,10 +19,9 @@
 // Created by napbad on 10/14/25.
 //
 
-extern "C" void
-vectorAddKernelTest(const float* d_a, const float* d_b, float* d_c, int n);
-
 #include <gtest/gtest.h>
+
+#include "testDefine.cuh"
 class BasicGPUTest : public testing::Test
 {
   public:

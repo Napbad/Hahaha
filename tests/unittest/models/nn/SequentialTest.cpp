@@ -34,4 +34,12 @@ TEST(SequentialTest, ModelConstructionAndForwardPass)
     // 4. Forward pass assertion
     EXPECT_EQ(output.shape(),
               hahaha::core::ds::Vector<sizeT>({1, output_features}));
+
+    // Backward should touch all parameters
+    output.backward();
+    for (auto* p : params)
+    {
+        ASSERT_TRUE(p->requiresGrad());
+        EXPECT_EQ(p->grad().shape(), p->shape());
+    }
 }

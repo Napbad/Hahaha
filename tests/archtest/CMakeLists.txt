@@ -39,6 +39,7 @@ add_executable(hahaha_dev_tests_arch_exe
         ${TEST_SOURCE_FILES}
         basic/gpu/BasicGPUTest.cpp
         basic/gpu/testDefine.cu
+        basic/gpu/testDefine.cuh
 )
 # Link libraries
 target_link_libraries(hahaha_dev_tests_arch_exe PRIVATE

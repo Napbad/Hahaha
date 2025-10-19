@@ -34,14 +34,13 @@ template <typename T> class Linear final : public Layer<T>
     {
     }
 
-    Variable<T> forward(const Variable<T>& input) override
+    Variable<T>* forward(const Variable<T>* input) override
     {
-
         auto selfShape = weights_.shape();
-        auto inputShape = input.shape();
-        auto mm = input.matmul(weights_);
+        auto inputShape = input->shape();
+        auto mm = input->matmul(weights_);
         auto mmShape = mm.shape();
-        return mm + bias_;
+        return new Variable<T>(mm + bias_);
     }
 
     ds::Vector<Variable<T>*> parameters() override

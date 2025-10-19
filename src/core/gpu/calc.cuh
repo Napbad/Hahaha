@@ -16,33 +16,16 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by Napbad on 7/19/25.
+// Created by root on 10/19/25.
 //
 
-#ifndef HAHAHA_LOSS_H
-#define HAHAHA_LOSS_H
-#include "compute/Variable.h"
-#include "core/defines/h3defs.h"
-#include "core/ml/Tensor.h"
+#ifndef HAHAHA_CALC_CUH
+#define HAHAHA_CALC_CUH
+#include <crt/host_defines.h>
 
-HHH_NAMESPACE_IMPORT
+extern "C"
+__global__ void vectorAddKernel (float *a, float *b, float *c, int n);
 
-namespace hahaha::ml
-{
-template <typename T> class Loss
-{
-  public:
-    virtual ~Loss() = default;
-    virtual Variable<T> *forward(const Variable<T>& input,
-                              const Variable<T>& target) = 0;
 
-    Variable<T>* operator()(const Variable<T>& input, const Variable<T>& target)
-    {
-        Variable<T> resultVar = forward(input, target);
-        return new Variable<T>(resultVar);
-    }
-};
 
-} // namespace hahaha::ml
-
-#endif // HAHAHA_LOSS_H
+#endif // HAHAHA_CALC_CUH

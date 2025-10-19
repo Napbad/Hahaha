@@ -25,6 +25,8 @@ include_directories(${CURL_INCLUDE_DIRS})
 # cuda setup
 find_package(CUDAToolkit REQUIRED)
 enable_language(CUDA)
+set(CUDA_PATH "/usr/local/cuda")
+link_directories("${CUDA_PATH}/lib64")
 
 file(
         GLOB HEADER_FILES
@@ -43,6 +45,7 @@ set(SOURCE_FILES
     src/models/linear_regression/LinearRegression.cpp
     src/datasets/dataset/DatasetDownloader.cpp
     src/core/gpu/calc.cu
+        src/core/gpu/calc.cuh
 )
 
 file(GLOB_RECURSE HEADER_FILES

@@ -14,35 +14,19 @@
 //
 // Email: napbad.sen@gmail.com
 // GitHub: https://github.com/Napbad
+#ifndef TESTDEFINE_CUH
+#define TESTDEFINE_CUH
 
-//
-// Created by Napbad on 7/19/25.
-//
+#include <cuda_runtime.h>
 
-#ifndef HAHAHA_LOSS_H
-#define HAHAHA_LOSS_H
-#include "compute/Variable.h"
-#include "core/defines/h3defs.h"
-#include "core/ml/Tensor.h"
 
-HHH_NAMESPACE_IMPORT
-
-namespace hahaha::ml
+extern "C"
+__global__ inline void vectorAddKernelTest(const float *a, const float *b, float *c, int n)
 {
-template <typename T> class Loss
-{
-  public:
-    virtual ~Loss() = default;
-    virtual Variable<T> *forward(const Variable<T>& input,
-                              const Variable<T>& target) = 0;
-
-    Variable<T>* operator()(const Variable<T>& input, const Variable<T>& target)
+    for (int i = 0;i < n;i++)
     {
-        Variable<T> resultVar = forward(input, target);
-        return new Variable<T>(resultVar);
+        c[i] = a[i] + b[i];
     }
-};
+}
 
-} // namespace hahaha::ml
-
-#endif // HAHAHA_LOSS_H
+#endif // TESTDEFINE_CUH

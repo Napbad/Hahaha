@@ -22,4 +22,12 @@ TEST(ReLUTest, ForwardPass)
     EXPECT_FLOAT_EQ(output_data[1], 0.0f);
     EXPECT_FLOAT_EQ(output_data[2], 0.0f);
     EXPECT_FLOAT_EQ(output_data[3], 3.0f);
+
+    // Backward should produce mask on input
+    output.backward();
+    auto& grad_in = input_variable.grad();
+    EXPECT_FLOAT_EQ(grad_in[0], 0.0f);
+    EXPECT_FLOAT_EQ(grad_in[1], 0.0f);
+    EXPECT_FLOAT_EQ(grad_in[2], 0.0f);
+    EXPECT_FLOAT_EQ(grad_in[3], 1.0f);
 }

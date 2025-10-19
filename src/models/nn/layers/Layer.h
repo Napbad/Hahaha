@@ -34,7 +34,7 @@ template <typename T> class Layer
     virtual ~Layer() = default;
 
     // Perform the forward pass
-    virtual Variable<T> forward(const Variable<T>& input) = 0;
+    virtual Variable<T> *forward(const Variable<T>* input) = 0;
 
     // Get the layer's parameters (weights, biases, etc.)
     virtual ds::Vector<Variable<T>*> parameters()
