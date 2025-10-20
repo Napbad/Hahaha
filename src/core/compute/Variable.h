@@ -351,6 +351,55 @@ template <typename T> class Variable
             node_->backwardFn(upstream);
     }
 
+    // In-place compound ops for optimization steps (no graph edges)
+    Variable& operator+=(const Tensor<T>& rhs)
+    {
+        node_->data += rhs;
+        return *this;
+    }
+
+    Variable& operator-=(const Tensor<T>& rhs)
+    {
+        node_->data -= rhs;
+        return *this;
+    }
+
+    Variable& operator*=(const Tensor<T>& rhs)
+    {
+        node_->data *= rhs;
+        return *this;
+    }
+
+    Variable& operator/=(const Tensor<T>& rhs)
+    {
+        node_->data /= rhs;
+        return *this;
+    }
+
+    Variable& operator+=(const T scalar)
+    {
+        node_->data = node_->data + scalar;
+        return *this;
+    }
+
+    Variable& operator-=(const T scalar)
+    {
+        node_->data = node_->data - scalar;
+        return *this;
+    }
+
+    Variable& operator*=(const T scalar)
+    {
+        node_->data = node_->data * scalar;
+        return *this;
+    }
+
+    Variable& operator/=(const T scalar)
+    {
+        node_->data = node_->data / scalar;
+        return *this;
+    }
+
     // Reductions
     Variable sum() const
     {

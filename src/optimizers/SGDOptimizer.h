@@ -41,9 +41,7 @@ template <typename T> class SGDOptimizer final : public Optimizer<T>
     void step() override
     {
         for (auto& param : this->_parameters)
-        {
             *param -= param->grad() * static_cast<T>(this->_learningRate);
-        }
     }
 };
 } // namespace hahaha::ml
