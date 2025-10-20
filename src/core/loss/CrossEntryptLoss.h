@@ -24,7 +24,6 @@
 #include "Loss.h"
 #include "core/defines/h3defs.h"
 #include "core/ml/Tensor.h"
-#include "math/Math.h"
 
 HHH_NAMESPACE_IMPORT
 
@@ -61,7 +60,7 @@ template <typename T> class CrossEntropyLoss final : public Loss<T>
             if constexpr (std::is_floating_point_v<T>)
             {
                 T input_val = input[i] + epsilon; // Avoid log(0)
-                loss += target[i] * Math::log(input_val);
+                loss += target[i] * math::log(input_val);
             }
         }
 

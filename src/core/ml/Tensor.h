@@ -25,7 +25,6 @@
 #include <numeric>
 
 #include "Error.h"
-#include "Res.h"
 #include "defines/h3defs.h"
 #include "ds/Vector.h"
 
@@ -41,7 +40,7 @@ class TensorErr final : public BaseError
     explicit TensorErr(const char* msg) : BaseError(msg)
     {
     }
-    explicit TensorErr(const ds::String& msg) : BaseError(msg)
+    explicit TensorErr(const String& msg) : BaseError(msg)
     {
     }
 };
@@ -204,7 +203,7 @@ template <typename T> class Tensor
     {
         static_assert((std::is_integral_v<Dims> && ...),
                       "Indices must be of integral type");
-        std::initializer_list<sizeT> indices = {static_cast<sizeT>(dims)...};
+        const std::initializer_list<sizeT> indices = {static_cast<sizeT>(dims)...};
         if (indices.size() != shape_.size())
         {
             throw std::runtime_error("Incorrect number of indices");
@@ -216,7 +215,7 @@ template <typename T> class Tensor
     {
         static_assert((std::is_integral_v<Dims> && ...),
                       "Indices must be of integral type");
-        std::initializer_list<sizeT> indices = {static_cast<sizeT>(dims)...};
+        const std::initializer_list<sizeT> indices = {static_cast<sizeT>(dims)...};
         if (indices.size() != shape_.size())
         {
             throw std::runtime_error("Incorrect number of indices");
@@ -402,7 +401,7 @@ template <typename T> class Tensor
     Tensor operator-(const Tensor& other) const
     {
         if (this->hasOnlyOneVal())
-            return (other * static_cast<T>(-1)) + data_[0]; // scalar - other
+            return other * static_cast<T>(-1) + data_[0]; // scalar - other
         if (other.hasOnlyOneVal())
             return *this - other.data_[0];
         checkShapeAndSizeNotEqual(other);
@@ -550,7 +549,7 @@ template <typename T> class Tensor
         return *this;
     }
 
-    Tensor<ValueType>& operator*=(const ValueType& scalar)
+    Tensor& operator*=(const ValueType& scalar)
     {
         for (sizeT i = 0; i < data_.size(); ++i)
         {
@@ -632,7 +631,7 @@ template <typename T> class Tensor
         }
 
         sizeT m = this->shape_[0];
-        sizeT n = this->shape_[1];
+        const sizeT n = this->shape_[1];
         sizeT p = other.shape_[1];
 
         Tensor result({m, p});
@@ -727,7 +726,7 @@ template <typename T> class Tensor
         Tensor tensor(shape);
         for (sizeT i = 0; i < tensor.size(); ++i)
         {
-            tensor[i] = static_cast<T>(std::rand()) / static_cast<T>(RAND_MAX);
+            tensor[i] = static_cast<T>(random()) / static_cast<T>(RAND_MAX);
         }
         return tensor;
     }
@@ -778,7 +777,7 @@ template <typename T> class Tensor
     static sizeT computeSize(const ds::Vector<sizeT>& shape)
     {
         return std::accumulate(
-            shape.begin(), shape.end(), sizeT{1}, std::multiplies<>());
+            shape.begin(), shape.end(), sizeT{1}, std::multiplies());
     }
 
     void checkShapeAndSizeNotEqual(const Tensor& other) const
@@ -800,7 +799,7 @@ template <typename T> class Tensor
     }
 
   private:
-    void printRecursive(std::ostream& os, sizeT dim, sizeT offset) const
+    void printRecursive(std::ostream& os, const sizeT dim, const sizeT offset) const
     {
         os << std::string(dim, ' ') << "[";
         if (dim == shape_.size() - 1)
@@ -847,7 +846,7 @@ Tensor<T> operator+(const T& scalar, const Tensor<T>& tensor)
 template <typename T>
 Tensor<T> operator-(const T& scalar, const Tensor<T>& tensor)
 {
-    return (tensor * static_cast<T>(-1)) + scalar;
+    return tensor * static_cast<T>(-1) + scalar;
 }
 
 template <typename T>
