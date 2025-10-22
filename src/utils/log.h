@@ -30,9 +30,9 @@
 #include <thread>
 
 #include "defines/h3defs.h"
+#include "ds/Queue.h"
 #include "ds/String.h"
 #include "ds/Vector.h"
-#include "ds/queue.h"
 
 namespace hahaha::core::util
 {
@@ -250,7 +250,7 @@ class Logger
   private:
     ds::Vector<LogOutput*> _outputs;
 
-    ds::queue<LogEntry> _messageQueue;
+    ds::Queue<LogEntry> _messageQueue;
     mutable std::mutex _queueMutex;
     std::condition_variable _queueCond{};
     std::thread _workerThread;

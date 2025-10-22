@@ -16,36 +16,5 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by Napbad on 10/4/25.
+// Created by root on 10/21/25.
 //
-
-#ifndef HIAHIAHIA_TRAINSTATISTICS_H
-#define HIAHIAHIA_TRAINSTATISTICS_H
-#include <ds/Vector.h>
-
-#include "defines/h3defs.h"
-#include "ds/Map.h"
-
-HHH_NAMESPACE_IMPORT
-
-namespace hahaha::ml
-{
-
-class TrainStatistics
-{
-  public:
-    ds::Vector<f32> losses;
-};
-
-class EmptyTrainStatistics : public TrainStatistics
-{
-};
-
-class LossTrainStatistics : public TrainStatistics
-{
-  public:
-  private:
-};
-} // namespace hahaha::ml
-
-#endif // HIAHIAHIA_TRAINSTATISTICS_H

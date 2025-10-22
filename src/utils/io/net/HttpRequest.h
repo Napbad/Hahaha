@@ -23,7 +23,7 @@
 #define HIAHIAHIA_HTTPREQUEST_H
 
 #include "HttpMethod.h"
-#include "ds/map.h"
+#include "ds/Map.h"
 
 namespace hahaha::core::util
 {

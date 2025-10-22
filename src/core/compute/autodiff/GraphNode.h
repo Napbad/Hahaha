@@ -15,37 +15,23 @@
 // Email: napbad.sen@gmail.com
 // GitHub: https://github.com/Napbad
 
-//
-// Created by Napbad on 10/4/25.
-//
+#ifndef HAHAHA_GRAPHNODE_H
+#define HAHAHA_GRAPHNODE_H
 
-#ifndef HIAHIAHIA_TRAINSTATISTICS_H
-#define HIAHIAHIA_TRAINSTATISTICS_H
-#include <ds/Vector.h>
+#include <memory>
 
-#include "defines/h3defs.h"
-#include "ds/Map.h"
-
-HHH_NAMESPACE_IMPORT
-
-namespace hahaha::ml
+namespace hahaha::ad
 {
 
-class TrainStatistics
-{
-  public:
-    ds::Vector<f32> losses;
+// Abstract base class for any node in the computation graph.
+template <typename T>
+class GraphNode {
+public:
+    virtual ~GraphNode() = default;
+
+    // We can add more virtual methods later for common behaviors like getting shape.
 };
 
-class EmptyTrainStatistics : public TrainStatistics
-{
-};
+} // namespace hahaha::ad
 
-class LossTrainStatistics : public TrainStatistics
-{
-  public:
-  private:
-};
-} // namespace hahaha::ml
-
-#endif // HIAHIAHIA_TRAINSTATISTICS_H
+#endif //HAHAHA_GRAPHNODE_H

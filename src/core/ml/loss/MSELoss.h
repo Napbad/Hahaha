@@ -19,44 +19,40 @@
 // Created by napbad on 10/6/25.
 //
 
-#ifndef HAHAHA_AUTOGRADOPS_H
-#define HAHAHA_AUTOGRADOPS_H
-#include "Variable.h"
+#ifndef HAHAHA_MSELOSS_H
+#define HAHAHA_MSELOSS_H
+#include "../../Tensor.h"
+#include "Loss.h"
 #include "core/defines/h3defs.h"
 
 HHH_NAMESPACE_IMPORT
 
 namespace hahaha::ml
 {
-template <typename T> class AutogradOps
+
+template <typename T> class MSELoss final : public Loss<T>
 {
   public:
-    static Variable<T> add(const Variable<T>& a, const Variable<T>& b)
-    {
-        return a + b;
-    }
+    MSELoss() = default;
+    ~MSELoss() override = default;
 
-    static Variable<T> mul(const Variable<T>& a, const Variable<T>& b)
+    Variable<T>* forward(const Variable<T>& input, const Variable<T>& target) override
     {
-        return a * b;
-    }
+        // MSE = mean((input - target)^2)
+        if (input.shape() != target.shape())
+        {
+            throw std::runtime_error(
+                "Input and target shapes must match for MSE loss");
+        }
 
-    static Variable<T> matmul(const Variable<T>& a, const Variable<T>& b)
-    {
-        return a.matmul(b);
-    }
+        auto diff = input - target;
+        auto squared = diff * diff;
 
-    static Variable<T> relu(const Variable<T>& a)
-    {
-        return a.relu();
-    }
-
-    static Variable<T> sigmoid(const Variable<T>& a)
-    {
-        return a.sigmoid();
+        // Return mean as a scalar variable
+        return new Variable<T>(squared.mean());
     }
 };
 
 } // namespace hahaha::ml
 
-#endif // HAHAHA_AUTOGRADOPS_H
+#endif // HAHAHA_MSELOSS_H

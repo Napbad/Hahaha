@@ -15,7 +15,7 @@
 // Email: napbad.sen@gmail.com
 // GitHub: https://github.com/Napbad
 
-#include "core/ds/map.h"
+#include "core/ds/Map.h"
 
 #include <gtest/gtest.h>
 #include <string>

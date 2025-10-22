@@ -18,7 +18,7 @@
 #ifndef HIAHIAHIA_SAMPLE_H
 #define HIAHIAHIA_SAMPLE_H
 
-#include <ml/Tensor.h>
+#include "core/Tensor.h"
 
 namespace hahaha::ml
 {

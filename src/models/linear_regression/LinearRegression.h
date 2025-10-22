@@ -18,8 +18,8 @@
 #ifndef HIAHIAHIA_LINEARREGRESSION_H
 #define HIAHIAHIA_LINEARREGRESSION_H
 
-#include <Model.h>
-#include <ml/Tensor.h>
+#include "core/Tensor.h"
+#include "models/Model.h"
 
 namespace hahaha::ml
 {

@@ -46,6 +46,13 @@ set(SOURCE_FILES
     src/datasets/dataset/DatasetDownloader.cpp
     src/core/gpu/calc.cu
         src/core/gpu/calc.cuh
+        src/core/compute/autodiff/ComputeGraph.h
+        src/core/compute/autodiff/ComputeNode.h
+        src/core/compute/autodiff/AutoDiffOp.h
+        src/core/compute/autodiff/auto_diff_ops.h
+        src/include/ml/common/TensorVar.h
+        src/core/compute/autodiff/derivative_nodes.h
+        src/core/TensorPtr.h
 )
 
 file(GLOB_RECURSE HEADER_FILES
@@ -77,4 +84,4 @@ enable_testing()
 add_subdirectory(tests)
 
 # Add examples
-add_subdirectory(examples)
+# add_subdirectory(examples)

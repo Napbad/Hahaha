@@ -30,7 +30,7 @@
 namespace hahaha::core::ds
 {
 
-template <class T, class Allocator = std::allocator<T>> class queue
+template <class T, class Allocator = std::allocator<T>> class Queue
 {
   public:
     // Member type aliases
@@ -42,12 +42,12 @@ template <class T, class Allocator = std::allocator<T>> class queue
     using size_type = size_t;
 
     // Default constructor
-    queue() noexcept : container_(), start_(0)
+    Queue() noexcept : container_(), start_(0)
     {
     }
 
     // Constructor with initializer list
-    queue(std::initializer_list<T> init) : container_(init), start_(0)
+    Queue(std::initializer_list<T> init) : container_(init), start_(0)
     {
     }
 

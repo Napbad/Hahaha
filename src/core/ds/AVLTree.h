@@ -71,7 +71,7 @@ template <typename T> class AVLTreeNode
         return parent_;
     }
 
-    int getHeight() const
+    [[nodiscard]] int getHeight() const
     {
         return height_;
     }
@@ -97,29 +97,29 @@ template <typename T> class AVLTreeNode
 
     void updateHeight()
     {
-        int leftHeight = left_ ? left_->height_ : 0;
-        int rightHeight = right_ ? right_->height_ : 0;
+        const int leftHeight = left_ ? left_->height_ : 0;
+        const int rightHeight = right_ ? right_->height_ : 0;
         height_ = std::max(leftHeight, rightHeight) + 1;
     }
 
-    int getBalanceFactor() const
+    [[nodiscard]] int getBalanceFactor() const
     {
-        int leftHeight = left_ ? left_->height_ : 0;
-        int rightHeight = right_ ? right_->height_ : 0;
+        const int leftHeight = left_ ? left_->height_ : 0;
+        const int rightHeight = right_ ? right_->height_ : 0;
         return leftHeight - rightHeight;
     }
 
-    bool hasLeft() const
+    [[nodiscard]] bool hasLeft() const
     {
         return left_ != nullptr;
     }
 
-    bool hasRight() const
+    [[nodiscard]] bool hasRight() const
     {
         return right_ != nullptr;
     }
 
-    bool hasChild() const
+    [[nodiscard]] bool hasChild() const
     {
         return hasLeft() || hasRight();
     }
@@ -247,11 +247,8 @@ template <typename T> class AVLTree
             parent->setLeft(new AVLTreeNode<T>(val, parent));
             return parent->getLeft();
         }
-        else
-        {
-            parent->setRight(new AVLTreeNode<T>(val, parent));
-            return parent->getRight();
-        }
+        parent->setRight(new AVLTreeNode<T>(val, parent));
+        return parent->getRight();
     }
 
     void removeNode(AVLTreeNode<T>* node)
@@ -300,10 +297,9 @@ template <typename T> class AVLTree
 
     AVLTreeNode<T>* rebalance(AVLTreeNode<T>* node)
     {
-        int balanceFactor = node->getBalanceFactor();
 
         // Left heavy
-        if (balanceFactor > 1)
+        if (const int balanceFactor = node->getBalanceFactor(); balanceFactor > 1)
         {
             // Left-Right case
             if (node->getLeft() && node->getLeft()->getBalanceFactor() < 0)
@@ -396,7 +392,7 @@ template <typename T> class AVLTree
         return leftChild;
     }
 
-    AVLTreeNode<T>* findMinNode(AVLTreeNode<T>* node)
+    static AVLTreeNode<T>* findMinNode(AVLTreeNode<T>* node)
     {
         while (node && node->hasLeft())
             node = node->getLeft();

@@ -16,33 +16,48 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by Napbad on 10/9/25.
+// Created by root on 10/21/25.
 //
 
-#ifndef HAHAHA_SGDOPTIMIZER_H
-#define HAHAHA_SGDOPTIMIZER_H
+#ifndef HAHAHA_DERIVATIVE_NODES_H
+#define HAHAHA_DERIVATIVE_NODES_H
+#include "ComputeNode.h"
 
-#include "Optimizer.h"
-#include "compute/Variable.h"
-#include "ds/Vector.h"
-
-HHH_NAMESPACE_IMPORT
-
-namespace hahaha::ml
+namespace hahaha::ad
 {
-template <typename T> class SGDOptimizer final : public Optimizer<T>
+
+// VALUE nodes
+template<typename T>
+class ConstantNode : public ComputeNode<T>
 {
-  public:
-    SGDOptimizer(const ds::Vector<Variable<T>*>& parameters,
-                 const f64 learningRate)
-        : Optimizer<T>(parameters, learningRate)
+
+};
+
+template<typename T>
+class VariableNode: public ComputeNode<T>
+{
+public:
+    explicit VariableNode(ComputeNode<T>* val)
     {
-    }
-    void step() override
-    {
-        for (auto& param : this->_parameters)
-            *param -= param->grad() * static_cast<T>(this->_learningRate);
+
     }
 };
-} // namespace hahaha::ml
-#endif // HAHAHA_SGDOPTIMIZER_H
+
+// OPERATOR nodes
+template<typename T>
+class AddNode : public ComputeNode<T>
+{
+public:
+    ComputeNode<T>* forward(std::initializer_list<ComputeNode<T>*> inputs) override
+    {
+        this->srcs_ = inputs;
+        auto res = new VariableNode<T>();
+        return res;
+    };
+};
+
+
+
+}
+
+#endif // HAHAHA_DERIVATIVE_NODES_H

@@ -18,11 +18,11 @@
 #ifndef HIAHIAHIA_DATASET_H
 #define HIAHIAHIA_DATASET_H
 
+#include "core/Tensor.h"
 #include <Error.h>
 #include <Res.h>
 #include <ds/String.h>
 #include <ds/Vector.h>
-#include <ml/Tensor.h>
 
 #include "Sample.h"
 

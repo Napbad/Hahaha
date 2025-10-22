@@ -15,7 +15,7 @@
 // Email: napbad.sen@gmail.com
 // GitHub: https://github.com/Napbad
 
-#include "core/ds/set.h"
+#include "core/ds/Set.h"
 
 #include <gtest/gtest.h>
 #include <string>

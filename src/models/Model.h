@@ -22,10 +22,10 @@
 #ifndef HIAHIAHIA_MODEL_H
 #define HIAHIAHIA_MODEL_H
 
+#include <../core/Tensor.h>
 #include <Error.h>
 #include <Res.h>
 #include <ds/String.h>
-#include <ml/Tensor.h>
 #include <ml/trainStatistics.h>
 
 namespace hahaha::ml

@@ -16,10 +16,18 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by napbad on 10/6/25.
+// Created by root on 10/21/25.
 //
 
-#ifndef HAHAHA_AUTOGRAD_H
-#define HAHAHA_AUTOGRAD_H
+#ifndef HAHAHA_AUTODIFFOP_H
+#define HAHAHA_AUTODIFFOP_H
+#include "ComputeNode.h"
 
-#endif // HAHAHA_AUTOGRAD_H
+namespace hahaha::ad
+{
+
+
+
+}
+
+#endif // HAHAHA_AUTODIFFOP_H

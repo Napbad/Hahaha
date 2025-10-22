@@ -21,9 +21,9 @@
 
 #ifndef HAHAHA_CROSSENTROPYLOSS_H
 #define HAHAHA_CROSSENTROPYLOSS_H
+#include "../../Tensor.h"
 #include "Loss.h"
 #include "core/defines/h3defs.h"
-#include "core/ml/Tensor.h"
 
 HHH_NAMESPACE_IMPORT
 

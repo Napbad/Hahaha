@@ -1,5 +1,6 @@
 # Add executable for the simple_nn example
-add_executable(simple_nn simple_nn.cpp)
+add_executable(simple_nn
+        main.cpp)
 
 set(CUDA_PATH "/usr/local/cuda-13.0")
 link_directories("${CUDA_PATH}/lib64")

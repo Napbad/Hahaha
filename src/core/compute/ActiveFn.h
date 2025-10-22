@@ -23,8 +23,8 @@
 #define HAHAHA_ACTIVEFN_H
 #include <cmath>
 
+#include "../Tensor.h"
 #include "core/defines/h3defs.h"
-#include "core/ml/Tensor.h"
 
 HHH_NAMESPACE_IMPORT
 

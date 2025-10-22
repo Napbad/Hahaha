@@ -16,36 +16,23 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by Napbad on 10/4/25.
+// Created by root on 10/21/25.
 //
 
-#ifndef HIAHIAHIA_TRAINSTATISTICS_H
-#define HIAHIAHIA_TRAINSTATISTICS_H
-#include <ds/Vector.h>
+#ifndef HAHAHA_ADOPS_H
+#define HAHAHA_ADOPS_H
+#include "AutoDiffOp.h"
 
-#include "defines/h3defs.h"
-#include "ds/Map.h"
-
-HHH_NAMESPACE_IMPORT
-
-namespace hahaha::ml
+namespace hahaha::ad
+{
+class AutoDiffAdd final : public AutoDiffOp
 {
 
-class TrainStatistics
-{
-  public:
-    ds::Vector<f32> losses;
+    ComputeNode* exec(ComputeNode* left, ComputeNode* right) override
+    {
+
+    }
 };
+}
 
-class EmptyTrainStatistics : public TrainStatistics
-{
-};
-
-class LossTrainStatistics : public TrainStatistics
-{
-  public:
-  private:
-};
-} // namespace hahaha::ml
-
-#endif // HIAHIAHIA_TRAINSTATISTICS_H
+#endif // HAHAHA_ADOPS_H

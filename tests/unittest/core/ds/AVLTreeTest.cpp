@@ -15,7 +15,7 @@
 // Email: napbad.sen@gmail.com
 // GitHub: https://github.com/Napbad
 
-#include "core/ds/avlTree.h"
+#include "core/ds/AVLTree.h"
 
 #include <algorithm>
 #include <gtest/gtest.h>
