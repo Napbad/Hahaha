@@ -25,14 +25,12 @@
 
 namespace hahaha::ad
 {
-template<typename T>
-class ComputeNode;
+template <typename T> class ComputeNode;
 }
 
 namespace hahaha
 {
-template<typename T>
-class TensorVar;
+template <typename T> class TensorVar;
 }
 
 namespace hahaha::core
@@ -42,87 +40,125 @@ using ml::Tensor;
 
 // one tensor can only be hold by 1 TensorVar and 1 GraphNode
 // this class will act as a wrapper for Tensor like shared_ptr
-template<typename T>
-class TensorPtr
+template <typename T> class TensorPtr
 {
-    friend class hahaha::TensorVar<T>;
-    friend class hahaha::ad::ComputeNode<T>;
+    friend class TensorVar<T>;
+    friend class ad::ComputeNode<T>;
 
-public:
-    TensorPtr() = delete;
-
-    explicit TensorPtr(const std::initializer_list<sizeT> shape) : refcount(0)
+  public:
+    ~TensorPtr()
     {
+        *refcount_ -= 1;
+        if (*refcount_ == 0)
+        {
+            delete refcount_;
+            delete tensor_;
+        }
+    }
+
+    TensorPtr(const std::initializer_list<sizeT> shape)
+    {
+        refcount_ = new i8(0);
         tensor_ = new Tensor<T>(shape);
     }
 
-    explicit TensorPtr(const ds::Vector<sizeT>& shape) : refcount(0)
+    explicit TensorPtr(const ds::Vector<sizeT>& shape)
     {
-        tensor_ = new Tensor<T> (shape);
+        refcount_ = new i8(0);
+        tensor_ = new Tensor<T>(shape);
     }
     explicit TensorPtr(const ds::Vector<sizeT>& shape, const T* data)
-        :refcount(0)
     {
+        refcount_ = new i8(0);
         tensor_ = new Tensor<T>(shape, data);
     }
 
     // Constructor for a 0-dimensional tensor (scalar)
-    explicit TensorPtr(T scalar) : refcount(0)
+    explicit TensorPtr(T scalar)
     {
+        refcount_ = new i8(0);
         tensor_ = new Tensor<T>(scalar);
     }
 
     // Constructor for a 0-dimensional tensor (scalar)
     explicit TensorPtr(const std::initializer_list<sizeT> shape,
-                    std::initializer_list<T> data)
-        : refcount(0)
+                       std::initializer_list<T> data)
     {
+        refcount_ = new i8(0);
         tensor_ = new Tensor<T>(shape, data);
     }
 
-
-    void refByVar()
+    void refByVar() const
     {
-        if (refcount > TENSOR_VAR_REF_MASK)
-            throw std::runtime_error("TensorPtr already referenced by a TensorVar");
-        refcount |= TENSOR_VAR_REF_MASK;
+        if (*refcount_ > TENSOR_VAR_REF_MASK)
+            throw std::runtime_error(
+                "TensorPtr already referenced by a TensorVar");
+        *refcount_ |= TENSOR_VAR_REF_MASK;
     }
 
-    void refByNode()
+    void refByNode() const
     {
-        if ((COMPUTE_NODE_REF_MASK & refcount) != 0)
-            throw std::runtime_error("TensorPtr already referenced by a ComputeNode");
-        refcount |= COMPUTE_NODE_REF_MASK;
+        if ((COMPUTE_NODE_REF_MASK & *refcount_) != 0)
+            throw std::runtime_error(
+                "TensorPtr already referenced by a ComputeNode");
+        *refcount_ |= COMPUTE_NODE_REF_MASK;
     }
-
 
     TensorPtr(const TensorPtr& other) = delete;
     TensorPtr(TensorPtr&& other) = delete;
     TensorPtr& operator=(const TensorPtr& other) = delete;
-    TensorPtr& operator=(TensorPtr&& other) = delete;
+    TensorPtr& operator=(TensorPtr&& other) noexcept
+    {
+        *this = std::move(other);
+        return *this;
+    };
 
-private:
+    explicit operator bool() const
+    {
+        return tensor_ != nullptr;
+    }
+
+  private:
     static constexpr i8 TENSOR_VAR_REF_MASK = 0b00000010;
     static constexpr i8 COMPUTE_NODE_REF_MASK = 0b00000001;
 
-    // only TensorVar and ComputeNode can initialize the TensorPtr
-    
+    TensorPtr()
+    {
+        refcount_ = new i8(0);
+        tensor_ = nullptr;
+    }
 
+    explicit TensorPtr (Tensor<T>&& tensor)
+    {
+        this->tensor_ = new Tensor<T>(std::move(tensor));
+        refcount_ = new i8(0);
+    }
+
+    explicit TensorPtr(Tensor<T>& tensor)
+    {
+        this->tensor_ = new Tensor<T>(tensor);
+        refcount_ = new i8(0);
+    }
+
+    explicit TensorPtr(Tensor<T> *tensor )
+    {
+        this->tensor_ = tensor;
+        refcount_ = new i8(0);
+    }
+
+    // only TensorVar and ComputeNode can initialize the TensorPtr
     [[nodiscard]] bool holdByVar() const
     {
-        return TENSOR_VAR_REF_MASK & refcount;
+        return TENSOR_VAR_REF_MASK & *refcount_;
     }
     [[nodiscard]] bool holdByNode() const
     {
-        return COMPUTE_NODE_REF_MASK & refcount;
+        return COMPUTE_NODE_REF_MASK & *refcount_;
     }
 
-    
-
     Tensor<T>* tensor_;
-    i8 refcount;
-
+    i8* refcount_;
 };
-}
+} // namespace hahaha::core
 
-#endif //HAHAHA_TENSORPTR_H
+#endif // HAHAHA_TENSORPTR_H

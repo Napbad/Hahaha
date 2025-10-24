@@ -26,8 +26,6 @@
 namespace hahaha::ad
 {
 
-
-
 }
 
 #endif // HAHAHA_AUTODIFFOP_H

@@ -21,39 +21,54 @@
 
 #ifndef HAHAHA_NODE_H
 #define HAHAHA_NODE_H
+
+#include <memory>
+#include <vector>
+
+#include "GraphNode.h"
 #include "Tensor.h"
 #include "TensorPtr.h"
-#include "GraphNode.h"
-#include <vector>
-#include <memory>
 
 namespace hahaha::ad
 {
 
-using core::ds::Vector;
 using core::Tensor;
 using core::TensorPtr;
+using core::ds::Vector;
 
-template<typename T>
-class ComputeNode : public GraphNode<T>
+template <typename T> class ComputeNode : public GraphNode<T>
 {
   public:
-    virtual ~ComputeNode() = default;
+    ~ComputeNode() override = default;
 
     ComputeNode() = default;
 
-    explicit ComputeNode(std::vector<std::shared_ptr<GraphNode<T>>> srcs) : srcs_(std::move(srcs)) {}
+    explicit ComputeNode(std::vector<std::shared_ptr<GraphNode<T>>> srcs)
+        : srcs_(std::move(srcs))
+    {
+    }
+
+    ComputeNode(const ComputeNode&) = delete;
+    ComputeNode& operator=(const ComputeNode&) = delete;
+    ComputeNode(ComputeNode&&) = default;
+    ComputeNode& operator=(ComputeNode&&) = default;
 
     virtual void forward() = 0;
     // We will define backward logic later
 
-    const std::vector<std::shared_ptr<GraphNode<T>>>& srcs() const { return srcs_; }
-    Tensor<T>& grad() { return grad_; }
+    const std::vector<std::shared_ptr<GraphNode<T>>>& srcs() const
+    {
+        return srcs_;
+    }
+    Tensor<T>& grad()
+    {
+        return grad_;
+    }
 
-protected:
+  protected:
     std::vector<std::shared_ptr<GraphNode<T>>> srcs_;
     Tensor<T> grad_;
 };
-}
+} // namespace hahaha::ad
 
 #endif // HAHAHA_NODE_H

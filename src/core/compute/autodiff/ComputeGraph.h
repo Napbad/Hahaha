@@ -22,4 +22,14 @@
 #ifndef HAHAHA_GRAPH_H
 #define HAHAHA_GRAPH_H
 
+namespace hahaha::ad
+{
+class ComputeGraph
+{
+  public:
+    void buildGraph();
+    void runGraph();
+};
+} // namespace hahaha::ad
+
 #endif // HAHAHA_GRAPH_H

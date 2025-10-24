@@ -24,7 +24,7 @@
 namespace hahaha::ml
 {
 
-class LinearRegression : public Model
+class LinearRegression final : public Model
 {
   public:
     LinearRegression() = default;

@@ -56,17 +56,13 @@ inline String trim(const String& s)
     return {start, end + 1};
 }
 
-
-template <typename T>
-struct ArithmeticTraits
+template <typename T> struct ArithmeticTraits
 {
     static constexpr bool isArithmetic = std::is_arithmetic_v<T>;
 };
 
 template <typename T>
 constexpr bool isArithmetic = ArithmeticTraits<T>::isArithmetic;
-
-
 
 } // namespace hahaha::core::util
 

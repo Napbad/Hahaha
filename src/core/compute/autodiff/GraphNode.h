@@ -18,20 +18,27 @@
 #ifndef HAHAHA_GRAPHNODE_H
 #define HAHAHA_GRAPHNODE_H
 
-#include <memory>
-
 namespace hahaha::ad
 {
 
-// Abstract base class for any node in the computation graph.
+using namespace std;
+
+template<typename T> class GraphNode;
+
 template <typename T>
-class GraphNode {
-public:
+using GraphNodePtr = std::shared_ptr<GraphNode<T>>;
+
+// Abstract base class for any node in the computation graph.
+template <typename T> class GraphNode
+{
+  public:
     virtual ~GraphNode() = default;
 
-    // We can add more virtual methods later for common behaviors like getting shape.
+    // We can add more virtual methods later for common behaviors like getting
+    // shape.
+    virtual std::vector<GraphNodePtr<T>> get_parents() const = 0;
 };
 
 } // namespace hahaha::ad
 
-#endif //HAHAHA_GRAPHNODE_H
+#endif // HAHAHA_GRAPHNODE_H

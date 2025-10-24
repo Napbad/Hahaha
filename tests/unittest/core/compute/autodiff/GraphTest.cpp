@@ -16,17 +16,20 @@
 // GitHub: https://github.com/Napbad
 
 #include <gtest/gtest.h>
-#include "include/ml/common/TensorVar.h"
+
 #include "core/compute/autodiff/ops.h"
 #include "core/ds/String.h"
+#include "include/ml/common/TensorVar.h"
 
 using namespace hahaha;
 using namespace hahaha::ad;
 using hahaha::core::ds::String;
 
-class GraphTest : public ::testing::Test {
-protected:
-    void SetUp() override {
+class GraphTest : public ::testing::Test
+{
+  protected:
+    void SetUp() override
+    {
         a = std::make_shared<TensorVar<float>>(1.0f, String("a"));
         b = std::make_shared<TensorVar<float>>(2.0f, String("b"));
         d = std::make_shared<TensorVar<float>>(3.0f, String("d"));
@@ -40,8 +43,8 @@ protected:
     std::shared_ptr<GraphNode<float>> v1, v2, v3, v4;
 };
 
-
-TEST_F(GraphTest, SimpleAddition) {
+TEST_F(GraphTest, SimpleAddition)
+{
     auto c = a + b;
 
     // The result should be a ComputeNode, specifically an AddNode
@@ -56,7 +59,8 @@ TEST_F(GraphTest, SimpleAddition) {
     ASSERT_EQ(add_node->srcs()[1], b);
 }
 
-TEST_F(GraphTest, SimpleMultiplication) {
+TEST_F(GraphTest, SimpleMultiplication)
+{
     auto c = b * d;
 
     auto mul_node = std::dynamic_pointer_cast<MultiplyNode<float>>(c);
@@ -66,7 +70,8 @@ TEST_F(GraphTest, SimpleMultiplication) {
     ASSERT_EQ(mul_node->srcs()[1], d);
 }
 
-TEST_F(GraphTest, ChainedOperations) {
+TEST_F(GraphTest, ChainedOperations)
+{
     // c = a + (b * d)
     auto c = a + b * d;
 
@@ -79,7 +84,8 @@ TEST_F(GraphTest, ChainedOperations) {
     ASSERT_EQ(add_node->srcs()[0], a);
 
     // The second source should be the result of the multiplication
-    auto mul_node = std::dynamic_pointer_cast<MultiplyNode<float>>(add_node->srcs()[1]);
+    auto mul_node =
+        std::dynamic_pointer_cast<MultiplyNode<float>>(add_node->srcs()[1]);
     ASSERT_NE(mul_node, nullptr);
     ASSERT_EQ(mul_node->srcs().size(), 2);
 
@@ -88,7 +94,8 @@ TEST_F(GraphTest, ChainedOperations) {
     ASSERT_EQ(mul_node->srcs()[1], d);
 }
 
-TEST_F(GraphTest, ComplexGraphStructure) {
+TEST_F(GraphTest, ComplexGraphStructure)
+{
     // result = (v1 * v2) + (v3 * v4)
     auto result = v1 * v2 + v3 * v4;
 
@@ -98,14 +105,16 @@ TEST_F(GraphTest, ComplexGraphStructure) {
     ASSERT_EQ(add_node->srcs().size(), 2);
 
     // Left source is the first multiplication
-    auto mul_node1 = std::dynamic_pointer_cast<MultiplyNode<float>>(add_node->srcs()[0]);
+    auto mul_node1 =
+        std::dynamic_pointer_cast<MultiplyNode<float>>(add_node->srcs()[0]);
     ASSERT_NE(mul_node1, nullptr);
     ASSERT_EQ(mul_node1->srcs().size(), 2);
     ASSERT_EQ(mul_node1->srcs()[0], v1);
     ASSERT_EQ(mul_node1->srcs()[1], v2);
 
     // Right source is the second multiplication
-    auto mul_node2 = std::dynamic_pointer_cast<MultiplyNode<float>>(add_node->srcs()[1]);
+    auto mul_node2 =
+        std::dynamic_pointer_cast<MultiplyNode<float>>(add_node->srcs()[1]);
     ASSERT_NE(mul_node2, nullptr);
     ASSERT_EQ(mul_node2->srcs().size(), 2);
     ASSERT_EQ(mul_node2->srcs()[0], v3);

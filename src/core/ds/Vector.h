@@ -64,8 +64,7 @@ template <class T, class Allocator = std::allocator<T>> class Vector
     {
     }
 
-    explicit Vector(const SizeType count)
-        : data_(nullptr)
+    explicit Vector(const SizeType count) : data_(nullptr)
     {
         if (count > 0)
         {
@@ -550,8 +549,7 @@ template <class T, class Allocator = std::allocator<T>> class Vector
     sizeT capacity_ = 0;
 };
 template <class T, class Allocator>
-Vector<T, Allocator>::Vector(std::initializer_list<T> init)
-    : data_(nullptr)
+Vector<T, Allocator>::Vector(std::initializer_list<T> init) : data_(nullptr)
 {
     reserve(init.size());
     size_ = init.size();
@@ -564,8 +562,7 @@ Vector<T, Allocator>::Vector(std::initializer_list<T> init)
 }
 
 template <class T, class Allocator>
-std::ostream& operator<<(std::ostream& os,
-                                const Vector<T, Allocator>& vec)
+std::ostream& operator<<(std::ostream& os, const Vector<T, Allocator>& vec)
 {
     os << vec.toString().c_str();
     return os;

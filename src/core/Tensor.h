@@ -203,7 +203,8 @@ template <typename T> class Tensor
     {
         static_assert((std::is_integral_v<Dims> && ...),
                       "Indices must be of integral type");
-        const std::initializer_list<sizeT> indices = {static_cast<sizeT>(dims)...};
+        const std::initializer_list<sizeT> indices = {
+            static_cast<sizeT>(dims)...};
         if (indices.size() != shape_.size())
         {
             throw std::runtime_error("Incorrect number of indices");
@@ -215,7 +216,8 @@ template <typename T> class Tensor
     {
         static_assert((std::is_integral_v<Dims> && ...),
                       "Indices must be of integral type");
-        const std::initializer_list<sizeT> indices = {static_cast<sizeT>(dims)...};
+        const std::initializer_list<sizeT> indices = {
+            static_cast<sizeT>(dims)...};
         if (indices.size() != shape_.size())
         {
             throw std::runtime_error("Incorrect number of indices");
@@ -799,7 +801,8 @@ template <typename T> class Tensor
     }
 
   private:
-    void printRecursive(std::ostream& os, const sizeT dim, const sizeT offset) const
+    void
+    printRecursive(std::ostream& os, const sizeT dim, const sizeT offset) const
     {
         os << std::string(dim, ' ') << "[";
         if (dim == shape_.size() - 1)

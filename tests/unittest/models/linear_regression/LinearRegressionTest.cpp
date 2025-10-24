@@ -19,11 +19,13 @@
 // Created by Napbad on 10/2/25.
 //
 
-#include <gtest/gtest.h>
-#include "core/Tensor.h"
 #include "models/linear_regression/LinearRegression.h"
+
 #include <fstream>
+#include <gtest/gtest.h>
 #include <iostream>
+
+#include "core/Tensor.h"
 
 HHH_NAMESPACE_IMPORT
 using hahaha::ml::LinearRegression;

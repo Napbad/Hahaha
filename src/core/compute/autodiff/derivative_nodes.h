@@ -27,28 +27,23 @@ namespace hahaha::ad
 {
 
 // VALUE nodes
-template<typename T>
-class ConstantNode : public ComputeNode<T>
+template <typename T> class ConstantNode : public ComputeNode<T>
 {
-
 };
 
-template<typename T>
-class VariableNode: public ComputeNode<T>
+template <typename T> class VariableNode : public ComputeNode<T>
 {
-public:
+  public:
     explicit VariableNode(ComputeNode<T>* val)
     {
-
     }
 };
 
 // OPERATOR nodes
-template<typename T>
-class AddNode : public ComputeNode<T>
+template <typename T> class AddNode : public ComputeNode<T>
 {
-public:
-    ComputeNode<T>* forward(std::initializer_list<ComputeNode<T>*> inputs) override
+  public:
+    ComputeNode<T>* forward(std::initializer_list<ComputeNode<T>*> inputs)
     {
         this->srcs_ = inputs;
         auto res = new VariableNode<T>();
@@ -56,8 +51,6 @@ public:
     };
 };
 
-
-
-}
+} // namespace hahaha::ad
 
 #endif // HAHAHA_DERIVATIVE_NODES_H

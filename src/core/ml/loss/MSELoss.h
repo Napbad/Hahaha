@@ -36,7 +36,8 @@ template <typename T> class MSELoss final : public Loss<T>
     MSELoss() = default;
     ~MSELoss() override = default;
 
-    Variable<T>* forward(const Variable<T>& input, const Variable<T>& target) override
+    Variable<T>* forward(const Variable<T>& input,
+                         const Variable<T>& target) override
     {
         // MSE = mean((input - target)^2)
         if (input.shape() != target.shape())

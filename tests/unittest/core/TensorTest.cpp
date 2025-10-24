@@ -15,10 +15,9 @@
 // Email: napbad.sen@gmail.com
 // GitHub: https://github.com/Napbad
 
-#include <gtest/gtest.h>
-
-#include <ds/Vector.h>
 #include <core/Tensor.h>
+#include <ds/Vector.h>
+#include <gtest/gtest.h>
 
 using namespace hahaha;
 using namespace hahaha::ml;

@@ -299,7 +299,8 @@ template <typename T> class AVLTree
     {
 
         // Left heavy
-        if (const int balanceFactor = node->getBalanceFactor(); balanceFactor > 1)
+        if (const int balanceFactor = node->getBalanceFactor();
+            balanceFactor > 1)
         {
             // Left-Right case
             if (node->getLeft() && node->getLeft()->getBalanceFactor() < 0)

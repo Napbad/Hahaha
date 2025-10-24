@@ -33,8 +33,8 @@ template <typename T> class Loss
 {
   public:
     virtual ~Loss() = default;
-    virtual Variable<T> *forward(const Variable<T>& input,
-                              const Variable<T>& target) = 0;
+    virtual Variable<T>* forward(const Variable<T>& input,
+                                 const Variable<T>& target) = 0;
 
     Variable<T>* operator()(const Variable<T>& input, const Variable<T>& target)
     {
