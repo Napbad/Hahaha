@@ -42,7 +42,10 @@ template <typename T> class TensorVar;
 template<typename T>
 using TensorVarPtr = std::shared_ptr<TensorVar<T>>;
 
-template <typename T> class TensorVar
+template<typename T>
+using Tensor = TensorVarPtr<T>;
+
+template <typename T> class TensorVar : public std::enable_shared_from_this<TensorVar<T>>
 {
   public:
     ~TensorVar()
@@ -147,7 +150,8 @@ template <typename T> class TensorVar
     // Basic accessors mirroring Tensor
     [[nodiscard]] const Vector<sizeT>& shape() const { return getTensorData_().shape(); }
     [[nodiscard]] sizeT size() const { return getTensorData_().size(); }
-    T operator[](sizeT idx) const { return getTensorData_()[idx]; }
+    T& operator[](sizeT idx) { return getTensorData_()[idx]; }
+    const T& operator[](sizeT idx) const { return getTensorData_()[idx]; }
 
     // Access underlying Tensor reference
     ml::TensorData<T>& tensorData() { return getTensorData_(); }
@@ -155,6 +159,80 @@ template <typename T> class TensorVar
 
     // Data view (const, matches Tensor<T>::data API)
     [[nodiscard]] const Vector<T>& data() const { return getTensorData_().data(); }
+
+    // Frequently used operations (graph-building)
+    // Helpers
+    Tensor<T> unaryOp_(const TensorVarOpType op)
+    {
+        auto self = this->shared_from_this();
+        return std::make_shared<TensorVar<T>>(op, std::initializer_list<TensorVarPtr<T>>{self});
+    }
+    Tensor<T> binaryOp_(const TensorVarOpType op, const Tensor<T>& rhs)
+    {
+        auto self = this->shared_from_this();
+        return std::make_shared<TensorVar<T>>(op, std::initializer_list<TensorVarPtr<T>>{self, rhs});
+    }
+
+    // Reductions
+    Tensor<T> sum() { return unaryOp_(TensorVarOpType::Sum); }
+    Tensor<T> mean() { return unaryOp_(TensorVarOpType::Mean); }
+    Tensor<T> max() { return unaryOp_(TensorVarOpType::Max); }
+    Tensor<T> min() { return unaryOp_(TensorVarOpType::Min); }
+    Tensor<T> prod() { return unaryOp_(TensorVarOpType::Prod); }
+
+    // Unary elementwise
+    Tensor<T> neg() { return unaryOp_(TensorVarOpType::Neg); }
+    Tensor<T> absOp() { return unaryOp_(TensorVarOpType::Abs); }
+    Tensor<T> sqrtOp() { return unaryOp_(TensorVarOpType::Sqrt); }
+    Tensor<T> expOp() { return unaryOp_(TensorVarOpType::Exp); }
+    Tensor<T> logOp() { return unaryOp_(TensorVarOpType::Log); }
+    Tensor<T> sigmoid() { return unaryOp_(TensorVarOpType::Sigmoid); }
+
+    // Binary elementwise
+    Tensor<T> add(const Tensor<T>& rhs) { return binaryOp_(TensorVarOpType::Add, rhs); }
+    Tensor<T> sub(const Tensor<T>& rhs) { return binaryOp_(TensorVarOpType::Sub, rhs); }
+    Tensor<T> mul(const Tensor<T>& rhs) { return binaryOp_(TensorVarOpType::Mul, rhs); }
+    Tensor<T> div(const Tensor<T>& rhs) { return binaryOp_(TensorVarOpType::Div, rhs); }
+    Tensor<T> matmul(const Tensor<T>& rhs) { return binaryOp_(TensorVarOpType::MatMul, rhs); }
+    // Immediate evaluation helpers (no graph)
+    // sumValue(): immediate value from underlying TensorData
+    T sumValue() const { return getTensorData_().sum(); }
+    // transpose(): immediate TensorData result (graph op not defined yet)
+    ml::TensorData<T> transpose() const { return getTensorData_().transpose(); }
+    [[nodiscard]] sizeT dim() const { return getTensorData_().dim(); }
+    [[nodiscard]] bool isScalar() const { return getTensorData_().isScalar(); }
+    [[nodiscard]] bool hasOnlyOneVal() const { return getTensorData_().hasOnlyOneVal(); }
+    [[nodiscard]] bool empty() const { return getTensorData_().empty(); }
+    [[nodiscard]] auto rawData() const { return getTensorData_().rawData(); }
+
+    // Indexing helpers
+    [[nodiscard]] sizeT index(const std::initializer_list<sizeT> idxs) const { return getTensorData_().index(idxs); }
+    [[nodiscard]] sizeT index(const Vector<sizeT>& idxs) const { return getTensorData_().index(idxs); }
+
+    // Element access via coordinates
+    T& operator()(const Vector<sizeT>& idxs) { return getTensorData_()(idxs); }
+    const T& operator()(const Vector<sizeT>& idxs) const { return getTensorData_()(idxs); }
+
+    template <typename... Dims>
+    T& operator()(Dims... dims) { return getTensorData_()(std::forward<Dims>(dims)...); }
+    template <typename... Dims>
+    const T& operator()(Dims... dims) const { return getTensorData_()(std::forward<Dims>(dims)...); }
+
+    // Slicing and mutation
+    ml::TensorData<T> at(const std::initializer_list<sizeT> idxs) const { return getTensorData_().at(idxs); }
+    void set(const std::initializer_list<sizeT> idxs, T value) { getTensorData_().set(idxs, value); }
+    T& first() { return getTensorData_().first(); }
+    void fill(const T v) { getTensorData_().fill(v); }
+    void copy(const ml::TensorData<T>& other) { getTensorData_().copy(other); }
+    void copy(const Vector<T>& other) { getTensorData_().copy(other); }
+
+    // Linalg and reshape
+    T dot(const ml::TensorData<T>& other) const { return getTensorData_().dot(other); }
+    T dot(const TensorVar<T>& other) const { return getTensorData_().dot(other.tensorData()); }
+    ml::TensorData<T> matmul(const ml::TensorData<T>& other) const { return getTensorData_().matmul(other); }
+    ml::TensorData<T> matmul(const TensorVar<T>& other) const { return getTensorData_().matmul(other.tensorData()); }
+    void reshape(const Vector<sizeT>& new_shape) { getTensorData_().reshape(new_shape); }
+    void print() const { getTensorData_().print(); }
 
     // Conversions to Tensor reference (explicit to avoid accidental decay)
     explicit operator ml::TensorData<T>&() { return getTensorData_(); }
@@ -195,8 +273,6 @@ template <typename T> class TensorVar
     TensorVarOpType opType_ = TensorVarOpType::None;
 };
 
-template<typename T>
-using Tensor = TensorVarPtr<T>;
 
 using Tensori = TensorVar<i32>;
 using Tensorf = TensorVar<f32>;
@@ -213,6 +289,66 @@ template <typename T, typename... Args>
 Tensor<T> tensor(Args&&... args)
 {
     return std::make_shared<TensorVar<T>>(std::forward<Args>(args)...);
+}
+
+// Friendly overloads to support brace-init without verbose types
+// 1) shape-only
+template <typename T, typename U,
+          typename = std::enable_if_t<std::is_integral_v<U>>>
+Tensor<T> tensor(std::initializer_list<U> shape)
+{
+    Vector<sizeT> s;
+    s.reserve(shape.size());
+    for (auto v : shape) s.pushBack(static_cast<sizeT>(v));
+    return std::make_shared<TensorVar<T>>(s);
+}
+
+// 2) shape + name
+template <typename T, typename U,
+          typename = std::enable_if_t<std::is_integral_v<U>>>
+Tensor<T> tensor(std::initializer_list<U> shape, const char* name)
+{
+    Vector<sizeT> s;
+    s.reserve(shape.size());
+    for (auto v : shape) s.pushBack(static_cast<sizeT>(v));
+    return std::make_shared<TensorVar<T>>(s, name);
+}
+
+// 3) shape + data
+template <typename T, typename U>
+Tensor<T> tensor(std::initializer_list<U> shape,
+                 std::initializer_list<T> data)
+{
+    Vector<sizeT> s;
+    s.reserve(shape.size());
+    for (auto v : shape) s.pushBack(static_cast<sizeT>(v));
+    return std::make_shared<TensorVar<T>>(s, data.begin());
+}
+
+// 4) shape + data + name
+template <typename T, typename U>
+Tensor<T> tensor(std::initializer_list<U> shape,
+                 std::initializer_list<T> data,
+                 const char* name)
+{
+    Vector<sizeT> s;
+    s.reserve(shape.size());
+    for (auto v : shape) s.pushBack(static_cast<sizeT>(v));
+    return std::make_shared<TensorVar<T>>(s, data.begin(), name);
+}
+
+// 5) scalar
+template <typename T>
+Tensor<T> tensor(T scalar)
+{
+    return std::make_shared<TensorVar<T>>(scalar);
+}
+
+// 6) scalar + name
+template <typename T>
+Tensor<T> tensor(T scalar, const char* name)
+{
+    return std::make_shared<TensorVar<T>>(scalar, name);
 }
 
 template<typename T>

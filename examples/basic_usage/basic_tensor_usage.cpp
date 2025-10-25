@@ -16,6 +16,10 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by root on 10/21/25.
+// Created by root on 10/25/25.
 //
 
+int main()
+{
+
+}

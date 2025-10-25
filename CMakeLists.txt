@@ -56,6 +56,7 @@ set(SOURCE_FILES
         src/include/ml/common/TensorVarOp.cpp
         src/include/ml/common/TensorVar.cpp
         src/core/compute/autodiff/ComputeGraph.cpp
+        examples/basic_usage/basic_tensor_usage.cpp
 )
 
 file(GLOB_RECURSE HEADER_FILES
@@ -87,4 +88,4 @@ enable_testing()
 add_subdirectory(tests)
 
 # Add examples
-# add_subdirectory(examples)
+ add_subdirectory(examples)
