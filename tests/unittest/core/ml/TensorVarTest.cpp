@@ -29,7 +29,7 @@ TEST(TensorVarTest, DerefAndConversionToTensor)
     ml::TensorData<float>& t = *v; // operator*()
     EXPECT_EQ(t.size(), static_cast<sizeT>(3));
 
-    const ml::TensorData<float>& ct = static_cast<const ml::TensorData<float>&>(v);
+    const auto& ct = static_cast<const ml::TensorData<float>&>(v);
     EXPECT_FLOAT_EQ(ct.sum(), 6.0f);
 }
 
@@ -38,3 +38,4 @@ TEST(TensorVarTest, EmptyThrowsOnAccess)
     TensorVar<float> empty;
     EXPECT_THROW(empty.size(), std::runtime_error);
 }
+
