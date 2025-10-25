@@ -20,7 +20,7 @@
 namespace hahaha::ml
 {
 
-f32 LinearRegression::predict(const Tensor<f32>& features) const
+f32 LinearRegression::predict(const TensorData<f32>& features) const
 {
     if (weights_.empty())
     {
@@ -51,8 +51,8 @@ ds::String LinearRegression::modelName() const
     return ds::String("LinearRegression");
 }
 
-void LinearRegression::checkStatus(const ml::Tensor<f32>& features,
-                                   const ml::Tensor<f32>& labels) const
+void LinearRegression::checkStatus(const ml::TensorData<f32>& features,
+                                   const ml::TensorData<f32>& labels) const
 {
     // Basic checks for tensor dimensions and sizes
     if (features.dim() != 2 || labels.dim() != 2)
@@ -74,14 +74,14 @@ void LinearRegression::checkStatus(const ml::Tensor<f32>& features,
             "Feature dimensions are inconsistent with model weights.");
     }
 }
-TrainStatistics LinearRegression::train(const Tensor<f32>& features,
-                                        const Tensor<f32>& labels)
+TrainStatistics LinearRegression::train(const TensorData<f32>& features,
+                                        const TensorData<f32>& labels)
 {
     checkStatus(features, labels);
 
     if (weights_.empty())
     {
-        weights_ = Tensor<f32>({features.shape()[1]});
+        weights_ = TensorData<f32>({features.shape()[1]});
         weights_.fill(1);
         bias_ = 0.0f;
     }
@@ -94,7 +94,7 @@ TrainStatistics LinearRegression::train(const Tensor<f32>& features,
         {
             auto feature_vec = features.data().subVector(
                 i * features.shape()[1], features.shape()[1]);
-            Tensor feature({features.shape()[1]}, feature_vec.begin());
+            TensorData feature({features.shape()[1]}, feature_vec.begin());
             auto label_vec = labels.data().subVector(i, 1);
             const auto label = label_vec[0];
 

@@ -22,10 +22,11 @@
 #ifndef HAHAHA_TENSORVAR_H
 #define HAHAHA_TENSORVAR_H
 
-#include "core/compute/autodiff/GraphNode.h"
-#include "core/ds/String.h"
-#include "TensorPtr.h"
 #include <stdexcept>
+
+#include "TensorPtr.h"
+#include "TensorVarOp.h"
+#include "core/ds/String.h"
 
 namespace hahaha
 {
@@ -34,9 +35,22 @@ using core::ds::String;
 using core::ds::Vector;
 using core::TensorPtr;
 
+template <typename T> class TensorVar;
+
+template<typename T>
+using TensorVarPtr = std::shared_ptr<TensorVar<T>>;
+
 template <typename T> class TensorVar
 {
   public:
+
+    TensorVar(const TensorVarOpType opType, std::initializer_list<TensorVarPtr<T>> operands)
+    {
+        opType_ = opType;
+        for (auto& operand : operands)
+            parents_.pushBack(operand);
+    }
+
     explicit TensorVar(String name = String()) : ptr_(nullptr), name_(std::move(name))
     {
     }
@@ -76,28 +90,30 @@ template <typename T> class TensorVar
         ptr_->refByVar();
     }
 
+    TensorVarPtr<T> calc();
+
     // ===================== Tensor-like API exposure =====================
     // Basic accessors mirroring Tensor
-    [[nodiscard]] const Vector<sizeT>& shape() const { return getTensor_().shape(); }
-    [[nodiscard]] sizeT size() const { return getTensor_().size(); }
-    T operator[](sizeT idx) const { return getTensor_()[idx]; }
+    [[nodiscard]] const Vector<sizeT>& shape() const { return getTensorData_().shape(); }
+    [[nodiscard]] sizeT size() const { return getTensorData_().size(); }
+    T operator[](sizeT idx) const { return getTensorData_()[idx]; }
 
     // Access underlying Tensor reference
-    ml::Tensor<T>& tensor() { return getTensor_(); }
-    const ml::Tensor<T>& tensor() const { return getTensor_(); }
+    ml::TensorData<T>& tensorData() { return getTensorData_(); }
+    const ml::TensorData<T>& tensorData() const { return getTensorData_(); }
 
     // Data view (const, matches Tensor<T>::data API)
-    [[nodiscard]] const Vector<T>& data() const { return getTensor_().data(); }
+    [[nodiscard]] const Vector<T>& data() const { return getTensorData_().data(); }
 
     // Conversions to Tensor reference (explicit to avoid accidental decay)
-    explicit operator ml::Tensor<T>&() { return getTensor_(); }
-    explicit operator const ml::Tensor<T>&() const { return getTensor_(); }
+    explicit operator ml::TensorData<T>&() { return getTensorData_(); }
+    explicit operator const ml::TensorData<T>&() const { return getTensorData_(); }
 
     // Pointer-like forwarding
-    ml::Tensor<T>* operator->() { return &getTensor_(); }
-    const ml::Tensor<T>* operator->() const { return &getTensor_(); }
-    ml::Tensor<T>& operator*() { return getTensor_(); }
-    const ml::Tensor<T>& operator*() const { return getTensor_(); }
+    ml::TensorData<T>* operator->() { return &getTensorData_(); }
+    const ml::TensorData<T>* operator->() const { return &getTensorData_(); }
+    ml::TensorData<T>& operator*() { return getTensorData_(); }
+    const ml::TensorData<T>& operator*() const { return getTensorData_(); }
 
     TensorVar& operator=(TensorVar&& other) noexcept {
         this->ptr_ = other.ptr_;
@@ -106,7 +122,7 @@ template <typename T> class TensorVar
 
   private:
     // Safety: centralize null-check
-    ml::Tensor<T>& getTensor_() const
+    ml::TensorData<T>& getTensorData_() const
     {
         if (!ptr_)
             throw std::runtime_error("TensorVar is empty (null TensorPtr)");
@@ -117,7 +133,54 @@ template <typename T> class TensorVar
 
     TensorPtr<T> ptr_;
     String name_;
+    Vector<TensorVarPtr<T>> parents_;
+
+    TensorVarOpType opType_ = TensorVarOpType::None;
 };
+
+template<typename T>
+using Tensor = TensorVarPtr<T>;
+
+template<typename T>
+using Tensori = TensorVar<i32>;
+template<typename T>
+using Tensorf = TensorVar<f32>;
+template<typename T>
+using Tensorb = TensorVar<bool>;
+template<typename T>
+using Tensoru = TensorVar<u32>;
+template<typename T>
+using Tensorl = TensorVar<i64>;
+template<typename T>
+using Tensorul = TensorVar<u64>;
+template<typename T>
+using Tensord = TensorVar<f64>;
+template<typename T>
+using Tensorc = TensorVar<char>;
+
+template<typename T>
+Tensor<T>& operator+ (Tensor<T>& lhs, Tensor<T>& rhs)
+{
+    return Tensor<T>(TensorVarOpType::Add, {lhs, rhs});
+}
+
+template<typename T>
+Tensor<T>& operator- (Tensor<T>& lhs, Tensor<T>& rhs)
+{
+    return Tensor<T>(TensorVarOpType::Sub, {lhs, rhs});
+}
+
+template<typename T>
+Tensor<T>& operator* (Tensor<T>& lhs, Tensor<T>& rhs)
+{
+    return Tensor<T>(TensorVarOpType::Mul, {lhs, rhs});
+}
+
+template<typename T>
+Tensor<T>& operator/ (Tensor<T>& lhs, Tensor<T>& rhs)
+{
+    return Tensor<T>(TensorVarOpType::Div, {lhs, rhs});
+}
 
 } // namespace hahaha
 

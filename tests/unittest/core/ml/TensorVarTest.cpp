@@ -26,10 +26,10 @@ TEST(TensorVarTest, PointerLikeForwardingTranspose)
 TEST(TensorVarTest, DerefAndConversionToTensor)
 {
     TensorVar<float> v({3}, {1.0f, 2.0f, 3.0f});
-    ml::Tensor<float>& t = *v; // operator*()
+    ml::TensorData<float>& t = *v; // operator*()
     EXPECT_EQ(t.size(), static_cast<sizeT>(3));
 
-    const ml::Tensor<float>& ct = static_cast<const ml::Tensor<float>&>(v);
+    const ml::TensorData<float>& ct = static_cast<const ml::TensorData<float>&>(v);
     EXPECT_FLOAT_EQ(ct.sum(), 6.0f);
 }
 

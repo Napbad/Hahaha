@@ -21,14 +21,20 @@
 
 #ifndef HAHAHA_GRAPH_H
 #define HAHAHA_GRAPH_H
+#include "include/ml/common/TensorVar.h"
 
 namespace hahaha::ad
 {
+
+template<typename T>
 class ComputeGraph
 {
   public:
-    void buildGraph();
-    void runGraph();
+    std::shared_ptr<TensorVar<T>> runGraph();
+
+    static ComputeGraph* buildComputeGraph(TensorVarPtr<T> tensor);
+
+    static Vector<std::shared_ptr<TensorVar<T>>> topo(TensorVarPtr<T> tensor);
 };
 } // namespace hahaha::ad
 

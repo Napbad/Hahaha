@@ -18,7 +18,7 @@
 #ifndef HIAHIAHIA_LINEARREGRESSION_H
 #define HIAHIAHIA_LINEARREGRESSION_H
 
-#include "core/Tensor.h"
+#include "core/TensorData.h"
 #include "models/Model.h"
 
 namespace hahaha::ml
@@ -34,11 +34,11 @@ class LinearRegression final : public Model
     {
     }
 
-    void checkStatus(const Tensor<f32>& features,
-                     const Tensor<f32>& labels) const;
-    ml::TrainStatistics train(const Tensor<f32>& features,
-                              const Tensor<f32>& labels) override;
-    [[nodiscard]] f32 predict(const Tensor<f32>& features) const override;
+    void checkStatus(const TensorData<f32>& features,
+                     const TensorData<f32>& labels) const;
+    ml::TrainStatistics train(const TensorData<f32>& features,
+                              const TensorData<f32>& labels) override;
+    [[nodiscard]] f32 predict(const TensorData<f32>& features) const override;
     [[nodiscard]] bool save(const String& filepath) const override;
     bool load(const String& path) override;
     [[nodiscard]] sizeT parameterCount() const override;
@@ -62,11 +62,11 @@ class LinearRegression final : public Model
         return epochs_;
     }
 
-    void setWeights(const Tensor<f32>& weights)
+    void setWeights(const TensorData<f32>& weights)
     {
         weights_ = weights;
     }
-    [[nodiscard]] const Tensor<f32>& weights() const
+    [[nodiscard]] const TensorData<f32>& weights() const
     {
         return weights_;
     }
@@ -80,7 +80,7 @@ class LinearRegression final : public Model
     }
 
   private:
-    Tensor<f32> weights_;
+    TensorData<f32> weights_;
     f32 bias_{0.0f};
 
     f32 learningRate_{0.01f};

@@ -26,13 +26,13 @@
 #include <vector>
 
 #include "GraphNode.h"
-#include "Tensor.h"
+#include "TensorData.h"
 #include "TensorPtr.h"
 
 namespace hahaha::ad
 {
 
-using core::Tensor;
+using core::TensorData;
 using core::TensorPtr;
 using core::ds::Vector;
 
@@ -60,14 +60,14 @@ template <typename T> class ComputeNode : public GraphNode<T>
     {
         return srcs_;
     }
-    Tensor<T>& grad()
+    TensorData<T>& grad()
     {
         return grad_;
     }
 
   protected:
     std::vector<std::shared_ptr<GraphNode<T>>> srcs_;
-    Tensor<T> grad_;
+    TensorData<T> grad_;
 };
 } // namespace hahaha::ad
 

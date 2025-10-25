@@ -52,6 +52,10 @@ set(SOURCE_FILES
         src/include/ml/common/TensorVar.h
         src/core/compute/autodiff/derivative_nodes.h
         src/core/TensorPtr.h
+        src/include/ml/common/TensorVarOp.h
+        src/include/ml/common/TensorVarOp.cpp
+        src/include/ml/common/TensorVar.cpp
+        src/core/compute/autodiff/ComputeGraph.cpp
 )
 
 file(GLOB_RECURSE HEADER_FILES

@@ -15,7 +15,7 @@
 // Email: napbad.sen@gmail.com
 // GitHub: https://github.com/Napbad
 
-#include "core/ds/rbTree.h"
+#include "core/ds/RBTree.h"
 
 #include <algorithm>
 #include <gtest/gtest.h>

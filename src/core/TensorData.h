@@ -45,7 +45,7 @@ class TensorErr final : public BaseError
     }
 };
 
-template <typename T> class Tensor
+template <typename T> class TensorData
 {
   public:
     using ValueType = T;
@@ -53,11 +53,11 @@ template <typename T> class Tensor
     // =================================================================================
     // Constructors and Destructor
     // =================================================================================
-    Tensor() = default;
+    TensorData() = default;
 
-    ~Tensor() = default;
+    ~TensorData() = default;
 
-    Tensor(const std::initializer_list<sizeT> shape) : shape_(shape)
+    TensorData(const std::initializer_list<sizeT> shape) : shape_(shape)
     {
         if (shape.size() == 0)
         {
@@ -74,7 +74,7 @@ template <typename T> class Tensor
         }
     }
 
-    explicit Tensor(const ds::Vector<sizeT>& shape) : shape_(shape)
+    explicit TensorData(const ds::Vector<sizeT>& shape) : shape_(shape)
     {
         if (shape.empty())
         {
@@ -91,19 +91,19 @@ template <typename T> class Tensor
         }
     }
 
-    explicit Tensor(const ds::Vector<sizeT>& shape, const T* data)
+    explicit TensorData(const ds::Vector<sizeT>& shape, const T* data)
         : shape_(shape), data_(data, data + computeSize(shape))
     {
     }
 
     // Constructor for a 0-dimensional tensor (scalar)
-    explicit Tensor(T scalar) : shape_({})
+    explicit TensorData(T scalar) : shape_({})
     {
         data_.pushBack(scalar);
     }
 
     // Constructor for a 0-dimensional tensor (scalar)
-    explicit Tensor(const std::initializer_list<sizeT> shape,
+    explicit TensorData(const std::initializer_list<sizeT> shape,
                     std::initializer_list<T> data)
         : shape_(shape), data_(data)
     {
@@ -237,7 +237,7 @@ template <typename T> class Tensor
     }
 
     // Slicing
-    Tensor at(const std::initializer_list<sizeT> indices) const
+    TensorData at(const std::initializer_list<sizeT> indices) const
     {
         if (indices.size() > dim())
         {
@@ -254,7 +254,7 @@ template <typename T> class Tensor
 
         if (indices.size() == dim())
         {
-            return Tensor(data_[start]);
+            return TensorData(data_[start]);
         }
 
         ds::Vector<sizeT> newShape;
@@ -269,7 +269,7 @@ template <typename T> class Tensor
             throw IndexOutOfBoundError("Calculated range out of bounds");
         }
 
-        Tensor res(newShape);
+        TensorData res(newShape);
         res.copy(data_.subVector(start, length));
         return res;
     }
@@ -321,7 +321,7 @@ template <typename T> class Tensor
     }
 
     // Copy data from another tensor or vector
-    void copy(const Tensor& other)
+    void copy(const TensorData& other)
     {
         if (other.shape() != shape_)
         {
@@ -358,7 +358,7 @@ template <typename T> class Tensor
         return data_[0];
     }
 
-    Tensor& operator=(const T& scalar)
+    TensorData& operator=(const T& scalar)
     {
         if (!isScalar())
         {
@@ -374,14 +374,14 @@ template <typename T> class Tensor
     // =================================================================================
 
     // Element-wise addition
-    Tensor operator+(const Tensor& other) const
+    TensorData operator+(const TensorData& other) const
     {
         if (this->hasOnlyOneVal())
             return other + data_[0];
         if (other.hasOnlyOneVal())
             return *this + other.data_[0];
         checkShapeAndSizeNotEqual(other);
-        Tensor result(shape_);
+        TensorData result(shape_);
         for (sizeT i = 0; i < size(); ++i)
         {
             result.data_[i] = data_[i] + other.data_[i];
@@ -389,9 +389,9 @@ template <typename T> class Tensor
         return result;
     }
 
-    Tensor operator+(ValueType scalar) const
+    TensorData operator+(ValueType scalar) const
     {
-        Tensor result(shape_);
+        TensorData result(shape_);
         for (sizeT i = 0; i < size(); ++i)
         {
             result.data_[i] = data_[i] + scalar;
@@ -400,14 +400,14 @@ template <typename T> class Tensor
     }
 
     // Element-wise subtraction
-    Tensor operator-(const Tensor& other) const
+    TensorData operator-(const TensorData& other) const
     {
         if (this->hasOnlyOneVal())
             return other * static_cast<T>(-1) + data_[0]; // scalar - other
         if (other.hasOnlyOneVal())
             return *this - other.data_[0];
         checkShapeAndSizeNotEqual(other);
-        Tensor result(shape_);
+        TensorData result(shape_);
         for (sizeT i = 0; i < size(); ++i)
         {
             result.data_[i] = data_[i] - other.data_[i];
@@ -415,9 +415,9 @@ template <typename T> class Tensor
         return result;
     }
 
-    Tensor operator-(ValueType scalar) const
+    TensorData operator-(ValueType scalar) const
     {
-        Tensor result(shape_);
+        TensorData result(shape_);
         for (sizeT i = 0; i < size(); ++i)
         {
             result.data_[i] = data_[i] - scalar;
@@ -426,14 +426,14 @@ template <typename T> class Tensor
     }
 
     // Element-wise multiplication
-    Tensor operator*(const Tensor& other) const
+    TensorData operator*(const TensorData& other) const
     {
         if (this->hasOnlyOneVal())
             return other * data_[0];
         if (other.hasOnlyOneVal())
             return *this * other.data_[0];
         checkShapeAndSizeNotEqual(other);
-        Tensor result(shape_);
+        TensorData result(shape_);
         for (sizeT i = 0; i < size(); ++i)
         {
             result.data_[i] = data_[i] * other.data_[i];
@@ -441,9 +441,9 @@ template <typename T> class Tensor
         return result;
     }
 
-    Tensor operator*(ValueType scalar) const
+    TensorData operator*(ValueType scalar) const
     {
-        Tensor result(shape_);
+        TensorData result(shape_);
         for (sizeT i = 0; i < size(); ++i)
         {
             result.data_[i] = data_[i] * scalar;
@@ -452,11 +452,11 @@ template <typename T> class Tensor
     }
 
     // Element-wise division
-    Tensor operator/(const Tensor& other) const
+    TensorData operator/(const TensorData& other) const
     {
         if (this->hasOnlyOneVal())
         {
-            Tensor result(other.shape());
+            TensorData result(other.shape());
             for (sizeT i = 0; i < other.size(); ++i)
             {
                 result[i] = data_[0] / other[i];
@@ -466,7 +466,7 @@ template <typename T> class Tensor
         if (other.hasOnlyOneVal())
             return *this / other.data_[0];
         checkShapeAndSizeNotEqual(other);
-        Tensor result(shape_);
+        TensorData result(shape_);
         for (sizeT i = 0; i < size(); ++i)
         {
             // Add check for division by zero if T is a floating-point type
@@ -482,7 +482,7 @@ template <typename T> class Tensor
         return result;
     }
 
-    Tensor operator/(ValueType scalar) const
+    TensorData operator/(ValueType scalar) const
     {
         if constexpr (std::is_floating_point_v<T>)
         {
@@ -491,7 +491,7 @@ template <typename T> class Tensor
                 throw std::runtime_error("Division by zero by scalar");
             }
         }
-        Tensor result(shape_);
+        TensorData result(shape_);
         for (sizeT i = 0; i < size(); ++i)
         {
             result.data_[i] = data_[i] / scalar;
@@ -503,7 +503,7 @@ template <typename T> class Tensor
     // Compound Assignment Operators
     // =================================================================================
 
-    Tensor& operator+=(const Tensor& other)
+    TensorData& operator+=(const TensorData& other)
     {
         if (other.hasOnlyOneVal())
         {
@@ -519,7 +519,7 @@ template <typename T> class Tensor
         return *this;
     }
 
-    Tensor& operator-=(const Tensor& other)
+    TensorData& operator-=(const TensorData& other)
     {
         if (other.hasOnlyOneVal())
         {
@@ -535,7 +535,7 @@ template <typename T> class Tensor
         return *this;
     }
 
-    Tensor& operator*=(const Tensor& other)
+    TensorData& operator*=(const TensorData& other)
     {
         if (other.hasOnlyOneVal())
         {
@@ -551,7 +551,7 @@ template <typename T> class Tensor
         return *this;
     }
 
-    Tensor& operator*=(const ValueType& scalar)
+    TensorData& operator*=(const ValueType& scalar)
     {
         for (sizeT i = 0; i < data_.size(); ++i)
         {
@@ -560,7 +560,7 @@ template <typename T> class Tensor
         return *this;
     }
 
-    Tensor& operator/=(const Tensor& other)
+    TensorData& operator/=(const TensorData& other)
     {
         if (other.hasOnlyOneVal())
         {
@@ -587,12 +587,12 @@ template <typename T> class Tensor
     // Comparison Operators
     // =================================================================================
 
-    bool operator==(const Tensor& other) const
+    bool operator==(const TensorData& other) const
     {
         return shape_ == other.shape_ && data_ == other.data_;
     }
 
-    bool operator!=(const Tensor& other) const
+    bool operator!=(const TensorData& other) const
     {
         return !(*this == other);
     }
@@ -601,7 +601,7 @@ template <typename T> class Tensor
     // Linear Algebra and Other Operations
     // =================================================================================
 
-    T dot(const Tensor& other) const
+    T dot(const TensorData& other) const
     {
         checkShapeAndSizeNotEqual(other);
         T result = 0;
@@ -619,7 +619,7 @@ template <typename T> class Tensor
     }
 
     // Matrix multiplication
-    Tensor matmul(const Tensor& other) const
+    TensorData matmul(const TensorData& other) const
     {
         if (this->dim() != 2 || other.dim() != 2)
         {
@@ -636,7 +636,7 @@ template <typename T> class Tensor
         const sizeT n = this->shape_[1];
         sizeT p = other.shape_[1];
 
-        Tensor result({m, p});
+        TensorData result({m, p});
         result.fill(0);
 
         for (sizeT i = 0; i < m; ++i)
@@ -653,7 +653,7 @@ template <typename T> class Tensor
     }
 
     // Transpose a 2D tensor (matrix)
-    Tensor transpose() const
+    TensorData transpose() const
     {
         if (dim() != 2)
         {
@@ -662,7 +662,7 @@ template <typename T> class Tensor
         }
         sizeT rows = shape_[0];
         sizeT cols = shape_[1];
-        Tensor result({cols, rows});
+        TensorData result({cols, rows});
         for (sizeT i = 0; i < rows; ++i)
         {
             for (sizeT j = 0; j < cols; ++j)
@@ -699,9 +699,9 @@ template <typename T> class Tensor
     // Static Factory Methods
     // =================================================================================
 
-    static Tensor fromVector(const ds::Vector<T>& vec)
+    static TensorData fromVector(const ds::Vector<T>& vec)
     {
-        Tensor tensor({vec.size()});
+        TensorData tensor({vec.size()});
         for (sizeT i = 0; i < vec.size(); ++i)
         {
             tensor.data_[i] = vec[i];
@@ -709,23 +709,23 @@ template <typename T> class Tensor
         return tensor;
     }
 
-    static Tensor zeros(const ds::Vector<sizeT>& shape)
+    static TensorData zeros(const ds::Vector<sizeT>& shape)
     {
-        Tensor tensor(shape);
+        TensorData tensor(shape);
         tensor.fill(static_cast<T>(0));
         return tensor;
     }
 
-    static Tensor ones(const ds::Vector<sizeT>& shape)
+    static TensorData ones(const ds::Vector<sizeT>& shape)
     {
-        Tensor tensor(shape);
+        TensorData tensor(shape);
         tensor.fill(static_cast<T>(1));
         return tensor;
     }
 
-    static Tensor rand(const ds::Vector<sizeT>& shape)
+    static TensorData rand(const ds::Vector<sizeT>& shape)
     {
-        Tensor tensor(shape);
+        TensorData tensor(shape);
         for (sizeT i = 0; i < tensor.size(); ++i)
         {
             tensor[i] = static_cast<T>(random()) / static_cast<T>(RAND_MAX);
@@ -782,7 +782,7 @@ template <typename T> class Tensor
             shape.begin(), shape.end(), sizeT{1}, std::multiplies());
     }
 
-    void checkShapeAndSizeNotEqual(const Tensor& other) const
+    void checkShapeAndSizeNotEqual(const TensorData& other) const
     {
         if (shape_ != other.shape_)
         {
@@ -841,21 +841,21 @@ template <typename T> class Tensor
 namespace hahaha::ml
 {
 template <typename T>
-Tensor<T> operator+(const T& scalar, const Tensor<T>& tensor)
+TensorData<T> operator+(const T& scalar, const TensorData<T>& tensor)
 {
     return tensor + scalar;
 }
 
 template <typename T>
-Tensor<T> operator-(const T& scalar, const Tensor<T>& tensor)
+TensorData<T> operator-(const T& scalar, const TensorData<T>& tensor)
 {
     return tensor * static_cast<T>(-1) + scalar;
 }
 
 template <typename T>
-Tensor<T> operator/(const T& scalar, const Tensor<T>& tensor)
+TensorData<T> operator/(const T& scalar, const TensorData<T>& tensor)
 {
-    Tensor<T> result(tensor.shape());
+    TensorData<T> result(tensor.shape());
     for (sizeT i = 0; i < tensor.size(); ++i)
     {
         if constexpr (std::is_floating_point_v<T>)
@@ -871,7 +871,7 @@ Tensor<T> operator/(const T& scalar, const Tensor<T>& tensor)
 }
 
 template <typename T>
-Tensor<T> operator*(const T& scalar, const Tensor<T>& tensor)
+TensorData<T> operator*(const T& scalar, const TensorData<T>& tensor)
 {
     return tensor * scalar;
 }

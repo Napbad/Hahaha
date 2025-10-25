@@ -25,7 +25,7 @@
 #include <gtest/gtest.h>
 #include <iostream>
 
-#include "core/Tensor.h"
+#include "core/TensorData.h"
 
 HHH_NAMESPACE_IMPORT
 using hahaha::ml::LinearRegression;
@@ -36,8 +36,8 @@ class LinearRegressionTest : public ::testing::Test
     void SetUp() override
     {
         // Create simple 2D dataset for testing: y = 2x + 1
-        features_2d = ml::Tensor<f32>({3, 1});
-        labels_2d = ml::Tensor<f32>({3, 1});
+        features_2d = ml::TensorData<f32>({3, 1});
+        labels_2d = ml::TensorData<f32>({3, 1});
 
         // Sample 1: x=1, y=3
         features_2d.set({0, 0}, 1.0f);
@@ -52,8 +52,8 @@ class LinearRegressionTest : public ::testing::Test
         labels_2d.set({2, 0}, 7.0f);
 
         // Create multi-dimensional dataset: y = 2x1 + 3x2 + 1
-        features_multi = ml::Tensor<f32>({3, 2});
-        labels_multi = ml::Tensor<f32>({3, 1});
+        features_multi = ml::TensorData<f32>({3, 2});
+        labels_multi = ml::TensorData<f32>({3, 1});
 
         // Sample 1: x1=1, x2=1, y=6
         features_multi.set({0, 0}, 1.0f);
@@ -76,10 +76,10 @@ class LinearRegressionTest : public ::testing::Test
     }
 
   protected:
-    ml::Tensor<f32> features_2d;
-    ml::Tensor<f32> labels_2d;
-    ml::Tensor<f32> features_multi;
-    ml::Tensor<f32> labels_multi;
+    ml::TensorData<f32> features_2d;
+    ml::TensorData<f32> labels_2d;
+    ml::TensorData<f32> features_multi;
+    ml::TensorData<f32> labels_multi;
 
     // Helper function to check if two floats are approximately equal
     static bool
@@ -117,7 +117,7 @@ TEST_F(LinearRegressionTest, TrainSimple2DTest)
     EXPECT_EQ(lr.parameterCount(), 2);
 
     // Test predictions on training data
-    ml::Tensor<f32> test_feature({1});
+    ml::TensorData<f32> test_feature({1});
     test_feature.set({0}, 1.0f);
     const f32 pred1 = lr.predict(test_feature);
     std::cout << "Prediction for x=1: " << pred1 << std::endl;
@@ -145,7 +145,7 @@ TEST_F(LinearRegressionTest, TrainMultiDimensionalTest)
     EXPECT_EQ(lr.parameterCount(), 3);
 
     // Test prediction
-    ml::Tensor<f32> test_feature({2});
+    ml::TensorData<f32> test_feature({2});
     test_feature.set({0}, 1.0f);
     test_feature.set({1}, 1.0f);
     f32 pred = lr.predict(test_feature);
@@ -158,7 +158,7 @@ TEST_F(LinearRegressionTest, PredictBeforeTrainingTest)
 {
     LinearRegression lr;
 
-    ml::Tensor<f32> test_feature({1});
+    ml::TensorData<f32> test_feature({1});
     test_feature.set({0}, 1.0f);
 
     // Should return bias value (0.0) since weights are empty
@@ -178,7 +178,7 @@ TEST_F(LinearRegressionTest, CheckStatusTest)
     EXPECT_NO_THROW(lr.checkStatus(features_2d, labels_2d));
 
     // Test with mismatched sample sizes
-    ml::Tensor<f32> bad_labels({2, 1}); // Different number of samples
+    ml::TensorData<f32> bad_labels({2, 1}); // Different number of samples
     bad_labels.fill(1.0f);
     EXPECT_THROW(lr.checkStatus(features_2d, bad_labels), std::runtime_error);
 }
@@ -199,15 +199,15 @@ TEST_F(LinearRegressionTest, EdgeCasesTest)
     LinearRegression lr;
 
     // Test with single sample
-    ml::Tensor<f32> single_feature({1, 1});
-    ml::Tensor<f32> single_label({1, 1});
+    ml::TensorData<f32> single_feature({1, 1});
+    ml::TensorData<f32> single_label({1, 1});
     single_feature.set({0, 0}, 5.0f);
     single_label.set({0, 0}, 10.0f);
 
     EXPECT_NO_THROW(lr.train(single_feature, single_label));
 
     // Test prediction with the same input
-    ml::Tensor<f32> test_feature({1});
+    ml::TensorData<f32> test_feature({1});
     test_feature.set({0}, 5.0f);
     f32 pred = lr.predict(test_feature);
     EXPECT_TRUE(isApproxEqual(pred, 10.0f, 1.0f))
@@ -233,8 +233,8 @@ TEST_F(LinearRegressionTest, LargerDatasetTest)
 
     // Create a larger dataset
     const sizeT num_samples = 100;
-    ml::Tensor<f32> large_features({num_samples, 1});
-    ml::Tensor<f32> large_labels({num_samples, 1});
+    ml::TensorData<f32> large_features({num_samples, 1});
+    ml::TensorData<f32> large_labels({num_samples, 1});
 
     // Generate y = 3x + 2 with some noise
     for (sizeT i = 0; i < num_samples; ++i)
@@ -247,7 +247,7 @@ TEST_F(LinearRegressionTest, LargerDatasetTest)
     EXPECT_NO_THROW(lr.train(large_features, large_labels));
 
     // Test prediction accuracy
-    ml::Tensor<f32> test_feature({1});
+    ml::TensorData<f32> test_feature({1});
     test_feature.set({0}, 5.0f);
     f32 pred = lr.predict(test_feature);
     f32 expected = 3.0f * 5.0f + 2.0f; // 17.0f

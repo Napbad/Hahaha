@@ -21,7 +21,7 @@
 
 #ifndef HAHAHA_CROSSENTROPYLOSS_H
 #define HAHAHA_CROSSENTROPYLOSS_H
-#include "../../Tensor.h"
+#include "../../TensorData.h"
 #include "Loss.h"
 #include "core/defines/h3defs.h"
 
@@ -36,7 +36,7 @@ template <typename T> class CrossEntropyLoss final : public Loss<T>
     CrossEntropyLoss() = default;
     ~CrossEntropyLoss() override = default;
 
-    Tensor<T> forward(const Tensor<T>& input, const Tensor<T>& target) override
+    TensorData<T> forward(const TensorData<T>& input, const TensorData<T>& target) override
     {
         // Cross Entropy = -sum(target * log(input))
         // Assumes input is already probabilities (after softmax)
@@ -48,7 +48,7 @@ template <typename T> class CrossEntropyLoss final : public Loss<T>
                 "Input and target shapes must match for Cross Entropy loss");
         }
 
-        Tensor<T> result({1});
+        TensorData<T> result({1});
         T loss = static_cast<T>(0);
 
         // Compute -sum(target * log(input + epsilon)) where epsilon prevents

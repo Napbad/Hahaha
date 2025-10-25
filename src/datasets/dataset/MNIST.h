@@ -45,7 +45,7 @@ class MNIST : public Dataset<f32>
     }
 
   private:
-    Tensor<f32> _features;
+    TensorData<f32> _features;
     ds::Vector<int> _labels;
 };
 } // namespace hahaha::ml

@@ -21,7 +21,7 @@
 
 #ifndef HAHAHA_MSELOSS_H
 #define HAHAHA_MSELOSS_H
-#include "../../Tensor.h"
+#include "../../TensorData.h"
 #include "Loss.h"
 #include "core/defines/h3defs.h"
 

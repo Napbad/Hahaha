@@ -23,7 +23,7 @@
 #define HAHAHA_ACTIVEFN_H
 #include <cmath>
 
-#include "../Tensor.h"
+#include "../TensorData.h"
 #include "core/defines/h3defs.h"
 
 HHH_NAMESPACE_IMPORT
@@ -54,9 +54,9 @@ class ActiveFn
         return x;
     }
 
-    static Tensor<f32> softmax(const Tensor<f32>& x)
+    static TensorData<f32> softmax(const TensorData<f32>& x)
     {
-        Tensor<f32> result(x.shape());
+        TensorData<f32> result(x.shape());
         result.fill(0);
         for (sizeT i = 0; i < x.size(); ++i)
         {

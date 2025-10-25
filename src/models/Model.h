@@ -22,11 +22,11 @@
 #ifndef HIAHIAHIA_MODEL_H
 #define HIAHIAHIA_MODEL_H
 
-#include <../core/Tensor.h>
+#include <../core/TensorData.h>
 #include <Error.h>
 #include <Res.h>
 #include <ds/String.h>
-#include <ml/trainStatistics.h>
+#include <ml/TrainStatistics.h>
 
 namespace hahaha::ml
 {
@@ -38,12 +38,12 @@ class Model
     virtual ~Model() = default;
 
     // Train the model with given features and labels
-    virtual ml::TrainStatistics train(const ml::Tensor<f32>& features,
-                                      const ml::Tensor<f32>& labels) = 0;
+    virtual ml::TrainStatistics train(const ml::TensorData<f32>& features,
+                                      const ml::TensorData<f32>& labels) = 0;
 
     // Make a prediction given input features
     [[nodiscard]] virtual f32
-    predict(const ml::Tensor<f32>& features) const = 0;
+    predict(const ml::TensorData<f32>& features) const = 0;
 
     // Save the model to a file
     [[nodiscard]] virtual bool save(const ds::String& filepath) const = 0;

@@ -40,11 +40,11 @@ typedef char i8;
 typedef float f32;
 typedef double f64;
 
-typedef unsigned long long ui128;
-typedef unsigned long int ui64;
-typedef unsigned int ui32;
-typedef unsigned short ui16;
-typedef unsigned char ui8;
+typedef unsigned long long u128;
+typedef unsigned long int u64;
+typedef unsigned int u32;
+typedef unsigned short u16;
+typedef unsigned char u8;
 
 typedef unsigned int sizeT;
 typedef long ptrDiffT;

@@ -37,7 +37,7 @@
 
 namespace hahaha::ml
 {
-template <typename T> class Tensor;
+template <typename T> class TensorData;
 }
 
 namespace hahaha::core::ds
@@ -45,7 +45,7 @@ namespace hahaha::core::ds
 template <class T, class Allocator = std::allocator<T>> class Vector
 {
 
-    friend class ml::Tensor<T>;
+    friend class ml::TensorData<T>;
 
   public:
     using ValueType = T;

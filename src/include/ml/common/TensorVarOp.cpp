@@ -16,33 +16,15 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by Napbad on 7/19/25.
+// Created by root on 10/25/25.
 //
 
-#ifndef HAHAHA_LOSS_H
-#define HAHAHA_LOSS_H
-#include "../../TensorData.h"
-#include "compute/Variable.h"
-#include "core/defines/h3defs.h"
-
-HHH_NAMESPACE_IMPORT
-
-namespace hahaha::ml
+#include "TensorVarOp.h"
+namespace hahaha
 {
-template <typename T> class Loss
+
+template <typename T> void TensorVarAddOp<T>::run(Tensor<T>& tensor)
 {
-  public:
-    virtual ~Loss() = default;
-    virtual Variable<T>* forward(const Variable<T>& input,
-                                 const Variable<T>& target) = 0;
+}
 
-    Variable<T>* operator()(const Variable<T>& input, const Variable<T>& target)
-    {
-        Variable<T> resultVar = forward(input, target);
-        return new Variable<T>(resultVar);
-    }
-};
-
-} // namespace hahaha::ml
-
-#endif // HAHAHA_LOSS_H
+}

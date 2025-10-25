@@ -21,7 +21,7 @@
 
 #ifndef HAHAHA_TENSORPTR_H
 #define HAHAHA_TENSORPTR_H
-#include "Tensor.h"
+#include "TensorData.h"
 
 namespace hahaha::ad
 {
@@ -36,7 +36,7 @@ template <typename T> class TensorVar;
 namespace hahaha::core
 {
 
-using ml::Tensor;
+using ml::TensorData;
 
 // one tensor can only be hold by 1 TensorVar and 1 GraphNode
 // this class will act as a wrapper for Tensor like shared_ptr
@@ -59,25 +59,25 @@ template <typename T> class TensorPtr
     TensorPtr(const std::initializer_list<sizeT> shape)
     {
         refcount_ = new i8(0);
-        tensor_ = new Tensor<T>(shape);
+        tensor_ = new TensorData<T>(shape);
     }
 
     explicit TensorPtr(const ds::Vector<sizeT>& shape)
     {
         refcount_ = new i8(0);
-        tensor_ = new Tensor<T>(shape);
+        tensor_ = new TensorData<T>(shape);
     }
     explicit TensorPtr(const ds::Vector<sizeT>& shape, const T* data)
     {
         refcount_ = new i8(0);
-        tensor_ = new Tensor<T>(shape, data);
+        tensor_ = new TensorData<T>(shape, data);
     }
 
     // Constructor for a 0-dimensional tensor (scalar)
     explicit TensorPtr(T scalar)
     {
         refcount_ = new i8(0);
-        tensor_ = new Tensor<T>(scalar);
+        tensor_ = new TensorData<T>(scalar);
     }
 
     // Constructor for a 0-dimensional tensor (scalar)
@@ -85,7 +85,7 @@ template <typename T> class TensorPtr
                        std::initializer_list<T> data)
     {
         refcount_ = new i8(0);
-        tensor_ = new Tensor<T>(shape, data);
+        tensor_ = new TensorData<T>(shape, data);
     }
 
     void refByVar() const
@@ -128,19 +128,19 @@ template <typename T> class TensorPtr
         tensor_ = nullptr;
     }
 
-    explicit TensorPtr (Tensor<T>&& tensor)
+    explicit TensorPtr (TensorData<T>&& tensor)
     {
-        this->tensor_ = new Tensor<T>(std::move(tensor));
+        this->tensor_ = new TensorData<T>(std::move(tensor));
         refcount_ = new i8(0);
     }
 
-    explicit TensorPtr(Tensor<T>& tensor)
+    explicit TensorPtr(TensorData<T>& tensor)
     {
-        this->tensor_ = new Tensor<T>(tensor);
+        this->tensor_ = new TensorData<T>(tensor);
         refcount_ = new i8(0);
     }
 
-    explicit TensorPtr(Tensor<T> *tensor )
+    explicit TensorPtr(TensorData<T> *tensor )
     {
         this->tensor_ = tensor;
         refcount_ = new i8(0);
@@ -156,7 +156,7 @@ template <typename T> class TensorPtr
         return COMPUTE_NODE_REF_MASK & *refcount_;
     }
 
-    Tensor<T>* tensor_;
+    TensorData<T>* tensor_;
     i8* refcount_;
 };
 } // namespace hahaha::core

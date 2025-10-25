@@ -320,8 +320,8 @@ template <typename T> class CSVDataset : public Dataset<T>
         }
 
         // Create tensors
-        auto featureTensor = Tensor<T>::fromVector(features);
-        auto labelTensor = Tensor<T>::fromVector(labels);
+        auto featureTensor = TensorData<T>::fromVector(features);
+        auto labelTensor = TensorData<T>::fromVector(labels);
 
         Ok(Sample<T>(std::move(featureTensor), std::move(labelTensor)));
     }

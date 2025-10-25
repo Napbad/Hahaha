@@ -16,33 +16,18 @@
 // GitHub: https://github.com/Napbad
 
 //
-// Created by Napbad on 7/19/25.
+// Created by root on 10/25/25.
 //
 
-#ifndef HAHAHA_LOSS_H
-#define HAHAHA_LOSS_H
-#include "../../TensorData.h"
-#include "compute/Variable.h"
-#include "core/defines/h3defs.h"
+#include "TensorVar.h"
 
-HHH_NAMESPACE_IMPORT
-
-namespace hahaha::ml
+#include "compute/autodiff/ComputeGraph.h"
+namespace hahaha
 {
-template <typename T> class Loss
+template <typename T> TensorVarPtr<T> TensorVar<T>::calc()
 {
-  public:
-    virtual ~Loss() = default;
-    virtual Variable<T>* forward(const Variable<T>& input,
-                                 const Variable<T>& target) = 0;
+    ad::ComputeGraph::buildComputeGraph(this);
 
-    Variable<T>* operator()(const Variable<T>& input, const Variable<T>& target)
-    {
-        Variable<T> resultVar = forward(input, target);
-        return new Variable<T>(resultVar);
-    }
-};
+}
 
-} // namespace hahaha::ml
-
-#endif // HAHAHA_LOSS_H
+}

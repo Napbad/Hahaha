@@ -18,7 +18,7 @@
 #ifndef HIAHIAHIA_SAMPLE_H
 #define HIAHIAHIA_SAMPLE_H
 
-#include "core/Tensor.h"
+#include "core/TensorData.h"
 
 namespace hahaha::ml
 {
@@ -34,7 +34,7 @@ template <typename T> class Sample
     /**
      * Create a new sample
      */
-    explicit Sample(Tensor<T> features, Tensor<T> labels)
+    explicit Sample(TensorData<T> features, TensorData<T> labels)
         : _features(std::move(features)), _labels(std::move(labels))
     {
     }
@@ -42,7 +42,7 @@ template <typename T> class Sample
     /**
      * Get the features
      */
-    [[nodiscard]] const Tensor<T>& features() const
+    [[nodiscard]] const TensorData<T>& features() const
     {
         return _features;
     }
@@ -50,7 +50,7 @@ template <typename T> class Sample
     /**
      * Get the labels
      */
-    [[nodiscard]] const Tensor<T>& labels() const
+    [[nodiscard]] const TensorData<T>& labels() const
     {
         return _labels;
     }
@@ -58,7 +58,7 @@ template <typename T> class Sample
     /**
      * Get mutable features
      */
-    Tensor<T>& features()
+    TensorData<T>& features()
     {
         return _features;
     }
@@ -66,7 +66,7 @@ template <typename T> class Sample
     /**
      * Get mutable labels
      */
-    Tensor<T>& labels()
+    TensorData<T>& labels()
     {
         return _labels;
     }
@@ -106,8 +106,8 @@ template <typename T> class Sample
     }
 
   private:
-    Tensor<T> _features;
-    Tensor<T> _labels;
+    TensorData<T> _features;
+    TensorData<T> _labels;
 };
 
 } // namespace hahaha::ml

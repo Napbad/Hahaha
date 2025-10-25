@@ -24,7 +24,7 @@
 #include <ds/Vector.h>
 
 #include "Sample.h"
-#include "core/Tensor.h"
+#include "core/TensorData.h"
 
 namespace hahaha::ml
 {

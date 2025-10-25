@@ -21,11 +21,11 @@
 
 #ifndef HAHAHA_COMMON_UTIL_VECTORIZE_H
 #define HAHAHA_COMMON_UTIL_VECTORIZE_H
-#include "../../core/Tensor.h"
+#include "../../core/TensorData.h"
 namespace hahaha::core::util
 {
 
-using ml::Tensor;
+using ml::TensorData;
 
 class VectorizeErr final : public BaseErr
 {
@@ -41,10 +41,10 @@ class Vectorize
 
   public:
     template <typename T>
-    static Res<Tensor<T>, VectorizeErr>
-    add(std::initializer_list<Tensor<T>> list)
+    static Res<TensorData<T>, VectorizeErr>
+    add(std::initializer_list<TensorData<T>> list)
     {
-        SetRetT(Tensor<T>, VectorizeErr) auto shape = list.begin()->shape();
+        SetRetT(TensorData<T>, VectorizeErr) auto shape = list.begin()->shape();
         for (auto& tensor : list)
         {
             if (shape != tensor.shape())
@@ -53,7 +53,7 @@ class Vectorize
             }
         }
 
-        auto res = Tensor<T>(shape);
+        auto res = TensorData<T>(shape);
         res.fill(0);
         auto tmp = res;
         for (auto& val : list)
@@ -64,9 +64,9 @@ class Vectorize
     }
 
     template <typename T>
-    Res<Tensor<T>, VectorizeErr> sub(std::initializer_list<Tensor<T>> list)
+    Res<TensorData<T>, VectorizeErr> sub(std::initializer_list<TensorData<T>> list)
     {
-        SetRetT(Tensor<T>, VectorizeErr) auto shape = list.begin()->shape();
+        SetRetT(TensorData<T>, VectorizeErr) auto shape = list.begin()->shape();
         for (auto& tensor : list)
         {
             if (shape != tensor.shape())
@@ -75,7 +75,7 @@ class Vectorize
             }
         }
 
-        auto res = Tensor<T>(shape);
+        auto res = TensorData<T>(shape);
         res.copy(*list.begin());
         auto begin = list.begin();
         ++begin;
@@ -87,10 +87,10 @@ class Vectorize
     }
 
     template <typename T>
-    static Res<Tensor<T>, VectorizeErr>
-    mul(std::initializer_list<Tensor<T>> list)
+    static Res<TensorData<T>, VectorizeErr>
+    mul(std::initializer_list<TensorData<T>> list)
     {
-        SetRetT(Tensor<T>, VectorizeErr) auto shape = list.begin()->shape();
+        SetRetT(TensorData<T>, VectorizeErr) auto shape = list.begin()->shape();
         for (auto& tensor : list)
         {
             if (shape != tensor.shape())
@@ -99,7 +99,7 @@ class Vectorize
             }
         }
 
-        auto res = Tensor<T>(shape);
+        auto res = TensorData<T>(shape);
         res.fill(1); // Start with 1 for multiplication
         for (auto& val : list)
         {
@@ -109,10 +109,10 @@ class Vectorize
     }
 
     template <typename T>
-    static Res<Tensor<T>, VectorizeErr>
-    div(std::initializer_list<Tensor<T>> list)
+    static Res<TensorData<T>, VectorizeErr>
+    div(std::initializer_list<TensorData<T>> list)
     {
-        SetRetT(Tensor<T>, VectorizeErr) auto shape = list.begin()->shape();
+        SetRetT(TensorData<T>, VectorizeErr) auto shape = list.begin()->shape();
         for (auto& tensor : list)
         {
             if (shape != tensor.shape())
@@ -121,7 +121,7 @@ class Vectorize
             }
         }
 
-        auto res = Tensor<T>(shape);
+        auto res = TensorData<T>(shape);
         res.copy(*list.begin());
         auto begin = list.begin();
         ++begin;
