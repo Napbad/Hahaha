@@ -21,7 +21,6 @@
 
 #ifndef HAHAHA_TENSORVAROP_H
 #define HAHAHA_TENSORVAROP_H
-#include "TensorVar.h"
 
 namespace hahaha
 {
@@ -104,21 +103,6 @@ enum class TensorVarOpType
     None        // No operation
 };
 
-
-template<typename T>
-class TensorVarOp
-{
-public:
-    virtual ~TensorVarOp() = default;
-    virtual void run(Tensor<T>& tensor) = 0;
-};
-
-template<typename T>
-class TensorVarAddOp final : public TensorVarOp<T>
-{
-public:
-    void run(Tensor<T>& tensor) override;
-};
 } // namespace hahaha
 
 #endif // HAHAHA_TENSORVAROP_H

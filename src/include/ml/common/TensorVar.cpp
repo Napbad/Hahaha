@@ -26,8 +26,8 @@ namespace hahaha
 {
 template <typename T> TensorVarPtr<T> TensorVar<T>::calc()
 {
-    ad::ComputeGraph::buildComputeGraph(this);
-
+    ad::ComputeGraph<T>::buildComputeGraph(this);
+return nullptr;
 }
 
 }

@@ -56,38 +56,38 @@ template <typename T> class TensorVar
     }
 
     TensorVar(const std::initializer_list<sizeT> shape, String name = String())
-        : ptr_(new TensorPtr<T>(shape)), name_(std::move(name))
+        : ptr_(TensorPtr<T>(shape)), name_(std::move(name))
     {
-        ptr_->refByVar();
+        ptr_.refByVar();
     }
 
     explicit TensorVar(const Vector<sizeT>& shape, String name = String())
-        : ptr_(new TensorPtr<T>(shape)), name_(std::move(name))
+        : ptr_(TensorPtr<T>(shape)), name_(std::move(name))
     {
-        ptr_->refByVar();
+        ptr_.refByVar();
     }
     explicit TensorVar(const Vector<sizeT>& shape,
                        const T* data,
                        String name = String())
-        : ptr_(new TensorPtr<T>(shape, data)), name_(std::move(name))
+        : ptr_(TensorPtr<T>(shape, data)), name_(std::move(name))
     {
-        ptr_->refByVar();
+        ptr_.refByVar();
     }
 
     // Constructor for a 0-dimensional tensor (scalar)
     explicit TensorVar(T scalar, String name = String())
-        : ptr_(new TensorPtr<T>(scalar)), name_(std::move(name))
+        : ptr_(TensorPtr<T>(scalar)), name_(std::move(name))
     {
-        ptr_->refByVar();
+        ptr_.refByVar();
     }
 
     // Constructor for a 0-dimensional tensor (scalar)
     explicit TensorVar(const std::initializer_list<sizeT> shape,
                        std::initializer_list<T> data,
                        String name = String())
-        : ptr_(new TensorPtr<T>(shape, data)), name_(std::move(name))
+        : ptr_(TensorPtr<T>(shape, data)), name_(std::move(name))
     {
-        ptr_->refByVar();
+        ptr_.refByVar();
     }
 
     TensorVarPtr<T> calc();
@@ -126,9 +126,9 @@ template <typename T> class TensorVar
     {
         if (!ptr_)
             throw std::runtime_error("TensorVar is empty (null TensorPtr)");
-        if (ptr_->tensor_ == nullptr)
+        if (ptr_.tensor_ == nullptr)
             throw std::runtime_error("TensorVar holds null Tensor pointer");
-        return ptr_->tensor_;
+        return *ptr_.tensor_;
     }
 
     TensorPtr<T> ptr_;

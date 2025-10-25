@@ -22,9 +22,4 @@
 #include "TensorVarOp.h"
 namespace hahaha
 {
-
-template <typename T> void TensorVarAddOp<T>::run(Tensor<T>& tensor)
-{
-}
-
 }
