@@ -18,16 +18,3 @@
 //
 // Created by root on 10/25/25.
 //
-
-#include "TensorVar.h"
-
-#include "compute/autodiff/ComputeGraph.h"
-namespace hahaha
-{
-template <typename T> TensorVarPtr<T> TensorVar<T>::calc()
-{
-    ad::ComputeGraph<T>::buildComputeGraph(this);
-return nullptr;
-}
-
-}

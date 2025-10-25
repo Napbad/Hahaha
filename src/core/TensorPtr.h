@@ -46,15 +46,7 @@ template <typename T> class TensorPtr
     friend class ad::ComputeNode<T>;
 
   public:
-    ~TensorPtr()
-    {
-        *refcount_ -= 1;
-        if (*refcount_ == 0)
-        {
-            delete refcount_;
-            delete tensor_;
-        }
-    }
+    ~TensorPtr() = default;
 
     TensorPtr(const std::initializer_list<sizeT> shape)
     {
@@ -90,7 +82,7 @@ template <typename T> class TensorPtr
 
     void refByVar() const
     {
-        if (*refcount_ > TENSOR_VAR_REF_MASK)
+        if ((TENSOR_VAR_REF_MASK & *refcount_) != 0)
             throw std::runtime_error(
                 "TensorPtr already referenced by a TensorVar");
         *refcount_ |= TENSOR_VAR_REF_MASK;
@@ -104,12 +96,66 @@ template <typename T> class TensorPtr
         *refcount_ |= COMPUTE_NODE_REF_MASK;
     }
 
+    void unrefByVar() const
+    {
+        if (refcount_ == nullptr)
+        {
+            return;
+        }
+        if ((TENSOR_VAR_REF_MASK & *refcount_) == 0)
+        {
+            throw std::runtime_error("Var bit not set");
+        }
+        *refcount_ = static_cast<i8>(*refcount_ & ~TENSOR_VAR_REF_MASK);
+        if (*refcount_ == 0)
+        {
+            delete refcount_;
+            delete tensor_;
+            const_cast<TensorPtr<T>*>(this)->refcount_ = nullptr;
+            const_cast<TensorPtr<T>*>(this)->tensor_ = nullptr;
+        }
+    }
+
+    void unrefByNode() const
+    {
+        if (refcount_ == nullptr)
+        {
+            return;
+        }
+        if ((COMPUTE_NODE_REF_MASK & *refcount_) == 0)
+        {
+            throw std::runtime_error("Node bit not set");
+        }
+        *refcount_ = static_cast<i8>(*refcount_ & ~COMPUTE_NODE_REF_MASK);
+        if (*refcount_ == 0)
+        {
+            delete refcount_;
+            delete tensor_;
+            const_cast<TensorPtr<T>*>(this)->refcount_ = nullptr;
+            const_cast<TensorPtr<T>*>(this)->tensor_ = nullptr;
+        }
+    }
+
     TensorPtr(const TensorPtr& other) = delete;
-    TensorPtr(TensorPtr&& other) = delete;
+    TensorPtr(TensorPtr&& other) noexcept
+    {
+        this->tensor_ = other.tensor_;
+        this->refcount_ = other.refcount_;
+        other.tensor_ = nullptr;
+        other.refcount_ = nullptr;
+    }
     TensorPtr& operator=(const TensorPtr& other) = delete;
     TensorPtr& operator=(TensorPtr&& other) noexcept
     {
-        *this = std::move(other);
+        if (this == &other)
+        {
+            return *this;
+        }
+        // steal
+        this->tensor_ = other.tensor_;
+        this->refcount_ = other.refcount_;
+        other.tensor_ = nullptr;
+        other.refcount_ = nullptr;
         return *this;
     };
 
@@ -155,6 +201,8 @@ template <typename T> class TensorPtr
     {
         return COMPUTE_NODE_REF_MASK & *refcount_;
     }
+
+    void releaseOwnership_() = delete;
 
     TensorData<T>* tensor_;
     i8* refcount_;

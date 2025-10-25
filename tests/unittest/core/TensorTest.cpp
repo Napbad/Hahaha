@@ -15,7 +15,7 @@
 // Email: napbad.sen@gmail.com
 // GitHub: https://github.com/Napbad
 
-#include <core/Tensor.h>
+#include <core/TensorData.h>
 #include <ds/Vector.h>
 #include <gtest/gtest.h>
 
@@ -23,8 +23,8 @@ using namespace hahaha;
 using namespace hahaha::ml;
 using namespace hahaha::core;
 
-// Test fixture for Tensor
-template <typename T> class TensorTest : public ::testing::Test
+// Test fixture for TensorData
+template <typename T> class TensorDataTest : public ::testing::Test
 {
   protected:
     void SetUp() override
@@ -55,20 +55,20 @@ template <typename T> class TensorTest : public ::testing::Test
 
 // Define type-parameterized tests
 using TestTypes = ::testing::Types<int, f32, f64>;
-TYPED_TEST_SUITE(TensorTest, TestTypes);
+TYPED_TEST_SUITE(TensorDataTest, TestTypes);
 
 // Test default constructor
-TYPED_TEST(TensorTest, DefaultConstructor)
+TYPED_TEST(TensorDataTest, DefaultConstructor)
 {
-    Tensor<TypeParam> tensor;
+    TensorData<TypeParam> tensor;
     EXPECT_TRUE(tensor.empty());
     EXPECT_EQ(tensor.size(), 0);
 }
 
 // Test constructor with shape only
-TYPED_TEST(TensorTest, ShapeConstructor)
+TYPED_TEST(TensorDataTest, ShapeConstructor)
 {
-    Tensor<TypeParam> tensor({2, 3});
+    TensorData<TypeParam> tensor({2, 3});
     EXPECT_EQ(tensor.dim(), 2);
     EXPECT_EQ(tensor.size(), 6);
     EXPECT_FALSE(tensor.empty());
@@ -80,9 +80,9 @@ TYPED_TEST(TensorTest, ShapeConstructor)
 }
 
 // Test constructor with shape and data
-TYPED_TEST(TensorTest, ShapeDataConstructor)
+TYPED_TEST(TensorDataTest, ShapeDataConstructor)
 {
-    Tensor<TypeParam> tensor({2, 2},
+    TensorData<TypeParam> tensor({2, 2},
                              {static_cast<TypeParam>(1),
                               static_cast<TypeParam>(2),
                               static_cast<TypeParam>(3),
@@ -93,9 +93,9 @@ TYPED_TEST(TensorTest, ShapeDataConstructor)
 }
 
 // Test 1D tensor
-TYPED_TEST(TensorTest, OneDimensionalTensor)
+TYPED_TEST(TensorDataTest, OneDimensionalTensorData)
 {
-    Tensor<TypeParam> tensor({5});
+    TensorData<TypeParam> tensor({5});
     EXPECT_EQ(tensor.dim(), 1);
     EXPECT_EQ(tensor.size(), 5);
 
@@ -104,9 +104,9 @@ TYPED_TEST(TensorTest, OneDimensionalTensor)
 }
 
 // Test 3D tensor
-TYPED_TEST(TensorTest, ThreeDimensionalTensor)
+TYPED_TEST(TensorDataTest, ThreeDimensionalTensorData)
 {
-    Tensor<TypeParam> tensor({2, 3, 4});
+    TensorData<TypeParam> tensor({2, 3, 4});
     EXPECT_EQ(tensor.dim(), 3);
     EXPECT_EQ(tensor.size(), 24);
 
@@ -117,9 +117,9 @@ TYPED_TEST(TensorTest, ThreeDimensionalTensor)
 }
 
 // Test fill method
-TYPED_TEST(TensorTest, FillMethod)
+TYPED_TEST(TensorDataTest, FillMethod)
 {
-    Tensor<TypeParam> tensor({3, 3});
+    TensorData<TypeParam> tensor({3, 3});
     tensor.fill(static_cast<TypeParam>(5));
 
     for (const auto& val : tensor)
@@ -129,9 +129,9 @@ TYPED_TEST(TensorTest, FillMethod)
 }
 
 // Test index calculation
-TYPED_TEST(TensorTest, IndexCalculation)
+TYPED_TEST(TensorDataTest, IndexCalculation)
 {
-    Tensor<TypeParam> tensor({2, 3});
+    TensorData<TypeParam> tensor({2, 3});
 
     // Test valid indices
     EXPECT_EQ(tensor.index({0, 0}), 0);
@@ -141,17 +141,17 @@ TYPED_TEST(TensorTest, IndexCalculation)
 }
 
 // Test index out of bounds
-TYPED_TEST(TensorTest, IndexOutOfBounds)
+TYPED_TEST(TensorDataTest, IndexOutOfBounds)
 {
-    Tensor<TypeParam> tensor({2, 3});
+    TensorData<TypeParam> tensor({2, 3});
     EXPECT_THROW((void) tensor.index({2, 0}), IndexOutOfBoundError);
     EXPECT_THROW((void) tensor.index({0, 3}), IndexOutOfBoundError);
 }
 
 // Test set and at methods
-TYPED_TEST(TensorTest, SetAndAtMethods)
+TYPED_TEST(TensorDataTest, SetAndAtMethods)
 {
-    Tensor<TypeParam> tensor({2, 3});
+    TensorData<TypeParam> tensor({2, 3});
 
     // Set values
     tensor.set({0, 0}, static_cast<TypeParam>(1));
@@ -165,10 +165,10 @@ TYPED_TEST(TensorTest, SetAndAtMethods)
 }
 
 // Test element-wise addition
-TYPED_TEST(TensorTest, ElementWiseAddition)
+TYPED_TEST(TensorDataTest, ElementWiseAddition)
 {
-    Tensor<TypeParam> tensor1({2, 2});
-    Tensor<TypeParam> tensor2({2, 2});
+    TensorData<TypeParam> tensor1({2, 2});
+    TensorData<TypeParam> tensor2({2, 2});
 
     tensor1.fill(static_cast<TypeParam>(3));
     tensor2.fill(static_cast<TypeParam>(2));
@@ -182,10 +182,10 @@ TYPED_TEST(TensorTest, ElementWiseAddition)
 }
 
 // Test element-wise subtraction
-TYPED_TEST(TensorTest, ElementWiseSubtraction)
+TYPED_TEST(TensorDataTest, ElementWiseSubtraction)
 {
-    Tensor<TypeParam> tensor1({2, 2});
-    Tensor<TypeParam> tensor2({2, 2});
+    TensorData<TypeParam> tensor1({2, 2});
+    TensorData<TypeParam> tensor2({2, 2});
 
     tensor1.fill(static_cast<TypeParam>(5));
     tensor2.fill(static_cast<TypeParam>(2));
@@ -199,10 +199,10 @@ TYPED_TEST(TensorTest, ElementWiseSubtraction)
 }
 
 // Test element-wise multiplication
-TYPED_TEST(TensorTest, ElementWiseMultiplication)
+TYPED_TEST(TensorDataTest, ElementWiseMultiplication)
 {
-    Tensor<TypeParam> tensor1({2, 2});
-    Tensor<TypeParam> tensor2({2, 2});
+    TensorData<TypeParam> tensor1({2, 2});
+    TensorData<TypeParam> tensor2({2, 2});
 
     tensor1.fill(static_cast<TypeParam>(3));
     tensor2.fill(static_cast<TypeParam>(4));
@@ -216,10 +216,10 @@ TYPED_TEST(TensorTest, ElementWiseMultiplication)
 }
 
 // Test element-wise division
-TYPED_TEST(TensorTest, ElementWiseDivision)
+TYPED_TEST(TensorDataTest, ElementWiseDivision)
 {
-    Tensor<TypeParam> tensor1({2, 2});
-    Tensor<TypeParam> tensor2({2, 2});
+    TensorData<TypeParam> tensor1({2, 2});
+    TensorData<TypeParam> tensor2({2, 2});
 
     tensor1.fill(static_cast<TypeParam>(12));
     tensor2.fill(static_cast<TypeParam>(4));
@@ -233,9 +233,9 @@ TYPED_TEST(TensorTest, ElementWiseDivision)
 }
 
 // Test scalar addition
-TYPED_TEST(TensorTest, ScalarAddition)
+TYPED_TEST(TensorDataTest, ScalarAddition)
 {
-    Tensor<TypeParam> tensor({2, 2});
+    TensorData<TypeParam> tensor({2, 2});
     tensor.fill(static_cast<TypeParam>(3));
 
     auto result = tensor + static_cast<TypeParam>(2);
@@ -247,9 +247,9 @@ TYPED_TEST(TensorTest, ScalarAddition)
 }
 
 // Test scalar multiplication
-TYPED_TEST(TensorTest, ScalarMultiplication)
+TYPED_TEST(TensorDataTest, ScalarMultiplication)
 {
-    Tensor<TypeParam> tensor({2, 2});
+    TensorData<TypeParam> tensor({2, 2});
     tensor.fill(static_cast<TypeParam>(3));
 
     auto result = tensor * static_cast<TypeParam>(4);
@@ -261,9 +261,9 @@ TYPED_TEST(TensorTest, ScalarMultiplication)
 }
 
 // Test scalar subtraction
-TYPED_TEST(TensorTest, ScalarSubtraction)
+TYPED_TEST(TensorDataTest, ScalarSubtraction)
 {
-    Tensor<TypeParam> tensor({2, 2});
+    TensorData<TypeParam> tensor({2, 2});
     tensor.fill(static_cast<TypeParam>(10));
 
     auto result = tensor - static_cast<TypeParam>(3);
@@ -275,9 +275,9 @@ TYPED_TEST(TensorTest, ScalarSubtraction)
 }
 
 // Test scalar division
-TYPED_TEST(TensorTest, ScalarDivision)
+TYPED_TEST(TensorDataTest, ScalarDivision)
 {
-    Tensor<TypeParam> tensor({2, 2});
+    TensorData<TypeParam> tensor({2, 2});
     tensor.fill(static_cast<TypeParam>(12));
 
     auto result = tensor / static_cast<TypeParam>(4);
@@ -289,10 +289,10 @@ TYPED_TEST(TensorTest, ScalarDivision)
 }
 
 // Test dot product
-TYPED_TEST(TensorTest, DotProduct)
+TYPED_TEST(TensorDataTest, DotProduct)
 {
-    Tensor<TypeParam> tensor1({3});
-    Tensor<TypeParam> tensor2({3});
+    TensorData<TypeParam> tensor1({3});
+    TensorData<TypeParam> tensor2({3});
 
     tensor1.set({0}, static_cast<TypeParam>(1));
     tensor1.set({1}, static_cast<TypeParam>(2));
@@ -308,10 +308,10 @@ TYPED_TEST(TensorTest, DotProduct)
 }
 
 // Test compound assignment operators
-TYPED_TEST(TensorTest, CompoundAddition)
+TYPED_TEST(TensorDataTest, CompoundAddition)
 {
-    Tensor<TypeParam> tensor1({2, 2});
-    Tensor<TypeParam> tensor2({2, 2});
+    TensorData<TypeParam> tensor1({2, 2});
+    TensorData<TypeParam> tensor2({2, 2});
 
     tensor1.fill(static_cast<TypeParam>(3));
     tensor2.fill(static_cast<TypeParam>(2));
@@ -324,10 +324,10 @@ TYPED_TEST(TensorTest, CompoundAddition)
     }
 }
 
-TYPED_TEST(TensorTest, CompoundSubtraction)
+TYPED_TEST(TensorDataTest, CompoundSubtraction)
 {
-    Tensor<TypeParam> tensor1({2, 2});
-    Tensor<TypeParam> tensor2({2, 2});
+    TensorData<TypeParam> tensor1({2, 2});
+    TensorData<TypeParam> tensor2({2, 2});
 
     tensor1.fill(static_cast<TypeParam>(5));
     tensor2.fill(static_cast<TypeParam>(2));
@@ -340,10 +340,10 @@ TYPED_TEST(TensorTest, CompoundSubtraction)
     }
 }
 
-TYPED_TEST(TensorTest, CompoundMultiplication)
+TYPED_TEST(TensorDataTest, CompoundMultiplication)
 {
-    Tensor<TypeParam> tensor1({2, 2});
-    Tensor<TypeParam> tensor2({2, 2});
+    TensorData<TypeParam> tensor1({2, 2});
+    TensorData<TypeParam> tensor2({2, 2});
 
     tensor1.fill(static_cast<TypeParam>(3));
     tensor2.fill(static_cast<TypeParam>(4));
@@ -356,10 +356,10 @@ TYPED_TEST(TensorTest, CompoundMultiplication)
     }
 }
 
-TYPED_TEST(TensorTest, CompoundDivision)
+TYPED_TEST(TensorDataTest, CompoundDivision)
 {
-    Tensor<TypeParam> tensor1({2, 2});
-    Tensor<TypeParam> tensor2({2, 2});
+    TensorData<TypeParam> tensor1({2, 2});
+    TensorData<TypeParam> tensor2({2, 2});
 
     tensor1.fill(static_cast<TypeParam>(12));
     tensor2.fill(static_cast<TypeParam>(4));
@@ -373,14 +373,14 @@ TYPED_TEST(TensorTest, CompoundDivision)
 }
 
 // Test fromVector static method
-TYPED_TEST(TensorTest, FromVector)
+TYPED_TEST(TensorDataTest, FromVector)
 {
     ds::Vector<TypeParam> vec;
     vec.pushBack(static_cast<TypeParam>(1));
     vec.pushBack(static_cast<TypeParam>(2));
     vec.pushBack(static_cast<TypeParam>(3));
 
-    auto tensor = Tensor<TypeParam>::fromVector(vec);
+    auto tensor = TensorData<TypeParam>::fromVector(vec);
 
     EXPECT_EQ(tensor.size(), 3);
     EXPECT_EQ(tensor.dim(), 1);
@@ -390,12 +390,12 @@ TYPED_TEST(TensorTest, FromVector)
 }
 
 // Test copy from tensor
-TYPED_TEST(TensorTest, CopyFromTensor)
+TYPED_TEST(TensorDataTest, CopyFromTensorData)
 {
-    Tensor<TypeParam> source({2, 2});
+    TensorData<TypeParam> source({2, 2});
     source.fill(static_cast<TypeParam>(5));
 
-    Tensor<TypeParam> dest({2, 2});
+    TensorData<TypeParam> dest({2, 2});
     dest.copy(source);
 
     for (const auto& val : dest)
@@ -405,7 +405,7 @@ TYPED_TEST(TensorTest, CopyFromTensor)
 }
 
 // Test copy from vector
-TYPED_TEST(TensorTest, CopyFromVector)
+TYPED_TEST(TensorDataTest, CopyFromVector)
 {
     ds::Vector<TypeParam> vec;
     vec.pushBack(static_cast<TypeParam>(1));
@@ -413,7 +413,7 @@ TYPED_TEST(TensorTest, CopyFromVector)
     vec.pushBack(static_cast<TypeParam>(3));
     vec.pushBack(static_cast<TypeParam>(4));
 
-    Tensor<TypeParam> tensor({2, 2});
+    TensorData<TypeParam> tensor({2, 2});
     tensor.copy(vec);
 
     EXPECT_EQ(tensor.at({0, 0}).first(), static_cast<TypeParam>(1));
@@ -421,18 +421,18 @@ TYPED_TEST(TensorTest, CopyFromVector)
 }
 
 // Test copy with mismatched shapes
-TYPED_TEST(TensorTest, CopyMismatchedShapes)
+TYPED_TEST(TensorDataTest, CopyMismatchedShapes)
 {
-    Tensor<TypeParam> source({2, 3});
-    Tensor<TypeParam> dest({3, 2});
+    TensorData<TypeParam> source({2, 3});
+    TensorData<TypeParam> dest({3, 2});
 
-    EXPECT_THROW(dest.copy(source), TensorErr);
+    EXPECT_THROW(dest.copy(source), TensorDataErr);
 }
 
 // Test iterators
-TYPED_TEST(TensorTest, Iterators)
+TYPED_TEST(TensorDataTest, Iterators)
 {
-    Tensor<TypeParam> tensor({3});
+    TensorData<TypeParam> tensor({3});
     tensor.set({0}, static_cast<TypeParam>(1));
     tensor.set({1}, static_cast<TypeParam>(2));
     tensor.set({2}, static_cast<TypeParam>(3));
@@ -451,9 +451,9 @@ TYPED_TEST(TensorTest, Iterators)
 }
 
 // Test first method
-TYPED_TEST(TensorTest, FirstMethod)
+TYPED_TEST(TensorDataTest, FirstMethod)
 {
-    Tensor<TypeParam> tensor({2, 2});
+    TensorData<TypeParam> tensor({2, 2});
     tensor.fill(static_cast<TypeParam>(0));
     tensor.set({0, 0}, static_cast<TypeParam>(42));
 
@@ -461,47 +461,47 @@ TYPED_TEST(TensorTest, FirstMethod)
 }
 
 // Test shape mismatch in operations
-TYPED_TEST(TensorTest, ShapeMismatchInAddition)
+TYPED_TEST(TensorDataTest, ShapeMismatchInAddition)
 {
-    Tensor<TypeParam> tensor1({2, 4});
-    Tensor<TypeParam> tensor2({3, 2});
+    TensorData<TypeParam> tensor1({2, 4});
+    TensorData<TypeParam> tensor2({3, 2});
 
     EXPECT_THROW(tensor1 + tensor2, std::runtime_error);
 }
 
-TYPED_TEST(TensorTest, ShapeMismatchInSubtraction)
+TYPED_TEST(TensorDataTest, ShapeMismatchInSubtraction)
 {
-    Tensor<TypeParam> tensor1({2, 4});
-    Tensor<TypeParam> tensor2({3, 2});
+    TensorData<TypeParam> tensor1({2, 4});
+    TensorData<TypeParam> tensor2({3, 2});
 
     EXPECT_THROW(tensor1 - tensor2, std::runtime_error);
 }
 
-TYPED_TEST(TensorTest, ShapeMismatchInMultiplication)
+TYPED_TEST(TensorDataTest, ShapeMismatchInMultiplication)
 {
-    Tensor<TypeParam> tensor1({2, 4});
-    Tensor<TypeParam> tensor2({3, 2});
+    TensorData<TypeParam> tensor1({2, 4});
+    TensorData<TypeParam> tensor2({3, 2});
 
     EXPECT_THROW(tensor1 * tensor2, std::runtime_error);
 }
 
-TYPED_TEST(TensorTest, ShapeMismatchInDivision)
+TYPED_TEST(TensorDataTest, ShapeMismatchInDivision)
 {
-    Tensor<TypeParam> tensor1({2, 4});
-    Tensor<TypeParam> tensor2({3, 2});
+    TensorData<TypeParam> tensor1({2, 4});
+    TensorData<TypeParam> tensor2({3, 2});
 
     EXPECT_THROW(tensor1 / tensor2, std::runtime_error);
 }
 
 // Floating point specific tests
-class TensorFloatTest : public ::testing::Test
+class TensorDataFloatTest : public ::testing::Test
 {
 };
 
-TEST_F(TensorFloatTest, DivisionByZeroElement)
+TEST_F(TensorDataFloatTest, DivisionByZeroElement)
 {
-    Tensor<f32> tensor1({2, 2});
-    Tensor<f32> tensor2({2, 2});
+    TensorData<f32> tensor1({2, 2});
+    TensorData<f32> tensor2({2, 2});
 
     tensor1.fill(10.0f);
     tensor2.fill(0.0f);
@@ -509,32 +509,32 @@ TEST_F(TensorFloatTest, DivisionByZeroElement)
     EXPECT_THROW(tensor1 / tensor2, std::runtime_error);
 }
 
-TEST_F(TensorFloatTest, DivisionByZeroScalar)
+TEST_F(TensorDataFloatTest, DivisionByZeroScalar)
 {
-    Tensor<f32> tensor({2, 2});
+    TensorData<f32> tensor({2, 2});
     tensor.fill(10.0f);
 
     EXPECT_THROW(tensor / 0.0f, std::runtime_error);
 }
 
 // Test high-dimensional tensors
-TEST_F(TensorFloatTest, FourDimensionalTensor)
+TEST_F(TensorDataFloatTest, FourDimensionalTensorData)
 {
-    Tensor<f32> tensor({2, 3, 4, 5});
+    TensorData<f32> tensor({2, 3, 4, 5});
     EXPECT_EQ(tensor.dim(), 4);
     EXPECT_EQ(tensor.size(), 120);
 }
 
 // Test edge cases
-TEST_F(TensorFloatTest, ScalarTensor)
+TEST_F(TensorDataFloatTest, ScalarTensorData)
 {
-    Tensor<f32> tensor({0}, {42.0f});
+    TensorData<f32> tensor({0}, {42.0f});
     EXPECT_EQ(tensor.dim(), 1);
 }
 
-TEST_F(TensorFloatTest, LargeValues)
+TEST_F(TensorDataFloatTest, LargeValues)
 {
-    Tensor<f32> tensor({2, 2});
+    TensorData<f32> tensor({2, 2});
     tensor.fill(1e30f);
 
     auto result = tensor + tensor;
@@ -545,9 +545,9 @@ TEST_F(TensorFloatTest, LargeValues)
 }
 
 // Test rawData method
-TEST_F(TensorFloatTest, RawDataMethod)
+TEST_F(TensorDataFloatTest, RawDataMethod)
 {
-    Tensor<f32> tensor({3});
+    TensorData<f32> tensor({3});
     tensor.set({0}, 1.0f);
     tensor.set({1}, 2.0f);
     tensor.set({2}, 3.0f);
@@ -560,9 +560,9 @@ TEST_F(TensorFloatTest, RawDataMethod)
 }
 
 // Test complex indexing scenarios
-TEST_F(TensorFloatTest, ComplexIndexing3D)
+TEST_F(TensorDataFloatTest, ComplexIndexing3D)
 {
-    Tensor<f32> tensor({2, 3, 4});
+    TensorData<f32> tensor({2, 3, 4});
 
     // Test corner cases
     EXPECT_EQ(tensor.index({0, 0, 0}), 0);
@@ -571,9 +571,9 @@ TEST_F(TensorFloatTest, ComplexIndexing3D)
 }
 
 // Test sequential operations
-TEST_F(TensorFloatTest, SequentialOperations)
+TEST_F(TensorDataFloatTest, SequentialOperations)
 {
-    Tensor<f32> tensor({3, 3});
+    TensorData<f32> tensor({3, 3});
     tensor.fill(2.0f);
 
     auto result = ((tensor + 1.0f) * 2.0f) - 3.0f;
@@ -586,19 +586,19 @@ TEST_F(TensorFloatTest, SequentialOperations)
 }
 
 // Test empty tensor
-TEST_F(TensorFloatTest, EmptyTensorCheck)
+TEST_F(TensorDataFloatTest, EmptyTensorDataCheck)
 {
-    Tensor<f32> empty_tensor;
+    TensorData<f32> empty_tensor;
     EXPECT_TRUE(empty_tensor.empty());
 
-    Tensor<f32> non_empty({2, 2});
+    TensorData<f32> non_empty({2, 2});
     EXPECT_FALSE(non_empty.empty());
 }
 
 // Test operator() access method
-TEST_F(TensorFloatTest, OperatorParenthesesAccess)
+TEST_F(TensorDataFloatTest, OperatorParenthesesAccess)
 {
-    Tensor<f32> tensor({3, 3});
+    TensorData<f32> tensor({3, 3});
     ds::Vector<sizeT> idx1{0, 0};
     ds::Vector<sizeT> idx2{1, 2};
     ds::Vector<sizeT> idx3{2, 2};
@@ -613,24 +613,24 @@ TEST_F(TensorFloatTest, OperatorParenthesesAccess)
 }
 
 // Test variadic operator() access
-TYPED_TEST(TensorTest, VariadicOperatorParenthesesAccess)
+TYPED_TEST(TensorDataTest, VariadicOperatorParenthesesAccess)
 {
     // 1D Vector
-    Tensor<TypeParam> vec({3}, {1, 2, 3});
+    TensorData<TypeParam> vec({3}, {1, 2, 3});
     EXPECT_EQ(vec(0ul), static_cast<TypeParam>(1));
     EXPECT_EQ(vec(2ul), static_cast<TypeParam>(3));
     vec(1ul) = static_cast<TypeParam>(22);
     EXPECT_EQ(vec(1ul), static_cast<TypeParam>(22));
 
     // 2D Matrix
-    Tensor<TypeParam> mat({2, 3}, {1, 2, 3, 4, 5, 6});
+    TensorData<TypeParam> mat({2, 3}, {1, 2, 3, 4, 5, 6});
     EXPECT_EQ(mat(0ul, 1ul), static_cast<TypeParam>(2));
     EXPECT_EQ(mat(1ul, 2ul), static_cast<TypeParam>(6));
     mat(1ul, 0ul) = static_cast<TypeParam>(44);
     EXPECT_EQ(mat(1ul, 0ul), static_cast<TypeParam>(44));
 
-    // 3D Tensor
-    Tensor<TypeParam> t3d({2, 2, 2}, {1, 2, 3, 4, 5, 6, 7, 8});
+    // 3D TensorData
+    TensorData<TypeParam> t3d({2, 2, 2}, {1, 2, 3, 4, 5, 6, 7, 8});
     EXPECT_EQ(t3d(0ul, 1ul, 0ul), static_cast<TypeParam>(3));
     EXPECT_EQ(t3d(1ul, 1ul, 1ul), static_cast<TypeParam>(8));
     t3d(1ul, 0ul, 1ul) = static_cast<TypeParam>(66);
@@ -642,10 +642,10 @@ TYPED_TEST(TensorTest, VariadicOperatorParenthesesAccess)
 }
 
 // Test scalar constructor and conversion
-TYPED_TEST(TensorTest, ScalarConstructorAndConversion)
+TYPED_TEST(TensorDataTest, ScalarConstructorAndConversion)
 {
     TypeParam scalar_value = static_cast<TypeParam>(42);
-    Tensor<TypeParam> scalar_tensor(scalar_value);
+    TensorData<TypeParam> scalar_tensor(scalar_value);
 
     EXPECT_EQ(scalar_tensor.dim(), 0);
     EXPECT_EQ(scalar_tensor.size(), 1);
@@ -661,9 +661,9 @@ TYPED_TEST(TensorTest, ScalarConstructorAndConversion)
 }
 
 // Test scalar assignment
-TYPED_TEST(TensorTest, ScalarAssignment)
+TYPED_TEST(TensorDataTest, ScalarAssignment)
 {
-    Tensor<TypeParam> scalar_tensor(static_cast<TypeParam>(10));
+    TensorData<TypeParam> scalar_tensor(static_cast<TypeParam>(10));
     EXPECT_EQ(scalar_tensor.first(), static_cast<TypeParam>(10));
 
     scalar_tensor = static_cast<TypeParam>(25);
@@ -671,10 +671,10 @@ TYPED_TEST(TensorTest, ScalarAssignment)
 }
 
 // Test transpose method
-TYPED_TEST(TensorTest, Transpose)
+TYPED_TEST(TensorDataTest, Transpose)
 {
-    Tensor<TypeParam> mat({2, 3}, {1, 2, 3, 4, 5, 6});
-    Tensor<TypeParam> transposed = mat.transpose();
+    TensorData<TypeParam> mat({2, 3}, {1, 2, 3, 4, 5, 6});
+    TensorData<TypeParam> transposed = mat.transpose();
 
     const auto& transposed_shape = transposed.shape();
     EXPECT_EQ(transposed_shape.size(), 2);
@@ -696,9 +696,9 @@ TYPED_TEST(TensorTest, Transpose)
 }
 
 // Test reshape method
-TYPED_TEST(TensorTest, Reshape)
+TYPED_TEST(TensorDataTest, Reshape)
 {
-    Tensor<TypeParam> tensor({2, 6}, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});
+    TensorData<TypeParam> tensor({2, 6}, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});
 
     // Valid reshape
     tensor.reshape({3, 4});
@@ -724,12 +724,12 @@ TYPED_TEST(TensorTest, Reshape)
 }
 
 // Test matmul method
-TYPED_TEST(TensorTest, Matmul)
+TYPED_TEST(TensorDataTest, Matmul)
 {
     // Standard matrix multiplication
-    Tensor<TypeParam> mat1({2, 3}, {1, 2, 3, 4, 5, 6});
-    Tensor<TypeParam> mat2({3, 2}, {7, 8, 9, 10, 11, 12});
-    Tensor<TypeParam> result = mat1.matmul(mat2);
+    TensorData<TypeParam> mat1({2, 3}, {1, 2, 3, 4, 5, 6});
+    TensorData<TypeParam> mat2({3, 2}, {7, 8, 9, 10, 11, 12});
+    TensorData<TypeParam> result = mat1.matmul(mat2);
 
     const auto& result_shape = result.shape();
     EXPECT_EQ(result_shape.size(), 2);
@@ -742,21 +742,21 @@ TYPED_TEST(TensorTest, Matmul)
     EXPECT_EQ(result(1, 1), 154); // 4*8 + 5*10 + 6*12
 
     // Matrix-vector multiplication
-    Tensor<TypeParam> mat_vec({3, 1}, {1, 2, 3});
-    Tensor<TypeParam> result_vec = mat1.matmul(mat_vec);
+    TensorData<TypeParam> mat_vec({3, 1}, {1, 2, 3});
+    TensorData<TypeParam> result_vec = mat1.matmul(mat_vec);
     EXPECT_EQ(result_vec(0, 0), 14); // 1*1 + 2*2 + 3*3
     EXPECT_EQ(result_vec(1, 0), 32); // 4*1 + 5*2 + 6*3
 
     // Incompatible shapes
-    Tensor<TypeParam> mat3({2, 2});
+    TensorData<TypeParam> mat3({2, 2});
     EXPECT_THROW(mat1.matmul(mat3), std::runtime_error);
 }
 
 // Test factory methods
-TYPED_TEST(TensorTest, FactoryMethods)
+TYPED_TEST(TensorDataTest, FactoryMethods)
 {
     // Zeros
-    Tensor<TypeParam> zeros = Tensor<TypeParam>::zeros({2, 3});
+    TensorData<TypeParam> zeros = TensorData<TypeParam>::zeros({2, 3});
     EXPECT_EQ(zeros.shape()[0], 2);
     EXPECT_EQ(zeros.shape()[1], 3);
     for (const auto& val : zeros)
@@ -765,7 +765,7 @@ TYPED_TEST(TensorTest, FactoryMethods)
     }
 
     // Ones
-    Tensor<TypeParam> ones = Tensor<TypeParam>::ones({3, 2});
+    TensorData<TypeParam> ones = TensorData<TypeParam>::ones({3, 2});
     EXPECT_EQ(ones.shape()[0], 3);
     EXPECT_EQ(ones.shape()[1], 2);
     for (const auto& val : ones)
@@ -774,7 +774,7 @@ TYPED_TEST(TensorTest, FactoryMethods)
     }
 
     // Rand
-    Tensor<TypeParam> random = Tensor<TypeParam>::rand({4, 4});
+    TensorData<TypeParam> random = TensorData<TypeParam>::rand({4, 4});
     EXPECT_EQ(random.shape()[0], 4);
     EXPECT_EQ(random.shape()[1], 4);
     for (const auto& val : random)
@@ -785,18 +785,18 @@ TYPED_TEST(TensorTest, FactoryMethods)
 }
 
 // Test scalar tensor operations
-TYPED_TEST(TensorTest, ScalarTensorOperations)
+TYPED_TEST(TensorDataTest, ScalarTensorDataOperations)
 {
-    Tensor<TypeParam> scalar1({}, {5});
-    Tensor<TypeParam> scalar2({}, {3});
+    TensorData<TypeParam> scalar1({}, {5});
+    TensorData<TypeParam> scalar2({}, {3});
 
     // Addition
-    Tensor<TypeParam> sum = scalar1 + scalar2;
+    TensorData<TypeParam> sum = scalar1 + scalar2;
     EXPECT_EQ(sum.dim(), 0);
     EXPECT_EQ(sum.first(), static_cast<TypeParam>(8));
 
     // Multiplication
-    Tensor<TypeParam> prod = scalar1 * scalar2;
+    TensorData<TypeParam> prod = scalar1 * scalar2;
     EXPECT_EQ(prod.dim(), 0);
     EXPECT_EQ(prod.first(), static_cast<TypeParam>(15));
 
@@ -806,9 +806,9 @@ TYPED_TEST(TensorTest, ScalarTensorOperations)
     std::cout << "prod: " << &prod << std::endl;
 }
 
-TYPED_TEST(TensorTest, ReshapeDataIntegrity)
+TYPED_TEST(TensorDataTest, ReshapeDataIntegrity)
 {
-    Tensor<TypeParam> tensor({2, 4}, {1, 2, 3, 4, 5, 6, 7, 8});
+    TensorData<TypeParam> tensor({2, 4}, {1, 2, 3, 4, 5, 6, 7, 8});
     tensor.reshape({4, 2});
 
     EXPECT_EQ(tensor(0, 0), static_cast<TypeParam>(1));
@@ -818,50 +818,50 @@ TYPED_TEST(TensorTest, ReshapeDataIntegrity)
     EXPECT_EQ(tensor(3, 1), static_cast<TypeParam>(8));
 }
 
-TYPED_TEST(TensorTest, MatmulEdgeCases)
+TYPED_TEST(TensorDataTest, MatmulEdgeCases)
 {
     // Identity matrix
-    Tensor<TypeParam> mat({2, 2}, {1, 0, 0, 1});
-    Tensor<TypeParam> other({2, 2}, {5, 6, 7, 8});
-    Tensor<TypeParam> result = mat.matmul(other);
+    TensorData<TypeParam> mat({2, 2}, {1, 0, 0, 1});
+    TensorData<TypeParam> other({2, 2}, {5, 6, 7, 8});
+    TensorData<TypeParam> result = mat.matmul(other);
     EXPECT_TRUE(result == other);
 
     // Non-commutative
-    Tensor<TypeParam> mat1({2, 2}, {1, 2, 3, 4});
-    Tensor<TypeParam> mat2({2, 2}, {5, 6, 7, 8});
-    Tensor<TypeParam> result1 = mat1.matmul(mat2);
-    Tensor<TypeParam> result2 = mat2.matmul(mat1);
+    TensorData<TypeParam> mat1({2, 2}, {1, 2, 3, 4});
+    TensorData<TypeParam> mat2({2, 2}, {5, 6, 7, 8});
+    TensorData<TypeParam> result1 = mat1.matmul(mat2);
+    TensorData<TypeParam> result2 = mat2.matmul(mat1);
     EXPECT_FALSE(result1 == result2);
     EXPECT_TRUE(result1 != result2);
 }
 
 // Test sum method
-TYPED_TEST(TensorTest, SumMethod)
+TYPED_TEST(TensorDataTest, SumMethod)
 {
-    // 1D Tensor
-    Tensor<TypeParam> vec({4}, {1, 2, 3, 4});
+    // 1D TensorData
+    TensorData<TypeParam> vec({4}, {1, 2, 3, 4});
     EXPECT_EQ(vec.sum(), static_cast<TypeParam>(10));
 
-    // 2D Tensor
-    Tensor<TypeParam> mat({2, 3}, {1, 2, 3, 4, 5, 6});
+    // 2D TensorData
+    TensorData<TypeParam> mat({2, 3}, {1, 2, 3, 4, 5, 6});
     EXPECT_EQ(mat.sum(), static_cast<TypeParam>(21));
 
-    // Tensor with single element
-    Tensor<TypeParam> single({1}, {42});
+    // TensorData with single element
+    TensorData<TypeParam> single({1}, {42});
     EXPECT_EQ(single.sum(), static_cast<TypeParam>(42));
 
-    // Tensor with zeros
-    Tensor<TypeParam> zeros = Tensor<TypeParam>::zeros({3, 3});
+    // TensorData with zeros
+    TensorData<TypeParam> zeros = TensorData<TypeParam>::zeros({3, 3});
     EXPECT_EQ(zeros.sum(), static_cast<TypeParam>(0));
 }
 
 // Test broadcasting operations
-TYPED_TEST(TensorTest, BroadcastingOperations)
+TYPED_TEST(TensorDataTest, BroadcastingOperations)
 {
-    Tensor<TypeParam> tensor({2, 2});
+    TensorData<TypeParam> tensor({2, 2});
     tensor.fill(static_cast<TypeParam>(10));
 
-    Tensor<TypeParam> scalar_tensor(static_cast<TypeParam>(5));
+    TensorData<TypeParam> scalar_tensor(static_cast<TypeParam>(5));
 
     // Test tensor + scalar_tensor
     auto result_add = tensor + scalar_tensor;
@@ -913,9 +913,9 @@ TYPED_TEST(TensorTest, BroadcastingOperations)
     }
 
     // Test scalar_tensor / tensor
-    Tensor<TypeParam> tensor_for_div({2, 2});
+    TensorData<TypeParam> tensor_for_div({2, 2});
     tensor_for_div.fill(static_cast<TypeParam>(2));
-    Tensor<TypeParam> scalar_for_div(static_cast<TypeParam>(10));
+    TensorData<TypeParam> scalar_for_div(static_cast<TypeParam>(10));
     auto result_div_rev = scalar_for_div / tensor_for_div;
     for (const auto& val : result_div_rev)
     {
@@ -924,12 +924,12 @@ TYPED_TEST(TensorTest, BroadcastingOperations)
 }
 
 // Test broadcasting with single-element, non-scalar tensor
-TYPED_TEST(TensorTest, BroadcastingSingleElementTensor)
+TYPED_TEST(TensorDataTest, BroadcastingSingleElementTensorData)
 {
-    Tensor<TypeParam> tensor({2, 2});
+    TensorData<TypeParam> tensor({2, 2});
     tensor.fill(static_cast<TypeParam>(10));
 
-    Tensor<TypeParam> single_element_tensor({1, 1},
+    TensorData<TypeParam> single_element_tensor({1, 1},
                                             {static_cast<TypeParam>(5)});
 
     EXPECT_FALSE(single_element_tensor.isScalar());
@@ -949,9 +949,9 @@ TYPED_TEST(TensorTest, BroadcastingSingleElementTensor)
 }
 
 // Test scalar multiplication commutativity
-TYPED_TEST(TensorTest, ScalarMultiplicationCommutativity)
+TYPED_TEST(TensorDataTest, ScalarMultiplicationCommutativity)
 {
-    Tensor<TypeParam> tensor({2, 2});
+    TensorData<TypeParam> tensor({2, 2});
     tensor.fill(static_cast<TypeParam>(3));
     TypeParam scalar = static_cast<TypeParam>(4);
 
@@ -962,9 +962,9 @@ TYPED_TEST(TensorTest, ScalarMultiplicationCommutativity)
 }
 
 // Test commutative scalar operations
-TYPED_TEST(TensorTest, CommutativeScalarOperations)
+TYPED_TEST(TensorDataTest, CommutativeScalarOperations)
 {
-    Tensor<TypeParam> tensor({2, 2});
+    TensorData<TypeParam> tensor({2, 2});
     tensor.fill(static_cast<TypeParam>(10));
     TypeParam scalar = static_cast<TypeParam>(5);
 
@@ -983,7 +983,7 @@ TYPED_TEST(TensorTest, CommutativeScalarOperations)
     }
 
     // Test scalar / tensor
-    Tensor<TypeParam> tensor_for_div({2, 2});
+    TensorData<TypeParam> tensor_for_div({2, 2});
     tensor_for_div.fill(static_cast<TypeParam>(2));
     TypeParam scalar_for_div = static_cast<TypeParam>(10);
     auto result_div = scalar_for_div / tensor_for_div;
@@ -994,9 +994,9 @@ TYPED_TEST(TensorTest, CommutativeScalarOperations)
 }
 
 // Test operator[] access
-TYPED_TEST(TensorTest, OperatorBracketAccess)
+TYPED_TEST(TensorDataTest, OperatorBracketAccess)
 {
-    Tensor<TypeParam> tensor({2, 3}, {1, 2, 3, 4, 5, 6});
+    TensorData<TypeParam> tensor({2, 3}, {1, 2, 3, 4, 5, 6});
 
     // Read access
     EXPECT_EQ(tensor[0], static_cast<TypeParam>(1));
@@ -1008,9 +1008,9 @@ TYPED_TEST(TensorTest, OperatorBracketAccess)
 }
 
 // Test tensor slicing with at() method
-TEST_F(TensorFloatTest, TensorSlicing3D)
+TEST_F(TensorDataFloatTest, TensorDataSlicing3D)
 {
-    Tensor<f32> tensor({2, 3, 4});
+    TensorData<f32> tensor({2, 3, 4});
     tensor.fill(5.0f);
 
     // Get a 2D slice by fixing first dimension
@@ -1025,9 +1025,9 @@ TEST_F(TensorFloatTest, TensorSlicing3D)
 }
 
 // Test tensor slicing with at() method - 2D to 1D
-TEST_F(TensorFloatTest, TensorSlicing2DTo1D)
+TEST_F(TensorDataFloatTest, TensorDataSlicing2DTo1D)
 {
-    Tensor<f32> tensor({3, 4});
+    TensorData<f32> tensor({3, 4});
 
     // Fill with sequential values
     for (sizeT i = 0; i < 3; ++i)
@@ -1050,9 +1050,9 @@ TEST_F(TensorFloatTest, TensorSlicing2DTo1D)
 }
 
 // Test tensor slicing with at() method - 2D to 0D (scalar)
-TEST_F(TensorFloatTest, TensorSlicing2DTo0D)
+TEST_F(TensorDataFloatTest, TensorDataSlicing2DTo0D)
 {
-    Tensor<f32> tensor({3, 4});
+    TensorData<f32> tensor({3, 4});
     tensor.fill(0.0f);
     tensor.set({1, 2}, 42.0f);
 
@@ -1063,59 +1063,59 @@ TEST_F(TensorFloatTest, TensorSlicing2DTo0D)
 }
 
 // Test at() with wrong number of indices
-TEST_F(TensorFloatTest, AtMethodTooManyIndices)
+TEST_F(TensorDataFloatTest, AtMethodTooManyIndices)
 {
-    Tensor<f32> tensor({2, 3});
+    TensorData<f32> tensor({2, 3});
     EXPECT_THROW((void) tensor.at({0, 1, 2}), IndexOutOfBoundError);
 }
 
 // Test at() with empty indices on non-empty tensor
-TEST_F(TensorFloatTest, AtMethodEmptyIndices)
+TEST_F(TensorDataFloatTest, AtMethodEmptyIndices)
 {
-    Tensor<f32> tensor({2, 3});
+    TensorData<f32> tensor({2, 3});
     EXPECT_THROW((void) tensor.at({}), IndexOutOfBoundError);
 }
 
 // Test set() with wrong number of indices
-TEST_F(TensorFloatTest, SetMethodTooManyIndices)
+TEST_F(TensorDataFloatTest, SetMethodTooManyIndices)
 {
-    Tensor<f32> tensor({2, 3});
+    TensorData<f32> tensor({2, 3});
     EXPECT_THROW(tensor.set({0, 1, 2}, 5.0f), IndexOutOfBoundError);
 }
 
 // Test set() with empty indices on non-empty tensor
-TEST_F(TensorFloatTest, SetMethodEmptyIndices)
+TEST_F(TensorDataFloatTest, SetMethodEmptyIndices)
 {
-    Tensor<f32> tensor({2, 3});
+    TensorData<f32> tensor({2, 3});
     EXPECT_THROW(tensor.set({}, 5.0f), IndexOutOfBoundError);
 }
 
 // Test copy with Vector size mismatch
-TEST_F(TensorFloatTest, CopyFromVecSizeMismatch)
+TEST_F(TensorDataFloatTest, CopyFromVecSizeMismatch)
 {
     ds::Vector<f32> vec;
     vec.pushBack(1.0f);
     vec.pushBack(2.0f);
     vec.pushBack(3.0f);
 
-    Tensor<f32> tensor({2, 2}); // Size 4, but vec has size 3
-    EXPECT_THROW(tensor.copy(vec), TensorErr);
+    TensorData<f32> tensor({2, 2}); // Size 4, but vec has size 3
+    EXPECT_THROW(tensor.copy(vec), TensorDataErr);
 }
 
-// Test TensorErr is returned for invalid copy
-TEST_F(TensorFloatTest, InvalidCopyReturnsTensorErr)
+// Test TensorDataErr is returned for invalid copy
+TEST_F(TensorDataFloatTest, InvalidCopyReturnsTensorDataErr)
 {
-    Tensor<f32> source({2, 3});
-    Tensor<f32> dest({3, 2});
+    TensorData<f32> source({2, 3});
+    TensorData<f32> dest({3, 2});
 
-    EXPECT_THROW(dest.copy(source), TensorErr);
+    EXPECT_THROW(dest.copy(source), TensorDataErr);
 }
 
 // Test checkShape logic with same size, different shape
-TYPED_TEST(TensorTest, CheckShapeSameSizeDifferentShape)
+TYPED_TEST(TensorDataTest, CheckShapeSameSizeDifferentShape)
 {
-    Tensor<TypeParam> tensor1({2, 6});
-    Tensor<TypeParam> tensor2({3, 4});
+    TensorData<TypeParam> tensor1({2, 6});
+    TensorData<TypeParam> tensor2({3, 4});
 
     tensor1.fill(static_cast<TypeParam>(2));
     tensor2.fill(static_cast<TypeParam>(3));
@@ -1125,7 +1125,7 @@ TYPED_TEST(TensorTest, CheckShapeSameSizeDifferentShape)
     std::streambuf* old_cout = std::cout.rdbuf(buffer.rdbuf());
 
     // This should not throw, but should print a warning
-    Tensor<TypeParam> result = tensor1 * tensor2;
+    TensorData<TypeParam> result = tensor1 * tensor2;
 
     // Restore cout
     std::cout.rdbuf(old_cout);
@@ -1143,9 +1143,9 @@ TYPED_TEST(TensorTest, CheckShapeSameSizeDifferentShape)
 }
 
 // Test computeSize with 0D tensor
-TEST_F(TensorFloatTest, ZeroDimensionalTensor)
+TEST_F(TensorDataFloatTest, ZeroDimensionalTensorData)
 {
-    Tensor<f32> scalar({1});
+    TensorData<f32> scalar({1});
     EXPECT_EQ(scalar.dim(), 1);
     EXPECT_EQ(scalar.size(), 1);
 
@@ -1154,10 +1154,10 @@ TEST_F(TensorFloatTest, ZeroDimensionalTensor)
 }
 
 // Test large tensor operations
-TEST_F(TensorFloatTest, LargeTensorOperations)
+TEST_F(TensorDataFloatTest, LargeTensorDataOperations)
 {
-    Tensor<f32> tensor1({10, 10, 10});
-    Tensor<f32> tensor2({10, 10, 10});
+    TensorData<f32> tensor1({10, 10, 10});
+    TensorData<f32> tensor2({10, 10, 10});
 
     tensor1.fill(2.0f);
     tensor2.fill(3.0f);
@@ -1191,10 +1191,10 @@ TEST_F(TensorFloatTest, LargeTensorOperations)
 }
 
 // Test mixed operations
-TEST_F(TensorFloatTest, MixedOperations)
+TEST_F(TensorDataFloatTest, MixedOperations)
 {
-    Tensor<f32> a({3, 3});
-    Tensor<f32> b({3, 3});
+    TensorData<f32> a({3, 3});
+    TensorData<f32> b({3, 3});
 
     a.fill(10.0f);
     b.fill(2.0f);
@@ -1210,10 +1210,10 @@ TEST_F(TensorFloatTest, MixedOperations)
 }
 
 // Test compound operations preserve shape
-TEST_F(TensorFloatTest, CompoundOperationsPreserveShape)
+TEST_F(TensorDataFloatTest, CompoundOperationsPreserveShape)
 {
-    Tensor<f32> tensor1({2, 3, 4});
-    Tensor<f32> tensor2({2, 3, 4});
+    TensorData<f32> tensor1({2, 3, 4});
+    TensorData<f32> tensor2({2, 3, 4});
 
     tensor1.fill(5.0f);
     tensor2.fill(2.0f);
@@ -1229,10 +1229,10 @@ TEST_F(TensorFloatTest, CompoundOperationsPreserveShape)
 }
 
 // Test dot product with zeros
-TEST_F(TensorFloatTest, DotProductWithZeros)
+TEST_F(TensorDataFloatTest, DotProductWithZeros)
 {
-    Tensor<f32> tensor1({5});
-    Tensor<f32> tensor2({5});
+    TensorData<f32> tensor1({5});
+    TensorData<f32> tensor2({5});
 
     tensor1.fill(5.0f);
     tensor2.fill(0.0f);
@@ -1242,10 +1242,10 @@ TEST_F(TensorFloatTest, DotProductWithZeros)
 }
 
 // Test dot product commutative property
-TEST_F(TensorFloatTest, DotProductCommutative)
+TEST_F(TensorDataFloatTest, DotProductCommutative)
 {
-    Tensor<f32> tensor1({4});
-    Tensor<f32> tensor2({4});
+    TensorData<f32> tensor1({4});
+    TensorData<f32> tensor2({4});
 
     tensor1.set({0}, 1.0f);
     tensor1.set({1}, 2.0f);
@@ -1266,9 +1266,9 @@ TEST_F(TensorFloatTest, DotProductCommutative)
 }
 
 // Test index calculation for higher dimensions
-TEST_F(TensorFloatTest, IndexCalculation4D)
+TEST_F(TensorDataFloatTest, IndexCalculation4D)
 {
-    Tensor<f32> tensor({2, 3, 4, 5});
+    TensorData<f32> tensor({2, 3, 4, 5});
 
     // Test corner indices
     EXPECT_EQ(tensor.index({0, 0, 0, 0}), 0);
@@ -1277,9 +1277,9 @@ TEST_F(TensorFloatTest, IndexCalculation4D)
 }
 
 // Test rawData returns correct data
-TEST_F(TensorFloatTest, RawDataReturnsCorrectValues)
+TEST_F(TensorDataFloatTest, RawDataReturnsCorrectValues)
 {
-    Tensor<f32> tensor({2, 3});
+    TensorData<f32> tensor({2, 3});
 
     for (sizeT i = 0; i < 6; ++i)
     {
@@ -1296,7 +1296,7 @@ TEST_F(TensorFloatTest, RawDataReturnsCorrectValues)
 }
 
 // Test fromVector with large vector
-TEST_F(TensorFloatTest, FromVectorLarge)
+TEST_F(TensorDataFloatTest, FromVectorLarge)
 {
     ds::Vector<f32> vec;
     for (sizeT i = 0; i < 100; ++i)
@@ -1304,7 +1304,7 @@ TEST_F(TensorFloatTest, FromVectorLarge)
         vec.pushBack(static_cast<f32>(i));
     }
 
-    auto tensor = Tensor<f32>::fromVector(vec);
+    auto tensor = TensorData<f32>::fromVector(vec);
 
     EXPECT_EQ(tensor.size(), 100);
     EXPECT_EQ(tensor.dim(), 1);
@@ -1316,9 +1316,9 @@ TEST_F(TensorFloatTest, FromVectorLarge)
 }
 
 // Test negative values
-TEST_F(TensorFloatTest, NegativeValues)
+TEST_F(TensorDataFloatTest, NegativeValues)
 {
-    Tensor<f32> tensor({3, 3});
+    TensorData<f32> tensor({3, 3});
     tensor.fill(-5.0f);
 
     for (const auto& val : tensor)
@@ -1334,9 +1334,9 @@ TEST_F(TensorFloatTest, NegativeValues)
 }
 
 // Test very small values
-TEST_F(TensorFloatTest, VerySmallValues)
+TEST_F(TensorDataFloatTest, VerySmallValues)
 {
-    Tensor<f32> tensor({2, 2});
+    TensorData<f32> tensor({2, 2});
     tensor.fill(1e-10f);
 
     auto result = tensor + tensor;
@@ -1347,14 +1347,14 @@ TEST_F(TensorFloatTest, VerySmallValues)
 }
 
 // Integer tensor specific tests
-class TensorIntTest : public ::testing::Test
+class TensorDataIntTest : public ::testing::Test
 {
 };
 
-TEST_F(TensorIntTest, IntegerDivision)
+TEST_F(TensorDataIntTest, IntegerDivision)
 {
-    Tensor<int> tensor1({2, 2});
-    Tensor<int> tensor2({2, 2});
+    TensorData<int> tensor1({2, 2});
+    TensorData<int> tensor2({2, 2});
 
     tensor1.fill(10);
     tensor2.fill(3);
@@ -1367,9 +1367,9 @@ TEST_F(TensorIntTest, IntegerDivision)
     }
 }
 
-TEST_F(TensorIntTest, IntegerArithmetic)
+TEST_F(TensorDataIntTest, IntegerArithmetic)
 {
-    Tensor<int> tensor({3});
+    TensorData<int> tensor({3});
     tensor.set({0}, 100);
     tensor.set({1}, 200);
     tensor.set({2}, 300);

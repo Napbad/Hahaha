@@ -8,10 +8,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 enable_testing()
 
 file(GLOB_RECURSE TEST_SOURCE_FILES
-    "core/**/*.cpp"
-    "datasets/**/*.cpp"
-    "models/**/*.cpp"
-    "optimizers/**/*.cpp"
+    "core/*.cpp"
+    "datasets/*.cpp"
+    "models/*.cpp"
+    "optimizers/*.cpp"
+        "hahaha/*.cpp"
 )
 
 # Find Google Test package

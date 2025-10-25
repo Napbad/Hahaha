@@ -33,14 +33,14 @@ namespace hahaha::ml
 
 using namespace hahaha::core;
 
-class TensorErr final : public BaseError
+class TensorDataErr final : public BaseError
 {
   public:
-    TensorErr() = default;
-    explicit TensorErr(const char* msg) : BaseError(msg)
+    TensorDataErr() = default;
+    explicit TensorDataErr(const char* msg) : BaseError(msg)
     {
     }
-    explicit TensorErr(const String& msg) : BaseError(msg)
+    explicit TensorDataErr(const String& msg) : BaseError(msg)
     {
     }
 };
@@ -325,7 +325,7 @@ template <typename T> class TensorData
     {
         if (other.shape() != shape_)
         {
-            throw TensorErr(
+            throw TensorDataErr(
                 "Cannot copy value from a tensor with different shape");
         }
         for (sizeT i = 0; i < other.size(); ++i)
@@ -338,7 +338,7 @@ template <typename T> class TensorData
     {
         if (other.size() != this->size())
         {
-            throw TensorErr(
+            throw TensorDataErr(
                 "Cannot copy value from a vector with different size");
         }
         for (sizeT i = 0; i < other.size(); ++i)

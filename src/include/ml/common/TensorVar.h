@@ -23,6 +23,8 @@
 #define HAHAHA_TENSORVAR_H
 
 #include <stdexcept>
+#include <memory>
+#include <utility>
 
 #include "TensorPtr.h"
 #include "TensorVarOp.h"
@@ -43,6 +45,18 @@ using TensorVarPtr = std::shared_ptr<TensorVar<T>>;
 template <typename T> class TensorVar
 {
   public:
+    ~TensorVar()
+    {
+        // Ensure Variable bit is released when TensorVar goes out of scope
+        if (ptr_ && ptr_.holdByVar())
+            ptr_.unrefByVar();
+    }
+
+    TensorVar(const TensorVar& other) = delete;
+    TensorVar& operator=(const TensorVar& other) = delete;
+
+    TensorVar(TensorVar&& other) noexcept = default;
+    TensorVar& operator=(TensorVar&& other) noexcept = default;
 
     TensorVar(const TensorVarOpType opType, std::initializer_list<TensorVarPtr<T>> operands)
     {
@@ -61,8 +75,21 @@ template <typename T> class TensorVar
         ptr_.refByVar();
     }
 
+    // Convenience overloads to accept C-string names
+    TensorVar(const std::initializer_list<sizeT> shape, const char* name)
+        : ptr_(TensorPtr<T>(shape)), name_(String(name))
+    {
+        ptr_.refByVar();
+    }
+
     explicit TensorVar(const Vector<sizeT>& shape, String name = String())
         : ptr_(TensorPtr<T>(shape)), name_(std::move(name))
+    {
+        ptr_.refByVar();
+    }
+
+    explicit TensorVar(const Vector<sizeT>& shape, const char* name)
+        : ptr_(TensorPtr<T>(shape)), name_(String(name))
     {
         ptr_.refByVar();
     }
@@ -70,6 +97,14 @@ template <typename T> class TensorVar
                        const T* data,
                        String name = String())
         : ptr_(TensorPtr<T>(shape, data)), name_(std::move(name))
+    {
+        ptr_.refByVar();
+    }
+
+    explicit TensorVar(const Vector<sizeT>& shape,
+                       const T* data,
+                       const char* name)
+        : ptr_(TensorPtr<T>(shape, data)), name_(String(name))
     {
         ptr_.refByVar();
     }
@@ -82,10 +117,26 @@ template <typename T> class TensorVar
     }
 
     // Constructor for a 0-dimensional tensor (scalar)
+    explicit TensorVar(T scalar, const char* name)
+        : ptr_(TensorPtr<T>(scalar)), name_(String(name))
+    {
+        ptr_.refByVar();
+    }
+
+    // Constructor for a 0-dimensional tensor (scalar)
     explicit TensorVar(const std::initializer_list<sizeT> shape,
                        std::initializer_list<T> data,
                        String name = String())
         : ptr_(TensorPtr<T>(shape, data)), name_(std::move(name))
+    {
+        ptr_.refByVar();
+    }
+
+    // Constructor for a 0-dimensional tensor (scalar)
+    explicit TensorVar(const std::initializer_list<sizeT> shape,
+                       std::initializer_list<T> data,
+                       const char* name)
+        : ptr_(TensorPtr<T>(shape, data)), name_(String(name))
     {
         ptr_.refByVar();
     }
@@ -115,14 +166,20 @@ template <typename T> class TensorVar
     ml::TensorData<T>& operator*() { return getTensorData_(); }
     const ml::TensorData<T>& operator*() const { return getTensorData_(); }
 
-    TensorVar& operator=(TensorVar&& other) noexcept {
-        this->ptr_ = other.ptr_;
-        return *this;
-    }
+    // moved versions are defaulted above
 
   private:
     // Safety: centralize null-check
-    ml::TensorData<T>& getTensorData_() const
+    ml::TensorData<T>& getTensorData_()
+    {
+        if (!ptr_)
+            throw std::runtime_error("TensorVar is empty (null TensorPtr)");
+        if (ptr_.tensor_ == nullptr)
+            throw std::runtime_error("TensorVar holds null Tensor pointer");
+        return *ptr_.tensor_;
+    }
+
+    const ml::TensorData<T>& getTensorData_() const
     {
         if (!ptr_)
             throw std::runtime_error("TensorVar is empty (null TensorPtr)");
@@ -141,46 +198,48 @@ template <typename T> class TensorVar
 template<typename T>
 using Tensor = TensorVarPtr<T>;
 
-template<typename T>
 using Tensori = TensorVar<i32>;
-template<typename T>
 using Tensorf = TensorVar<f32>;
-template<typename T>
 using Tensorb = TensorVar<bool>;
-template<typename T>
 using Tensoru = TensorVar<u32>;
-template<typename T>
 using Tensorl = TensorVar<i64>;
-template<typename T>
 using Tensorul = TensorVar<u64>;
-template<typename T>
 using Tensord = TensorVar<f64>;
-template<typename T>
 using Tensorc = TensorVar<char>;
 
-template<typename T>
-Tensor<T>& operator+ (Tensor<T>& lhs, Tensor<T>& rhs)
+// Factory helper to construct a TensorVarPtr with perfect forwarding.
+// This is a convenience layer over TensorVar constructors.
+template <typename T, typename... Args>
+Tensor<T> tensor(Args&&... args)
 {
-    return Tensor<T>(TensorVarOpType::Add, {lhs, rhs});
+    return std::make_shared<TensorVar<T>>(std::forward<Args>(args)...);
 }
 
 template<typename T>
-Tensor<T>& operator- (Tensor<T>& lhs, Tensor<T>& rhs)
+Tensor<T> operator+ (const Tensor<T>& lhs, const Tensor<T>& rhs)
 {
-    return Tensor<T>(TensorVarOpType::Sub, {lhs, rhs});
+    return std::make_shared<TensorVar<T>>(TensorVarOpType::Add, {lhs, rhs});
 }
 
 template<typename T>
-Tensor<T>& operator* (Tensor<T>& lhs, Tensor<T>& rhs)
+Tensor<T> operator- (const Tensor<T>& lhs, const Tensor<T>& rhs)
 {
-    return Tensor<T>(TensorVarOpType::Mul, {lhs, rhs});
+    return std::make_shared<TensorVar<T>>(TensorVarOpType::Sub, {lhs, rhs});
 }
 
 template<typename T>
-Tensor<T>& operator/ (Tensor<T>& lhs, Tensor<T>& rhs)
+Tensor<T> operator* (const Tensor<T>& lhs, const Tensor<T>& rhs)
 {
-    return Tensor<T>(TensorVarOpType::Div, {lhs, rhs});
+    return std::make_shared<TensorVar<T>>(TensorVarOpType::Mul, {lhs, rhs});
 }
+
+template<typename T>
+Tensor<T> operator/ (const Tensor<T>& lhs, const Tensor<T>& rhs)
+{
+    return std::make_shared<TensorVar<T>>(TensorVarOpType::Div, {lhs, rhs});
+}
+
+
 
 } // namespace hahaha
 
