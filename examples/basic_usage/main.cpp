@@ -19,14 +19,15 @@ int main()
               << ", size: " << v->size() << std::endl;
 
     // Fill values manually
-    (*v)[0] = 1.0f;
-    (*v)[1] = 2.0f;
-    (*v)[2] = 3.0f;
+    v->set({0}, 1.0f);
+    v->set({1}, 2.0f);
+    v->set({2}, 3.0f);
     std::cout << "Vector sum: " << v->sumValue() << std::endl;
 
     // 3) Create a 2x2 tensor with data (shape and data are two arguments)
     auto m = tensor<float>({2, 2},
-                           {1.0f, 2.0f, 3.0f, 4.0f},
+                           {1.0f, 2.0f,
+                                 3.0f, 4.0f},
                            "m");
     std::cout << "Matrix shape: " << m->shape().toString()
               << ", sum: " << m->sumValue() << std::endl;

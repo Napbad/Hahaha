@@ -25,6 +25,7 @@
 #include <stdexcept>
 #include <memory>
 #include <utility>
+#include <type_traits>
 
 #include "TensorPtr.h"
 #include "TensorVarOp.h"
@@ -42,8 +43,31 @@ template <typename T> class TensorVar;
 template<typename T>
 using TensorVarPtr = std::shared_ptr<TensorVar<T>>;
 
-template<typename T>
-using Tensor = TensorVarPtr<T>;
+// Lightweight handle that wraps shared_ptr<TensorVar<T>> and forwards ergonomics
+template <typename T> class Tensor
+{
+  public:
+    using Element = TensorVar<T>;
+    Tensor() = default;
+    explicit Tensor(std::nullptr_t) : ptr_(nullptr) {}
+    explicit Tensor(TensorVarPtr<T> p) : ptr_(std::move(p)) {}
+
+    // Factory-friendly implicit conversion to shared_ptr for interop
+    explicit operator TensorVarPtr<T>() const { return ptr_; }
+
+    // Accessors
+    TensorVar<T>* operator->() const { return ptr_.get(); }
+    TensorVar<T>& operator*() const { return *ptr_; }
+    explicit operator bool() const { return static_cast<bool>(ptr_); }
+    TensorVarPtr<T> ptr() const { return ptr_; }
+
+    // Indexing convenience, forwards to TensorVar
+    T& operator[](sizeT idx) { return (*ptr_)[idx]; }
+    const T& operator[](sizeT idx) const { return (*ptr_)[idx]; }
+
+  private:
+    TensorVarPtr<T> ptr_{};
+};
 
 template <typename T> class TensorVar : public std::enable_shared_from_this<TensorVar<T>>
 {
@@ -165,12 +189,12 @@ template <typename T> class TensorVar : public std::enable_shared_from_this<Tens
     Tensor<T> unaryOp_(const TensorVarOpType op)
     {
         auto self = this->shared_from_this();
-        return std::make_shared<TensorVar<T>>(op, std::initializer_list<TensorVarPtr<T>>{self});
+        return Tensor<T>(std::make_shared<TensorVar<T>>(op, std::initializer_list<TensorVarPtr<T>>{self}));
     }
     Tensor<T> binaryOp_(const TensorVarOpType op, const Tensor<T>& rhs)
     {
         auto self = this->shared_from_this();
-        return std::make_shared<TensorVar<T>>(op, std::initializer_list<TensorVarPtr<T>>{self, rhs});
+        return Tensor<T>(std::make_shared<TensorVar<T>>(op, std::initializer_list<TensorVarPtr<T>>{self, rhs}));
     }
 
     // Reductions
@@ -218,6 +242,12 @@ template <typename T> class TensorVar : public std::enable_shared_from_this<Tens
     template <typename... Dims>
     const T& operator()(Dims... dims) const { return getTensorData_()(std::forward<Dims>(dims)...); }
 
+    // Setter-style call: v->operator()({i, j, ...}, value)
+    void operator()(const std::initializer_list<sizeT> idxs, const T& value)
+    {
+        getTensorData_().set(idxs, value);
+    }
+
     // Slicing and mutation
     ml::TensorData<T> at(const std::initializer_list<sizeT> idxs) const { return getTensorData_().at(idxs); }
     void set(const std::initializer_list<sizeT> idxs, T value) { getTensorData_().set(idxs, value); }
@@ -228,9 +258,9 @@ template <typename T> class TensorVar : public std::enable_shared_from_this<Tens
 
     // Linalg and reshape
     T dot(const ml::TensorData<T>& other) const { return getTensorData_().dot(other); }
-    T dot(const TensorVar<T>& other) const { return getTensorData_().dot(other.tensorData()); }
+    T dot(const TensorVar& other) const { return getTensorData_().dot(other.tensorData()); }
     ml::TensorData<T> matmul(const ml::TensorData<T>& other) const { return getTensorData_().matmul(other); }
-    ml::TensorData<T> matmul(const TensorVar<T>& other) const { return getTensorData_().matmul(other.tensorData()); }
+    ml::TensorData<T> matmul(const TensorVar& other) const { return getTensorData_().matmul(other.tensorData()); }
     void reshape(const Vector<sizeT>& new_shape) { getTensorData_().reshape(new_shape); }
     void print() const { getTensorData_().print(); }
 
@@ -288,7 +318,7 @@ using Tensorc = TensorVar<char>;
 template <typename T, typename... Args>
 Tensor<T> tensor(Args&&... args)
 {
-    return std::make_shared<TensorVar<T>>(std::forward<Args>(args)...);
+    return Tensor<T>(std::make_shared<TensorVar<T>>(std::forward<Args>(args)...));
 }
 
 // Friendly overloads to support brace-init without verbose types
@@ -300,7 +330,7 @@ Tensor<T> tensor(std::initializer_list<U> shape)
     Vector<sizeT> s;
     s.reserve(shape.size());
     for (auto v : shape) s.pushBack(static_cast<sizeT>(v));
-    return std::make_shared<TensorVar<T>>(s);
+    return Tensor<T>(std::make_shared<TensorVar<T>>(s));
 }
 
 // 2) shape + name
@@ -311,7 +341,7 @@ Tensor<T> tensor(std::initializer_list<U> shape, const char* name)
     Vector<sizeT> s;
     s.reserve(shape.size());
     for (auto v : shape) s.pushBack(static_cast<sizeT>(v));
-    return std::make_shared<TensorVar<T>>(s, name);
+    return Tensor<T>(std::make_shared<TensorVar<T>>(s, name));
 }
 
 // 3) shape + data
@@ -322,7 +352,7 @@ Tensor<T> tensor(std::initializer_list<U> shape,
     Vector<sizeT> s;
     s.reserve(shape.size());
     for (auto v : shape) s.pushBack(static_cast<sizeT>(v));
-    return std::make_shared<TensorVar<T>>(s, data.begin());
+    return Tensor<T>(std::make_shared<TensorVar<T>>(s, data.begin()));
 }
 
 // 4) shape + data + name
@@ -334,45 +364,64 @@ Tensor<T> tensor(std::initializer_list<U> shape,
     Vector<sizeT> s;
     s.reserve(shape.size());
     for (auto v : shape) s.pushBack(static_cast<sizeT>(v));
-    return std::make_shared<TensorVar<T>>(s, data.begin(), name);
+    return Tensor<T>(std::make_shared<TensorVar<T>>(s, data.begin(), name));
 }
 
 // 5) scalar
 template <typename T>
 Tensor<T> tensor(T scalar)
 {
-    return std::make_shared<TensorVar<T>>(scalar);
+    return Tensor<T>(std::make_shared<TensorVar<T>>(scalar));
 }
 
 // 6) scalar + name
 template <typename T>
 Tensor<T> tensor(T scalar, const char* name)
 {
-    return std::make_shared<TensorVar<T>>(scalar, name);
+    return Tensor<T>(std::make_shared<TensorVar<T>>(scalar, name));
 }
 
 template<typename T>
 Tensor<T> operator+ (const Tensor<T>& lhs, const Tensor<T>& rhs)
 {
-    return std::make_shared<TensorVar<T>>(TensorVarOpType::Add, {lhs, rhs});
+    return Tensor<T>(std::make_shared<TensorVar<T>>(TensorVarOpType::Add, {lhs, rhs}));
 }
 
 template<typename T>
 Tensor<T> operator- (const Tensor<T>& lhs, const Tensor<T>& rhs)
 {
-    return std::make_shared<TensorVar<T>>(TensorVarOpType::Sub, {lhs, rhs});
+    return Tensor<T>(std::make_shared<TensorVar<T>>(TensorVarOpType::Sub, {lhs, rhs}));
 }
 
 template<typename T>
 Tensor<T> operator* (const Tensor<T>& lhs, const Tensor<T>& rhs)
 {
-    return std::make_shared<TensorVar<T>>(TensorVarOpType::Mul, {lhs, rhs});
+    return Tensor<T>(std::make_shared<TensorVar<T>>(TensorVarOpType::Mul, {lhs, rhs}));
 }
 
 template<typename T>
 Tensor<T> operator/ (const Tensor<T>& lhs, const Tensor<T>& rhs)
 {
-    return std::make_shared<TensorVar<T>>(TensorVarOpType::Div, {lhs, rhs});
+    return Tensor<T>(std::make_shared<TensorVar<T>>(TensorVarOpType::Div, {lhs, rhs}));
+}
+
+
+// -----------------------------------------------------------------------------
+// Convenience free functions for shared_ptr<TensorVar<T>> ergonomics
+// -----------------------------------------------------------------------------
+template <typename T>
+inline void set(const Tensor<T>& t,
+                const std::initializer_list<sizeT> idxs,
+                const T& value)
+{
+    t->set(idxs, value);
+}
+
+template <typename T>
+inline T& atRef(const Tensor<T>& t, const std::initializer_list<sizeT> idxs)
+{
+    // Returns a reference via operator() to allow write access
+    return const_cast<ml::TensorData<T>&>(static_cast<const ml::TensorData<T>&>(*t))(Vector<sizeT>(idxs));
 }
 
 
