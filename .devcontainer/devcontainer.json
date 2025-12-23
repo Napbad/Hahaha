@@ -1,13 +1,16 @@
   {
     "name": "HahahaDevContainer",
     "dockerFile": "../Dockerfile",
-    "image": "hahaha-dev",
+    // "image": "hahaha-dev",
     "build": {
         "args": {
           "IMAGE_NAME": "nvidia/cuda",
           "TARGETARCH": "amd64"
         }
     },
+    "runArgs": [
+        "--network=host" 
+    ],
     "runArgs": [
       "--gpus", "all",
       "--privileged"

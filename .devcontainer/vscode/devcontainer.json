@@ -1,0 +1,56 @@
+  {
+    "name": "HahahaDevContainer_vscode",
+    "dockerFile": "../../Dockerfile",
+    // "image": "hahaha-dev",
+    "build": {
+        "args": {
+          "IMAGE_NAME": "nvidia/cuda",
+          "TARGETARCH": "amd64"
+        }
+    },
+    "runArgs": [
+        "--network=host" 
+    ],
+    "runArgs": [
+      "--gpus", "all",
+      "--privileged"
+    ],
+    "mounts": [
+      "type=bind,source=${localWorkspaceFolder},target=/workspace"
+    ],
+    "workspaceFolder": "/workspace",
+    "remoteUser": "root",
+    "postCreateCommand": "echo 'CUDA Dev Container started! Check CUDA with: nvidia-smi'",
+    "customizations": {
+      "vscode": {
+        "extensions": [
+          "bierner.markdown-mermaid",
+          "damiankoper.gdb-debug",
+          "davidanson.vscode-markdownlint",
+          "donjayamanne.githistory",
+          "eamodio.gitlens",
+          "eriklynd.json-tools",
+          "github.copilot",
+          "github.copilot-chat",
+          "guyutongxue.cpp-reference",
+          "janisdd.vscode-edit-csv",
+          "llvm-vs-code-extensions.vscode-clangd",
+          "mermaidchart.vscode-mermaid-chart",
+          "mesonbuild.mesonbuild",
+          "ms-python.debugpy",
+          "ms-python.python",
+          "ms-python.vscode-pylance",
+          "ms-python.vscode-python-envs",
+          "ms-vscode.cpptools",
+          "ms-vscode.makefile-tools",
+          "psioniq.psi-header",
+          "qiaojie.binary-viewer",
+          "redhat.vscode-xml",
+          "redhat.vscode-yaml",
+          "shd101wyy.markdown-preview-enhanced",
+          "streetsidesoftware.code-spell-checker",
+          "xaver.clang-format"
+        ]
+      }
+    }
+  }

@@ -7,6 +7,10 @@
 /cmake_install.cmake
 /compile_commands.json
 /.cmake/
+/buildDir/
+/builddir/
+/build*/
+
 
 # IDE and Editor files
 .vscode/settings.json
@@ -262,3 +266,5 @@ benchmark_results/
 
 # Custom project specific
 # Add your project-specific ignore patterns here
+
+tmp/*

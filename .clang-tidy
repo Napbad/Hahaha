@@ -1,0 +1,28 @@
+Checks: '-*,modernize-*,performance-*,readability-*,bugprone-*,clang-analyzer-*,cppcoreguidelines-*'
+WarningsAsErrors: '*'
+
+HeaderFilterRegex: '^(core/include/|tests/|sample/)'
+AnalyzeTemporaryDtors: true
+FormatStyle: file
+
+CheckOptions:
+  - key:             modernize-use-nullptr.NullMacros
+    value:           'NULL'
+  - key:             modernize-use-auto.MinTypeNameLength
+    value:           '5'
+  - key:             readability-identifier-naming.VariableCase
+    value:           'snake_case'
+  - key:             readability-identifier-naming.FunctionCase
+    value:           'camelCase'
+  - key:             readability-identifier-naming.ClassCase
+    value:           'PascalCase'
+  - key:             cppcoreguidelines-pro-type-member-init.HardFailure
+    value:           '1'
+  - key:             modernize-avoid-c-arrays.StrictMode
+    value:           '1'
+
+Notes: |
+  - This config is intentionally strict: `WarningsAsErrors: '*'` to enforce fixes early.
+  - `HeaderFilterRegex` limits analysis to project headers to reduce noise.
+  - `FormatStyle: file` makes clang-tidy pick up formatting rules from .clang-format.
+  - Tweak `CheckOptions` to match project naming conventions (snake_case variables, camelCase functions, PascalCase classes).

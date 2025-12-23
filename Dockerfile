@@ -84,13 +84,45 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     libgtest-dev \
     clang \
+    meson \
+    fish \
+    clangd \
     clang-format\
     && rm -rf /var/lib/apt/lists/*
 
+# Make clang/clang++ the system default C/C++ compilers so tools like Meson
+# which consult `cc`/`c++` or $CC/$CXX will use clang inside the container.
+# We register both clang and gcc with update-alternatives and set clang as the
+# higher-priority choice.
+RUN update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100 \
+ && update-alternatives --install /usr/bin/cc cc /usr/bin/gcc 50 \
+ && update-alternatives --set cc /usr/bin/clang \
+ && update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 100 \
+ && update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 50 \
+ && update-alternatives --set c++ /usr/bin/clang++ || true
+
+# Also set environment variables so build systems that respect CC/CXX prefer
+# clang/clang++ by default. Project-level settings or Meson env overrides
+# can still override these.
+ENV CC=clang
+ENV CXX=clang++
+
 # Build and install Google Test from source
-RUN cd /usr/src/googletest && \
-    cmake . && \
-    cmake --build . --target install  
+# The Debian/Ubuntu package `libgtest-dev` provides sources under /usr/src.
+# Use the standard location installed by the package instead of a non-existent /usr/core path.
+RUN if [ -d "/usr/src/googletest" ]; then \
+            cd /usr/src/googletest && \
+            cmake . && \
+            cmake --build . --target install; \
+        elif [ -d "/usr/src/gtest" ]; then \
+            cd /usr/src/gtest && \
+            cmake . && \
+            cmake --build . --target install; \
+        else \
+            echo "googletest sources not found in /usr/src; skipping build"; \
+        fi
+
+
 
 # RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
@@ -99,7 +131,7 @@ ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:${LD_LIBRARY_PATH}
 
 WORKDIR /workspace
 
-# RUN cd /workspace/src/python_interface/
+# RUN cd /workspace/core/python_interface/
 # RUN uv sync
 
 CMD ["/bin/bash"]

@@ -1,7 +1,5 @@
-// Default Ubuntu-based DevContainer Template.
-// For more customization options, see https://containers.dev/implementors/json_reference
 {
-  name: "HahahaDevContainer",
+  "name": "HahahaDevContainer_clion",
   "dockerFile": "../../Dockerfile",
   "build": {
       "args": {
@@ -14,25 +12,25 @@
     "type=bind,source=${localWorkspaceFolder},target=/workspace"
   ],
 
-  customizations : {
+  "customizations" : {
     // Configure JetBrains IDE-specific properties
-    jetbrains : {
-      backend : "Clion",
-      settings : {
+    "jetbrains" : {
+      "backend" : "Clion",
+      "settings" : {
         // IDE settings can be added via “Show context actions”|“Add currently modified settings from IDE”.
         // A complete list of supported settings is also available through auto-completion
       },
-      plugins: [
+      "plugins": [
         // A set of plugin IDs.
         // Plugin ID can be found on the corresponding plugin’s page at https://plugins.jetbrains.com        docker run --rm --gpus all nvidia/cuda:12.4.1-base-ubuntu22.04 nvidia-smi.
       ]
     }
   },
-  features: {
+  "features": {
     "ghcr.io/devcontainers/features/git" : {},
 
     // Add additional features to your project using auto-completion.
   },
   // Use root user for development
-  remoteUser: "root"
+  "remoteUser": "root"
 }
