@@ -1,4 +1,4 @@
-project('hahaha', 'cpp',
+    project('hahaha', 'cpp',
         version : '0.0.1',
         default_options : [
                 'warning_level=3',

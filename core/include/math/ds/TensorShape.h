@@ -1,4 +1,4 @@
-// Copyright (c) 2025 Napbad
+// Copyright (c) 2025 Contributors of hahaha(https://github.com/Napbad/Hahaha)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,49 +22,134 @@
 #ifndef HAHAHA_MATH_DS_TENSOR_SHAPE_H
 #define HAHAHA_MATH_DS_TENSOR_SHAPE_H
 
-#include <gtest/gtest.h>
+#include <algorithm>
 #include <initializer_list>
+#include <string>
 #include <vector>
 
 #include "common/definitions.h"
+#include "utils/common/HelperStruct.h"
+
+class TensorShapeTest;
 
 namespace hahaha::math
 {
 
-using namespace hahaha::common;
+using hahaha::common::u32;
+using hahaha::util::isInitList;
+using hahaha::util::isLegalDataType;
 
 /**
- * @brief TensorShape
+ * @brief Represents the shape (dimensions) of a tensor.
  *
+ * TensorShape stores a vector of unsigned 32-bit integers representing the
+ * size of each dimension, e.g. a 2x3 matrix has dims {2, 3}.
+ *
+ * This class provides helpers to build shapes from initializer lists and
+ * to compute the total number of elements.
  */
 class TensorShape
 {
   public:
     TensorShape() = default;
-    TensorShape(const TensorShape&) = default;
-    TensorShape(TensorShape&&) = delete;
-    TensorShape& operator=(const TensorShape&) = default;
-    TensorShape& operator=(TensorShape&&) = delete;
     ~TensorShape() = default;
 
+    /**
+     * @brief Copy-construct a TensorShape
+     */
+    TensorShape(const TensorShape&) = default;
+
+    /**
+     * @brief Move-construct a TensorShape
+     * @param other Source to move from
+     */
+    TensorShape(TensorShape&& other) noexcept : dims_(std::move(other.dims_))
+    {
+    }
+
+    /**
+     * @brief Construct from an initializer list of dimensions
+     * @param dims List of dimension sizes (e.g. {2,3,4})
+     */
     TensorShape(const std::initializer_list<u32> dims)
     {
         dims_.reserve(dims.size());
+#pragma unroll 5
         for (const auto& dim : dims)
         {
             dims_.emplace_back(dim);
         }
     }
 
-    std::vector<u32> dims() const
+    /**
+     * @brief Construct from a vector of dimensions
+     * @param dims Vector of dimension sizes
+     */
+    explicit TensorShape(const std::vector<u32>& dims)
+    {
+        dims_.reserve(dims.size());
+#pragma unroll 5
+        for (const auto& dim : dims)
+        {
+            dims_.push_back(dim);
+        }
+    }
+    TensorShape& operator=(const TensorShape&) = default;
+    TensorShape& operator=(TensorShape&& other) noexcept
+    {
+        dims_ = std::move(other.dims_);
+        return *this;
+    };
+
+    /**
+     * @brief Return a copy of the dimensions vector
+     * @return std::vector<u32> dimensions
+     */
+    [[nodiscard]] std::vector<u32> dims() const
     {
         return dims_;
     }
 
+    /**
+     * @brief Compute total number of elements for the shape
+     * @return u32 product of all dimensions (1 for empty shape)
+     */
+    [[nodiscard]] u32 totalSize() const
+    {
+        u32 size = 1;
+#pragma unroll 5
+        for (const auto& dim : dims_)
+        {
+            size *= dim;
+        }
+        return size;
+    }
+
+    void reverse()
+    {
+        std::reverse(dims_.begin(), dims_.end());
+    }
+
+    [[nodiscard]] std::string toString() const
+    {
+        std::string result = "(";
+#pragma unroll 5
+        for (size_t i = 0; i < dims_.size(); ++i)
+        {
+            result += std::to_string(dims_[i]);
+            if (i != dims_.size() - 1)
+            {
+                result += ", ";
+            }
+        }
+        result += ")";
+        return result;
+    }
   private:
     std::vector<u32> dims_;
-
-    friend class TensorShapeTest;
+    
+    // default name of the test fixture class to this class
+    friend class ::TensorShapeTest;
 };
 
 } // namespace hahaha::math

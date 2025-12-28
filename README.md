@@ -1,53 +1,96 @@
-# Hahaha
+# Hahaha[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
-A lightweight numerical computing and machine learning basic library with core components implemented in C++. It is designed to provide simple support for tensor operations, loss functions, and optimizers, making it suitable for learning purposes and small-scale project development.
+A lightweight numerical computing and machine learning library with core components implemented in C++. Designed for learners and small-scale projects, Hahaha provides efficient tensor operations, automatic differentiation foundation, and essential ML components.
 
-## Core Features
+## 🚀 Features
 
-• Tensor: Optimized tensor data structure and basic operation implementation, providing low-level support for numerical computing.
+- **Tensor Module**: Comprehensive tensor data structure with shape management (`TensorShape`), stride control (`TensorStride`), and nested data handling (`NestedData`) for efficient numerical operations
+- **Automatic Differentiation Ready**: Foundation for computational graphs through `ComputeGraph.h`
+- **High-Performance Computing**: Optimized for modern C++23 standards with CUDA 13.0 acceleration support
+- **Complete Development Environment**: Docker-based development container with `.devcontainer` configuration for consistent setup across platforms
+- **Professional Tooling**: Integrated code formatting (`clang-format`), static analysis (`clang-tidy`), and unit testing (Google Test)
+- **Example Applications**: Complete MNIST handwritten digit recognition example demonstrating network layers, activation functions, optimizers, and training workflow
 
-• Machine Learning Components: Includes basic loss functions, optimizers, and some fundamental but flexible implementations of basic models.
+## 🛠️ Installation & Setup
 
-• Development Environment Support: Offers .devcontainer, Dockerfile, and prepare_dev.sh script to quickly configure a consistent development environment.
+### Prerequisites
 
-• Code Style Tools: Integrates .clang-format and format.sh for easy unification of code style.
+- Docker (for containerized development)
+- Git
+- CMake ≥ 3.10
+- NVIDIA GPU with CUDA 13.0 support (optional, for GPU acceleration)
 
-## Environment Preparation
+### Quick Start with Docker
 
-### Dependency Requirements
-
-• C++ compiler (supporting C++23 or higher)
-
-• CMake (version 3.10 or higher)
-
-• Git
-
-### Quick Configuration Steps
-
-1.Clone the repository:
 ```bash
+# Clone the repository
 git clone https://github.com/Napbad/Hahaha.git && cd Hahaha
-```
-2. Choose one of the following methods to configure the environment:
 
-◦ Script Configuration: Run bash prepare_dev.sh to automatically prepare basic docker development dependencies(container).
+# Build the development image
+docker build -t hahaha-dev .
 
-◦ Docker Configuration: Run docker build -t hahaha-dev . to build the Docker development image.
+# Run the development container
+docker run --gpus all -it --rm -v $(pwd):/workspace hahaha-dev
 
-◦ IDE Container Configuration: Directly load the project container configuration via IDEs that support .devcontainer (e.g., VS Code or Clion).
-
-## Basic Usage
-
-1. Compile the project:
-```bash
+# Compile the project
 mkdir build && cd build
-cmake ..
-make
+cmake .. && make
 ```
-2. Run tests: After compilation, execute test files (e.g., Linear Regression tests) in the build/tests/ directory.
 
-3. Extended development: Reference modules such as tensors and loss functions in the src/ directory to implement custom numerical computing or machine learning functions.
+### VS Code Development
 
-License
+The project includes full `.devcontainer` support:
+1. Open this folder in VS Code
+2. Click "Reopen in Container" when prompted
+3. The development environment will be automatically configured
 
-This project is open-source under the Apache License 2.0. See the LICENSE file in the project root directory for details.
+## 📚 Usage Examples
+
+### Basic Tensor Operations
+
+```cpp
+#include "math/ds/TensorData.h"
+
+// Create tensors with initializer lists
+hahaha::math::TensorData<int> tensor1({{1, 2}, {3, 4}});
+hahaha::math::TensorData<double> tensor2({{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}});
+
+// Single value tensor
+hahaha::math::TensorData<float> scalar(42.0f);
+```
+
+### Running Tests
+
+```bash
+# After building
+./build/tests/core/math/ds/TensorDataTest
+```
+
+## 🧪 Testing
+
+All core components are thoroughly tested with Google Test framework:
+
+```bash
+# Run all tests
+make test
+
+# Or run specific test executable
+cd build/tests/core/math/ds/
+./TensorDataTest
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these guidelines:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a pull request
+
+Please ensure your code follows the project's coding standards by running `format.sh` before submitting.
+
+## 📄 License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
