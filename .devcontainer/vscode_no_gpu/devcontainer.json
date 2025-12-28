@@ -1,7 +1,6 @@
   {
-    "name": "HahahaDevContainer_vscode",
+    "name": "HahahaDevContainer_vscode_no_gpu",
     "dockerFile": "../../Dockerfile",
-    // "image": "hahaha-dev",
     "build": {
       "args": {
         "IMAGE_NAME": "nvidia/cuda",
@@ -10,7 +9,6 @@
     },
     "runArgs": [
       "--network=host",
-      "--gpus", "all",
       "--privileged"
     ],
     "mounts": [
@@ -50,5 +48,5 @@
           "xaver.clang-format"
         ]
       }
-    },
+    }
   }

@@ -23,6 +23,7 @@
 #define HAHAHA_MATH_DS_TENSOR_DATA_H
 
 #include "common/definitions.h"
+#include "math/ds/TensorShape.h"
 
 namespace hahaha::math
 {
@@ -73,6 +74,7 @@ template <typename ValueType> class TensorData
   private:
     ValueType* data_;
     u32 size_;
+    TensorShape shape_;
 };
 
 } // namespace hahaha::math

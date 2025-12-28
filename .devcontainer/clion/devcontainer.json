@@ -2,21 +2,19 @@
   "name": "HahahaDevContainer_clion",
   "dockerFile": "../../Dockerfile",
   "build": {
-      "args": {
-        "IMAGE_NAME": "nvidia/cuda",
-        "TARGETARCH": "amd64"
-      }
+    "args": {
+      "IMAGE_NAME": "nvidia/cuda",
+      "TARGETARCH": "amd64"
+    }
   },
- 
   "mounts": [
     "type=bind,source=${localWorkspaceFolder},target=/workspace"
   ],
-
-  "customizations" : {
+  "customizations": {
     // Configure JetBrains IDE-specific properties
-    "jetbrains" : {
-      "backend" : "Clion",
-      "settings" : {
+    "jetbrains": {
+      "backend": "Clion",
+      "settings": {
         // IDE settings can be added via “Show context actions”|“Add currently modified settings from IDE”.
         // A complete list of supported settings is also available through auto-completion
       },
@@ -27,8 +25,7 @@
     }
   },
   "features": {
-    "ghcr.io/devcontainers/features/git" : {},
-
+    "ghcr.io/devcontainers/features/git": {},
     // Add additional features to your project using auto-completion.
   },
   // Use root user for development

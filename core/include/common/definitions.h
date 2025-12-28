@@ -19,8 +19,8 @@
 // Updated: 2025-12-14 23:02:36
 //
 
-#ifndef HAHAHA_DEFINITIONS_H
-#define HAHAHA_DEFINITIONS_H
+#ifndef HAHAHA_COMMON_DEFINITIONS_H
+#define HAHAHA_COMMON_DEFINITIONS_H
 
 #include <cstdint>
 
@@ -40,4 +40,4 @@ static constexpr bool8 False = 0;
 
 } // namespace hahaha::common
 
-#endif // HAHAHA_DEFINITIONS_H
+#endif // HAHAHA_COMMON_DEFINITIONS_H

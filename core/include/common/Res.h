@@ -19,10 +19,8 @@
 // 
 //
 
-#ifndef HAHAHA_RES_H
-#define HAHAHA_RES_H
-
-#include <memory>
+#ifndef HAHAHA_COMMON_RES_H
+#define HAHAHA_COMMON_RES_H
 #include <type_traits>
 #include <variant>
 
@@ -33,4 +31,4 @@ namespace hahaha::common
     
 }
 
-#endif // HAHAHA_RES_H
+#endif // HAHAHA_COMMON_RES_H
