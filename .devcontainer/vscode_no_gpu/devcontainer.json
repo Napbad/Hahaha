@@ -16,7 +16,7 @@
     ],
     "workspaceFolder": "/workspace",
     "remoteUser": "root",
-    "postCreateCommand": "echo 'CUDA Dev Container started! Check CUDA with: nvidia-smi'",
+    "postCreateCommand": "mkdir -p /workspace/extern/externlibs && git clone --depth 1 https://github.com/ocornut/imgui.git /workspace/extern/externlibs/imgui",
     "customizations": {
       "vscode": {
         "extensions": [

@@ -122,10 +122,6 @@ RUN if [ -d "/usr/src/googletest" ]; then \
             echo "googletest sources not found in /usr/src; skipping build"; \
         fi
 
-# Pull and configure imgui (latest commit only)
-RUN mkdir -p /workspace/extern/externlibs && \
-    git clone --depth 1 https://github.com/ocornut/imgui.git /workspace/extern/externlibs/imgui
-
 # RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
 ENV PATH=/usr/local/cuda/bin:${PATH}
@@ -136,5 +132,5 @@ WORKDIR /workspace
 # RUN cd /workspace/core/python_interface/
 # RUN uv sync
 
-CMD ["/bin/bash"]
+CMD ["/bin/fish"]
 

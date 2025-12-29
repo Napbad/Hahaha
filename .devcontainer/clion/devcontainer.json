@@ -29,5 +29,6 @@
     // Add additional features to your project using auto-completion.
   },
   // Use root user for development
-  "remoteUser": "root"
+  "remoteUser": "root",
+  "postCreateCommand": "mkdir -p /workspace/extern/externlibs && git clone --depth 1 https://github.com/ocornut/imgui.git /workspace/extern/externlibs/imgui"
 }
