@@ -1,23 +1,20 @@
 // Copyright (c) 2025 Contributors of hahaha(https://github.com/Napbad/Hahaha)
-//
+// 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-//
-//     https://www.apache.org/licenses/LICENSE-2.0
-//
+// 
+//      https://www.apache.org/licenses/LICENSE-2.0 
+// 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-// Email: napbad.sen@gmail.com
-// GitHub: https://github.com/Napbad
-//
-// Created: 2025-12-16 14:43:32 by Napbad
-// Updated: 2025-12-23 06:47:06
-//
+// 
+// Contributors:
+// Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
+// 
 
 #ifndef HAHAHA_MATH_DS_TENSOR_SHAPE_H
 #define HAHAHA_MATH_DS_TENSOR_SHAPE_H
@@ -36,8 +33,8 @@ namespace hahaha::math
 {
 
 using hahaha::common::u32;
-using hahaha::util::isInitList;
-using hahaha::util::isLegalDataType;
+using hahaha::utils::isInitList;
+using hahaha::utils::isLegalDataType;
 
 /**
  * @brief Represents the shape (dimensions) of a tensor.
@@ -71,53 +68,37 @@ class TensorShape
      * @brief Construct from an initializer list of dimensions
      * @param dims List of dimension sizes (e.g. {2,3,4})
      */
-    TensorShape(const std::initializer_list<u32> dims)
+    TensorShape(const std::initializer_list<u32> dims) : dims_(dims)
     {
-        dims_.reserve(dims.size());
-#pragma unroll 5
-        for (const auto& dim : dims)
-        {
-            dims_.emplace_back(dim);
-        }
     }
 
     /**
      * @brief Construct from a vector of dimensions
      * @param dims Vector of dimension sizes
      */
-    explicit TensorShape(const std::vector<u32>& dims)
+    explicit TensorShape(const std::vector<u32>& dims) : dims_(dims)
     {
-        dims_.reserve(dims.size());
-#pragma unroll 5
-        for (const auto& dim : dims)
-        {
-            dims_.push_back(dim);
-        }
     }
     TensorShape& operator=(const TensorShape&) = default;
-    TensorShape& operator=(TensorShape&& other) noexcept
-    {
-        dims_ = std::move(other.dims_);
-        return *this;
-    };
+    TensorShape& operator=(TensorShape&& other) noexcept = default;
 
     /**
      * @brief Return a copy of the dimensions vector
-     * @return std::vector<u32> dimensions
+     * @return const std::vector<u32>& dimensions
      */
-    [[nodiscard]] std::vector<u32> dims() const
+    [[nodiscard]] const std::vector<u32>& dims() const
     {
         return dims_;
     }
 
     /**
      * @brief Compute total number of elements for the shape
-     * @return u32 product of all dimensions (1 for empty shape)
+     * @return u64 product of all dimensions (1 for empty shape)
      */
-    [[nodiscard]] u32 totalSize() const
+    [[nodiscard]] hahaha::common::u64 totalSize() const
     {
-        u32 size = 1;
-#pragma unroll 5
+        hahaha::common::u64 size = 1;
+        #pragma unroll 5
         for (const auto& dim : dims_)
         {
             size *= dim;

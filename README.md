@@ -59,26 +59,6 @@ hahaha::math::TensorData<double> tensor2({{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}});
 hahaha::math::TensorData<float> scalar(42.0f);
 ```
 
-### Running Tests
-
-```bash
-# After building
-./build/tests/core/math/ds/TensorDataTest
-```
-
-## 🧪 Testing
-
-All core components are thoroughly tested with Google Test framework:
-
-```bash
-# Run all tests
-make test
-
-# Or run specific test executable
-cd build/tests/core/math/ds/
-./TensorDataTest
-```
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please follow these guidelines:

@@ -11,9 +11,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 // 
-// Created: 2025-12-23 06:51:07 by Napbad
+// Contributors:
+// Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 // 
 
 #include <iostream>
@@ -123,6 +123,21 @@ TEST_F(TensorShapeTest, ComputeSize) {
 
     TensorShape ts3;
     ASSERT_EQ(ts3.totalSize(), 1);
+
+    // Test overflow with large dimensions
+    TensorShape ts4({1024, 1024, 1024, 8}); // 1024^3 * 8 = 2^33
+    ASSERT_EQ(ts4.totalSize(), 8589934592ULL);
+}
+
+TEST_F(TensorShapeTest, DimsAccess) {
+    TensorShape ts({2, 3});
+    const auto& dims = ts.dims();
+    ASSERT_EQ(dims.size(), 2);
+    ASSERT_EQ(dims[0], 2);
+    ASSERT_EQ(dims[1], 3);
+    
+    // Ensure it's a reference to the same data (at least check it's not copying on every call)
+    ASSERT_EQ(&ts.dims(), &ts.dims());
 }
 
 TEST_F(TensorShapeTest, ToString) {

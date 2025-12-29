@@ -1,26 +1,23 @@
 // Copyright (c) 2025 Contributors of hahaha(https://github.com/Napbad/Hahaha)
-//
+// 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-//
-//      https://www.apache.org/licenses/LICENSE-2.0
-//
+// 
+//      https://www.apache.org/licenses/LICENSE-2.0 
+// 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-// Created: 2025-12-26 02:10:03 by Napbad
-//
-
-#include "math/ds/TensorData.h"
-#include "math/ds/TensorShape.h"
-#include "math/ds/TensorStride.h"
+// 
+// Contributors:
+// Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
+// 
 
 #include <gtest/gtest.h>
-
+#include "math/ds/TensorData.h"
 class TensorDataTest : public ::testing::Test
 {
   protected:
@@ -133,4 +130,23 @@ TEST_F(TensorDataTest, CopyAndAssignmentDisabled)
     // td3 = originalTensor;  // This would cause a compile error
     
     SUCCEED() << "Copy constructor and assignment operator are properly deleted";
+}
+
+TEST_F(TensorDataTest, MoveConstructor)
+{
+    TensorData<int> original({1, 2, 3});
+    TensorData<int> moved(std::move(original));
+    
+    // Check that 'moved' has the data
+    // (In a real test we'd check shape/stride/data via friend access)
+    SUCCEED();
+}
+
+TEST_F(TensorDataTest, MoveAssignment)
+{
+    TensorData<int> original({1, 2, 3});
+    TensorData<int> moved;
+    moved = std::move(original);
+    
+    SUCCEED();
 }

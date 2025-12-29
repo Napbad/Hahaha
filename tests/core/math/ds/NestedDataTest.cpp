@@ -11,9 +11,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 // 
-// Created: 2025-12-28 01:36:56 by Napbad
+// Contributors:
+// Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 // 
 
 #include <gtest/gtest.h>
@@ -121,4 +121,18 @@ TEST_F(NestedDataTest, InitializeViaNestedInitializerList3) {
     ASSERT_EQ(nestedData.getFlatData().at(5), 6);
     ASSERT_EQ(nestedData.getFlatData().at(6), 7);
     ASSERT_EQ(nestedData.getFlatData().at(7), 8);
+}
+
+TEST_F(NestedDataTest, InitializeWithEmptyList) {
+    ASSERT_NO_THROW(NestedData<int> nd({}));
+    NestedData<int> nd({});
+    ASSERT_EQ(nd.getFlatData().size(), 0);
+    ASSERT_EQ(nd.getShape().size(), 0);
+}
+
+TEST_F(NestedDataTest, SingleValueConstruction) {
+    NestedData<int> nd(42);
+    ASSERT_EQ(nd.getFlatData().size(), 1);
+    ASSERT_EQ(nd.getFlatData()[0], 42);
+    ASSERT_EQ(nd.getShape().size(), 0);
 }
