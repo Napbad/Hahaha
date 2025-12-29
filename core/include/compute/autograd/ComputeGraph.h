@@ -16,13 +16,13 @@
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 //
 
-#ifndef HAHAHA_AUTOGRAD_COMPUTE_GRAPH_H
-#define HAHAHA_AUTOGRAD_COMPUTE_GRAPH_H
+#ifndef HAHAHA_COMPUTE_AUTOGRAD_COMPUTE_GRAPH_H
+#define HAHAHA_COMPUTE_AUTOGRAD_COMPUTE_GRAPH_H
 
 #include <memory>
 #include <vector>
 
-#include "autograd/Node.h"
+#include "compute/autograd/Node.h"
 
 namespace hahaha::autograd
 {
@@ -79,4 +79,4 @@ template <typename T> class ComputeGraph
 
 } // namespace hahaha::autograd
 
-#endif // HAHAHA_AUTOGRAD_COMPUTE_GRAPH_H
+#endif // HAHAHA_COMPUTE_AUTOGRAD_COMPUTE_GRAPH_H

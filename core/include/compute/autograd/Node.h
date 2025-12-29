@@ -16,8 +16,8 @@
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 //
 
-#ifndef HAHAHA_AUTOGRAD_NODE_H
-#define HAHAHA_AUTOGRAD_NODE_H
+#ifndef HAHAHA_COMPUTE_AUTOGRAD_NODE_H
+#define HAHAHA_COMPUTE_AUTOGRAD_NODE_H
 
 #include <memory>
 #include <vector>
@@ -99,5 +99,4 @@ template <typename T> class Node
 
 } // namespace hahaha::autograd
 
-#endif // HAHAHA_AUTOGRAD_NODE_H
-
+#endif // HAHAHA_COMPUTE_AUTOGRAD_NODE_H

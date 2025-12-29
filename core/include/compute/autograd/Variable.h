@@ -16,11 +16,12 @@
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 //
 
-#ifndef HAHAHA_AUTOGRAD_VARIABLE_H
-#define HAHAHA_AUTOGRAD_VARIABLE_H
+#ifndef HAHAHA_COMPUTE_AUTOGRAD_VARIABLE_H
+#define HAHAHA_COMPUTE_AUTOGRAD_VARIABLE_H
 
 #include <memory>
-#include "autograd/Node.h"
+
+#include "compute/autograd/Node.h"
 #include "math/Tensor.h"
 
 namespace hahaha::autograd
@@ -98,5 +99,4 @@ template <typename T> class Variable
 
 } // namespace hahaha::autograd
 
-#endif // HAHAHA_AUTOGRAD_VARIABLE_H
-
+#endif // HAHAHA_COMPUTE_AUTOGRAD_VARIABLE_H

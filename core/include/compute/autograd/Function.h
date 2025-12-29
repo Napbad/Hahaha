@@ -16,8 +16,8 @@
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 //
 
-#ifndef HAHAHA_AUTOGRAD_FUNCTION_H
-#define HAHAHA_AUTOGRAD_FUNCTION_H
+#ifndef HAHAHA_COMPUTE_AUTOGRAD_FUNCTION_H
+#define HAHAHA_COMPUTE_AUTOGRAD_FUNCTION_H
 
 #include <memory>
 #include <vector>
@@ -60,5 +60,4 @@ template <typename T> class Function
 
 } // namespace hahaha::autograd
 
-#endif // HAHAHA_AUTOGRAD_FUNCTION_H
-
+#endif // HAHAHA_COMPUTE_AUTOGRAD_FUNCTION_H

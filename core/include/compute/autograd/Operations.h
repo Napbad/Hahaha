@@ -16,14 +16,14 @@
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 //
 
-#ifndef HAHAHA_AUTOGRAD_OPERATIONS_H
-#define HAHAHA_AUTOGRAD_OPERATIONS_H
+#ifndef HAHAHA_COMPUTE_AUTOGRAD_OPERATIONS_H
+#define HAHAHA_COMPUTE_AUTOGRAD_OPERATIONS_H
 
 #include <memory>
 #include <vector>
 
-#include "autograd/Function.h"
-#include "autograd/Variable.h"
+#include "compute/autograd/Function.h"
+#include "compute/autograd/Variable.h"
 #include "math/Tensor.h"
 
 namespace hahaha::autograd
@@ -91,4 +91,4 @@ template <typename T> std::shared_ptr<Variable<T>> operator*(std::shared_ptr<Var
 
 } // namespace hahaha::autograd
 
-#endif // HAHAHA_AUTOGRAD_OPERATIONS_H
+#endif // HAHAHA_COMPUTE_AUTOGRAD_OPERATIONS_H
