@@ -16,10 +16,11 @@
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 // 
 
-#include "math/Tensor.h"
+#include "imgui.h"
+#include "imgui_internal.h"
 
-namespace hahaha::math { 
+namespace hahaha::display {
 
-// Template implementations are in Tensor.h
-
-} //  namespace hahaha::math
+    class Window { 
+    };
+}

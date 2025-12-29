@@ -1,20 +1,20 @@
 // Copyright (c) 2025 Contributors of hahaha(https://github.com/Napbad/Hahaha)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //      https://www.apache.org/licenses/LICENSE-2.0 
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// 
+//
 // Contributors:
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
-// 
+//
 
 #ifndef HAHAHA_MATH_DS_TENSOR_STRIDE_H
 #define HAHAHA_MATH_DS_TENSOR_STRIDE_H
@@ -62,7 +62,7 @@ class TensorStride
 #pragma unroll 5
         for (size_t i = dims.size() - 1; i > 0; --i)
         {
-            strides_[i - 1] = strides_[i] * static_cast<u32>(dims[i]);
+            strides_[i - 1] = strides_[i] * static_cast<size_t>(dims[i]);
         }
     }
 
@@ -71,14 +71,14 @@ class TensorStride
      * @param shape The source shape to compute strides for.
      */
     explicit TensorStride(const TensorShape& shape) : TensorStride(shape.dims())
-        {
+    {
     }
 
     /**
      * @brief Return a reference to the strides vector.
-     * @return const std::vector<u32>& strides.
+     * @return const std::vector<size_t>& strides.
      */
-    [[nodiscard]] const std::vector<u32>& dims() const
+    [[nodiscard]] const std::vector<size_t>& dims() const
     {
         return strides_;
     }
@@ -86,18 +86,18 @@ class TensorStride
     /**
      * @brief Access stride by dimension index.
      * @param index Dimension index.
-     * @return u32 The stride value at that dimension.
+     * @return size_t The stride value at that dimension.
      */
-    [[nodiscard]] u32 operator[](u32 index) const
+    [[nodiscard]] size_t operator[](size_t index) const
     {
         return strides_[index];
     }
 
     /**
      * @brief Return the number of dimensions.
-     * @return u32 dimension count.
+     * @return size_t dimension count.
      */
-    [[nodiscard]] u32 size() const
+    [[nodiscard]] size_t size() const
     {
         return strides_.size();
     }
@@ -112,7 +112,7 @@ class TensorStride
         sstream << "[";
 
 #pragma unroll 5
-        for (u32 i = 0; i < strides_.size(); ++i)
+        for (size_t i = 0; i < strides_.size(); ++i)
         {
             sstream << strides_[i];
             if (i != strides_.size() - 1)
@@ -132,8 +132,44 @@ class TensorStride
         std::reverse(strides_.begin(), strides_.end());
     }
 
+    /**
+     * @brief Access stride by dimension index.
+     * @param index Dimension index.
+     * @return size_t The stride value at that dimension.
+     */
+    size_t operator[](size_t index)
+    {
+        return strides_[index];
+    }
+
+    /**
+     * @brief Access stride by dimension index. It has bound check
+     * @param index Dimension index.
+     * @return size_t The stride value at that dimension.
+     */
+    size_t at(size_t index)
+    {
+        if (index >= strides_.size())
+        {
+            throw std::out_of_range("Index out of range");
+        }
+        return strides_[index];
+    }
+    /**
+     * @brief Access stride by dimension index. It has bound check
+     * @param index Dimension index.
+     * @return size_t The stride value at that dimension.
+     */
+    [[nodiscard]] size_t at(size_t index) const
+    {
+        if (index >= strides_.size())
+        {
+            throw std::out_of_range("Index out of range");
+        }
+        return strides_[index];
+    }
   private:
-    std::vector<u32> strides_;
+    std::vector<size_t> strides_;
 };
 } // namespace hahaha::math
 

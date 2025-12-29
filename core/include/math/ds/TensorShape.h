@@ -1,25 +1,26 @@
 // Copyright (c) 2025 Contributors of hahaha(https://github.com/Napbad/Hahaha)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //      https://www.apache.org/licenses/LICENSE-2.0 
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// 
+//
 // Contributors:
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
-// 
+//
 
 #ifndef HAHAHA_MATH_DS_TENSOR_SHAPE_H
 #define HAHAHA_MATH_DS_TENSOR_SHAPE_H
 
 #include <algorithm>
+#include <cstddef>
 #include <initializer_list>
 #include <string>
 #include <vector>
@@ -68,7 +69,7 @@ class TensorShape
      * @brief Construct from an initializer list of dimensions
      * @param dims List of dimension sizes (e.g. {2,3,4})
      */
-    TensorShape(const std::initializer_list<u32> dims) : dims_(dims)
+    TensorShape(const std::initializer_list<size_t> dims) : dims_(dims)
     {
     }
 
@@ -76,7 +77,7 @@ class TensorShape
      * @brief Construct from a vector of dimensions
      * @param dims Vector of dimension sizes
      */
-    explicit TensorShape(const std::vector<u32>& dims) : dims_(dims)
+    explicit TensorShape(const std::vector<size_t>& dims) : dims_(dims)
     {
     }
     TensorShape& operator=(const TensorShape&) = default;
@@ -84,9 +85,9 @@ class TensorShape
 
     /**
      * @brief Return a copy of the dimensions vector
-     * @return const std::vector<u32>& dimensions
+     * @return const std::vector<size_t>& dimensions
      */
-    [[nodiscard]] const std::vector<u32>& dims() const
+    [[nodiscard]] const std::vector<size_t>& dims() const
     {
         return dims_;
     }
@@ -98,7 +99,7 @@ class TensorShape
     [[nodiscard]] hahaha::common::u64 totalSize() const
     {
         hahaha::common::u64 size = 1;
-        #pragma unroll 5
+#pragma unroll 5
         for (const auto& dim : dims_)
         {
             size *= dim;
@@ -126,8 +127,16 @@ class TensorShape
         result += ")";
         return result;
     }
+
+    bool operator== (const TensorShape& other) const {
+        return dims_ == other.dims_;
+    }
+    bool operator!= (const TensorShape& other) const {
+        return !(*this == other);
+    }
+
   private:
-    std::vector<u32> dims_;
+    std::vector<size_t> dims_;
     
     // default name of the test fixture class to this class
     friend class ::TensorShapeTest;

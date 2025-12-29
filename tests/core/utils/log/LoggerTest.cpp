@@ -35,12 +35,18 @@ protected:
         if (std::filesystem::exists("test_log.txt")) {
             std::filesystem::remove("test_log.txt");
         }
+        if (std::filesystem::exists("log.txt")) {
+            std::filesystem::remove("log.txt");
+        }
     }
 
     void TearDown() override {
         // Clean up log files after each test
         if (std::filesystem::exists("test_log.txt")) {
             std::filesystem::remove("test_log.txt");
+        }
+        if (std::filesystem::exists("log.txt")) {
+            std::filesystem::remove("log.txt");
         }
     }
 };
@@ -55,8 +61,8 @@ TEST_F(LoggerTest, LogLevelToString) {
 }
 
 TEST_F(LoggerTest, LoggerColorToString) {
-    EXPECT_EQ(toString(LoggerColor::RED), "\033[31m");
-    EXPECT_EQ(toString(LoggerColor::RESET), "\033[0m");
+    EXPECT_EQ(toString(LogColor::RED), "\033[31m");
+    EXPECT_EQ(toString(LogColor::RESET), "\033[0m");
 }
 
 TEST_F(LoggerTest, LoggerConfigDefault) {
@@ -69,7 +75,7 @@ TEST_F(LoggerTest, LoggerConfigDefault) {
 }
 
 TEST_F(LoggerTest, CustomLoggerInstance) {
-    LoggerConfig config(LoggerColor::GREEN, LogLevel::DEBUG, "test_log.txt", true, false, false);
+    LoggerConfig config(LogColor::GREEN, LogLevel::DEBUG, "test_log.txt", true, false, false);
     {
         Logger customLogger(config);
         // We can't use the static methods as they use the singleton

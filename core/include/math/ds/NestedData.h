@@ -1,11 +1,11 @@
 // Copyright (c) 2025 Contributors of hahaha(https://github.com/Napbad/Hahaha)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
-//      https://www.apache.org/licenses/LICENSE-2.0 
-// 
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,7 +14,7 @@
 // 
 // Contributors:
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
-// 
+//
 
 #ifndef HAHAHA_MATH_DS_NESTED_DATA_H
 #define HAHAHA_MATH_DS_NESTED_DATA_H
@@ -22,7 +22,6 @@
 #include <initializer_list>
 #include <vector>
 
-#include "common/definitions.h"
 
 // Forward declaration for friend class template
 class NestedDataTest;
@@ -32,7 +31,6 @@ namespace hahaha::math
 
 template <typename T> class TensorData;
 
-using hahaha::common::u32;
 
 /**
  * @brief Utility structure for handling nested initializer lists to initialize tensors.
@@ -65,7 +63,7 @@ template <typename T> struct NestedData
         if (data.size() == 0) { return;
 }
 
-        shape.push_back(static_cast<u32>(data.size()));
+        shape.push_back(data.size());
         const auto& firstShape = data.begin()->shape;
         shape.insert(shape.end(), firstShape.begin(), firstShape.end());
 
@@ -95,16 +93,16 @@ template <typename T> struct NestedData
 
     /**
      * @brief Get the computed shape of the nested data.
-     * @return const std::vector<u32>& reference to shape dimensions.
+     * @return const std::vector<size_t>& reference to shape dimensions.
      */
-    [[nodiscard]] const std::vector<u32>& getShape() const
+    [[nodiscard]] const std::vector<size_t>& getShape() const
     {
         return shape;
     }
 
   private:
     std::vector<T> flatData;
-    std::vector<u32> shape;
+    std::vector<size_t> shape;
 
     friend class TensorData<T>;
     friend class ::NestedDataTest;

@@ -19,7 +19,11 @@
 #ifndef HAHAHA_MATH_TENSOR_H
 #define HAHAHA_MATH_TENSOR_H
 
+#include <algorithm>
+#include <numeric>
+#include <stdexcept>
 #include <vector>
+
 #include "math/ds/TensorData.h"
 
 class TensorDataTest;
@@ -122,86 +126,285 @@ template <typename T> class Tensor
      * @param indices List of indices for each dimension.
      * @return T& reference to the element.
      */
-    T& at(const std::initializer_list<size_t>& indices);
+    T& at(const std::initializer_list<size_t>& indices) {
+        const auto& shapeDims = data_.shape_.dims();
+        if (indices.size() != shapeDims.size()) {
+            throw std::out_of_range("Dimension mismatch: expected " + 
+                                    std::to_string(shapeDims.size()) + 
+                                    " indices, got " + std::to_string(indices.size()));
+        }
+
+        size_t linearIdx = 0;
+        auto idxIt = indices.begin();
+        const auto& strideDims = data_.stride_.dims();
+
+        for (size_t i = 0; i < shapeDims.size(); ++i) {
+            size_t dimIdx = *idxIt;
+            if (dimIdx >= shapeDims[i]) {
+                throw std::out_of_range("Index out of bounds at dimension " + std::to_string(i));
+            }
+            linearIdx += dimIdx * strideDims[i];
+            ++idxIt;
+        }
+        return data_.data_[linearIdx];
+    }
 
     /**
      * @brief Constant element access with bounds checking.
      * @param indices List of indices for each dimension.
      * @return const T& reference to the element.
      */
-    const T& at(const std::initializer_list<size_t>& indices) const;
+    const T& at(const std::initializer_list<size_t>& indices) const {
+        const auto& shapeDims = data_.shape_.dims();
+        if (indices.size() != shapeDims.size()) {
+            throw std::out_of_range("Dimension mismatch");
+        }
+
+        size_t linearIdx = 0;
+        auto idxIt = indices.begin();
+        const auto& strideDims = data_.stride_.dims();
+
+        for (size_t i = 0; i < shapeDims.size(); ++i) {
+            size_t dimIdx = *idxIt;
+            if (dimIdx >= shapeDims[i]) {
+                throw std::out_of_range("Index out of bounds");
+            }
+            linearIdx += dimIdx * strideDims[i];
+            ++idxIt;
+        }
+        return data_.data_[linearIdx];
+    }
 
     /**
      * @brief Reshape tensor to new dimensions.
      * @param newShape Vector of new dimension sizes.
      * @return Tensor<T> A new tensor with reshaped dimensions.
      */
-    Tensor<T> reshape(const std::vector<size_t>& newShape) const;
+    Tensor<T> reshape(const std::vector<size_t>& newShape) const {
+        size_t totalSize = std::accumulate(newShape.begin(), newShape.end(), 1ULL, std::multiplies<size_t>());
+        if (totalSize != size()) {
+            throw std::invalid_argument("New shape total size (" + std::to_string(totalSize) + 
+                                        ") must match current size (" + std::to_string(size()) + ")");
+        }
+
+        Tensor<T> result;
+        result.data_.shape_ = TensorShape(newShape);
+        result.data_.stride_ = TensorStride(result.data_.shape_);
+        
+        size_t currentSize = size();
+        result.data_.data_ = std::make_unique<T[]>(currentSize);
+        std::copy(data_.data_.get(), data_.data_.get() + currentSize, result.data_.data_.get());
+        
+        return result;
+    }
 
     /**
      * @brief Total number of elements in the tensor.
      * @return size_t count of elements.
      */
-    [[nodiscard]] size_t size() const;
+    [[nodiscard]] size_t size() const {
+        return static_cast<size_t>(data_.shape_.totalSize());
+    }
 
     /**
      * @brief Number of dimensions.
      * @return size_t dimension count.
      */
-    [[nodiscard]] size_t dimensions() const;
+    [[nodiscard]] size_t dimensions() const {
+        return data_.shape_.dims().size();
+    }
 
     /**
      * @brief Element-wise addition.
      * @param other The tensor to add.
      * @return Tensor<T> result tensor.
      */
-    Tensor<T> add(const Tensor<T>& other) const;
+    Tensor<T> add(const Tensor<T>& other) const {
+        if (shape() != other.shape()) {
+            throw std::invalid_argument("Tensors must have the same shape for addition");
+        }
+        
+        Tensor<T> result;
+        result.data_.shape_ = data_.shape_;
+        result.data_.stride_ = data_.stride_;
+        
+        size_t tensorSize = size();
+        result.data_.data_ = std::make_unique<T[]>(tensorSize);
+        
+        for (size_t i = 0; i < tensorSize; ++i) {
+            result.data_.data_[i] = data_.data_[i] + other.data_.data_[i];
+        }
+        
+        return result;
+    }
 
     /**
      * @brief Element-wise subtraction.
      * @param other The tensor to subtract.
      * @return Tensor<T> result tensor.
      */
-    Tensor<T> subtract(const Tensor<T>& other) const;
+    Tensor<T> subtract(const Tensor<T>& other) const {
+        if (shape() != other.shape()) {
+            throw std::invalid_argument("Tensors must have the same shape for subtraction");
+        }
+        
+        Tensor<T> result;
+        result.data_.shape_ = data_.shape_;
+        result.data_.stride_ = data_.stride_;
+        
+        size_t tensorSize = size();
+        result.data_.data_ = std::make_unique<T[]>(tensorSize);
+        
+        for (size_t i = 0; i < tensorSize; ++i) {
+            result.data_.data_[i] = data_.data_[i] - other.data_.data_[i];
+        }
+        
+        return result;
+    }
 
     /**
      * @brief Element-wise multiplication.
      * @param other The tensor to multiply.
      * @return Tensor<T> result tensor.
      */
-    Tensor<T> multiply(const Tensor<T>& other) const;
+    Tensor<T> multiply(const Tensor<T>& other) const {
+        if (shape() != other.shape()) {
+            throw std::invalid_argument("Tensors must have the same shape for multiplication");
+        }
+        
+        Tensor<T> result;
+        result.data_.shape_ = data_.shape_;
+        result.data_.stride_ = data_.stride_;
+        
+        size_t tensorSize = size();
+        result.data_.data_ = std::make_unique<T[]>(tensorSize);
+        
+        for (size_t i = 0; i < tensorSize; ++i) {
+            result.data_.data_[i] = data_.data_[i] * other.data_.data_[i];
+        }
+        
+        return result;
+    }
 
     /**
      * @brief Element-wise division.
      * @param other The tensor to divide.
      * @return Tensor<T> result tensor.
      */
-    Tensor<T> divide(const Tensor<T>& other) const;
+    Tensor<T> divide(const Tensor<T>& other) const {
+        if (shape() != other.shape()) {
+            throw std::invalid_argument("Tensors must have the same shape for division");
+        }
+        
+        Tensor<T> result;
+        result.data_.shape_ = data_.shape_;
+        result.data_.stride_ = data_.stride_;
+        
+        size_t tensorSize = size();
+        result.data_.data_ = std::make_unique<T[]>(tensorSize);
+        
+        for (size_t i = 0; i < tensorSize; ++i) {
+            if (other.data_.data_[i] == T(0)) {
+                throw std::runtime_error("Division by zero at index " + std::to_string(i));
+            }
+            result.data_.data_[i] = data_.data_[i] / other.data_.data_[i];
+        }
+        
+        return result;
+    }
 
     /**
      * @brief Matrix multiplication (for 2D tensors).
      * @param other The tensor to multiply with.
      * @return Tensor<T> result tensor.
      */
-    Tensor<T> matmul(const Tensor<T>& other) const;
+    Tensor<T> matmul(const Tensor<T>& other) const {
+        if (dimensions() != 2 || other.dimensions() != 2) {
+            throw std::invalid_argument("matmul is only implemented for 2D tensors");
+        }
+        
+        const auto& thisDims = data_.shape_.dims();
+        const auto& otherDims = other.data_.shape_.dims();
+        
+        if (thisDims[1] != otherDims[0]) {
+            throw std::invalid_argument("Matrix dimensions mismatch for matmul: (" + 
+                                        std::to_string(thisDims[0]) + "x" + std::to_string(thisDims[1]) + 
+                                        ") and (" + std::to_string(otherDims[0]) + "x" + 
+                                        std::to_string(otherDims[1]) + ")");
+        }
+        
+        size_t rows = thisDims[0];
+        size_t cols = otherDims[1];
+        size_t inner = thisDims[1];
+        
+        Tensor<T> result;
+        result.data_.shape_ = TensorShape({rows, cols});
+        result.data_.stride_ = TensorStride(result.data_.shape_);
+        result.data_.data_ = std::make_unique<T[]>(rows * cols);
+        
+        for (size_t i = 0; i < rows; ++i) {
+            for (size_t j = 0; j < cols; ++j) {
+                T sum = T(0);
+                for (size_t k = 0; k < inner; ++k) {
+                    sum += data_.data_[i * inner + k] * other.data_.data_[k * cols + j];
+                }
+                result.data_.data_[i * cols + j] = sum;
+            }
+        }
+        
+        return result;
+    }
 
     /**
      * @brief Transpose operation.
      * @return Tensor<T> transposed tensor.
      */
-    Tensor<T> transpose() const;
+    Tensor<T> transpose() const {
+        if (dimensions() != 2) {
+            throw std::invalid_argument("transpose is only implemented for 2D tensors for now");
+        }
+        
+        const auto& shapeDims = data_.shape_.dims();
+        size_t rows = shapeDims[0];
+        size_t cols = shapeDims[1];
+        
+        Tensor<T> result;
+        result.data_.shape_ = TensorShape({cols, rows});
+        result.data_.stride_ = TensorStride(result.data_.shape_);
+        result.data_.data_ = std::make_unique<T[]>(size());
+        
+        for (size_t i = 0; i < rows; ++i) {
+            for (size_t j = 0; j < cols; ++j) {
+                result.data_.data_[j * rows + i] = data_.data_[i * cols + j];
+            }
+        }
+        
+        return result;
+    }
 
     /**
      * @brief Broadcast tensor to match the shape of another tensor.
      * @param other The target tensor for broadcasting.
      */
-    void broadcast(const Tensor<T>& other);
+    void broadcast(const Tensor<T>&  /*other*/) {
+        throw std::runtime_error("Broadcasting not implemented yet");
+    }
 
-    Tensor<T> operator+(const Tensor<T>& other) const;
-    Tensor<T> operator-(const Tensor<T>& other) const;
-    Tensor<T> operator*(const Tensor<T>& other) const;
-    Tensor<T> operator/(const Tensor<T>& other) const;
-    Tensor<T> operator-() const;
+    Tensor<T> operator+(const Tensor<T>& other) const { return add(other); }
+    Tensor<T> operator-(const Tensor<T>& other) const { return subtract(other); }
+    Tensor<T> operator*(const Tensor<T>& other) const { return multiply(other); }
+    Tensor<T> operator/(const Tensor<T>& other) const { return divide(other); }
+    Tensor<T> operator-() const {
+        Tensor<T> result;
+        result.data_.shape_ = data_.shape_;
+        result.data_.stride_ = data_.stride_;
+        size_t tensorSize = size();
+        result.data_.data_ = std::make_unique<T[]>(tensorSize);
+        for (size_t i = 0; i < tensorSize; ++i) {
+            result.data_.data_[i] = -data_.data_[i];
+        }
+        return result;
+    }
 
   private:
     TensorData<T> data_;

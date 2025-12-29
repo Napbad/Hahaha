@@ -16,6 +16,7 @@
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 // 
 
+#include <cstddef>
 #include <iostream>
 
 #include <gtest/gtest.h>
@@ -57,7 +58,7 @@ TEST_F(TensorShapeTest, InitWithNoParam) {
 }
 
 TEST_F(TensorShapeTest, InitWithStdVector) {
-    std::vector<u32> dims = {4, 5, 6, 7};
+    std::vector<size_t> dims = {4, 5, 6, 7};
     std::cout << "Vector size: " << dims.size() << std::endl;
     auto ts1 = TensorShape(dims);
     ASSERT_EQ(ts1.dims().size(), 4);
@@ -149,4 +150,25 @@ TEST_F(TensorShapeTest, ToString) {
 
     TensorShape ts3;
     ASSERT_EQ(ts3.toString(), "()");
+}
+
+TEST_F(TensorShapeTest, Reverse) {
+    TensorShape ts1({1, 2, 3});
+    ts1.reverse();
+    ASSERT_EQ(ts1.toString(), "(3, 2, 1)");
+
+    TensorShape ts2({4, 5});
+    ts2.reverse();
+    ASSERT_EQ(ts2.toString(), "(5, 4)");
+
+    TensorShape ts3;
+    ts3.reverse();
+}
+
+TEST_F(TensorShapeTest, OperatorEqual) { 
+    ASSERT_TRUE(TensorShape({1, 2, 3}) == TensorShape({1, 2, 3}));
+}
+
+TEST_F(TensorShapeTest, OperatorNotEqual) { 
+    ASSERT_TRUE(TensorShape({1, 2, 3}) != TensorShape({1, 2, 4}));
 }

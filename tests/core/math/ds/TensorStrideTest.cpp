@@ -75,3 +75,28 @@ TEST_F(TensorStrideTest, Reverse) {
     ASSERT_EQ(stride[0], 1);
     ASSERT_EQ(stride[1], 3);
 }
+
+
+TEST_F(TensorStrideTest, indexAccess) {
+
+    TensorStride stride(TensorShape({2, 3}));
+    ASSERT_EQ(stride[0], 3);
+    ASSERT_EQ(stride[1], 1);
+}
+
+TEST_F(TensorStrideTest, at) {
+    TensorStride stride(TensorShape({2, 3}));
+    ASSERT_EQ(stride.at(0), 3);
+    ASSERT_EQ(stride.at(1), 1);
+}
+
+TEST_F(TensorStrideTest, atOutOfRange) {
+    TensorStride stride(TensorShape({2, 3}));
+    ASSERT_THROW(stride.at(2), std::out_of_range);
+}
+
+TEST_F(TensorStrideTest, atConst) {
+    const TensorStride stride(TensorShape({2, 3}));
+    ASSERT_EQ(stride.at(0), 3);
+    ASSERT_EQ(stride.at(1), 1);
+}
