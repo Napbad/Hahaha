@@ -28,6 +28,7 @@ Checks: >
   -readability-magic-numbers,
   -hicpp-uppercase-literal-suffix,
   -altera-unroll-loops,
+  -misc-non-private-member-variables-in-classes,
 
 
 CheckOptions:

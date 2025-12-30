@@ -16,8 +16,8 @@
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 //
 
-#ifndef HAHAHA_MATH_TENSOR_H
-#define HAHAHA_MATH_TENSOR_H
+#ifndef HAHAHA_MATH_TENSOR_WRAPPER_H
+#define HAHAHA_MATH_TENSOR_WRAPPER_H
 
 #include <algorithm>
 #include <iterator>
@@ -431,10 +431,11 @@ template <typename T> class TensorWrapper {
     TensorData<T> data_;
 
     bool requiresGrad_ = common::getConfig().defaultRequiresGrad;
+    std::shared_ptr<TensorWrapper<T>> grad_ = nullptr;
 
     // default name of the test fixture class to this class
     friend class ::TensorWrapperTest;
 };
 } // namespace hahaha::math
 
-#endif // HAHAHA_MATH_TENSOR_H
+#endif // HAHAHA_MATH_TENSOR_WRAPPER_H
