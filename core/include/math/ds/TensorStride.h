@@ -32,16 +32,17 @@ using hahaha::common::u32;
 /**
  * @brief Represents the memory strides of a tensor.
  *
- * TensorStride stores a vector of unsigned 32-bit integers representing the
- * number of elements to skip to move to the next element in each dimension.
- * For a row-major tensor, the last dimension has a stride of 1.
+ * Strides define how many elements to skip in memory to move to the next
+ * element in a specific dimension.
+ *
+ * For a row-major tensor of shape (d0, d1, ..., dN):
+ * - stride[N] = 1
+ * - stride[i] = stride[i+1] * dims[i+1]
  */
 class TensorStride {
 
   public:
-    /**
-     * @brief Default constructor for an empty TensorStride.
-     */
+    /** @brief Default constructor for an empty TensorStride. */
     TensorStride() = default;
 
     /**
@@ -66,16 +67,13 @@ class TensorStride {
      * @param shape The source shape to compute strides for.
      */
     explicit TensorStride(const TensorShape& shape)
-        : TensorStride(shape.dims()) {
-    }
+        : TensorStride(shape.getDims()) {}
 
     /**
-     * @brief Return a reference to the strides vector.
+     * @brief Get the strides vector.
      * @return const std::vector<size_t>& strides.
      */
-    [[nodiscard]] const std::vector<size_t>& dims() const {
-        return strides_;
-    }
+    [[nodiscard]] const std::vector<size_t>& getDims() const { return strides_; }
 
     /**
      * @brief Access stride by dimension index.
@@ -90,9 +88,7 @@ class TensorStride {
      * @brief Return the number of dimensions.
      * @return size_t dimension count.
      */
-    [[nodiscard]] size_t size() const {
-        return strides_.size();
-    }
+    [[nodiscard]] size_t getSize() const { return strides_.size(); }
 
     /**
      * @brief Return a string representation of the strides.
@@ -114,26 +110,22 @@ class TensorStride {
     }
 
     /**
-     * @brief Reverse the order of strides (e.g. for switching between
-     * row/column major).
+     * @brief Reverse the order of strides (e.g., for switching layout).
      */
-    void reverse() {
-        std::reverse(strides_.begin(), strides_.end());
-    }
+    void reverse() { std::reverse(strides_.begin(), strides_.end()); }
 
     /**
      * @brief Access stride by dimension index.
      * @param index Dimension index.
      * @return size_t The stride value at that dimension.
      */
-    size_t operator[](size_t index) {
-        return strides_[index];
-    }
+    size_t operator[](size_t index) { return strides_[index]; }
 
     /**
-     * @brief Access stride by dimension index. It has bound check
+     * @brief Access stride with bounds checking.
      * @param index Dimension index.
-     * @return size_t The stride value at that dimension.
+     * @return size_t The stride value.
+     * @throw std::out_of_range If index is invalid.
      */
     size_t at(size_t index) {
         if (index >= strides_.size()) {
@@ -141,10 +133,12 @@ class TensorStride {
         }
         return strides_[index];
     }
+
     /**
-     * @brief Access stride by dimension index. It has bound check
+     * @brief Const access stride with bounds checking.
      * @param index Dimension index.
-     * @return size_t The stride value at that dimension.
+     * @return size_t The stride value.
+     * @throw std::out_of_range If index is invalid.
      */
     [[nodiscard]] size_t at(size_t index) const {
         if (index >= strides_.size()) {
@@ -154,7 +148,7 @@ class TensorStride {
     }
 
   private:
-    std::vector<size_t> strides_;
+    std::vector<size_t> strides_; /**< Vector of computed stride values. */
 };
 } // namespace hahaha::math
 

@@ -38,10 +38,9 @@ struct LogMessageEntry {
 
   public:
     /**
-     * @brief Default constructor.
+     * @brief Default constructor. Defaults to INFO level.
      */
-    LogMessageEntry() : level(LogLevel::INFO) {
-    }
+    LogMessageEntry() : level_(LogLevel::INFO) {}
 
     /**
      * @brief Construct with level and message.
@@ -49,37 +48,43 @@ struct LogMessageEntry {
      * @param message Content of the message.
      */
     LogMessageEntry(LogLevel level, std::string message)
-
-        : message_(std::move(message)), level(level) {
-    }
+        : message_(std::move(message)), level_(level) {}
 
     /**
-     * @brief Format the entry as a colored string for console.
-     * @return std::string formatted message.
+     * @brief Format the entry as a colored string for console output.
+     * @return std::string formatted and colored message.
      */
     std::string toString() {
-        return std::format("[{}] {}", toColoredString(level), message_);
+        return std::format("[{}] {}", toColoredString(level_), message_);
     }
 
     /**
-     * @brief Get a reference to the raw message string.
-     * @return std::string& message reference.
+     * @brief Get the raw message string.
+     * @return std::string& Reference to the message.
      */
-    [[nodiscard]] std::string& getMessage() {
-        return message_;
-    }
+    [[nodiscard]] std::string& getMessage() { return message_; }
 
     /**
-     * @brief Get the severity level of the entry.
-     * @return LogLevel the level.
+     * @brief Set the message content.
+     * @param message New message string.
      */
-    [[nodiscard]] LogLevel getLevel() const {
-        return level;
-    }
+    void setMessage(std::string message) { message_ = std::move(message); }
+
+    /**
+     * @brief Get the severity level.
+     * @return LogLevel The level of this entry.
+     */
+    [[nodiscard]] LogLevel getLevel() const { return level_; }
+
+    /**
+     * @brief Set the severity level.
+     * @param level New log level.
+     */
+    void setLevel(LogLevel level) { level_ = level; }
 
   private:
-    std::string message_;
-    LogLevel level;
+    std::string message_; /**< Log message content. */
+    LogLevel level_;      /**< Log severity level. */
 } __attribute__((aligned(64)));
 
 } // namespace hahaha::utils

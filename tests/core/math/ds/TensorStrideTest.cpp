@@ -28,24 +28,24 @@ using hahaha::math::TensorStride;
 class TensorStrideTest : public ::testing::Test {};
 
 TEST_F(TensorStrideTest, StrideFromVector1D) {
-    std::vector<uint32_t> dims = {5};
+    std::vector<size_t> dims = {5};
     TensorStride stride(dims);
-    ASSERT_EQ(stride.size(), 1);
+    ASSERT_EQ(stride.getSize(), 1);
     ASSERT_EQ(stride[0], 1);
 }
 
 TEST_F(TensorStrideTest, StrideFromVector2D) {
-    std::vector<uint32_t> dims = {3, 4};
+    std::vector<size_t> dims = {3, 4};
     TensorStride stride(dims);
-    ASSERT_EQ(stride.size(), 2);
+    ASSERT_EQ(stride.getSize(), 2);
     ASSERT_EQ(stride[0], 4);
     ASSERT_EQ(stride[1], 1);
 }
 
 TEST_F(TensorStrideTest, StrideFromVector3D) {
-    std::vector<uint32_t> dims = {2, 3, 4};
+    std::vector<size_t> dims = {2, 3, 4};
     TensorStride stride(dims);
-    ASSERT_EQ(stride.size(), 3);
+    ASSERT_EQ(stride.getSize(), 3);
     ASSERT_EQ(stride[0], 12);
     ASSERT_EQ(stride[1], 4);
     ASSERT_EQ(stride[2], 1);
@@ -54,7 +54,7 @@ TEST_F(TensorStrideTest, StrideFromVector3D) {
 TEST_F(TensorStrideTest, StrideFromShape) {
     TensorShape shape({2, 3, 4});
     TensorStride stride(shape);
-    ASSERT_EQ(stride.size(), 3);
+    ASSERT_EQ(stride.getSize(), 3);
     ASSERT_EQ(stride[0], 12);
     ASSERT_EQ(stride[1], 4);
     ASSERT_EQ(stride[2], 1);
@@ -63,7 +63,7 @@ TEST_F(TensorStrideTest, StrideFromShape) {
 TEST_F(TensorStrideTest, EmptyStride) {
     TensorShape shape({});
     TensorStride stride(shape);
-    ASSERT_EQ(stride.size(), 0);
+    ASSERT_EQ(stride.getSize(), 0);
 }
 
 TEST_F(TensorStrideTest, ToString) {
@@ -79,7 +79,6 @@ TEST_F(TensorStrideTest, Reverse) {
 }
 
 TEST_F(TensorStrideTest, indexAccess) {
-
     TensorStride stride(TensorShape({2, 3}));
     ASSERT_EQ(stride[0], 3);
     ASSERT_EQ(stride[1], 1);

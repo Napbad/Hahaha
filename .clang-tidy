@@ -29,6 +29,7 @@ Checks: >
   -hicpp-uppercase-literal-suffix,
   -altera-unroll-loops,
   -misc-non-private-member-variables-in-classes,
+  -readability-uppercase-literal-suffix
 
 
 CheckOptions:

@@ -19,178 +19,105 @@
 #ifndef HAHAHA_TENSOR_H
 #define HAHAHA_TENSOR_H
 
+#include <memory>
 #include <type_traits>
-#include <utility>
-#include <vector>
 
-#include "compute/compute_graph/ControlBlock.h"
+#include "compute/compute_graph/ComputeFun.h"
+#include "math/ds/TensorData.h"
 #include "utils/common/HelperStruct.h"
 
 namespace hahaha {
 
-using compute::ControlBlock;
-template <typename T,
-          typename = std::enable_if<utils::isLegalDataType<T>::value>>
-class Tensor {
+/**
+ * @brief High-level User Interface for Tensor operations and Autograd.
+ *
+ * This class acts as a handle to a ComputeNode in the computational graph.
+ * It provides operator overloading (+, -, *, /) which automatically builds
+ * the graph in the background (Dynamic Graph / Define-by-Run).
+ *
+ * Usage:
+ *   Tensor<float> a({2, 2}, 1.0f);
+ *   Tensor<float> b({2, 2}, 2.0f);
+ *   auto c = a + b;
+ *   c.backward(); // Propagates gradients back to a and b
+ *
+ * @tparam T Numeric data type.
+ */
+template <typename T> class Tensor {
+    static_assert(utils::isLegalDataType<T>::value,
+                  "T must be a legal data type");
+
   public:
-    Tensor() : controlBlock(nullptr) {
-    }
-
+    /**
+     * @brief Construct a Tensor from an existing TensorWrapper.
+     * @param data The numerical data wrapper.
+     */
     // NOLINTNEXTLINE
-    Tensor(const Tensor<T>& other)
-        : controlBlock(other.controlBlock), parents(other.parents),
-          children(other.children), isWeak(other.isWeak) {
+    Tensor(const math::TensorWrapper<T>& data)
+        : computeNode_(std::make_shared<compute::ComputeNode<T>>(
+              std::make_shared<math::TensorWrapper<T>>(data))) {}
 
-        for (auto& child : children) {
-            bool exist = false;
-            for (auto& childsParent : child.parents) {
-                if (childsParent == this->controlBlock) {
-                    exist = true;
-                    break;
-                }
-            }
-            if (!exist) {
-                child.parents.push_back(*this);
-            }
-        }
-
-        for (auto& parent : parents) {
-            bool exist = false;
-            for (auto& parentsChild : parent.children) {
-                if (parentsChild == this->controlBlock) {
-                    exist = true;
-                    break;
-                }
-            }
-            if (!exist) {
-                parent.children.push_back(this->createWeakRef());
-            }
-        }
-
-        if (controlBlock) {
-            if (isWeak) {
-                controlBlock->weakCount++;
-            } else {
-                controlBlock->strongCount++;
-            }
-        }
-    }
-
+    /**
+     * @brief Construct a Tensor from a shared pointer to TensorWrapper.
+     * @param dataPtr pointer to the numerical data.
+     */
     // NOLINTNEXTLINE
-    Tensor(Tensor<T>&& other)
-        : parents(std::move(other.parents)),
-          children(std::move(other.children)),
-          controlBlock(other.controlBlock) {
+    Tensor(std::shared_ptr<math::TensorWrapper<T>> dataPtr)
+        : computeNode_(std::make_shared<compute::ComputeNode<T>>(dataPtr)) {}
 
-        other.controlBlock = nullptr;
+    /**
+     * @brief Internal constructor to wrap a ComputeNode.
+     * @param computeNode The node in the computational graph.
+     */
+    explicit Tensor(std::shared_ptr<compute::ComputeNode<T>> computeNode)
+        : computeNode_(computeNode) {}
+
+    /** @brief Addition operator. Builds an 'Add' node. */
+    Tensor<T> operator+(const Tensor<T>& other) const {
+        return Tensor(compute::add(this->computeNode_, other.computeNode_));
     }
 
-    ~Tensor() {
-        release();
+    /** @brief Subtraction operator. Builds a 'Sub' node. */
+    Tensor<T> operator-(const Tensor<T>& other) const {
+        return Tensor(compute::sub(this->computeNode_, other.computeNode_));
     }
 
-    Tensor& operator=(const Tensor<T>& other) {
-        if (other == this) {
-            return *this;
-        }
-
-        this->release();
-
-        for (auto& child : children) {
-            bool exist = false;
-            for (auto& childsParent : child.parents) {
-                if (childsParent == this->controlBlock) {
-                    exist = true;
-                    break;
-                }
-            }
-            if (!exist) {
-                child.parents.push_back(*this);
-            }
-        }
-
-        for (auto& parent : parents) {
-            bool exist = false;
-            for (auto& parentsChild : parent.children) {
-                if (parentsChild == this->controlBlock) {
-                    exist = true;
-                    break;
-                }
-            }
-            if (!exist) {
-                parent.children.push_back(this->createWeakRef());
-            }
-        }
-
-        if (controlBlock) {
-            if (isWeak) {
-                controlBlock->weakCount++;
-            } else {
-                controlBlock->strongCount++;
-            }
-        }
-        return *this;
+    /** @brief Multiplication operator. Builds a 'Mul' node. */
+    Tensor<T> operator*(const Tensor<T>& other) const {
+        return Tensor(compute::mul(this->computeNode_, other.computeNode_));
     }
 
-    Tensor& operator=(Tensor<T>&& other) {
-        if (other == this) {
-            return *this;
-        }
-
-        this->release();
-        this->controlBlock = other.controlBlock;
-        other.controlBlock = nullptr;
-        this->isWeak = other.isWeak;
-        this->children = std::move(other.children);
-        this->parents = std::move(other.parents);
-
-        return *this;
+    /** @brief Division operator. Builds a 'Div' node. */
+    Tensor<T> operator/(const Tensor<T>& other) const {
+        return Tensor(compute::div(this->computeNode_, other.computeNode_));
     }
 
-    bool operator==(const Tensor<T>& other) {
-        return controlBlock == other.controlBlock;
+    /**
+     * @brief Triggers backpropagation from this tensor.
+     *
+     * This will compute gradients for all ancestor tensors in the graph
+     * that have 'requiresGrad' set to true.
+     */
+    void backward() { computeNode_->backward(); }
+
+    /**
+     * @brief Get the underlying compute node.
+     * @return shared_ptr to the node.
+     */
+    std::shared_ptr<compute::ComputeNode<T>> getComputeNode() {
+        return computeNode_;
+    }
+
+    /**
+     * @brief Set the compute node for this tensor.
+     * @param node The new node.
+     */
+    void setComputeNode(std::shared_ptr<compute::ComputeNode<T>> node) {
+        computeNode_ = node;
     }
 
   private:
-    std::vector<ControlBlock<T>*> parents;  // should be strong pointers
-    std::vector<ControlBlock<T>*> children; // should be weak pointers
-
-    // memory management
-    ControlBlock<T>* controlBlock;
-    bool isWeak = false;
-
-    Tensor<T>(ControlBlock<T>* controlBlock, bool weak) {
-        this->controlBlock = controlBlock;
-        this->isWeak = weak;
-    }
-
-    Tensor<T> createWeakRef() {
-        return Tensor<T>(controlBlock, true);
-    }
-
-    bool isInvalid() {
-        return controlBlock == nullptr || controlBlock->strongCount == 0;
-    }
-
-    void release() {
-        if (!controlBlock) {
-            return;
-        }
-        if (isWeak) {
-            controlBlock->weakCount--;
-            if (controlBlock->strongCount == 0
-                && controlBlock->weakCount == 0) {
-                delete controlBlock->data;
-                delete controlBlock;
-            }
-            return;
-        }
-        controlBlock->strongCount--;
-        if (controlBlock->strongCount == 0 && controlBlock->weakCount == 0) {
-            delete controlBlock->data;
-            delete controlBlock;
-        }
-    }
+    std::shared_ptr<compute::ComputeNode<T>> computeNode_; /**< Graph link. */
 };
 
 } // namespace hahaha

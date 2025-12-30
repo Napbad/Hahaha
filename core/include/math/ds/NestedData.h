@@ -36,6 +36,10 @@ template <typename T> class TensorData;
  * NestedData recursively flattens multi-dimensional initializer lists into a 1D
  * vector while keeping track of the tensor's shape.
  *
+ * Example:
+ *   NestedData<float> data = {{1, 2}, {3, 4}};
+ *   // flatData_ becomes {1, 2, 3, 4}, shape_ becomes {2, 2}
+ *
  * @tparam T The numeric type of the tensor data.
  */
 template <typename T> struct NestedData {
@@ -46,12 +50,13 @@ template <typename T> struct NestedData {
      * @param data The scalar value.
      */
     // NOLINTNEXTLINE google-explicit-constructor
-    NestedData(T data) {
-        flatData.push_back(data);
-    }
+    NestedData(T data) { flatData_.push_back(data); }
 
     /**
      * @brief Construct from a nested initializer list.
+     *
+     * This constructor recursively flattens the list and computes the shape.
+     *
      * @param data The nested initializer list.
      */
     NestedData(std::initializer_list<NestedData<T>> data) {
@@ -59,21 +64,21 @@ template <typename T> struct NestedData {
             return;
         }
 
-        shape.push_back(data.size());
-        const auto& firstShape = data.begin()->shape;
-        shape.insert(shape.end(), firstShape.begin(), firstShape.end());
+        shape_.push_back(data.size());
+        const auto& firstShape = data.begin()->shape_;
+        shape_.insert(shape_.end(), firstShape.begin(), firstShape.end());
 
         size_t totalElements = 0;
 #pragma unroll 5
         for (const auto& val : data) {
-            totalElements += val.flatData.size();
+            totalElements += val.flatData_.size();
         }
-        flatData.reserve(totalElements);
+        flatData_.reserve(totalElements);
 
 #pragma unroll 5
         for (const auto& val : data) {
-            flatData.insert(
-                flatData.end(), val.flatData.begin(), val.flatData.end());
+            flatData_.insert(flatData_.end(), val.flatData_.begin(),
+                             val.flatData_.end());
         }
     }
 
@@ -81,21 +86,17 @@ template <typename T> struct NestedData {
      * @brief Get the flattened 1D data.
      * @return const std::vector<T>& reference to flat data.
      */
-    const std::vector<T>& getFlatData() const {
-        return flatData;
-    }
+    const std::vector<T>& getFlatData() const { return flatData_; }
 
     /**
      * @brief Get the computed shape of the nested data.
      * @return const std::vector<size_t>& reference to shape dimensions.
      */
-    [[nodiscard]] const std::vector<size_t>& getShape() const {
-        return shape;
-    }
+    [[nodiscard]] const std::vector<size_t>& getShape() const { return shape_; }
 
   private:
-    std::vector<T> flatData;
-    std::vector<size_t> shape;
+    std::vector<T> flatData_; /**< Linearized multi-dimensional data. */
+    std::vector<size_t> shape_; /**< Computed shape of the input list. */
 
     friend class TensorData<T>;
     friend class ::NestedDataTest;

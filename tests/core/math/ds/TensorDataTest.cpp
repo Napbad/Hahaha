@@ -31,105 +31,95 @@ class TensorDataTest : public ::testing::Test {
 using hahaha::math::TensorData;
 
 TEST_F(TensorDataTest, InitWithInitializerList) {
-    TensorData<int> singleValueTensor = {1};
-    ASSERT_NO_THROW(TensorData<int> singleValueTensor = {1};);
+    TensorData<int> singleValueTensor(hahaha::math::NestedData<int>{1});
+    EXPECT_EQ(singleValueTensor.getShape().getDims().size(), 1);
+    EXPECT_EQ(singleValueTensor.getShape().getDims()[0], 1);
+    EXPECT_EQ(singleValueTensor.getData()[0], 1);
 
-    TensorData<int> twoElementTensor({{1}, {2}});
-    ASSERT_NO_THROW(TensorData<int> twoElementTensor({{1}, {2}}););
+    TensorData<int> twoElementTensor(hahaha::math::NestedData<int>{{1}, {2}});
+    EXPECT_EQ(twoElementTensor.getShape().getDims().size(), 2);
+    EXPECT_EQ(twoElementTensor.getShape().getDims()[0], 2);
+    EXPECT_EQ(twoElementTensor.getShape().getDims()[1], 1);
+    EXPECT_EQ(twoElementTensor.getData()[0], 1);
+    EXPECT_EQ(twoElementTensor.getData()[1], 2);
 }
 
 TEST_F(TensorDataTest, DefaultConstructor) {
     TensorData<float> defaultConstructedTensor;
-    // Default constructor should create an empty TensorData
-    // Since TensorDataTest is a friend class, we can check internal state if
-    // needed
+    EXPECT_EQ(defaultConstructedTensor.getShape().getDims().size(), 0);
+    EXPECT_EQ(defaultConstructedTensor.getData().get(), nullptr);
+}
+
+TEST_F(TensorDataTest, ShapeValueConstructor) {
+    hahaha::math::TensorShape shape({2, 3});
+    TensorData<int> tensor_data(shape, 7);
+    EXPECT_EQ(tensor_data.getShape().getTotalSize(), 6);
+    for (size_t i = 0; i < 6; ++i) {
+        EXPECT_EQ(tensor_data.getData()[i], 7);
+    }
+    EXPECT_EQ(tensor_data.getStride().getSize(), 2);
+    EXPECT_EQ(tensor_data.getStride()[0], 3);
+    EXPECT_EQ(tensor_data.getStride()[1], 1);
 }
 
 TEST_F(TensorDataTest, OneDimensionalTensor) {
-    TensorData<int> oneDimensionalTensor({1, 2, 3, 4, 5});
-
-    // Test that we can create a tensor with 1D data
-    ASSERT_NO_THROW((TensorData<int>{{1, 2, 3, 4, 5}}));
+    TensorData<int> tensor_1d(hahaha::math::NestedData<int>{1, 2, 3, 4, 5});
+    EXPECT_EQ(tensor_1d.getShape().getTotalSize(), 5);
+    for (int i = 0; i < 5; ++i) {
+        EXPECT_EQ(tensor_1d.getData()[i], i + 1);
+    }
 }
 
-TEST_F(TensorDataTest, TwoDimensionalTensor) {
-    TensorData<double> twoDimensionalTensor({{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}});
+TEST_F(TensorDataTest, CopyConstructor) {
+    TensorData<int> original(hahaha::math::NestedData<int>{{1, 2}, {3, 4}});
+    TensorData<int> copied(original);
 
-    // Test that we can create a 2x3 tensor
-    ASSERT_NO_THROW((TensorData<double>{{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}}));
-}
+    EXPECT_EQ(copied.getShape(), original.getShape());
+    EXPECT_EQ(copied.getStride().getSize(), original.getStride().getSize());
+    for (size_t i = 0; i < original.getShape().getTotalSize(); ++i) {
+        EXPECT_EQ(copied.getData()[i], original.getData()[i]);
+    }
 
-TEST_F(TensorDataTest, ThreeDimensionalTensor) {
-    TensorData<float> threeDimensionalTensor(
-        {{{1, 2}, {3, 4}}, {{5, 6}, {7, 8}}});
-
-    // Test that we can create a 2x2x2 tensor
-    ASSERT_NO_THROW((TensorData<float>{{{{1, 2}, {3, 4}}, {{5, 6}, {7, 8}}}}));
-}
-
-TEST_F(TensorDataTest, SingleValueTensor) {
-    TensorData<int> singleValueTensor(42);
-
-    // Test that we can create a tensor with a single value
-    ASSERT_NO_THROW((TensorData<int>{42}));
-}
-
-TEST_F(TensorDataTest, LargeTensor) {
-    // Test with a larger tensor to make sure it works properly
-    TensorData<int> largeTensor(
-        {{1, 2, 3, 4, 5, 6}, {7, 8, 9, 10, 11, 12}, {13, 14, 15, 16, 17, 18}});
-
-    ASSERT_NO_THROW((TensorData<int>{{{1, 2, 3, 4, 5, 6},
-                                      {7, 8, 9, 10, 11, 12},
-                                      {13, 14, 15, 16, 17, 18}}}));
-}
-
-TEST_F(TensorDataTest, EmptyTensor) {
-    // Test creating an empty tensor (0 dimensions)
-    // Using default constructor instead of ambiguous {} initializer
-    TensorData<int> emptyTensor;
-
-    ASSERT_NO_THROW((TensorData<int>()));
-}
-
-TEST_F(TensorDataTest, DifferentTypes) {
-    // Test different value types
-    ASSERT_NO_THROW((TensorData<int>({1, 2, 3})));
-    ASSERT_NO_THROW((TensorData<float>({1.1f, 2.2f, 3.3f})));
-    ASSERT_NO_THROW((TensorData<double>({1.1, 2.2, 3.3})));
-    ASSERT_NO_THROW((TensorData<char>({'a', 'b', 'c'})));
-    ASSERT_NO_THROW((TensorData<bool>({true, false, true})));
-}
-
-TEST_F(TensorDataTest, CopyAndAssignmentDisabled) {
-    TensorData<int> originalTensor({1, 2, 3});
-
-    // Test that copy constructor is deleted
-    // This should not compile, so we're verifying the behavior by design
-    // TensorData<int> td2 = originalTensor;  // This would cause a compile
-    // error
-
-    // Test that assignment operator is deleted
-    // TensorData<int> td3;
-    // td3 = originalTensor;  // This would cause a compile error
-
-    SUCCEED()
-        << "Copy constructor and assignment operator are properly deleted";
+    // Verify deep copy
+    copied.getData()[0] = 100;
+    EXPECT_EQ(original.getData()[0], 1);
+    EXPECT_EQ(copied.getData()[0], 100);
 }
 
 TEST_F(TensorDataTest, MoveConstructor) {
-    TensorData<int> original({1, 2, 3});
+    TensorData<int> original(hahaha::math::NestedData<int>{1, 2, 3});
+    void* originalPtr = original.getData().get();
+    
     TensorData<int> moved(std::move(original));
 
-    // Check that 'moved' has the data
-    // (In a real test we'd check shape/stride/data via friend access)
-    SUCCEED();
+    EXPECT_EQ(moved.getShape().getTotalSize(), 3);
+    EXPECT_EQ(moved.getData().get(), originalPtr);
+    EXPECT_EQ(original.getData().get(), nullptr);
+    EXPECT_EQ(original.getShape().getDims().size(), 0);
 }
 
 TEST_F(TensorDataTest, MoveAssignment) {
-    TensorData<int> original({1, 2, 3});
+    TensorData<int> original(hahaha::math::NestedData<int>{1, 2, 3});
+    void* originalPtr = original.getData().get();
     TensorData<int> moved;
+    
     moved = std::move(original);
 
-    SUCCEED();
+    EXPECT_EQ(moved.getShape().getTotalSize(), 3);
+    EXPECT_EQ(moved.getData().get(), originalPtr);
+    EXPECT_EQ(original.getData().get(), nullptr);
+}
+
+TEST_F(TensorDataTest, SettersAndGetters) {
+    TensorData<int> td;
+    auto data = std::make_unique<int[]>(4);
+    data[0] = 10;
+    
+    td.setData(std::move(data));
+    td.setShape(hahaha::math::TensorShape({2, 2}));
+    td.setStride(hahaha::math::TensorStride(hahaha::math::TensorShape({2, 2})));
+
+    EXPECT_EQ(td.getData()[0], 10);
+    EXPECT_EQ(td.getShape().getTotalSize(), 4);
+    EXPECT_EQ(td.getStride()[0], 2);
 }
