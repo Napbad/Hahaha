@@ -34,7 +34,7 @@ class TensorWrapperTest;
 
 namespace hahaha::compute {
 template <typename T> class ComputeNode;
-}
+} // namespace hahaha::compute
 
 namespace hahaha::math {
 

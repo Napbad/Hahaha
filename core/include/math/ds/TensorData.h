@@ -21,11 +21,9 @@
 
 #include <memory>
 
-#include "common/definitions.h"
 #include "math/ds/NestedData.h"
 #include "math/ds/TensorShape.h"
 #include "math/ds/TensorStride.h"
-#include "utils/common/HelperStruct.h"
 
 namespace hahaha::math {
 

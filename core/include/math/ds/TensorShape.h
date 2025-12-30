@@ -66,7 +66,7 @@ class TensorShape {
      * @brief Construct from an initializer list of dimensions.
      * @param dims List of dimension sizes (e.g., {2, 3, 4}).
      */
-    explicit TensorShape(const std::initializer_list<size_t> dims) : dims_(dims) {}
+    TensorShape(const std::initializer_list<size_t> dims) : dims_(dims) {}
 
     /**
      * @brief Construct from a vector of dimensions.
