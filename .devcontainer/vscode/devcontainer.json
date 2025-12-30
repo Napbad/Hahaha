@@ -18,7 +18,7 @@
     ],
     "workspaceFolder": "/workspace",
     "remoteUser": "root",
-    "postCreateCommand": "mkdir -p /workspace/extern/externlibs && git clone --depth 1 https://github.com/ocornut/imgui.git /workspace/extern/externlibs/imgui",
+    "postCreateCommand": "/workspace/dev/post_build.sh",
     "customizations": {
       "vscode": {
         "extensions": [
