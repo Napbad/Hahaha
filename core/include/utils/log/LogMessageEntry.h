@@ -40,7 +40,8 @@ struct LogMessageEntry {
     /**
      * @brief Default constructor. Defaults to INFO level.
      */
-    LogMessageEntry() : level_(LogLevel::INFO) {}
+    LogMessageEntry() : level_(LogLevel::INFO) {
+    }
 
     /**
      * @brief Construct with level and message.
@@ -48,7 +49,8 @@ struct LogMessageEntry {
      * @param message Content of the message.
      */
     LogMessageEntry(LogLevel level, std::string message)
-        : message_(std::move(message)), level_(level) {}
+        : message_(std::move(message)), level_(level) {
+    }
 
     /**
      * @brief Format the entry as a colored string for console output.
@@ -62,25 +64,33 @@ struct LogMessageEntry {
      * @brief Get the raw message string.
      * @return std::string& Reference to the message.
      */
-    [[nodiscard]] std::string& getMessage() { return message_; }
+    [[nodiscard]] std::string& getMessage() {
+        return message_;
+    }
 
     /**
      * @brief Set the message content.
      * @param message New message string.
      */
-    void setMessage(std::string message) { message_ = std::move(message); }
+    void setMessage(std::string message) {
+        message_ = std::move(message);
+    }
 
     /**
      * @brief Get the severity level.
      * @return LogLevel The level of this entry.
      */
-    [[nodiscard]] LogLevel getLevel() const { return level_; }
+    [[nodiscard]] LogLevel getLevel() const {
+        return level_;
+    }
 
     /**
      * @brief Set the severity level.
      * @param level New log level.
      */
-    void setLevel(LogLevel level) { level_ = level; }
+    void setLevel(LogLevel level) {
+        level_ = level;
+    }
 
   private:
     std::string message_; /**< Log message content. */

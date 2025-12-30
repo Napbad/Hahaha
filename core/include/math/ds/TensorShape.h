@@ -60,19 +60,22 @@ class TensorShape {
      * @brief Move-construct a TensorShape.
      * @param other Source to move from.
      */
-    TensorShape(TensorShape&& other) noexcept : dims_(std::move(other.dims_)) {}
+    TensorShape(TensorShape&& other) noexcept : dims_(std::move(other.dims_)) {
+    }
 
     /**
      * @brief Construct from an initializer list of dimensions.
      * @param dims List of dimension sizes (e.g., {2, 3, 4}).
      */
-    TensorShape(const std::initializer_list<size_t> dims) : dims_(dims) {}
+    TensorShape(const std::initializer_list<size_t> dims) : dims_(dims) {
+    }
 
     /**
      * @brief Construct from a vector of dimensions.
      * @param dims Vector of dimension sizes.
      */
-    explicit TensorShape(const std::vector<size_t>& dims) : dims_(dims) {}
+    explicit TensorShape(const std::vector<size_t>& dims) : dims_(dims) {
+    }
 
     /** @brief Copy assignment operator. */
     TensorShape& operator=(const TensorShape&) = default;
@@ -84,7 +87,9 @@ class TensorShape {
      * @brief Get the dimensions vector.
      * @return const std::vector<size_t>& dimensions.
      */
-    [[nodiscard]] const std::vector<size_t>& getDims() const { return dims_; }
+    [[nodiscard]] const std::vector<size_t>& getDims() const {
+        return dims_;
+    }
 
     /**
      * @brief Compute the total number of elements for this shape.
@@ -104,7 +109,9 @@ class TensorShape {
     }
 
     /** @brief Reverse the dimensions (e.g., for converting layout). */
-    void reverse() { std::reverse(dims_.begin(), dims_.end()); }
+    void reverse() {
+        std::reverse(dims_.begin(), dims_.end());
+    }
 
     /**
      * @brief Return a string representation of the shape.
@@ -135,7 +142,7 @@ class TensorShape {
 
   private:
     std::vector<size_t> dims_; /**< Vector of dimension sizes. */
-    
+
     // Friend class for testing
     friend class ::TensorShapeTest;
 };

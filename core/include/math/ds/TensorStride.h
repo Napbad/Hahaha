@@ -67,13 +67,16 @@ class TensorStride {
      * @param shape The source shape to compute strides for.
      */
     explicit TensorStride(const TensorShape& shape)
-        : TensorStride(shape.getDims()) {}
+        : TensorStride(shape.getDims()) {
+    }
 
     /**
      * @brief Get the strides vector.
      * @return const std::vector<size_t>& strides.
      */
-    [[nodiscard]] const std::vector<size_t>& getDims() const { return strides_; }
+    [[nodiscard]] const std::vector<size_t>& getDims() const {
+        return strides_;
+    }
 
     /**
      * @brief Access stride by dimension index.
@@ -88,7 +91,9 @@ class TensorStride {
      * @brief Return the number of dimensions.
      * @return size_t dimension count.
      */
-    [[nodiscard]] size_t getSize() const { return strides_.size(); }
+    [[nodiscard]] size_t getSize() const {
+        return strides_.size();
+    }
 
     /**
      * @brief Return a string representation of the strides.
@@ -112,14 +117,18 @@ class TensorStride {
     /**
      * @brief Reverse the order of strides (e.g., for switching layout).
      */
-    void reverse() { std::reverse(strides_.begin(), strides_.end()); }
+    void reverse() {
+        std::reverse(strides_.begin(), strides_.end());
+    }
 
     /**
      * @brief Access stride by dimension index.
      * @param index Dimension index.
      * @return size_t The stride value at that dimension.
      */
-    size_t operator[](size_t index) { return strides_[index]; }
+    size_t operator[](size_t index) {
+        return strides_[index];
+    }
 
     /**
      * @brief Access stride with bounds checking.

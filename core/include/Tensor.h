@@ -54,7 +54,8 @@ template <typename T> class Tensor {
     // NOLINTNEXTLINE
     Tensor(const math::TensorWrapper<T>& data)
         : computeNode_(std::make_shared<compute::ComputeNode<T>>(
-              std::make_shared<math::TensorWrapper<T>>(data))) {}
+              std::make_shared<math::TensorWrapper<T>>(data))) {
+    }
 
     /**
      * @brief Construct a Tensor from a NestedData (flattened multi-dim list).
@@ -63,7 +64,8 @@ template <typename T> class Tensor {
     // NOLINTNEXTLINE
     Tensor(math::NestedData<T>&& data)
         : computeNode_(std::make_shared<compute::ComputeNode<T>>(
-              std::make_shared<math::TensorWrapper<T>>(std::move(data)))) {}
+              std::make_shared<math::TensorWrapper<T>>(std::move(data)))) {
+    }
 
     /**
      * @brief Construct a scalar Tensor.
@@ -73,7 +75,8 @@ template <typename T> class Tensor {
     Tensor(T val)
         : computeNode_(std::make_shared<compute::ComputeNode<T>>(
               std::make_shared<math::TensorWrapper<T>>(
-                  math::NestedData<T>(val)))) {}
+                  math::NestedData<T>(val)))) {
+    }
 
     /**
      * @brief Construct a Tensor from a shared pointer to TensorWrapper.
@@ -81,14 +84,16 @@ template <typename T> class Tensor {
      */
     // NOLINTNEXTLINE
     Tensor(std::shared_ptr<math::TensorWrapper<T>> dataPtr)
-        : computeNode_(std::make_shared<compute::ComputeNode<T>>(dataPtr)) {}
+        : computeNode_(std::make_shared<compute::ComputeNode<T>>(dataPtr)) {
+    }
 
     /**
      * @brief Internal constructor to wrap a ComputeNode.
      * @param computeNode The node in the computational graph.
      */
     explicit Tensor(std::shared_ptr<compute::ComputeNode<T>> computeNode)
-        : computeNode_(computeNode) {}
+        : computeNode_(computeNode) {
+    }
 
     /** @brief Addition operator. Builds an 'Add' node. */
     Tensor<T> operator+(const Tensor<T>& other) const {
@@ -121,7 +126,9 @@ template <typename T> class Tensor {
      * This will compute gradients for all ancestor tensors in the graph
      * that have 'requiresGrad' set to true.
      */
-    void backward() { computeNode_->backward(); }
+    void backward() {
+        computeNode_->backward();
+    }
 
     /**
      * @brief Get the managed gradient as a Tensor.
@@ -140,7 +147,9 @@ template <typename T> class Tensor {
     }
 
     /** @brief Set whether this tensor requires gradients. */
-    void setRequiresGrad(bool req) { computeNode_->setRequiresGrad(req); }
+    void setRequiresGrad(bool req) {
+        computeNode_->setRequiresGrad(req);
+    }
 
     /** @brief Check if gradients are required. */
     [[nodiscard]] bool getRequiresGrad() const {

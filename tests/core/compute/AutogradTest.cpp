@@ -16,16 +16,19 @@
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 //
 
-#include "Tensor.h"
 #include <gtest/gtest.h>
+
+#include "Tensor.h"
 
 using hahaha::Tensor;
 using hahaha::math::NestedData;
 
 class AutogradTest : public ::testing::Test {
   protected:
-    void SetUp() override {}
-    void TearDown() override {}
+    void SetUp() override {
+    }
+    void TearDown() override {
+    }
 };
 
 TEST_F(AutogradTest, SimpleAddition) {
@@ -173,7 +176,6 @@ TEST_F(AutogradTest, SimpleDivision) {
 
     ASSERT_NE(x.grad(), nullptr);
     ASSERT_NE(y.grad(), nullptr);
-    EXPECT_FLOAT_EQ(x.grad()->at({}), 0.5f);   // dz/dx = 1/y = 1/2 = 0.5
-    EXPECT_FLOAT_EQ(y.grad()->at({}), -2.5f);  // dz/dy = -x/(y^2) = -10/4 = -2.5
+    EXPECT_FLOAT_EQ(x.grad()->at({}), 0.5f);  // dz/dx = 1/y = 1/2 = 0.5
+    EXPECT_FLOAT_EQ(y.grad()->at({}), -2.5f); // dz/dy = -x/(y^2) = -10/4 = -2.5
 }
-

@@ -89,7 +89,7 @@ TEST_F(TensorDataTest, CopyConstructor) {
 TEST_F(TensorDataTest, MoveConstructor) {
     TensorData<int> original(hahaha::math::NestedData<int>{1, 2, 3});
     void* originalPtr = original.getData().get();
-    
+
     TensorData<int> moved(std::move(original));
 
     EXPECT_EQ(moved.getShape().getTotalSize(), 3);
@@ -102,7 +102,7 @@ TEST_F(TensorDataTest, MoveAssignment) {
     TensorData<int> original(hahaha::math::NestedData<int>{1, 2, 3});
     void* originalPtr = original.getData().get();
     TensorData<int> moved;
-    
+
     moved = std::move(original);
 
     EXPECT_EQ(moved.getShape().getTotalSize(), 3);
@@ -114,7 +114,7 @@ TEST_F(TensorDataTest, SettersAndGetters) {
     TensorData<int> td;
     auto data = std::make_unique<int[]>(4);
     data[0] = 10;
-    
+
     td.setData(std::move(data));
     td.setShape(hahaha::math::TensorShape({2, 2}));
     td.setStride(hahaha::math::TensorStride(hahaha::math::TensorShape({2, 2})));

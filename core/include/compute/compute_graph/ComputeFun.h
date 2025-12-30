@@ -37,8 +37,9 @@ namespace hahaha::compute {
  *   dL/dy = dL/dz * dz/dy = dL/dz * 1
  */
 template <typename T>
-std::shared_ptr<ComputeNode<T>> add(const std::shared_ptr<ComputeNode<T>>& lhs,
-                                    const std::shared_ptr<ComputeNode<T>>& rhs) {
+std::shared_ptr<ComputeNode<T>>
+add(const std::shared_ptr<ComputeNode<T>>& lhs,
+    const std::shared_ptr<ComputeNode<T>>& rhs) {
     auto resData = std::make_shared<math::TensorWrapper<T>>(
         lhs->getData()->add(*rhs->getData()));
 
@@ -74,8 +75,9 @@ std::shared_ptr<ComputeNode<T>> add(const std::shared_ptr<ComputeNode<T>>& lhs,
  *   dL/dy = dL/dz * dz/dy = dL/dz * (-1)
  */
 template <typename T>
-std::shared_ptr<ComputeNode<T>> sub(const std::shared_ptr<ComputeNode<T>>& lhs,
-                                    const std::shared_ptr<ComputeNode<T>>& rhs) {
+std::shared_ptr<ComputeNode<T>>
+sub(const std::shared_ptr<ComputeNode<T>>& lhs,
+    const std::shared_ptr<ComputeNode<T>>& rhs) {
     auto resData = std::make_shared<math::TensorWrapper<T>>(
         lhs->getData()->subtract(*rhs->getData()));
 
@@ -114,8 +116,9 @@ std::shared_ptr<ComputeNode<T>> sub(const std::shared_ptr<ComputeNode<T>>& lhs,
  *   dL/dy = dL/dz * dz/dy = dL/dz * x
  */
 template <typename T>
-std::shared_ptr<ComputeNode<T>> mul(const std::shared_ptr<ComputeNode<T>>& lhs,
-                                    const std::shared_ptr<ComputeNode<T>>& rhs) {
+std::shared_ptr<ComputeNode<T>>
+mul(const std::shared_ptr<ComputeNode<T>>& lhs,
+    const std::shared_ptr<ComputeNode<T>>& rhs) {
     auto resData = std::make_shared<math::TensorWrapper<T>>(
         lhs->getData()->multiply(*rhs->getData()));
 
@@ -157,8 +160,9 @@ std::shared_ptr<ComputeNode<T>> mul(const std::shared_ptr<ComputeNode<T>>& lhs,
  *   dL/dy = dL/dz * dz/dy = dL/dz * (-x / y^2)
  */
 template <typename T>
-std::shared_ptr<ComputeNode<T>> div(const std::shared_ptr<ComputeNode<T>>& lhs,
-                                    const std::shared_ptr<ComputeNode<T>>& rhs) {
+std::shared_ptr<ComputeNode<T>>
+div(const std::shared_ptr<ComputeNode<T>>& lhs,
+    const std::shared_ptr<ComputeNode<T>>& rhs) {
     auto resData = std::make_shared<math::TensorWrapper<T>>(
         lhs->getData()->divide(*rhs->getData()));
 
@@ -206,8 +210,9 @@ std::shared_ptr<ComputeNode<T>> div(const std::shared_ptr<ComputeNode<T>>& lhs,
  *   dL/dY = X^T @ dL/dZ
  */
 template <typename T>
-std::shared_ptr<ComputeNode<T>> matmul(const std::shared_ptr<ComputeNode<T>>& lhs,
-                                       const std::shared_ptr<ComputeNode<T>>& rhs) {
+std::shared_ptr<ComputeNode<T>>
+matmul(const std::shared_ptr<ComputeNode<T>>& lhs,
+       const std::shared_ptr<ComputeNode<T>>& rhs) {
     auto resData = std::make_shared<math::TensorWrapper<T>>(
         lhs->getData()->matmul(*rhs->getData()));
 

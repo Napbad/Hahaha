@@ -16,15 +16,17 @@
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 //
 
-#include "math/TensorWrapper.h"
-
-#include <gtest/gtest.h>
 #include <cstdlib>
+#include <gtest/gtest.h>
+
+#include "math/TensorWrapper.h"
 
 class TensorTest : public ::testing::Test {
   protected:
-    void SetUp() override {}
-    void TearDown() override {}
+    void SetUp() override {
+    }
+    void TearDown() override {
+    }
 };
 
 using hahaha::math::TensorWrapper;
@@ -58,7 +60,8 @@ TEST_F(TensorTest, SingleValueTensor) {
 }
 
 TEST_F(TensorTest, HigherDimensionalTensor) {
-    TensorWrapper<int> tensor_3d(NestedData<int>{{{1, 2}, {3, 4}}, {{5, 6}, {7, 8}}});
+    TensorWrapper<int> tensor_3d(
+        NestedData<int>{{{1, 2}, {3, 4}}, {{5, 6}, {7, 8}}});
     EXPECT_EQ(tensor_3d.getShape().getTotalSize(), 8);
     EXPECT_EQ(tensor_3d.getShape().getDims().size(), 3);
     EXPECT_EQ(tensor_3d.getShape().getDims()[0], 2);
@@ -87,7 +90,7 @@ TEST_F(TensorTest, ElementAccess) {
 TEST_F(TensorTest, ArithmeticEdgeCases) {
     TensorWrapper<float> tensor_a(NestedData<float>{{1.0f, 2.0f}});
     TensorWrapper<float> tensor_b(NestedData<float>{{1.0f, 2.0f, 3.0f}});
-    
+
     // Shape mismatch
     EXPECT_THROW(tensor_a + tensor_b, std::invalid_argument);
     EXPECT_THROW(tensor_a - tensor_b, std::invalid_argument);
@@ -103,7 +106,7 @@ TEST_F(TensorTest, ArithmeticEdgeCases) {
 TEST_F(TensorTest, OperatorInPlaceAddition) {
     TensorWrapper<int> tensor1(NestedData<int>{{1, 2}, {3, 4}});
     TensorWrapper<int> tensor2(NestedData<int>{{5, 6}, {7, 8}});
-    
+
     tensor1 += tensor2;
     EXPECT_EQ(tensor1.at({0, 0}), 6);
     EXPECT_EQ(tensor1.at({1, 1}), 12);
@@ -114,22 +117,24 @@ TEST_F(TensorTest, OperatorInPlaceAddition) {
 
 TEST_F(TensorTest, ReshapeEdgeCases) {
     TensorWrapper<int> tensor_reshape(NestedData<int>{1, 2, 3, 4});
-    
+
     // Size mismatch
     EXPECT_THROW(tensor_reshape.reshape({3}), std::invalid_argument);
     EXPECT_THROW(tensor_reshape.reshape({2, 3}), std::invalid_argument);
 }
 
 TEST_F(TensorTest, MatmulEdgeCases) {
-    TensorWrapper<float> matrix_a(NestedData<float>{{1.0f, 2.0f}, {3.0f, 4.0f}}); // 2x2
-    TensorWrapper<float> matrix_b(NestedData<float>{{1.0f, 2.0f, 3.0f}});        // 1x3
-    
+    TensorWrapper<float> matrix_a(
+        NestedData<float>{{1.0f, 2.0f}, {3.0f, 4.0f}});                   // 2x2
+    TensorWrapper<float> matrix_b(NestedData<float>{{1.0f, 2.0f, 3.0f}}); // 1x3
+
     // Dimension mismatch (1D vs 2D)
     TensorWrapper<float> tensor_c(NestedData<float>{1.0f, 2.0f});
     EXPECT_THROW(matrix_a.matmul(tensor_c), std::invalid_argument);
-    
+
     // Inner dimension mismatch
-    TensorWrapper<float> matrix_d(NestedData<float>{{1.0f, 2.0f}, {3.0f, 4.0f}, {5.0f, 6.0f}}); // 3x2
+    TensorWrapper<float> matrix_d(
+        NestedData<float>{{1.0f, 2.0f}, {3.0f, 4.0f}, {5.0f, 6.0f}}); // 3x2
     EXPECT_THROW(matrix_a.matmul(matrix_d), std::invalid_argument);
 }
 
@@ -176,8 +181,10 @@ TEST_F(TensorTest, Reshape) {
 }
 
 TEST_F(TensorTest, MatrixMultiplication) {
-    TensorWrapper<float> matrix_a(NestedData<float>{{1.0f, 2.0f}, {3.0f, 4.0f}}); // 2x2
-    TensorWrapper<float> matrix_b(NestedData<float>{{5.0f, 6.0f}, {7.0f, 8.0f}}); // 2x2
+    TensorWrapper<float> matrix_a(
+        NestedData<float>{{1.0f, 2.0f}, {3.0f, 4.0f}}); // 2x2
+    TensorWrapper<float> matrix_b(
+        NestedData<float>{{5.0f, 6.0f}, {7.0f, 8.0f}}); // 2x2
 
     auto matrix_c = matrix_a.matmul(matrix_b);
     EXPECT_EQ(matrix_c.at({0, 0}), 19.0f);
@@ -187,8 +194,9 @@ TEST_F(TensorTest, MatrixMultiplication) {
 }
 
 TEST_F(TensorTest, Transpose) {
-    TensorWrapper<int> tensor_orig(NestedData<int>{{1, 2, 3}, {4, 5, 6}}); // 2x3
-    auto tensor_transposed = tensor_orig.transpose();                      // 3x2
+    TensorWrapper<int> tensor_orig(
+        NestedData<int>{{1, 2, 3}, {4, 5, 6}});       // 2x3
+    auto tensor_transposed = tensor_orig.transpose(); // 3x2
 
     EXPECT_EQ(tensor_transposed.getShape().getDims()[0], 3);
     EXPECT_EQ(tensor_transposed.getShape().getDims()[1], 2);
@@ -196,4 +204,3 @@ TEST_F(TensorTest, Transpose) {
     EXPECT_EQ(tensor_transposed.at({0, 1}), 4);
     EXPECT_EQ(tensor_transposed.at({2, 1}), 6);
 }
-

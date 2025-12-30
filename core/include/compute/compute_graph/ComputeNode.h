@@ -61,7 +61,8 @@ template <typename T> class ComputeNode {
      * @param data The tensor data managed by this node.
      */
     explicit ComputeNode(std::shared_ptr<math::TensorWrapper<T>> data)
-        : data_(data) {}
+        : data_(data) {
+    }
 
     /**
      * @brief Construct a node as a result of an operation.
@@ -74,14 +75,17 @@ template <typename T> class ComputeNode {
     ComputeNode(std::shared_ptr<ComputeNode<T>> lhs,
                 std::shared_ptr<ComputeNode<T>> rhs,
                 std::shared_ptr<math::TensorWrapper<T>> res,
-                Operator operatorType, std::function<void()> gradFun)
-        : data_(res), operatorType_(operatorType), gradFun_(std::move(gradFun)) {
+                Operator operatorType,
+                std::function<void()> gradFun)
+        : data_(res), operatorType_(operatorType),
+          gradFun_(std::move(gradFun)) {
         if (operatorType_ == Operator::None) {
             throw std::invalid_argument("Operator cannot be None");
         }
         parents_.push_back(lhs);
         parents_.push_back(rhs);
-        // Automatically determine if this node requires gradients based on parents
+        // Automatically determine if this node requires gradients based on
+        // parents
         this->requiresGrad_ =
             lhs->requiresGrad_ || rhs->requiresGrad_ || this->requiresGrad_;
     }
@@ -98,8 +102,8 @@ template <typename T> class ComputeNode {
     void accumulateGrad(std::shared_ptr<math::TensorWrapper<T>> grad) {
         if (this->grad_) {
             // grad_total = grad_total + incoming_grad
-            this->grad_ =
-                std::make_shared<math::TensorWrapper<T>>(this->grad_->add(*grad));
+            this->grad_ = std::make_shared<math::TensorWrapper<T>>(
+                this->grad_->add(*grad));
         } else {
             // First gradient received, clone it to avoid side effects
             this->grad_ = std::make_shared<math::TensorWrapper<T>>(*grad);
@@ -118,7 +122,9 @@ template <typename T> class ComputeNode {
      * @brief Get the managed tensor data.
      * @return shared_ptr to the data.
      */
-    std::shared_ptr<math::TensorWrapper<T>> getData() { return this->data_; }
+    std::shared_ptr<math::TensorWrapper<T>> getData() {
+        return this->data_;
+    }
 
     /**
      * @brief Set the gradient tensor for this node.
@@ -132,28 +138,38 @@ template <typename T> class ComputeNode {
      * @brief Get the current gradient tensor.
      * @return shared_ptr to the gradient.
      */
-    std::shared_ptr<math::TensorWrapper<T>> getGrad() { return this->grad_; }
+    std::shared_ptr<math::TensorWrapper<T>> getGrad() {
+        return this->grad_;
+    }
 
     /**
      * @brief Check if this node requires gradient calculation.
      * @return true if gradients are needed.
      */
-    [[nodiscard]] bool getRequiresGrad() const { return requiresGrad_; }
+    [[nodiscard]] bool getRequiresGrad() const {
+        return requiresGrad_;
+    }
 
     /**
      * @brief Set whether this node requires gradients.
      * @param req Boolean flag.
      */
-    void setRequiresGrad(bool req) { this->requiresGrad_ = req; }
+    void setRequiresGrad(bool req) {
+        this->requiresGrad_ = req;
+    }
 
     /**
      * @brief Set the gradient function for backpropagation.
      * @param gradFun The function to compute gradients.
      */
-    void setGradFun(std::function<void()> gradFun) { gradFun_ = std::move(gradFun); }
+    void setGradFun(std::function<void()> gradFun) {
+        gradFun_ = std::move(gradFun);
+    }
 
     /** @brief Get the gradient function. */
-    std::function<void()> getGradFun() { return gradFun_; }
+    std::function<void()> getGradFun() {
+        return gradFun_;
+    }
 
     /**
      * @brief Triggers the backward pass starting from this node.
@@ -168,7 +184,8 @@ template <typename T> class ComputeNode {
         }
         // If it's the root of the backward pass (Loss), initialize dL/dz = 1
         if (!grad_) {
-            grad_ = std::make_shared<math::TensorWrapper<T>>(data_->getShape(), 1);
+            grad_ =
+                std::make_shared<math::TensorWrapper<T>>(data_->getShape(), 1);
         }
         // Call the operator-specific gradient function
         if (gradFun_) {
@@ -181,8 +198,8 @@ template <typename T> class ComputeNode {
     std::shared_ptr<math::TensorWrapper<T>> data_;         /**< Forward data. */
     Operator operatorType_ = Operator::None; /**< Operation used. */
 
-    bool requiresGrad_ = false;          /**< Grad requirement flag. */
-    std::function<void()> gradFun_;      /**< Backprop logic. */
+    bool requiresGrad_ = false;     /**< Grad requirement flag. */
+    std::function<void()> gradFun_; /**< Backprop logic. */
     std::shared_ptr<math::TensorWrapper<T>> grad_; /**< Accumulated grad. */
 
     friend class hahaha::Tensor<T>;

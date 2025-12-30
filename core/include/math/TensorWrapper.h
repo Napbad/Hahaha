@@ -61,20 +61,23 @@ template <typename T> class TensorWrapper {
      * @param initValue The initial value for all elements.
      */
     explicit TensorWrapper(const TensorShape& shape, T initValue = 0)
-        : data_(TensorData<T>(shape, initValue)) {}
+        : data_(TensorData<T>(shape, initValue)) {
+    }
 
     /**
      * @brief Copy constructor. Performs a deep copy of the data.
      * @param other The tensor to copy from.
      */
-    TensorWrapper(const TensorWrapper& other) : data_(other.data_) {}
+    TensorWrapper(const TensorWrapper& other) : data_(other.data_) {
+    }
 
     /**
      * @brief Move constructor. Transfers ownership of the data.
      * @param other The source tensor to move from.
      */
     TensorWrapper(TensorWrapper&& other) noexcept
-        : data_(std::move(other.data_)) {}
+        : data_(std::move(other.data_)) {
+    }
 
     /**
      * @brief Copy assignment is deleted to encourage explicit copying.
@@ -102,19 +105,24 @@ template <typename T> class TensorWrapper {
      * @brief Construct from NestedData (e.g., nested initializer list).
      * @param data The source nested data.
      */
-    explicit TensorWrapper(NestedData<T>&& data) : data_(std::move(data)) {}
+    explicit TensorWrapper(NestedData<T>&& data) : data_(std::move(data)) {
+    }
 
     /**
      * @brief Get a reference to the raw data pointer.
      * @return Reference to the unique_ptr holding the data array.
      */
-    std::unique_ptr<T[]>& getRawData() { return data_.getData(); }
+    std::unique_ptr<T[]>& getRawData() {
+        return data_.getData();
+    }
 
     /**
      * @brief Get the tensor's shape.
      * @return const TensorShape& reference to internal shape.
      */
-    [[nodiscard]] const TensorShape& getShape() const { return data_.getShape(); }
+    [[nodiscard]] const TensorShape& getShape() const {
+        return data_.getShape();
+    }
 
     /**
      * @brief Get the tensor's strides.
@@ -136,10 +144,10 @@ template <typename T> class TensorWrapper {
     T& at(const std::initializer_list<size_t>& indices) {
         const auto& shapeDims = data_.getShape().getDims();
         if (indices.size() != shapeDims.size()) {
-            throw std::out_of_range("Dimension mismatch: expected " +
-                                    std::to_string(shapeDims.size()) +
-                                    " indices, got " +
-                                    std::to_string(indices.size()));
+            throw std::out_of_range("Dimension mismatch: expected "
+                                    + std::to_string(shapeDims.size())
+                                    + " indices, got "
+                                    + std::to_string(indices.size()));
         }
 
         size_t linearIdx = 0;
@@ -149,8 +157,8 @@ template <typename T> class TensorWrapper {
         for (size_t i = 0; i < shapeDims.size(); ++i) {
             size_t dimIdx = *idxIt;
             if (dimIdx >= shapeDims[i]) {
-                throw std::out_of_range("Index out of bounds at dimension " +
-                                        std::to_string(i));
+                throw std::out_of_range("Index out of bounds at dimension "
+                                        + std::to_string(i));
             }
             linearIdx += dimIdx * strideDims[i];
             std::advance(idxIt, 1);
@@ -193,12 +201,13 @@ template <typename T> class TensorWrapper {
      * @return TensorWrapper<T> A new tensor with reshaped dimensions.
      */
     TensorWrapper<T> reshape(const std::vector<size_t>& newShape) const {
-        size_t totalSize = std::accumulate(newShape.begin(), newShape.end(),
-                                           1ULL, std::multiplies<size_t>());
+        size_t totalSize = std::accumulate(
+            newShape.begin(), newShape.end(), 1ULL, std::multiplies<size_t>());
         if (totalSize != getSize()) {
-            throw std::invalid_argument(
-                "New shape total size (" + std::to_string(totalSize) +
-                ") must match current size (" + std::to_string(getSize()) + ")");
+            throw std::invalid_argument("New shape total size ("
+                                        + std::to_string(totalSize)
+                                        + ") must match current size ("
+                                        + std::to_string(getSize()) + ")");
         }
 
         TensorWrapper<T> result;
@@ -207,7 +216,8 @@ template <typename T> class TensorWrapper {
 
         size_t currentSize = getSize();
         result.data_.setData(std::make_unique<T[]>(currentSize));
-        std::copy(data_.getData().get(), data_.getData().get() + currentSize,
+        std::copy(data_.getData().get(),
+                  data_.getData().get() + currentSize,
                   result.data_.getData().get());
 
         return result;
@@ -339,8 +349,8 @@ template <typename T> class TensorWrapper {
 
         for (size_t i = 0; i < tensorSize; ++i) {
             if (other.data_.getData()[i] == T(0)) {
-                throw std::runtime_error("Division by zero at index " +
-                                         std::to_string(i));
+                throw std::runtime_error("Division by zero at index "
+                                         + std::to_string(i));
             }
             result.data_.getData()[i] =
                 data_.getData()[i] / other.data_.getData()[i];
@@ -369,10 +379,11 @@ template <typename T> class TensorWrapper {
 
         if (thisDims[1] != otherDims[0]) {
             throw std::invalid_argument(
-                "Matrix dimensions mismatch for matmul: (" +
-                std::to_string(thisDims[0]) + "x" + std::to_string(thisDims[1]) +
-                ") and (" + std::to_string(otherDims[0]) + "x" +
-                std::to_string(otherDims[1]) + ")");
+                "Matrix dimensions mismatch for matmul: ("
+                + std::to_string(thisDims[0]) + "x"
+                + std::to_string(thisDims[1]) + ") and ("
+                + std::to_string(otherDims[0]) + "x"
+                + std::to_string(otherDims[1]) + ")");
         }
 
         size_t rows = thisDims[0];
@@ -388,8 +399,8 @@ template <typename T> class TensorWrapper {
             for (size_t j = 0; j < cols; ++j) {
                 T sum = T(0);
                 for (size_t k = 0; k < inner; ++k) {
-                    sum += data_.getData()[i * inner + k] *
-                           other.data_.getData()[k * cols + j];
+                    sum += data_.getData()[i * inner + k]
+                        * other.data_.getData()[k * cols + j];
                 }
                 result.data_.getData()[i * cols + j] = sum;
             }

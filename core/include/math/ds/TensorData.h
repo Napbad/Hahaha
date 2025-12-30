@@ -77,7 +77,8 @@ template <typename T> class TensorData {
      */
     TensorData(TensorData&& other) noexcept
         : data_(std::move(other.data_)), shape_(std::move(other.shape_)),
-          stride_(std::move(other.stride_)) {}
+          stride_(std::move(other.stride_)) {
+    }
 
     /**
      * @brief Copy assignment is deleted. Use constructor for copying.
@@ -111,8 +112,8 @@ template <typename T> class TensorData {
     explicit TensorData(NestedData<T>&& data) : shape_(data.getShape()) {
         size_t size = data.getFlatData().size();
         data_ = std::make_unique<T[]>(size);
-        std::copy(data.getFlatData().begin(), data.getFlatData().end(),
-                  data_.get());
+        std::copy(
+            data.getFlatData().begin(), data.getFlatData().end(), data_.get());
         stride_ = TensorStride(shape_);
     }
 
@@ -120,43 +121,57 @@ template <typename T> class TensorData {
      * @brief Get the raw data pointer.
      * @return Reference to the unique_ptr holding the data.
      */
-    std::unique_ptr<T[]>& getData() { return data_; }
+    std::unique_ptr<T[]>& getData() {
+        return data_;
+    }
 
     /**
      * @brief Const version of data pointer access.
      * @return Const reference to the unique_ptr.
      */
-    const std::unique_ptr<T[]>& getData() const { return data_; }
+    const std::unique_ptr<T[]>& getData() const {
+        return data_;
+    }
 
     /**
      * @brief Replace the current data array.
      * @param data New data array as unique_ptr.
      */
-    void setData(std::unique_ptr<T[]> data) { data_ = std::move(data); }
+    void setData(std::unique_ptr<T[]> data) {
+        data_ = std::move(data);
+    }
 
     /**
      * @brief Get the tensor shape.
      * @return Const reference to the shape.
      */
-    [[nodiscard]] const TensorShape& getShape() const { return shape_; }
+    [[nodiscard]] const TensorShape& getShape() const {
+        return shape_;
+    }
 
     /**
      * @brief Update the tensor shape.
      * @param shape New shape.
      */
-    void setShape(const TensorShape& shape) { shape_ = shape; }
+    void setShape(const TensorShape& shape) {
+        shape_ = shape;
+    }
 
     /**
      * @brief Get the memory strides.
      * @return Const reference to the strides.
      */
-    [[nodiscard]] const TensorStride& getStride() const { return stride_; }
+    [[nodiscard]] const TensorStride& getStride() const {
+        return stride_;
+    }
 
     /**
      * @brief Update the memory strides.
      * @param stride New strides.
      */
-    void setStride(const TensorStride& stride) { stride_ = stride; }
+    void setStride(const TensorStride& stride) {
+        stride_ = stride;
+    }
 
   private:
     std::unique_ptr<T[]> data_; /**< Raw heap-allocated data array. */
