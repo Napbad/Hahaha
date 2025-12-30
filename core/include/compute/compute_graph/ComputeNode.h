@@ -21,7 +21,6 @@
 
 #include <functional>
 #include <memory>
-#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -76,7 +75,7 @@ template <typename T> class ComputeNode {
                 std::shared_ptr<ComputeNode<T>> rhs,
                 std::shared_ptr<math::TensorWrapper<T>> res,
                 Operator operatorType, std::function<void()> gradFun)
-        : data_(res), operatorType_(operatorType), gradFun_(gradFun) {
+        : data_(res), operatorType_(operatorType), gradFun_(std::move(gradFun)) {
         if (operatorType_ == Operator::None) {
             throw std::invalid_argument("Operator cannot be None");
         }
@@ -145,6 +144,8 @@ template <typename T> class ComputeNode {
      * @brief Set whether this node requires gradients.
      * @param req Boolean flag.
      */
+    void setRequiresGrad(bool req) { this->requiresGrad_ = req; }
+
     /**
      * @brief Set the gradient function for backpropagation.
      * @param gradFun The function to compute gradients.

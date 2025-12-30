@@ -20,7 +20,6 @@
 #define HAHAHA_TENSOR_H
 
 #include <memory>
-#include <type_traits>
 
 #include "compute/compute_graph/ComputeFun.h"
 #include "math/ds/TensorData.h"
@@ -58,6 +57,25 @@ template <typename T> class Tensor {
               std::make_shared<math::TensorWrapper<T>>(data))) {}
 
     /**
+     * @brief Construct a Tensor from a NestedData (flattened multi-dim list).
+     * @param data The source nested data.
+     */
+    // NOLINTNEXTLINE
+    Tensor(math::NestedData<T>&& data)
+        : computeNode_(std::make_shared<compute::ComputeNode<T>>(
+              std::make_shared<math::TensorWrapper<T>>(std::move(data)))) {}
+
+    /**
+     * @brief Construct a scalar Tensor.
+     * @param val The scalar value.
+     */
+    // NOLINTNEXTLINE
+    Tensor(T val)
+        : computeNode_(std::make_shared<compute::ComputeNode<T>>(
+              std::make_shared<math::TensorWrapper<T>>(
+                  math::NestedData<T>(val)))) {}
+
+    /**
      * @brief Construct a Tensor from a shared pointer to TensorWrapper.
      * @param dataPtr pointer to the numerical data.
      */
@@ -92,6 +110,11 @@ template <typename T> class Tensor {
         return Tensor(compute::div(this->computeNode_, other.computeNode_));
     }
 
+    /** @brief Matrix multiplication. */
+    Tensor<T> matmul(const Tensor<T>& other) const {
+        return Tensor(compute::matmul(this->computeNode_, other.computeNode_));
+    }
+
     /**
      * @brief Triggers backpropagation from this tensor.
      *
@@ -99,6 +122,40 @@ template <typename T> class Tensor {
      * that have 'requiresGrad' set to true.
      */
     void backward() { computeNode_->backward(); }
+
+    /**
+     * @brief Get the managed gradient as a Tensor.
+     * @return Tensor containing the accumulated gradients.
+     */
+    [[nodiscard]] std::shared_ptr<Tensor<T>> grad() const {
+        if (computeNode_->getGrad()) {
+            return std::make_shared<Tensor<T>>(computeNode_->getGrad());
+        }
+        return nullptr;
+    }
+
+    /** @brief Get the underlying data wrapper. */
+    [[nodiscard]] std::shared_ptr<math::TensorWrapper<T>> data() const {
+        return computeNode_->getData();
+    }
+
+    /** @brief Set whether this tensor requires gradients. */
+    void setRequiresGrad(bool req) { computeNode_->setRequiresGrad(req); }
+
+    /** @brief Check if gradients are required. */
+    [[nodiscard]] bool getRequiresGrad() const {
+        return computeNode_->getRequiresGrad();
+    }
+
+    /** @brief Access element at specified indices (for testing). */
+    T& at(const std::initializer_list<size_t>& indices) {
+        return computeNode_->getData()->at(indices);
+    }
+
+    /** @brief Const access to element. */
+    const T& at(const std::initializer_list<size_t>& indices) const {
+        return computeNode_->getData()->at(indices);
+    }
 
     /**
      * @brief Get the underlying compute node.

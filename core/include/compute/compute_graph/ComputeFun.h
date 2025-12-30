@@ -37,8 +37,8 @@ namespace hahaha::compute {
  *   dL/dy = dL/dz * dz/dy = dL/dz * 1
  */
 template <typename T>
-std::shared_ptr<ComputeNode<T>> add(std::shared_ptr<ComputeNode<T>>& lhs,
-                                    std::shared_ptr<ComputeNode<T>>& rhs) {
+std::shared_ptr<ComputeNode<T>> add(const std::shared_ptr<ComputeNode<T>>& lhs,
+                                    const std::shared_ptr<ComputeNode<T>>& rhs) {
     auto resData = std::make_shared<math::TensorWrapper<T>>(
         lhs->getData()->add(*rhs->getData()));
 
@@ -74,8 +74,8 @@ std::shared_ptr<ComputeNode<T>> add(std::shared_ptr<ComputeNode<T>>& lhs,
  *   dL/dy = dL/dz * dz/dy = dL/dz * (-1)
  */
 template <typename T>
-std::shared_ptr<ComputeNode<T>> sub(std::shared_ptr<ComputeNode<T>>& lhs,
-                                    std::shared_ptr<ComputeNode<T>>& rhs) {
+std::shared_ptr<ComputeNode<T>> sub(const std::shared_ptr<ComputeNode<T>>& lhs,
+                                    const std::shared_ptr<ComputeNode<T>>& rhs) {
     auto resData = std::make_shared<math::TensorWrapper<T>>(
         lhs->getData()->subtract(*rhs->getData()));
 
@@ -114,8 +114,8 @@ std::shared_ptr<ComputeNode<T>> sub(std::shared_ptr<ComputeNode<T>>& lhs,
  *   dL/dy = dL/dz * dz/dy = dL/dz * x
  */
 template <typename T>
-std::shared_ptr<ComputeNode<T>> mul(std::shared_ptr<ComputeNode<T>>& lhs,
-                                    std::shared_ptr<ComputeNode<T>>& rhs) {
+std::shared_ptr<ComputeNode<T>> mul(const std::shared_ptr<ComputeNode<T>>& lhs,
+                                    const std::shared_ptr<ComputeNode<T>>& rhs) {
     auto resData = std::make_shared<math::TensorWrapper<T>>(
         lhs->getData()->multiply(*rhs->getData()));
 
@@ -129,16 +129,16 @@ std::shared_ptr<ComputeNode<T>> mul(std::shared_ptr<ComputeNode<T>>& lhs,
             auto gradPtr = res->getGrad();
             if (lhs->getRequiresGrad()) {
                 // dL/dx = grad_output * y
-                auto g = std::make_shared<math::TensorWrapper<T>>(
+                auto gradLhs = std::make_shared<math::TensorWrapper<T>>(
                     gradPtr->multiply(*rhs->getData()));
-                lhs->accumulateGrad(g);
+                lhs->accumulateGrad(gradLhs);
                 lhs->backward();
             }
             if (rhs->getRequiresGrad()) {
                 // dL/dy = grad_output * x
-                auto g = std::make_shared<math::TensorWrapper<T>>(
+                auto gradRhs = std::make_shared<math::TensorWrapper<T>>(
                     gradPtr->multiply(*lhs->getData()));
-                rhs->accumulateGrad(g);
+                rhs->accumulateGrad(gradRhs);
                 rhs->backward();
             }
         }
@@ -157,8 +157,8 @@ std::shared_ptr<ComputeNode<T>> mul(std::shared_ptr<ComputeNode<T>>& lhs,
  *   dL/dy = dL/dz * dz/dy = dL/dz * (-x / y^2)
  */
 template <typename T>
-std::shared_ptr<ComputeNode<T>> div(std::shared_ptr<ComputeNode<T>>& lhs,
-                                    std::shared_ptr<ComputeNode<T>>& rhs) {
+std::shared_ptr<ComputeNode<T>> div(const std::shared_ptr<ComputeNode<T>>& lhs,
+                                    const std::shared_ptr<ComputeNode<T>>& rhs) {
     auto resData = std::make_shared<math::TensorWrapper<T>>(
         lhs->getData()->divide(*rhs->getData()));
 
@@ -170,20 +170,20 @@ std::shared_ptr<ComputeNode<T>> div(std::shared_ptr<ComputeNode<T>>& lhs,
     auto gradFun = [lhs, rhs, weakRes]() {
         if (auto res = weakRes.lock()) {
             auto gradPtr = res->getGrad();
-            auto y = rhs->getData();
+            auto rhsData = rhs->getData();
 
             if (lhs->getRequiresGrad()) {
                 // dL/dx = grad_output / y
                 auto grad = std::make_shared<math::TensorWrapper<T>>(
-                    gradPtr->divide(*y));
+                    gradPtr->divide(*rhsData));
                 lhs->accumulateGrad(grad);
                 lhs->backward();
             }
             if (rhs->getRequiresGrad()) {
                 // dL/dy = grad_output * (-x / y^2)
-                auto x = lhs->getData();
-                auto y_sq = y->multiply(*y);
-                auto neg_x = -(*x);
+                auto lhsData = lhs->getData();
+                auto y_sq = rhsData->multiply(*rhsData);
+                auto neg_x = -(*lhsData);
                 auto local_grad = neg_x.divide(y_sq);
                 auto grad = std::make_shared<math::TensorWrapper<T>>(
                     gradPtr->multiply(local_grad));
@@ -206,8 +206,8 @@ std::shared_ptr<ComputeNode<T>> div(std::shared_ptr<ComputeNode<T>>& lhs,
  *   dL/dY = X^T @ dL/dZ
  */
 template <typename T>
-std::shared_ptr<ComputeNode<T>> matmul(std::shared_ptr<ComputeNode<T>>& lhs,
-                                       std::shared_ptr<ComputeNode<T>>& rhs) {
+std::shared_ptr<ComputeNode<T>> matmul(const std::shared_ptr<ComputeNode<T>>& lhs,
+                                       const std::shared_ptr<ComputeNode<T>>& rhs) {
     auto resData = std::make_shared<math::TensorWrapper<T>>(
         lhs->getData()->matmul(*rhs->getData()));
 
