@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      https://www.apache.org/licenses/LICENSE-2.0 
+//      https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,8 +22,7 @@
 #include <cstddef>
 #include <type_traits>
 
-namespace hahaha::compute::vectorize
-{
+namespace hahaha::compute::vectorize {
 
 /**
  * @brief Represents a fixed-size vector for SIMD operations.
@@ -33,10 +32,10 @@ namespace hahaha::compute::vectorize
  * @tparam T The numeric type of elements.
  * @tparam Width The number of elements in the SIMD vector.
  */
-template <typename T, size_t Width> class SimdVector
-{
+template <typename T, size_t Width> class SimdVector {
   public:
-    static_assert(std::is_arithmetic_v<T>, "SimdVector only supports arithmetic types.");
+    static_assert(std::is_arithmetic_v<T>,
+                  "SimdVector only supports arithmetic types.");
 
     SimdVector() = default;
 
@@ -76,4 +75,3 @@ template <typename T, size_t Width> class SimdVector
 } // namespace hahaha::compute::vectorize
 
 #endif // HAHAHA_COMPUTE_VECTORIZE_SIMD_VECTOR_H
-

@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      https://www.apache.org/licenses/LICENSE-2.0 
+//      https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,8 +22,7 @@
 #include <cstddef>
 #include <vector>
 
-namespace hahaha::compute::vectorize
-{
+namespace hahaha::compute::vectorize {
 
 /**
  * @brief Base class for vectorized operations on large data sets.
@@ -31,8 +30,7 @@ namespace hahaha::compute::vectorize
  * This class provides an interface for performing operations that leverage
  * SIMD instructions for performance.
  */
-class VectorizedOp
-{
+class VectorizedOp {
   public:
     VectorizedOp() = default;
     virtual ~VectorizedOp() = default;
@@ -43,11 +41,11 @@ class VectorizedOp
      * @param data_ptr Pointer to the data.
      * @param size Number of elements in the data.
      */
-    template <typename T>
-    void execute(T* data_ptr, size_t size);
+    template <typename T> void execute(T* data_ptr, size_t size);
 
     /**
-     * @brief Check if the operation can be vectorized for the current architecture.
+     * @brief Check if the operation can be vectorized for the current
+     * architecture.
      * @return bool True if vectorization is supported.
      */
     virtual bool isSupported() const = 0;
@@ -62,4 +60,3 @@ class VectorizedOp
 } // namespace hahaha::compute::vectorize
 
 #endif // HAHAHA_COMPUTE_VECTORIZE_VECTORIZED_OP_H
-

@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      https://www.apache.org/licenses/LICENSE-2.0 
+//      https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,8 +30,7 @@
 
 class TensorShapeTest;
 
-namespace hahaha::math
-{
+namespace hahaha::math {
 
 using hahaha::common::u32;
 using hahaha::utils::isInitList;
@@ -46,8 +45,7 @@ using hahaha::utils::isLegalDataType;
  * This class provides helpers to build shapes from initializer lists and
  * to compute the total number of elements.
  */
-class TensorShape
-{
+class TensorShape {
   public:
     TensorShape() = default;
     ~TensorShape() = default;
@@ -61,24 +59,21 @@ class TensorShape
      * @brief Move-construct a TensorShape
      * @param other Source to move from
      */
-    TensorShape(TensorShape&& other) noexcept : dims_(std::move(other.dims_))
-    {
+    TensorShape(TensorShape&& other) noexcept : dims_(std::move(other.dims_)) {
     }
 
     /**
      * @brief Construct from an initializer list of dimensions
      * @param dims List of dimension sizes (e.g. {2,3,4})
      */
-    TensorShape(const std::initializer_list<size_t> dims) : dims_(dims)
-    {
+    TensorShape(const std::initializer_list<size_t> dims) : dims_(dims) {
     }
 
     /**
      * @brief Construct from a vector of dimensions
      * @param dims Vector of dimension sizes
      */
-    explicit TensorShape(const std::vector<size_t>& dims) : dims_(dims)
-    {
+    explicit TensorShape(const std::vector<size_t>& dims) : dims_(dims) {
     }
     TensorShape& operator=(const TensorShape&) = default;
     TensorShape& operator=(TensorShape&& other) noexcept = default;
@@ -87,8 +82,7 @@ class TensorShape
      * @brief Return a copy of the dimensions vector
      * @return const std::vector<size_t>& dimensions
      */
-    [[nodiscard]] const std::vector<size_t>& dims() const
-    {
+    [[nodiscard]] const std::vector<size_t>& dims() const {
         return dims_;
     }
 
@@ -96,31 +90,25 @@ class TensorShape
      * @brief Compute total number of elements for the shape
      * @return u64 product of all dimensions (1 for empty shape)
      */
-    [[nodiscard]] hahaha::common::u64 totalSize() const
-    {
+    [[nodiscard]] hahaha::common::u64 totalSize() const {
         hahaha::common::u64 size = 1;
 #pragma unroll 5
-        for (const auto& dim : dims_)
-        {
+        for (const auto& dim : dims_) {
             size *= dim;
         }
         return size;
     }
 
-    void reverse()
-    {
+    void reverse() {
         std::reverse(dims_.begin(), dims_.end());
     }
 
-    [[nodiscard]] std::string toString() const
-    {
+    [[nodiscard]] std::string toString() const {
         std::string result = "(";
 #pragma unroll 5
-        for (size_t i = 0; i < dims_.size(); ++i)
-        {
+        for (size_t i = 0; i < dims_.size(); ++i) {
             result += std::to_string(dims_[i]);
-            if (i != dims_.size() - 1)
-            {
+            if (i != dims_.size() - 1) {
                 result += ", ";
             }
         }
@@ -128,16 +116,16 @@ class TensorShape
         return result;
     }
 
-    bool operator== (const TensorShape& other) const {
+    bool operator==(const TensorShape& other) const {
         return dims_ == other.dims_;
     }
-    bool operator!= (const TensorShape& other) const {
+    bool operator!=(const TensorShape& other) const {
         return !(*this == other);
     }
 
   private:
     std::vector<size_t> dims_;
-    
+
     // default name of the test fixture class to this class
     friend class ::TensorShapeTest;
 };

@@ -4,12 +4,10 @@
 
 #include <gtest/gtest.h>
 
-int main()
-{
+int main() {
     ::testing::InitGoogleTest();
     return RUN_ALL_TESTS();
 }
-
 
 // #include <initializer_list>
 // #include <iostream>
@@ -40,18 +38,20 @@ int main()
 //     std::cout << "} ";
 // }
 
-
 // // This version handles ANY nesting depth
 // template<typename T>
-// void printRecursive(const T& container) {  // Note: const T& instead of initializer_list directly
-//     if constexpr (requires { container.begin(); container.end(); }) {  // C++20: check if iterable
+// void printRecursive(const T& container) {  // Note: const T& instead of
+// initializer_list directly
+//     if constexpr (requires { container.begin(); container.end(); }) {  //
+//     C++20: check if iterable
 //         std::cout << "{ ";
 //         for (const auto& elem : container) {
 //             printRecursive(elem);
 //         }
 //         std::cout << "} ";
 //     } else {
-//         std::cout << container << ", ";  // fallback, but we rely on int overload
+//         std::cout << container << ", ";  // fallback, but we rely on int
+//         overload
 //     }
 // }
 

@@ -22,20 +22,20 @@
 #include <string_view>
 
 #include "utils/log/LogColor.h"
-namespace hahaha::utils
-{
+namespace hahaha::utils {
 
 /**
  * @brief Severity levels for log messages.
  */
-enum class LogLevel
-{
+enum class LogLevel {
     TRACE, /**< Fine-grained informational events. */
     DEBUG, /**< Detailed information useful for debugging. */
     INFO,  /**< General informational messages about progress. */
     WARN,  /**< Potentially harmful situations. */
-    ERROR, /**< Error events that might still allow the application to continue. */
-    FATAL  /**< Very severe error events that will presumably lead the application to abort. */
+    ERROR, /**< Error events that might still allow the application to continue.
+            */
+    FATAL  /**< Very severe error events that will presumably lead the
+              application to abort. */
 };
 
 /**
@@ -43,10 +43,8 @@ enum class LogLevel
  * @param level The log level.
  * @return std::string_view textual representation (e.g. "INFO ").
  */
-inline std::string_view toString(LogLevel level)
-{
-    switch (level)
-    {
+inline std::string_view toString(LogLevel level) {
+    switch (level) {
     case LogLevel::TRACE:
         return "TRACE";
     case LogLevel::DEBUG:
@@ -63,23 +61,21 @@ inline std::string_view toString(LogLevel level)
 }
 
 /** ANSI escape codes for colored log levels in console. */
-const std::string_view DefaultColoredDebug = "\033[0;36mDEBUG\033[0m";  // CYAN
-const std::string_view DefaultColoredInfo = "\033[0;32mINFO \033[0m";    // GREEN
-const std::string_view DefaultColoredWarn = "\033[0;33mWARN \033[0m";    // YELLOW
-const std::string_view DefaultColoredError = "\033[0;31mERROR\033[0m";  // RED
-const std::string_view DefaultColoredFatal = "\033[0;35mFATAL\033[0m";  // MAGENTA
-const std::string_view DefaultColoredTrace = "\033[0;34mTRACE\033[0m";  // BLUE
-
+const std::string_view DefaultColoredDebug = "\033[0;36mDEBUG\033[0m"; // CYAN
+const std::string_view DefaultColoredInfo = "\033[0;32mINFO \033[0m";  // GREEN
+const std::string_view DefaultColoredWarn = "\033[0;33mWARN \033[0m";  // YELLOW
+const std::string_view DefaultColoredError = "\033[0;31mERROR\033[0m"; // RED
+const std::string_view DefaultColoredFatal =
+    "\033[0;35mFATAL\033[0m"; // MAGENTA
+const std::string_view DefaultColoredTrace = "\033[0;34mTRACE\033[0m"; // BLUE
 
 /**
  * @brief Convert LogLevel to a colored string for console output.
  * @param level The log level.
  * @return std::string_view ANSI colored representation.
  */
-inline std::string_view toColoredString(LogLevel level)
-{
-    switch (level)
-    {
+inline std::string_view toColoredString(LogLevel level) {
+    switch (level) {
     case LogLevel::TRACE:
         return DefaultColoredTrace;
     case LogLevel::DEBUG:
@@ -94,7 +90,6 @@ inline std::string_view toColoredString(LogLevel level)
         return DefaultColoredFatal;
     }
 }
-
 
 } // namespace hahaha::utils
 

@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      https://www.apache.org/licenses/LICENSE-2.0 
+//      https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,8 +25,7 @@
 #include "utils/log/LogColor.h"
 #include "utils/log/LogLevel.h"
 
-namespace hahaha::utils
-{
+namespace hahaha::utils {
 constexpr LogColor DefaultColor = LogColor::BLACK;
 constexpr LogLevel DefaultLevel = LogLevel::INFO;
 constexpr std::string_view DefaultFile = "log.txt";
@@ -34,8 +33,7 @@ constexpr std::string_view DefaultFile = "log.txt";
 /**
  * @brief Configuration settings for the Logger.
  */
-class LoggerConfig
-{
+class LoggerConfig {
   public:
     /**
      * @brief Construct a LoggerConfig with basic settings.
@@ -46,8 +44,7 @@ class LoggerConfig
     explicit LoggerConfig(LogColor color = DefaultColor,
                           LogLevel level = DefaultLevel,
                           std::string_view file = DefaultFile)
-        : color_(color), level_(level), file_(file)
-    {
+        : color_(color), level_(level), file_(file) {
     }
 
     /**
@@ -60,15 +57,14 @@ class LoggerConfig
      * @param timeEnabled Enable timestamping.
      */
     LoggerConfig(LogColor color,
-                          LogLevel level,
-                          std::string file,
-                          bool writeToFile,
-                          bool writeToConsole,
-                          bool timeEnabled)
+                 LogLevel level,
+                 std::string file,
+                 bool writeToFile,
+                 bool writeToConsole,
+                 bool timeEnabled)
         : color_(color), level_(level), file_(std::move(file)),
           writeToFile_(writeToFile), writeToConsole_(writeToConsole),
-          timeEnabled_(timeEnabled)
-    {
+          timeEnabled_(timeEnabled) {
     }
 
     [[nodiscard]] LoggerConfig(const LoggerConfig&) = default;
@@ -78,49 +74,39 @@ class LoggerConfig
 
     ~LoggerConfig() = default;
 
-
-    [[nodiscard]] LogColor getColor() const
-    {
+    [[nodiscard]] LogColor getColor() const {
         return color_;
     }
 
-    [[nodiscard]] LogLevel getLevel() const
-    {
+    [[nodiscard]] LogLevel getLevel() const {
         return level_;
     }
 
-    [[nodiscard]] std::string_view getFile() const
-    {
+    [[nodiscard]] std::string_view getFile() const {
         return file_;
     }
 
-    [[nodiscard]] bool isWriteToFile() const
-    {
+    [[nodiscard]] bool isWriteToFile() const {
         return writeToFile_;
     }
 
-    [[nodiscard]] bool isWriteToConsole() const
-    {
+    [[nodiscard]] bool isWriteToConsole() const {
         return writeToConsole_;
     }
 
-    [[nodiscard]] bool isEnableTime() const
-    {
+    [[nodiscard]] bool isEnableTime() const {
         return timeEnabled_;
     }
 
-    void setColor(LogColor color)
-    {
+    void setColor(LogColor color) {
         color_ = color;
     }
 
-    void setLevel(LogLevel level)
-    {
+    void setLevel(LogLevel level) {
         level_ = level;
     }
 
-    void setFile(std::string_view file)
-    {
+    void setFile(std::string_view file) {
         file_ = file;
     }
 

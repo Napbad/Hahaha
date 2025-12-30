@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// https://www.apache.org/licenses/LICENSE-2.0
+//      https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,20 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-// Email: napbad.sen@gmail.com
-// GitHub: https://github.com/Napbad
-//
-//
-//
+// Contributors:
+// Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 //
 
-#ifndef HAHAHA_COMMON_RES_H
-#define HAHAHA_COMMON_RES_H
-#include <type_traits>
-#include <variant>
+#ifndef HAHAHA_COMMON_CONFIG_H
+#define HAHAHA_COMMON_CONFIG_H
 
-#include "common/definitions.h"
+namespace hahaha::common {
 
-namespace hahaha::common {}
+class Config {
+  public:
+    bool defaultRequiresGrad = true;
+};
 
-#endif // HAHAHA_COMMON_RES_H
+inline Config& getConfig() {
+    static Config config;
+    return config;
+}
+
+} // namespace hahaha::common
+
+#endif

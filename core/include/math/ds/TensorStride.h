@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      https://www.apache.org/licenses/LICENSE-2.0 
+//      https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,8 +26,7 @@
 #include "common/definitions.h"
 #include "math/ds/TensorShape.h"
 
-namespace hahaha::math
-{
+namespace hahaha::math {
 using hahaha::common::u32;
 
 /**
@@ -37,8 +36,7 @@ using hahaha::common::u32;
  * number of elements to skip to move to the next element in each dimension.
  * For a row-major tensor, the last dimension has a stride of 1.
  */
-class TensorStride
-{
+class TensorStride {
 
   public:
     /**
@@ -51,17 +49,14 @@ class TensorStride
      * @tparam T The numeric type of dimensions.
      * @param dims Vector of dimension sizes.
      */
-    template <typename T> explicit TensorStride(const std::vector<T>& dims)
-    {
+    template <typename T> explicit TensorStride(const std::vector<T>& dims) {
         strides_.resize(dims.size());
-        if (dims.empty())
-        {
+        if (dims.empty()) {
             return;
         }
         strides_[dims.size() - 1] = 1;
 #pragma unroll 5
-        for (size_t i = dims.size() - 1; i > 0; --i)
-        {
+        for (size_t i = dims.size() - 1; i > 0; --i) {
             strides_[i - 1] = strides_[i] * static_cast<size_t>(dims[i]);
         }
     }
@@ -70,16 +65,15 @@ class TensorStride
      * @brief Construct strides from a TensorShape.
      * @param shape The source shape to compute strides for.
      */
-    explicit TensorStride(const TensorShape& shape) : TensorStride(shape.dims())
-    {
+    explicit TensorStride(const TensorShape& shape)
+        : TensorStride(shape.dims()) {
     }
 
     /**
      * @brief Return a reference to the strides vector.
      * @return const std::vector<size_t>& strides.
      */
-    [[nodiscard]] const std::vector<size_t>& dims() const
-    {
+    [[nodiscard]] const std::vector<size_t>& dims() const {
         return strides_;
     }
 
@@ -88,8 +82,7 @@ class TensorStride
      * @param index Dimension index.
      * @return size_t The stride value at that dimension.
      */
-    [[nodiscard]] size_t operator[](size_t index) const
-    {
+    [[nodiscard]] size_t operator[](size_t index) const {
         return strides_[index];
     }
 
@@ -97,8 +90,7 @@ class TensorStride
      * @brief Return the number of dimensions.
      * @return size_t dimension count.
      */
-    [[nodiscard]] size_t size() const
-    {
+    [[nodiscard]] size_t size() const {
         return strides_.size();
     }
 
@@ -106,17 +98,14 @@ class TensorStride
      * @brief Return a string representation of the strides.
      * @return std::string formatted as "[s1, s2, ...]".
      */
-    [[nodiscard]] std::string toString() const
-    {
+    [[nodiscard]] std::string toString() const {
         std::stringstream sstream;
         sstream << "[";
 
 #pragma unroll 5
-        for (size_t i = 0; i < strides_.size(); ++i)
-        {
+        for (size_t i = 0; i < strides_.size(); ++i) {
             sstream << strides_[i];
-            if (i != strides_.size() - 1)
-            {
+            if (i != strides_.size() - 1) {
                 sstream << ", ";
             }
         }
@@ -125,10 +114,10 @@ class TensorStride
     }
 
     /**
-     * @brief Reverse the order of strides (e.g. for switching between row/column major).
+     * @brief Reverse the order of strides (e.g. for switching between
+     * row/column major).
      */
-    void reverse()
-    {
+    void reverse() {
         std::reverse(strides_.begin(), strides_.end());
     }
 
@@ -137,8 +126,7 @@ class TensorStride
      * @param index Dimension index.
      * @return size_t The stride value at that dimension.
      */
-    size_t operator[](size_t index)
-    {
+    size_t operator[](size_t index) {
         return strides_[index];
     }
 
@@ -147,10 +135,8 @@ class TensorStride
      * @param index Dimension index.
      * @return size_t The stride value at that dimension.
      */
-    size_t at(size_t index)
-    {
-        if (index >= strides_.size())
-        {
+    size_t at(size_t index) {
+        if (index >= strides_.size()) {
             throw std::out_of_range("Index out of range");
         }
         return strides_[index];
@@ -160,14 +146,13 @@ class TensorStride
      * @param index Dimension index.
      * @return size_t The stride value at that dimension.
      */
-    [[nodiscard]] size_t at(size_t index) const
-    {
-        if (index >= strides_.size())
-        {
+    [[nodiscard]] size_t at(size_t index) const {
+        if (index >= strides_.size()) {
             throw std::out_of_range("Index out of range");
         }
         return strides_[index];
     }
+
   private:
     std::vector<size_t> strides_;
 };

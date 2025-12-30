@@ -25,8 +25,7 @@
 
 #include "utils/log/LogLevel.h"
 
-namespace hahaha::utils
-{
+namespace hahaha::utils {
 
 /**
  * @brief Represents a single log message entry in the queue.
@@ -35,15 +34,13 @@ namespace hahaha::utils
  * and provides a method to format it for output. It is cache-aligned
  * for better performance in the asynchronous logging queue.
  */
-struct LogMessageEntry
-{
+struct LogMessageEntry {
 
   public:
     /**
      * @brief Default constructor.
      */
-    LogMessageEntry() : level(LogLevel::INFO)
-    {
+    LogMessageEntry() : level(LogLevel::INFO) {
     }
 
     /**
@@ -53,16 +50,14 @@ struct LogMessageEntry
      */
     LogMessageEntry(LogLevel level, std::string message)
 
-        : message_(std::move(message)), level(level)
-    {
+        : message_(std::move(message)), level(level) {
     }
 
     /**
      * @brief Format the entry as a colored string for console.
      * @return std::string formatted message.
      */
-    std::string toString()
-    {
+    std::string toString() {
         return std::format("[{}] {}", toColoredString(level), message_);
     }
 
@@ -70,8 +65,7 @@ struct LogMessageEntry
      * @brief Get a reference to the raw message string.
      * @return std::string& message reference.
      */
-    [[nodiscard]] std::string& getMessage()
-    {
+    [[nodiscard]] std::string& getMessage() {
         return message_;
     }
 
@@ -79,8 +73,7 @@ struct LogMessageEntry
      * @brief Get the severity level of the entry.
      * @return LogLevel the level.
      */
-    [[nodiscard]] LogLevel getLevel() const
-    {
+    [[nodiscard]] LogLevel getLevel() const {
         return level;
     }
 

@@ -1,80 +1,82 @@
 // Copyright (c) 2025 Contributors of hahaha(https://github.com/Napbad/Hahaha)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
-//      https://www.apache.org/licenses/LICENSE-2.0 
-// 
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// 
+//
 // Contributors:
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
-// 
+//
 
 #ifndef HAHAHA_MATH_TENSOR_H
 #define HAHAHA_MATH_TENSOR_H
 
 #include <algorithm>
+#include <iterator>
+#include <memory>
 #include <numeric>
 #include <stdexcept>
 #include <vector>
 
+#include "common/Config.h"
 #include "math/ds/TensorData.h"
 
-class TensorDataTest;
+class TensorWrapperTest;
 
-namespace hahaha::math
-{
+namespace hahaha::math {
 
 /**
  * @brief Main Tensor class providing a high-level API for numerical operations.
  *
  * This class wraps TensorData and provides a comprehensive set of operations
  * including basic arithmetic, matrix multiplication, and reshape capabilities.
- * It is designed to work with automatic differentiation and computational graphs.
+ * It is designed to work with automatic differentiation and computational
+ * graphs.
  *
  * @tparam T The numeric type of the tensor elements.
  */
-template <typename T> class Tensor
-{
+template <typename T> class TensorWrapper {
   public:
     /**
      * @brief Default constructor for an empty tensor.
      */
-    Tensor() = default;
+    TensorWrapper() = default;
 
     /**
      * @brief Copy constructor is deleted (use explicit copy if needed).
      */
-    Tensor(const Tensor&) = delete;
+    TensorWrapper(const TensorWrapper&) = delete;
 
     /**
      * @brief Move constructor.
      * @param other The source tensor to move from.
      */
-    Tensor(Tensor&& other) noexcept 
-        : data_(std::move(other.data_)), 
-          forwardTensor_(std::move(other.forwardTensor_)) {}
+    TensorWrapper(TensorWrapper&& other) noexcept
+        : data_(std::move(other.data_)){
+    }
 
     /**
      * @brief Copy assignment is deleted.
      */
-    Tensor& operator=(const Tensor&) = delete;
+    TensorWrapper& operator=(const TensorWrapper&) = delete;
 
     /**
      * @brief Move assignment operator.
      * @param other The source tensor to move from.
      * @return Tensor& reference to this.
      */
-    Tensor& operator=(Tensor&& other) noexcept {
+    TensorWrapper& operator=(TensorWrapper&& other) noexcept {
         if (this != &other) {
             data_ = std::move(other.data_);
-            forwardTensor_ = std::move(other.forwardTensor_);
+            requiresGrad_ = other.requiresGrad_;
         }
         return *this;
     }
@@ -82,24 +84,21 @@ template <typename T> class Tensor
     /**
      * @brief Destructor.
      */
-    ~Tensor() = default;
+    ~TensorWrapper() = default;
 
     /**
      * @brief Construct from NestedData (e.g. nested initializer list).
      * @param data The source nested data.
      */
     // NOLINTNEXTLINE google-explicit-constructor
-    Tensor(NestedData<T>&& data) : data_(std::move(data))
-    {
-
+    TensorWrapper(NestedData<T>&& data) : data_(std::move(data)) {
     }
 
     /**
      * @brief Get a reference to the raw data pointer.
      * @return std::unique_ptr<T[]>& reference to internal data.
      */
-    std::unique_ptr<T[]>& getRawData()
-    {
+    std::unique_ptr<T[]>& getRawData() {
         return data_.data_;
     }
 
@@ -107,8 +106,7 @@ template <typename T> class Tensor
      * @brief Get the tensor's shape.
      * @return const TensorShape& reference to internal shape.
      */
-    [[nodiscard]] const TensorShape& shape() const
-    {
+    [[nodiscard]] const TensorShape& shape() const {
         return data_.shape_;
     }
 
@@ -116,8 +114,7 @@ template <typename T> class Tensor
      * @brief Get the tensor's strides.
      * @return const TensorStride& reference to internal strides.
      */
-    [[nodiscard]] const TensorStride& stride() const
-    {
+    [[nodiscard]] const TensorStride& stride() const {
         return data_.stride_;
     }
 
@@ -129,22 +126,24 @@ template <typename T> class Tensor
     T& at(const std::initializer_list<size_t>& indices) {
         const auto& shapeDims = data_.shape_.dims();
         if (indices.size() != shapeDims.size()) {
-            throw std::out_of_range("Dimension mismatch: expected " + 
-                                    std::to_string(shapeDims.size()) + 
-                                    " indices, got " + std::to_string(indices.size()));
+            throw std::out_of_range("Dimension mismatch: expected "
+                                    + std::to_string(shapeDims.size())
+                                    + " indices, got "
+                                    + std::to_string(indices.size()));
         }
 
         size_t linearIdx = 0;
-        auto idxIt = indices.begin();
+        const auto* idxIt = indices.begin();
         const auto& strideDims = data_.stride_.dims();
 
         for (size_t i = 0; i < shapeDims.size(); ++i) {
             size_t dimIdx = *idxIt;
             if (dimIdx >= shapeDims[i]) {
-                throw std::out_of_range("Index out of bounds at dimension " + std::to_string(i));
+                throw std::out_of_range("Index out of bounds at dimension "
+                                        + std::to_string(i));
             }
             linearIdx += dimIdx * strideDims[i];
-            ++idxIt;
+            std::advance(idxIt, 1);
         }
         return data_.data_[linearIdx];
     }
@@ -161,7 +160,7 @@ template <typename T> class Tensor
         }
 
         size_t linearIdx = 0;
-        auto idxIt = indices.begin();
+        const auto* idxIt = indices.begin();
         const auto& strideDims = data_.stride_.dims();
 
         for (size_t i = 0; i < shapeDims.size(); ++i) {
@@ -170,7 +169,7 @@ template <typename T> class Tensor
                 throw std::out_of_range("Index out of bounds");
             }
             linearIdx += dimIdx * strideDims[i];
-            ++idxIt;
+            std::advance(idxIt, 1);
         }
         return data_.data_[linearIdx];
     }
@@ -180,21 +179,25 @@ template <typename T> class Tensor
      * @param newShape Vector of new dimension sizes.
      * @return Tensor<T> A new tensor with reshaped dimensions.
      */
-    Tensor<T> reshape(const std::vector<size_t>& newShape) const {
-        size_t totalSize = std::accumulate(newShape.begin(), newShape.end(), 1ULL, std::multiplies<size_t>());
+    TensorWrapper<T> reshape(const std::vector<size_t>& newShape) const {
+        size_t totalSize = std::accumulate(
+            newShape.begin(), newShape.end(), 1ULL, std::multiplies<size_t>());
         if (totalSize != size()) {
-            throw std::invalid_argument("New shape total size (" + std::to_string(totalSize) + 
-                                        ") must match current size (" + std::to_string(size()) + ")");
+            throw std::invalid_argument(
+                "New shape total size (" + std::to_string(totalSize)
+                + ") must match current size (" + std::to_string(size()) + ")");
         }
 
-        Tensor<T> result;
+        TensorWrapper<T> result;
         result.data_.shape_ = TensorShape(newShape);
         result.data_.stride_ = TensorStride(result.data_.shape_);
-        
+
         size_t currentSize = size();
         result.data_.data_ = std::make_unique<T[]>(currentSize);
-        std::copy(data_.data_.get(), data_.data_.get() + currentSize, result.data_.data_.get());
-        
+        std::copy(data_.data_.get(),
+                  data_.data_.get() + currentSize,
+                  result.data_.data_.get());
+
         return result;
     }
 
@@ -219,22 +222,23 @@ template <typename T> class Tensor
      * @param other The tensor to add.
      * @return Tensor<T> result tensor.
      */
-    Tensor<T> add(const Tensor<T>& other) const {
+    TensorWrapper<T> add(const TensorWrapper<T>& other) const {
         if (shape() != other.shape()) {
-            throw std::invalid_argument("Tensors must have the same shape for addition");
+            throw std::invalid_argument(
+                "Tensors must have the same shape for addition");
         }
-        
-        Tensor<T> result;
+
+        TensorWrapper<T> result;
         result.data_.shape_ = data_.shape_;
         result.data_.stride_ = data_.stride_;
-        
+
         size_t tensorSize = size();
         result.data_.data_ = std::make_unique<T[]>(tensorSize);
-        
+
         for (size_t i = 0; i < tensorSize; ++i) {
             result.data_.data_[i] = data_.data_[i] + other.data_.data_[i];
         }
-        
+
         return result;
     }
 
@@ -243,22 +247,23 @@ template <typename T> class Tensor
      * @param other The tensor to subtract.
      * @return Tensor<T> result tensor.
      */
-    Tensor<T> subtract(const Tensor<T>& other) const {
+    TensorWrapper<T> subtract(const TensorWrapper<T>& other) const {
         if (shape() != other.shape()) {
-            throw std::invalid_argument("Tensors must have the same shape for subtraction");
+            throw std::invalid_argument(
+                "Tensors must have the same shape for subtraction");
         }
-        
-        Tensor<T> result;
+
+        TensorWrapper<T> result;
         result.data_.shape_ = data_.shape_;
         result.data_.stride_ = data_.stride_;
-        
+
         size_t tensorSize = size();
         result.data_.data_ = std::make_unique<T[]>(tensorSize);
-        
+
         for (size_t i = 0; i < tensorSize; ++i) {
             result.data_.data_[i] = data_.data_[i] - other.data_.data_[i];
         }
-        
+
         return result;
     }
 
@@ -267,22 +272,23 @@ template <typename T> class Tensor
      * @param other The tensor to multiply.
      * @return Tensor<T> result tensor.
      */
-    Tensor<T> multiply(const Tensor<T>& other) const {
+    TensorWrapper<T> multiply(const TensorWrapper<T>& other) const {
         if (shape() != other.shape()) {
-            throw std::invalid_argument("Tensors must have the same shape for multiplication");
+            throw std::invalid_argument(
+                "Tensors must have the same shape for multiplication");
         }
-        
-        Tensor<T> result;
+
+        TensorWrapper<T> result;
         result.data_.shape_ = data_.shape_;
         result.data_.stride_ = data_.stride_;
-        
+
         size_t tensorSize = size();
         result.data_.data_ = std::make_unique<T[]>(tensorSize);
-        
+
         for (size_t i = 0; i < tensorSize; ++i) {
             result.data_.data_[i] = data_.data_[i] * other.data_.data_[i];
         }
-        
+
         return result;
     }
 
@@ -291,25 +297,27 @@ template <typename T> class Tensor
      * @param other The tensor to divide.
      * @return Tensor<T> result tensor.
      */
-    Tensor<T> divide(const Tensor<T>& other) const {
+    TensorWrapper<T> divide(const TensorWrapper<T>& other) const {
         if (shape() != other.shape()) {
-            throw std::invalid_argument("Tensors must have the same shape for division");
+            throw std::invalid_argument(
+                "Tensors must have the same shape for division");
         }
-        
-        Tensor<T> result;
+
+        TensorWrapper<T> result;
         result.data_.shape_ = data_.shape_;
         result.data_.stride_ = data_.stride_;
-        
+
         size_t tensorSize = size();
         result.data_.data_ = std::make_unique<T[]>(tensorSize);
-        
+
         for (size_t i = 0; i < tensorSize; ++i) {
             if (other.data_.data_[i] == T(0)) {
-                throw std::runtime_error("Division by zero at index " + std::to_string(i));
+                throw std::runtime_error("Division by zero at index "
+                                         + std::to_string(i));
             }
             result.data_.data_[i] = data_.data_[i] / other.data_.data_[i];
         }
-        
+
         return result;
     }
 
@@ -318,40 +326,44 @@ template <typename T> class Tensor
      * @param other The tensor to multiply with.
      * @return Tensor<T> result tensor.
      */
-    Tensor<T> matmul(const Tensor<T>& other) const {
+    TensorWrapper<T> matmul(const TensorWrapper<T>& other) const {
         if (dimensions() != 2 || other.dimensions() != 2) {
-            throw std::invalid_argument("matmul is only implemented for 2D tensors");
+            throw std::invalid_argument(
+                "matmul is only implemented for 2D tensors");
         }
-        
+
         const auto& thisDims = data_.shape_.dims();
         const auto& otherDims = other.data_.shape_.dims();
-        
+
         if (thisDims[1] != otherDims[0]) {
-            throw std::invalid_argument("Matrix dimensions mismatch for matmul: (" + 
-                                        std::to_string(thisDims[0]) + "x" + std::to_string(thisDims[1]) + 
-                                        ") and (" + std::to_string(otherDims[0]) + "x" + 
-                                        std::to_string(otherDims[1]) + ")");
+            throw std::invalid_argument(
+                "Matrix dimensions mismatch for matmul: ("
+                + std::to_string(thisDims[0]) + "x"
+                + std::to_string(thisDims[1]) + ") and ("
+                + std::to_string(otherDims[0]) + "x"
+                + std::to_string(otherDims[1]) + ")");
         }
-        
+
         size_t rows = thisDims[0];
         size_t cols = otherDims[1];
         size_t inner = thisDims[1];
-        
-        Tensor<T> result;
+
+        TensorWrapper<T> result;
         result.data_.shape_ = TensorShape({rows, cols});
         result.data_.stride_ = TensorStride(result.data_.shape_);
         result.data_.data_ = std::make_unique<T[]>(rows * cols);
-        
+
         for (size_t i = 0; i < rows; ++i) {
             for (size_t j = 0; j < cols; ++j) {
                 T sum = T(0);
                 for (size_t k = 0; k < inner; ++k) {
-                    sum += data_.data_[i * inner + k] * other.data_.data_[k * cols + j];
+                    sum += data_.data_[i * inner + k]
+                        * other.data_.data_[k * cols + j];
                 }
                 result.data_.data_[i * cols + j] = sum;
             }
         }
-        
+
         return result;
     }
 
@@ -359,26 +371,27 @@ template <typename T> class Tensor
      * @brief Transpose operation.
      * @return Tensor<T> transposed tensor.
      */
-    Tensor<T> transpose() const {
+    TensorWrapper<T> transpose() const {
         if (dimensions() != 2) {
-            throw std::invalid_argument("transpose is only implemented for 2D tensors for now");
+            throw std::invalid_argument(
+                "transpose is only implemented for 2D tensors for now");
         }
-        
+
         const auto& shapeDims = data_.shape_.dims();
         size_t rows = shapeDims[0];
         size_t cols = shapeDims[1];
-        
-        Tensor<T> result;
+
+        TensorWrapper<T> result;
         result.data_.shape_ = TensorShape({cols, rows});
         result.data_.stride_ = TensorStride(result.data_.shape_);
         result.data_.data_ = std::make_unique<T[]>(size());
-        
+
         for (size_t i = 0; i < rows; ++i) {
             for (size_t j = 0; j < cols; ++j) {
                 result.data_.data_[j * rows + i] = data_.data_[i * cols + j];
             }
         }
-        
+
         return result;
     }
 
@@ -386,16 +399,24 @@ template <typename T> class Tensor
      * @brief Broadcast tensor to match the shape of another tensor.
      * @param other The target tensor for broadcasting.
      */
-    void broadcast(const Tensor<T>&  /*other*/) {
+    void broadcast(const TensorWrapper<T>& /*other*/) {
         throw std::runtime_error("Broadcasting not implemented yet");
     }
 
-    Tensor<T> operator+(const Tensor<T>& other) const { return add(other); }
-    Tensor<T> operator-(const Tensor<T>& other) const { return subtract(other); }
-    Tensor<T> operator*(const Tensor<T>& other) const { return multiply(other); }
-    Tensor<T> operator/(const Tensor<T>& other) const { return divide(other); }
-    Tensor<T> operator-() const {
-        Tensor<T> result;
+    TensorWrapper<T> operator+(const TensorWrapper<T>& other) const {
+        return add(other);
+    }
+    TensorWrapper<T> operator-(const TensorWrapper<T>& other) const {
+        return subtract(other);
+    }
+    TensorWrapper<T> operator*(const TensorWrapper<T>& other) const {
+        return multiply(other);
+    }
+    TensorWrapper<T> operator/(const TensorWrapper<T>& other) const {
+        return divide(other);
+    }
+    TensorWrapper<T> operator-() const {
+        TensorWrapper<T> result;
         result.data_.shape_ = data_.shape_;
         result.data_.stride_ = data_.stride_;
         size_t tensorSize = size();
@@ -409,12 +430,10 @@ template <typename T> class Tensor
   private:
     TensorData<T> data_;
 
-    // used for autograd and compute graph
-    std::vector<TensorData<T>> forwardTensor_;
+    bool requiresGrad_ = common::getConfig().defaultRequiresGrad;
 
     // default name of the test fixture class to this class
-    friend class ::TensorDataTest;
-
+    friend class ::TensorWrapperTest;
 };
 } // namespace hahaha::math
 

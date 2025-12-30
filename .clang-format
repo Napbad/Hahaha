@@ -2,7 +2,6 @@ Language: Cpp
 BasedOnStyle: LLVM
 IndentWidth: 4
 UseTab: Never
-BreakBeforeBraces: Allman
 BreakBeforeBinaryOperators: NonAssignment
 ContinuationIndentWidth: 4
 AlignOperands: false
@@ -25,6 +24,7 @@ BinPackParameters: false
 BinPackArguments: false
 SortIncludes: true
 IncludeBlocks: Regroup
+BreakBeforeBraces: Attach
 IncludeCategories:
   - Regex:           '^<.*'
     Priority:        1

@@ -1,35 +1,36 @@
 // Copyright (c) 2025 Contributors of hahaha(https://github.com/Napbad/Hahaha)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
-//      https://www.apache.org/licenses/LICENSE-2.0 
-// 
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// 
+//
 // Contributors:
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
-// 
+//
 
-#include <gtest/gtest.h>
 #include "utils/log/Logger.h"
-#include <filesystem>
-#include <thread>
-#include <chrono>
 
+#include <chrono>
+#include <filesystem>
+#include <gtest/gtest.h>
+#include <thread>
+
+using hahaha::utils::LogColor;
 using hahaha::utils::Logger;
 using hahaha::utils::LoggerConfig;
-using hahaha::utils::LogMessageEntry;
 using hahaha::utils::LogLevel;
-using hahaha::utils::LogColor;
+using hahaha::utils::LogMessageEntry;
 
 class LoggerTest : public ::testing::Test {
-protected:
+  protected:
     void SetUp() override {
         // Clean up log files before each test
         if (std::filesystem::exists("test_log.txt")) {
@@ -75,7 +76,8 @@ TEST_F(LoggerTest, LoggerConfigDefault) {
 }
 
 TEST_F(LoggerTest, CustomLoggerInstance) {
-    LoggerConfig config(LogColor::GREEN, LogLevel::DEBUG, "test_log.txt", true, false, false);
+    LoggerConfig config(
+        LogColor::GREEN, LogLevel::DEBUG, "test_log.txt", true, false, false);
     {
         Logger customLogger(config);
         // We can't use the static methods as they use the singleton
@@ -88,12 +90,13 @@ TEST_F(LoggerTest, SingletonLoggerUsage) {
     // This will use the singleton instance, writing to log.txt by default
     hahaha::utils::Logger::info("Test info message");
     hahaha::utils::Logger::error("Test error message");
-    
+
     // Give some time for the background thread to process
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    
-    // Check if default log file exists (it might have been created by previous runs or this run)
-    // We don't assert its content strictly because it's a singleton and might have other logs
+
+    // Check if default log file exists (it might have been created by previous
+    // runs or this run) We don't assert its content strictly because it's a
+    // singleton and might have other logs
     EXPECT_TRUE(std::filesystem::exists("log.txt"));
 }
 
@@ -101,9 +104,8 @@ TEST_F(LoggerTest, LogMessageEntryTest) {
     LogMessageEntry entry(LogLevel::INFO, "Test message");
     EXPECT_EQ(entry.getLevel(), LogLevel::INFO);
     EXPECT_EQ(entry.getMessage(), "Test message");
-    
+
     std::string str = entry.toString();
     EXPECT_NE(str.find("INFO"), std::string::npos);
     EXPECT_NE(str.find("Test message"), std::string::npos);
 }
-

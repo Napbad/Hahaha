@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      https://www.apache.org/licenses/LICENSE-2.0 
+//      https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,8 +23,7 @@
 #include <string>
 #include <vector>
 
-namespace hahaha::compute::gpu
-{
+namespace hahaha::compute::gpu {
 
 /**
  * @brief Manages the GPU device context and resources.
@@ -32,8 +31,7 @@ namespace hahaha::compute::gpu
  * This class handles initialization, device selection, and management of
  * global resources required for GPU computation.
  */
-class GpuContext
-{
+class GpuContext {
   public:
     GpuContext() = default;
     virtual ~GpuContext() = default;
@@ -74,4 +72,3 @@ class GpuContext
 } // namespace hahaha::compute::gpu
 
 #endif // HAHAHA_COMPUTE_GPU_GPU_CONTEXT_H
-

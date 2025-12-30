@@ -1,39 +1,35 @@
 // Copyright (c) 2025 Contributors of hahaha(https://github.com/Napbad/Hahaha)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
-//      https://www.apache.org/licenses/LICENSE-2.0 
-// 
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// 
+//
 // Contributors:
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
-// 
-
-#include <cstddef>
-#include <iostream>
-
-#include <gtest/gtest.h>
+//
 
 #include "math/ds/TensorShape.h"
 
-class TensorShapeTest : public ::testing::Test
-{
+#include <cstddef>
+#include <gtest/gtest.h>
+#include <iostream>
+
+class TensorShapeTest : public ::testing::Test {
   protected:
-    void SetUp() override
-    {
+    void SetUp() override {
         // Code here will be called immediately after the constructor (right
         // before each test).
     }
 
-    void TearDown() override
-    {
+    void TearDown() override {
         // Code here will be called immediately after each test (right
         // before the destructor).
     }
@@ -41,8 +37,8 @@ class TensorShapeTest : public ::testing::Test
     // Objects declared here can be used by all tests in the test suite for Foo.
 };
 
-using hahaha::math::TensorShape;
 using hahaha::common::u32;
+using hahaha::math::TensorShape;
 
 TEST_F(TensorShapeTest, InitWithInitializerList) {
     auto ts1 = TensorShape({1, 2, 3});
@@ -136,8 +132,9 @@ TEST_F(TensorShapeTest, DimsAccess) {
     ASSERT_EQ(dims.size(), 2);
     ASSERT_EQ(dims[0], 2);
     ASSERT_EQ(dims[1], 3);
-    
-    // Ensure it's a reference to the same data (at least check it's not copying on every call)
+
+    // Ensure it's a reference to the same data (at least check it's not copying
+    // on every call)
     ASSERT_EQ(&ts.dims(), &ts.dims());
 }
 
@@ -165,10 +162,10 @@ TEST_F(TensorShapeTest, Reverse) {
     ts3.reverse();
 }
 
-TEST_F(TensorShapeTest, OperatorEqual) { 
+TEST_F(TensorShapeTest, OperatorEqual) {
     ASSERT_TRUE(TensorShape({1, 2, 3}) == TensorShape({1, 2, 3}));
 }
 
-TEST_F(TensorShapeTest, OperatorNotEqual) { 
+TEST_F(TensorShapeTest, OperatorNotEqual) {
     ASSERT_TRUE(TensorShape({1, 2, 3}) != TensorShape({1, 2, 4}));
 }

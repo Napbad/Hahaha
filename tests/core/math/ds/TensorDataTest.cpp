@@ -11,29 +11,26 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// 
+//
 // Contributors:
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 //
 
-#include <gtest/gtest.h>
 #include "math/ds/TensorData.h"
-class TensorDataTest : public ::testing::Test
-{
+
+#include <gtest/gtest.h>
+class TensorDataTest : public ::testing::Test {
   protected:
-    void SetUp() override
-    {
+    void SetUp() override {
     }
 
-    void TearDown() override
-    {
+    void TearDown() override {
     }
 };
 
 using hahaha::math::TensorData;
 
-TEST_F(TensorDataTest, InitWithInitializerList)
-{
+TEST_F(TensorDataTest, InitWithInitializerList) {
     TensorData<int> singleValueTensor = {1};
     ASSERT_NO_THROW(TensorData<int> singleValueTensor = {1};);
 
@@ -41,74 +38,61 @@ TEST_F(TensorDataTest, InitWithInitializerList)
     ASSERT_NO_THROW(TensorData<int> twoElementTensor({{1}, {2}}););
 }
 
-TEST_F(TensorDataTest, DefaultConstructor)
-{
+TEST_F(TensorDataTest, DefaultConstructor) {
     TensorData<float> defaultConstructedTensor;
     // Default constructor should create an empty TensorData
-    // Since TensorDataTest is a friend class, we can check internal state if needed
+    // Since TensorDataTest is a friend class, we can check internal state if
+    // needed
 }
 
-TEST_F(TensorDataTest, OneDimensionalTensor)
-{
+TEST_F(TensorDataTest, OneDimensionalTensor) {
     TensorData<int> oneDimensionalTensor({1, 2, 3, 4, 5});
-    
+
     // Test that we can create a tensor with 1D data
     ASSERT_NO_THROW((TensorData<int>{{1, 2, 3, 4, 5}}));
 }
 
-TEST_F(TensorDataTest, TwoDimensionalTensor)
-{
+TEST_F(TensorDataTest, TwoDimensionalTensor) {
     TensorData<double> twoDimensionalTensor({{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}});
-    
+
     // Test that we can create a 2x3 tensor
     ASSERT_NO_THROW((TensorData<double>{{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}}));
 }
 
-TEST_F(TensorDataTest, ThreeDimensionalTensor)
-{
-    TensorData<float> threeDimensionalTensor({{{1, 2}, {3, 4}}, {{5, 6}, {7, 8}}});
-    
+TEST_F(TensorDataTest, ThreeDimensionalTensor) {
+    TensorData<float> threeDimensionalTensor(
+        {{{1, 2}, {3, 4}}, {{5, 6}, {7, 8}}});
+
     // Test that we can create a 2x2x2 tensor
     ASSERT_NO_THROW((TensorData<float>{{{{1, 2}, {3, 4}}, {{5, 6}, {7, 8}}}}));
 }
 
-TEST_F(TensorDataTest, SingleValueTensor)
-{
+TEST_F(TensorDataTest, SingleValueTensor) {
     TensorData<int> singleValueTensor(42);
-    
+
     // Test that we can create a tensor with a single value
     ASSERT_NO_THROW((TensorData<int>{42}));
 }
 
-TEST_F(TensorDataTest, LargeTensor)
-{
+TEST_F(TensorDataTest, LargeTensor) {
     // Test with a larger tensor to make sure it works properly
-    TensorData<int> largeTensor({
-        {1, 2, 3, 4, 5, 6},
-        {7, 8, 9, 10, 11, 12},
-        {13, 14, 15, 16, 17, 18}
-    });
-    
-    ASSERT_NO_THROW((
-        TensorData<int>{{
-            {1, 2, 3, 4, 5, 6},
-            {7, 8, 9, 10, 11, 12},
-            {13, 14, 15, 16, 17, 18}
-        }}
-    ));
+    TensorData<int> largeTensor(
+        {{1, 2, 3, 4, 5, 6}, {7, 8, 9, 10, 11, 12}, {13, 14, 15, 16, 17, 18}});
+
+    ASSERT_NO_THROW((TensorData<int>{{{1, 2, 3, 4, 5, 6},
+                                      {7, 8, 9, 10, 11, 12},
+                                      {13, 14, 15, 16, 17, 18}}}));
 }
 
-TEST_F(TensorDataTest, EmptyTensor)
-{
+TEST_F(TensorDataTest, EmptyTensor) {
     // Test creating an empty tensor (0 dimensions)
     // Using default constructor instead of ambiguous {} initializer
     TensorData<int> emptyTensor;
-    
+
     ASSERT_NO_THROW((TensorData<int>()));
 }
 
-TEST_F(TensorDataTest, DifferentTypes)
-{
+TEST_F(TensorDataTest, DifferentTypes) {
     // Test different value types
     ASSERT_NO_THROW((TensorData<int>({1, 2, 3})));
     ASSERT_NO_THROW((TensorData<float>({1.1f, 2.2f, 3.3f})));
@@ -117,36 +101,35 @@ TEST_F(TensorDataTest, DifferentTypes)
     ASSERT_NO_THROW((TensorData<bool>({true, false, true})));
 }
 
-TEST_F(TensorDataTest, CopyAndAssignmentDisabled)
-{
+TEST_F(TensorDataTest, CopyAndAssignmentDisabled) {
     TensorData<int> originalTensor({1, 2, 3});
-    
+
     // Test that copy constructor is deleted
     // This should not compile, so we're verifying the behavior by design
-    // TensorData<int> td2 = originalTensor;  // This would cause a compile error
-    
+    // TensorData<int> td2 = originalTensor;  // This would cause a compile
+    // error
+
     // Test that assignment operator is deleted
     // TensorData<int> td3;
     // td3 = originalTensor;  // This would cause a compile error
-    
-    SUCCEED() << "Copy constructor and assignment operator are properly deleted";
+
+    SUCCEED()
+        << "Copy constructor and assignment operator are properly deleted";
 }
 
-TEST_F(TensorDataTest, MoveConstructor)
-{
+TEST_F(TensorDataTest, MoveConstructor) {
     TensorData<int> original({1, 2, 3});
     TensorData<int> moved(std::move(original));
-    
+
     // Check that 'moved' has the data
     // (In a real test we'd check shape/stride/data via friend access)
     SUCCEED();
 }
 
-TEST_F(TensorDataTest, MoveAssignment)
-{
+TEST_F(TensorDataTest, MoveAssignment) {
     TensorData<int> original({1, 2, 3});
     TensorData<int> moved;
     moved = std::move(original);
-    
+
     SUCCEED();
 }

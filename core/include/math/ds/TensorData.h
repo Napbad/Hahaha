@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      https://www.apache.org/licenses/LICENSE-2.0 
+//      https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,10 +27,9 @@
 #include "math/ds/TensorStride.h"
 #include "utils/common/HelperStruct.h"
 
-namespace hahaha::math
-{
+namespace hahaha::math {
 
-template <typename T> class Tensor;
+template <typename T> class TensorWrapper;
 
 using hahaha::common::u32;
 using hahaha::utils::isInitList;
@@ -49,8 +48,7 @@ using hahaha::utils::isNestedInitList;
  *
  * @tparam T The numeric type of the tensor elements.
  */
-template <typename T> class TensorData
-{
+template <typename T> class TensorData {
   public:
     /**
      * @brief Default constructor.
@@ -66,10 +64,10 @@ template <typename T> class TensorData
      * @brief Move constructor.
      * @param other The source TensorData to move from.
      */
-    TensorData(TensorData&& other) noexcept 
-        : data_(std::move(other.data_)), 
-          shape_(std::move(other.shape_)), 
-          stride_(std::move(other.stride_)) {}
+    TensorData(TensorData&& other) noexcept
+        : data_(std::move(other.data_)), shape_(std::move(other.shape_)),
+          stride_(std::move(other.stride_)) {
+    }
 
     /**
      * @brief Copy assignment is deleted.
@@ -96,13 +94,12 @@ template <typename T> class TensorData
     ~TensorData() = default;
 
     /**
-     * @brief Construct from NestedData, moving the flattened data into managed memory.
+     * @brief Construct from NestedData, moving the flattened data into managed
+     * memory.
      * @param data The source NestedData (typically from an initializer list).
      */
     // NOLINTNEXTLINE google-explicit-constructor
-    TensorData(NestedData<T>&& data)
-        : shape_(std::move(data.shape))
-    {
+    TensorData(NestedData<T>&& data) : shape_(std::move(data.shape)) {
         size_t size = data.flatData.size();
         data_ = std::make_unique<T[]>(size);
         std::move(data.flatData.begin(), data.flatData.end(), data_.get());
@@ -115,7 +112,7 @@ template <typename T> class TensorData
     TensorStride stride_;
 
     friend class TensorDataTest;
-    friend class Tensor<T>;
+    friend class TensorWrapper<T>;
 };
 
 } // namespace hahaha::math

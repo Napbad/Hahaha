@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      https://www.apache.org/licenses/LICENSE-2.0 
+//      https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,8 +34,7 @@
 #include "utils/log/LogMessageEntry.h"
 #include "utils/log/LoggerConfig.h"
 
-namespace hahaha::utils
-{
+namespace hahaha::utils {
 /**
  * @brief Thread-safe asynchronous logging system.
  *
@@ -45,8 +44,7 @@ namespace hahaha::utils
  *
  * Use the static methods (info, warn, error, etc.) for convenient logging.
  */
-class Logger
-{
+class Logger {
   public:
     Logger(const Logger&) = delete;
     Logger(Logger&&) = delete;
@@ -58,8 +56,7 @@ class Logger
      * @param config The configuration to use.
      */
     explicit Logger(LoggerConfig config)
-        : config_(std::move(config)), running_(true)
-    {
+        : config_(std::move(config)), running_(true) {
         stream_.open(config_.getFile().data());
         workerThread_ = std::thread(&Logger::process, this);
     }
@@ -67,19 +64,15 @@ class Logger
     /**
      * @brief Destructor: flushes the queue and joins the worker thread.
      */
-    ~Logger()
-    {
-        if (running_)
-        {
+    ~Logger() {
+        if (running_) {
             running_ = false;
             condition_.notify_all();
-            if (workerThread_.joinable())
-            {
+            if (workerThread_.joinable()) {
                 workerThread_.join();
             }
         }
-        if (stream_.is_open())
-        {
+        if (stream_.is_open()) {
             stream_.close();
         }
     }
@@ -88,8 +81,7 @@ class Logger
      * @brief Get the singleton Logger instance.
      * @return Logger& reference to the singleton.
      */
-    static Logger& instance()
-    {
+    static Logger& instance() {
         static Logger logger(LoggerConfig{});
         return logger;
     }
@@ -138,10 +130,8 @@ class Logger
     /**
      * @brief Background process that drains the log queue.
      */
-    void process()
-    {
-        while (running_ || !queue_.empty())
-        {
+    void process() {
+        while (running_ || !queue_.empty()) {
             // get log entry
             LogMessageEntry entry;
             {
@@ -149,18 +139,14 @@ class Logger
                 condition_.wait(
                     lock, [this] { return !queue_.empty() || !running_; });
 
-                if (!running_ && queue_.empty())
-                {
+                if (!running_ && queue_.empty()) {
                     break;
                 }
 
-                if (!queue_.empty())
-                {
+                if (!queue_.empty()) {
                     entry = std::move(queue_.front());
                     queue_.pop();
-                }
-                else
-                {
+                } else {
                     continue;
                 }
             }
@@ -168,14 +154,12 @@ class Logger
             std::string timestamp;
             getTimeIfEnabled(timestamp);
 
-            if (config_.isWriteToFile())
-            {
+            if (config_.isWriteToFile()) {
                 stream_ << timestamp << "[" << toString(entry.getLevel()) << "]"
                         << entry.getMessage() << '\n';
                 stream_.flush(); // Ensure data is written
             }
-            if (config_.isWriteToConsole())
-            {
+            if (config_.isWriteToConsole()) {
                 std::cout << timestamp << "[" << toString(entry.getLevel())
                           << "]" << entry.getMessage() << '\n';
                 std::cout.flush(); // Ensure data is written
@@ -187,10 +171,8 @@ class Logger
      * @brief Generate timestamp string if enabled in config.
      * @param timestamp Output string for the timestamp.
      */
-    void getTimeIfEnabled(std::string& timestamp)
-    {
-        if (config_.isEnableTime())
-        {
+    void getTimeIfEnabled(std::string& timestamp) {
+        if (config_.isEnableTime()) {
             std::time_t now = std::time(nullptr);
             std::tm localTime{};
 
@@ -221,8 +203,7 @@ class Logger
     std::atomic<bool> running_;
 };
 
-inline void Logger::log(const std::string& msg, LogLevel level)
-{
+inline void Logger::log(const std::string& msg, LogLevel level) {
     Logger& logger = instance();
     {
         std::lock_guard<std::mutex> lock(logger.mutex_);
@@ -231,127 +212,100 @@ inline void Logger::log(const std::string& msg, LogLevel level)
     logger.condition_.notify_one();
 }
 
-inline void Logger::log(const char* msg, LogLevel level)
-{
+inline void Logger::log(const char* msg, LogLevel level) {
     log(std::string(msg), level);
 }
 
-inline void Logger::fatal(const std::string& msg)
-{
+inline void Logger::fatal(const std::string& msg) {
     log(msg, LogLevel::FATAL);
 }
 
-inline void Logger::fatal(const char* msg)
-{
+inline void Logger::fatal(const char* msg) {
     log(std::string(msg), LogLevel::FATAL);
 }
 
-inline void Logger::error(const std::string& msg)
-{
+inline void Logger::error(const std::string& msg) {
     log(msg, LogLevel::ERROR);
 }
 
-inline void Logger::error(const char* msg)
-{
+inline void Logger::error(const char* msg) {
     log(std::string(msg), LogLevel::ERROR);
 }
 
-inline void Logger::warn(const std::string& msg)
-{
+inline void Logger::warn(const std::string& msg) {
     log(msg, LogLevel::WARN);
 }
 
-inline void Logger::warn(const char* msg)
-{
+inline void Logger::warn(const char* msg) {
     log(std::string(msg), LogLevel::WARN);
 }
 
-inline void Logger::info(const std::string& msg)
-{
+inline void Logger::info(const std::string& msg) {
     log(msg, LogLevel::INFO);
 }
 
-inline void Logger::info(const char* msg)
-{
+inline void Logger::info(const char* msg) {
     log(std::string(msg), LogLevel::INFO);
 }
 
-inline void Logger::debug(const std::string& msg)
-{
+inline void Logger::debug(const std::string& msg) {
     log(msg, LogLevel::DEBUG);
 }
 
-inline void Logger::debug(const char* msg)
-{
+inline void Logger::debug(const char* msg) {
     log(std::string(msg), LogLevel::DEBUG);
 }
 
-inline void Logger::trace(const std::string& msg)
-{
+inline void Logger::trace(const std::string& msg) {
     log(msg, LogLevel::TRACE);
 }
 
-inline void Logger::trace(const char* msg)
-{
+inline void Logger::trace(const char* msg) {
     log(std::string(msg), LogLevel::TRACE);
 }
 
 } // namespace hahaha::utils
 
-inline void info(const std::string& msg)
-{
+inline void info(const std::string& msg) {
     hahaha::utils::Logger::info(msg);
 }
-inline void info(const char* msg)
-{
+inline void info(const char* msg) {
     hahaha::utils::Logger::info(msg);
 }
-inline void debug(const std::string& msg)
-{
+inline void debug(const std::string& msg) {
     hahaha::utils::Logger::debug(msg);
 }
-inline void debug(const char* msg)
-{
+inline void debug(const char* msg) {
     hahaha::utils::Logger::debug(msg);
 }
-inline void warn(const std::string& msg)
-{
+inline void warn(const std::string& msg) {
     hahaha::utils::Logger::warn(msg);
 }
-inline void warn(const char* msg)
-{
+inline void warn(const char* msg) {
     hahaha::utils::Logger::warn(msg);
 }
-inline void error(const std::string& msg)
-{
+inline void error(const std::string& msg) {
     hahaha::utils::Logger::error(msg);
 }
-inline void error(const char* msg)
-{
+inline void error(const char* msg) {
     hahaha::utils::Logger::error(msg);
 }
-inline void fatal(const std::string& msg)
-{
+inline void fatal(const std::string& msg) {
     hahaha::utils::Logger::fatal(msg);
 }
-inline void fatal(const char* msg)
-{
+inline void fatal(const char* msg) {
     hahaha::utils::Logger::fatal(msg);
 }
-inline void trace(const std::string& msg)
-{
+inline void trace(const std::string& msg) {
     hahaha::utils::Logger::trace(msg);
 }
-inline void trace(const char* msg)
-{
+inline void trace(const char* msg) {
     hahaha::utils::Logger::trace(msg);
 }
-inline void log(const std::string& msg, hahaha::utils::LogLevel level)
-{
+inline void log(const std::string& msg, hahaha::utils::LogLevel level) {
     hahaha::utils::Logger::log(msg, level);
 }
-inline void log(const char* msg, hahaha::utils::LogLevel level)
-{
+inline void log(const char* msg, hahaha::utils::LogLevel level) {
     hahaha::utils::Logger::log(msg, level);
 }
 

@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// 
+//
 // Contributors:
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 //
@@ -22,26 +22,23 @@
 #include <initializer_list>
 #include <vector>
 
-
 // Forward declaration for friend class template
 class NestedDataTest;
 
-namespace hahaha::math
-{
+namespace hahaha::math {
 
 template <typename T> class TensorData;
 
-
 /**
- * @brief Utility structure for handling nested initializer lists to initialize tensors.
+ * @brief Utility structure for handling nested initializer lists to initialize
+ * tensors.
  *
- * NestedData recursively flattens multi-dimensional initializer lists into a 1D vector
- * while keeping track of the tensor's shape.
+ * NestedData recursively flattens multi-dimensional initializer lists into a 1D
+ * vector while keeping track of the tensor's shape.
  *
  * @tparam T The numeric type of the tensor data.
  */
-template <typename T> struct NestedData
-{
+template <typename T> struct NestedData {
 
   public:
     /**
@@ -49,8 +46,7 @@ template <typename T> struct NestedData
      * @param data The scalar value.
      */
     // NOLINTNEXTLINE google-explicit-constructor
-    NestedData(T data)
-    {
+    NestedData(T data) {
         flatData.push_back(data);
     }
 
@@ -58,25 +54,24 @@ template <typename T> struct NestedData
      * @brief Construct from a nested initializer list.
      * @param data The nested initializer list.
      */
-    NestedData(std::initializer_list<NestedData<T>> data)
-    {
-        if (data.size() == 0) { return;
-}
+    NestedData(std::initializer_list<NestedData<T>> data) {
+        if (data.size() == 0) {
+            return;
+        }
 
         shape.push_back(data.size());
         const auto& firstShape = data.begin()->shape;
         shape.insert(shape.end(), firstShape.begin(), firstShape.end());
 
         size_t totalElements = 0;
-        #pragma unroll 5
+#pragma unroll 5
         for (const auto& val : data) {
             totalElements += val.flatData.size();
         }
         flatData.reserve(totalElements);
 
 #pragma unroll 5
-        for (const auto& val : data)
-        {
+        for (const auto& val : data) {
             flatData.insert(
                 flatData.end(), val.flatData.begin(), val.flatData.end());
         }
@@ -86,8 +81,7 @@ template <typename T> struct NestedData
      * @brief Get the flattened 1D data.
      * @return const std::vector<T>& reference to flat data.
      */
-    const std::vector<T>& getFlatData() const
-    {
+    const std::vector<T>& getFlatData() const {
         return flatData;
     }
 
@@ -95,8 +89,7 @@ template <typename T> struct NestedData
      * @brief Get the computed shape of the nested data.
      * @return const std::vector<size_t>& reference to shape dimensions.
      */
-    [[nodiscard]] const std::vector<size_t>& getShape() const
-    {
+    [[nodiscard]] const std::vector<size_t>& getShape() const {
         return shape;
     }
 

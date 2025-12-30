@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      https://www.apache.org/licenses/LICENSE-2.0 
+//      https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,14 +21,12 @@
 
 #include <cstddef>
 
-namespace hahaha::compute::gpu
-{
+namespace hahaha::compute::gpu {
 
 /**
  * @brief Utilities for GPU memory allocation and data transfer.
  */
-class GpuMemory
-{
+class GpuMemory {
   public:
     /**
      * @brief Allocate memory on the GPU.
@@ -49,7 +47,8 @@ class GpuMemory
      * @param host_ptr Source pointer on the host.
      * @param size Size of data to copy in bytes.
      */
-    static void copyToDevice(void* device_ptr, const void* host_ptr, size_t size);
+    static void
+    copyToDevice(void* device_ptr, const void* host_ptr, size_t size);
 
     /**
      * @brief Copy data from device to host.
@@ -65,10 +64,10 @@ class GpuMemory
      * @param src_ptr Source pointer on the device.
      * @param size Size of data to copy in bytes.
      */
-    static void copyDeviceToDevice(void* dest_ptr, const void* src_ptr, size_t size);
+    static void
+    copyDeviceToDevice(void* dest_ptr, const void* src_ptr, size_t size);
 };
 
 } // namespace hahaha::compute::gpu
 
 #endif // HAHAHA_COMPUTE_GPU_GPU_MEMORY_H
-
