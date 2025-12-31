@@ -21,6 +21,7 @@
 
 #include <memory>
 
+#include "compute/Device.h"
 #include "compute/compute_graph/ComputeFun.h"
 #include "math/ds/TensorData.h"
 #include "utils/common/HelperStruct.h"
@@ -144,6 +145,19 @@ template <typename T> class Tensor {
     /** @brief Get the underlying data wrapper. */
     [[nodiscard]] std::shared_ptr<math::TensorWrapper<T>> data() const {
         return computeNode_->getData();
+    }
+
+    /**
+     * @brief Move the tensor to a different device.
+     * @param device The target device.
+     */
+    void to(const compute::Device& device) {
+        computeNode_->getData()->to(device);
+    }
+
+    /** @brief Get the device where the tensor resides. */
+    [[nodiscard]] const compute::Device& getDevice() const {
+        return computeNode_->getData()->getDevice();
     }
 
     /** @brief Set whether this tensor requires gradients. */
