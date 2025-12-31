@@ -16,10 +16,43 @@
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 //
 
+#ifndef HAHAHA_DISPLAY_WINDOW_H
+#define HAHAHA_DISPLAY_WINDOW_H
+
 #include "imgui.h"
 #include "imgui_internal.h"
+#include <string>
 
 namespace hahaha::display {
 
-class Window {};
+/**
+ * @brief Base Window class for managing ImGui contexts and rendering.
+ */
+class Window {
+  public:
+    Window() = default;
+    virtual ~Window() = default;
+
+    /**
+     * @brief Initialize the window.
+     * @param title Window title.
+     * @param width Window width.
+     * @param height Window height.
+     */
+    virtual void init(const std::string& title, int width, int height) = 0;
+
+    /**
+     * @brief Render a frame.
+     * @return bool True if the window should remain open.
+     */
+    virtual bool render() = 0;
+
+    /**
+     * @brief Close the window.
+     */
+    virtual void close() = 0;
+};
+
 } // namespace hahaha::display
+
+#endif // HAHAHA_DISPLAY_WINDOW_H

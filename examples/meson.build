@@ -5,3 +5,4 @@ example_sources = run_command('find', '.', '-name', '*.cpp', '-type', 'f', check
 
 subdir('autograd')
 subdir('basic_usage')
+subdir('ml_visualizer')

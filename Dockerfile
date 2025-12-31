@@ -88,6 +88,10 @@ RUN apt-get update && apt-get install -y \
     fish \
     clangd \
     clang-format\
+    libglfw3-dev \
+    libgl1-mesa-dev \
+    libglu1-mesa-dev \
+    pkgconf \
     && rm -rf /var/lib/apt/lists/*
 
 # Make clang/clang++ the system default C/C++ compilers so tools like Meson
