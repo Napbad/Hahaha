@@ -49,16 +49,16 @@ class DeviceComputeDispatcher {
             // In a real implementation, this would call specialized functions
             // from hahaha::compute::cpu namespace
             size_t size = lhs.getSize();
-            auto* l_ptr = lhs.data_.getData().get();
-            auto* r_ptr = rhs.data_.getData().get();
-            auto* res_ptr = res.data_.getData().get();
+            auto* lPtr = lhs.data_.getData().get();
+            auto* rPtr = rhs.data_.getData().get();
+            auto* resPtr = res.data_.getData().get();
 
             for (size_t i = 0; i < size; ++i) {
                 switch (op) {
-                    case Operator::Add: res_ptr[i] = l_ptr[i] + r_ptr[i]; break;
-                    case Operator::Sub: res_ptr[i] = l_ptr[i] - r_ptr[i]; break;
-                    case Operator::Mul: res_ptr[i] = l_ptr[i] * r_ptr[i]; break;
-                    case Operator::Div: res_ptr[i] = l_ptr[i] / r_ptr[i]; break;
+                    case Operator::Add: resPtr[i] = lPtr[i] + rPtr[i]; break;
+                    case Operator::Sub: resPtr[i] = lPtr[i] - rPtr[i]; break;
+                    case Operator::Mul: resPtr[i] = lPtr[i] * rPtr[i]; break;
+                    case Operator::Div: resPtr[i] = lPtr[i] / rPtr[i]; break;
                     default: throw std::runtime_error("Unsupported binary op");
                 }
             }

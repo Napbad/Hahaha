@@ -71,7 +71,7 @@ struct Device {
         }
         return deviceName + ":" + std::to_string(id);
     }
-};
+} __attribute__((aligned(2)));
 
 } // namespace hahaha::compute
 
