@@ -16,13 +16,13 @@
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 //
 
-#ifndef HAHAHA_COMPUTE_DEVICE_H
-#define HAHAHA_COMPUTE_DEVICE_H
+#ifndef HAHAHA_BACKEND_DEVICE_H
+#define HAHAHA_BACKEND_DEVICE_H
 
 #include <cstdint>
 #include <string>
 
-namespace hahaha::compute {
+namespace hahaha::backend {
 
 /**
  * @brief Types of devices supported for computation.
@@ -73,7 +73,7 @@ struct Device {
     }
 } __attribute__((aligned(2)));
 
-} // namespace hahaha::compute
+} // namespace hahaha::backend
 
-#endif // HAHAHA_COMPUTE_DEVICE_H
+#endif // HAHAHA_BACKEND_DEVICE_H
 

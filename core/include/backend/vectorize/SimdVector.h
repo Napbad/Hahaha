@@ -16,13 +16,13 @@
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 //
 
-#ifndef HAHAHA_COMPUTE_VECTORIZE_SIMD_VECTOR_H
-#define HAHAHA_COMPUTE_VECTORIZE_SIMD_VECTOR_H
+#ifndef HAHAHA_BACKEND_VECTORIZE_SIMD_VECTOR_H
+#define HAHAHA_BACKEND_VECTORIZE_SIMD_VECTOR_H
 
 #include <cstddef>
 #include <type_traits>
 
-namespace hahaha::compute::vectorize {
+namespace hahaha::backend::vectorize {
 
 /**
  * @brief Represents a fixed-size vector for SIMD operations.
@@ -72,6 +72,6 @@ template <typename T, size_t Width> class SimdVector {
     void broadcast(T value);
 };
 
-} // namespace hahaha::compute::vectorize
+} // namespace hahaha::backend::vectorize
 
-#endif // HAHAHA_COMPUTE_VECTORIZE_SIMD_VECTOR_H
+#endif // HAHAHA_BACKEND_VECTORIZE_SIMD_VECTOR_H

@@ -24,7 +24,7 @@
 #include <utility>
 #include <vector>
 
-#include "compute/compute_graph/Operator.h"
+#include "common/Operator.h"
 #include "math/TensorWrapper.h"
 #include "utils/common/HelperStruct.h"
 
@@ -75,11 +75,11 @@ template <typename T> class ComputeNode {
     ComputeNode(std::shared_ptr<ComputeNode<T>> lhs,
                 std::shared_ptr<ComputeNode<T>> rhs,
                 std::shared_ptr<math::TensorWrapper<T>> res,
-                Operator operatorType,
+                common::Operator operatorType,
                 std::function<void()> gradFun)
         : data_(res), operatorType_(operatorType),
           gradFun_(std::move(gradFun)) {
-        if (operatorType_ == Operator::None) {
+        if (operatorType_ == common::Operator::None) {
             throw std::invalid_argument("Operator cannot be None");
         }
         parents_.push_back(lhs);
@@ -196,7 +196,7 @@ template <typename T> class ComputeNode {
   private:
     std::vector<std::shared_ptr<ComputeNode<T>>> parents_; /**< Input nodes. */
     std::shared_ptr<math::TensorWrapper<T>> data_;         /**< Forward data. */
-    Operator operatorType_ = Operator::None; /**< Operation used. */
+    common::Operator operatorType_ = common::Operator::None; /**< Operation used. */
 
     bool requiresGrad_ = false;     /**< Grad requirement flag. */
     std::function<void()> gradFun_; /**< Backprop logic. */

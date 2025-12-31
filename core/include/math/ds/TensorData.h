@@ -22,7 +22,7 @@
 #include <memory>
 #include <stdexcept>
 
-#include "compute/Device.h"
+#include "backend/Device.h"
 #include "math/ds/NestedData.h"
 #include "math/ds/TensorShape.h"
 #include "math/ds/TensorStride.h"
@@ -59,11 +59,11 @@ template <typename T> class TensorData {
      */
     TensorData(const TensorShape& shape,
                T initValue,
-               compute::Device device = compute::Device())
+               backend::Device device = backend::Device())
         : shape_(shape), stride_(shape), device_(device) {
         size_t size = shape_.getTotalSize();
-        if (device_.type == compute::DeviceType::CPU
-            || device_.type == compute::DeviceType::SIMD) {
+        if (device_.type == backend::DeviceType::CPU
+            || device_.type == backend::DeviceType::SIMD) {
             data_ = std::make_unique<T[]>(size);
             std::fill(data_.get(), data_.get() + size, initValue);
         } else {
@@ -80,8 +80,8 @@ template <typename T> class TensorData {
     TensorData(const TensorData& other)
         : shape_(other.shape_), stride_(other.stride_), device_(other.device_) {
         size_t size = shape_.getTotalSize();
-        if (device_.type == compute::DeviceType::CPU
-            || device_.type == compute::DeviceType::SIMD) {
+        if (device_.type == backend::DeviceType::CPU
+            || device_.type == backend::DeviceType::SIMD) {
             data_ = std::make_unique<T[]>(size);
             std::copy(other.data_.get(), other.data_.get() + size, data_.get());
         } else {
@@ -131,7 +131,7 @@ template <typename T> class TensorData {
      * @param data The NestedData object containing flattened data and shape.
      */
     explicit TensorData(NestedData<T>&& data)
-        : shape_(data.getShape()), device_(compute::Device()) {
+        : shape_(data.getShape()), device_(backend::Device()) {
         size_t size = data.getFlatData().size();
         data_ = std::make_unique<T[]>(size);
         std::copy(
@@ -199,7 +199,7 @@ template <typename T> class TensorData {
      * @brief Get the device where the data is stored.
      * @return Const reference to the device.
      */
-    [[nodiscard]] const compute::Device& getDevice() const {
+    [[nodiscard]] const backend::Device& getDevice() const {
         return device_;
     }
 
@@ -207,7 +207,7 @@ template <typename T> class TensorData {
      * @brief Set the device for this tensor data.
      * @param device New device.
      */
-    void setDevice(const compute::Device& device) {
+    void setDevice(const backend::Device& device) {
         device_ = device;
     }
 
@@ -215,7 +215,7 @@ template <typename T> class TensorData {
     std::unique_ptr<T[]> data_; /**< Raw heap-allocated data array. */
     TensorShape shape_;         /**< Dimensionality metadata. */
     TensorStride stride_;       /**< Memory skip values for indexing. */
-    compute::Device device_;    /**< Device where data resides. */
+    backend::Device device_;    /**< Device where data resides. */
 
     friend class TensorWrapper<T>;
 };

@@ -27,10 +27,11 @@
 #include <stdexcept>
 #include <vector>
 
-#include "compute/Device.h"
-#include "compute/DeviceComputeDispatcher.h"
+#include "backend/Device.h"
+#include "backend/DeviceComputeDispatcher.h"
 #include "math/ds/TensorData.h"
 #include "math/ds/TensorShape.h"
+#include "common/Operator.h"
 
 class TensorWrapperTest;
 
@@ -66,7 +67,7 @@ template <typename T> class TensorWrapper {
      */
     explicit TensorWrapper(const TensorShape& shape,
                            T initValue = 0,
-                           compute::Device device = compute::Device())
+                           backend::Device device = backend::Device())
         : data_(TensorData<T>(shape, initValue, device)) {
     }
 
@@ -140,9 +141,9 @@ template <typename T> class TensorWrapper {
 
     /**
      * @brief Get the device where the tensor resides.
-     * @return const compute::Device& reference to the device.
+     * @return const backend::Device& reference to the device.
      */
-    [[nodiscard]] const compute::Device& getDevice() const {
+    [[nodiscard]] const backend::Device& getDevice() const {
         return data_.getDevice();
     }
 
@@ -150,20 +151,20 @@ template <typename T> class TensorWrapper {
      * @brief Move the tensor to a different device.
      * @param device The target device.
      */
-    void to(const compute::Device& device) {
+    void to(const backend::Device& device) {
         if (data_.getDevice() == device) {
             return;
         }
 
         // Logic for moving data between devices
-        if (device.type == compute::DeviceType::CPU
-            || device.type == compute::DeviceType::SIMD) {
-            if (data_.getDevice().type == compute::DeviceType::GPU) {
+        if (device.type == backend::DeviceType::CPU
+            || device.type == backend::DeviceType::SIMD) {
+            if (data_.getDevice().type == backend::DeviceType::GPU) {
                 // TODO: Implement GPU to CPU transfer
                 throw std::runtime_error(
                     "GPU to CPU transfer not yet implemented");
             }
-        } else if (device.type == compute::DeviceType::GPU) {
+        } else if (device.type == backend::DeviceType::GPU) {
             // TODO: Implement CPU to GPU transfer
             throw std::runtime_error("CPU to GPU transfer not yet implemented");
         }
@@ -300,8 +301,8 @@ template <typename T> class TensorWrapper {
         result.data_.setDevice(data_.getDevice());
         result.data_.setData(std::make_unique<T[]>(getSize()));
 
-        compute::DeviceComputeDispatcher<T>::dispatchBinary(
-            compute::Operator::Add, *this, other, result);
+        backend::DeviceComputeDispatcher<T>::dispatchBinary(
+            common::Operator::Add, *this, other, result);
 
         return result;
     }
@@ -328,8 +329,8 @@ template <typename T> class TensorWrapper {
         result.data_.setDevice(data_.getDevice());
         result.data_.setData(std::make_unique<T[]>(getSize()));
 
-        compute::DeviceComputeDispatcher<T>::dispatchBinary(
-            compute::Operator::Sub, *this, other, result);
+        backend::DeviceComputeDispatcher<T>::dispatchBinary(
+            common::Operator::Sub, *this, other, result);
 
         return result;
     }
@@ -356,8 +357,8 @@ template <typename T> class TensorWrapper {
         result.data_.setDevice(data_.getDevice());
         result.data_.setData(std::make_unique<T[]>(getSize()));
 
-        compute::DeviceComputeDispatcher<T>::dispatchBinary(
-            compute::Operator::Mul, *this, other, result);
+        backend::DeviceComputeDispatcher<T>::dispatchBinary(
+            common::Operator::Mul, *this, other, result);
 
         return result;
     }
@@ -384,8 +385,8 @@ template <typename T> class TensorWrapper {
         result.data_.setDevice(data_.getDevice());
         result.data_.setData(std::make_unique<T[]>(getSize()));
 
-        compute::DeviceComputeDispatcher<T>::dispatchBinary(
-            compute::Operator::Div, *this, other, result);
+        backend::DeviceComputeDispatcher<T>::dispatchBinary(
+            common::Operator::Div, *this, other, result);
 
         return result;
     }
@@ -429,7 +430,7 @@ template <typename T> class TensorWrapper {
         result.data_.setDevice(data_.getDevice());
         result.data_.setData(std::make_unique<T[]>(rows * cols));
 
-        compute::DeviceComputeDispatcher<T>::dispatchMatMul(
+        backend::DeviceComputeDispatcher<T>::dispatchMatMul(
             *this, other, result);
 
         return result;
@@ -535,7 +536,7 @@ template <typename T> class TensorWrapper {
     // Friend classes for internal access
     friend class ::TensorWrapperTest;
     friend class hahaha::compute::ComputeNode<T>;
-    friend class hahaha::compute::DeviceComputeDispatcher<T>;
+    friend class hahaha::backend::DeviceComputeDispatcher<T>;
 };
 
 } // namespace hahaha::math

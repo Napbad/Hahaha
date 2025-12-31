@@ -16,14 +16,14 @@
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 //
 
-#ifndef HAHAHA_COMPUTE_GPU_GPU_CONTEXT_H
-#define HAHAHA_COMPUTE_GPU_GPU_CONTEXT_H
+#ifndef HAHAHA_BACKEND_GPU_GPU_CONTEXT_H
+#define HAHAHA_BACKEND_GPU_GPU_CONTEXT_H
 
 #include <memory>
 #include <string>
 #include <vector>
 
-namespace hahaha::compute::gpu {
+namespace hahaha::backend::gpu {
 
 /**
  * @brief Manages the GPU device context and resources.
@@ -69,6 +69,6 @@ class GpuContext {
     [[nodiscard]] virtual int getDeviceCount() const = 0;
 };
 
-} // namespace hahaha::compute::gpu
+} // namespace hahaha::backend::gpu
 
-#endif // HAHAHA_COMPUTE_GPU_GPU_CONTEXT_H
+#endif // HAHAHA_BACKEND_GPU_GPU_CONTEXT_H

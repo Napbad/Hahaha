@@ -21,8 +21,8 @@
 
 #include <memory>
 
-#include "compute/compute_graph/ComputeNode.h"
-#include "compute/compute_graph/Operator.h"
+#include "common/Operator.h"
+#include "compute/graph/ComputeNode.h"
 #include "math/TensorWrapper.h"
 #include "math/ds/TensorData.h"
 
@@ -44,7 +44,7 @@ add(const std::shared_ptr<ComputeNode<T>>& lhs,
         lhs->getData()->add(*rhs->getData()));
 
     std::shared_ptr<ComputeNode<T>> resNode = std::make_shared<ComputeNode<T>>(
-        lhs, rhs, resData, Operator::Add, nullptr);
+        lhs, rhs, resData, common::Operator::Add, nullptr);
 
     std::weak_ptr<ComputeNode<T>> weakRes = resNode;
 
@@ -82,7 +82,7 @@ sub(const std::shared_ptr<ComputeNode<T>>& lhs,
         lhs->getData()->subtract(*rhs->getData()));
 
     std::shared_ptr<ComputeNode<T>> resNode = std::make_shared<ComputeNode<T>>(
-        lhs, rhs, resData, Operator::Sub, nullptr);
+        lhs, rhs, resData, common::Operator::Sub, nullptr);
 
     std::weak_ptr<ComputeNode<T>> weakRes = resNode;
 
@@ -123,7 +123,7 @@ mul(const std::shared_ptr<ComputeNode<T>>& lhs,
         lhs->getData()->multiply(*rhs->getData()));
 
     std::shared_ptr<ComputeNode<T>> resNode = std::make_shared<ComputeNode<T>>(
-        lhs, rhs, resData, Operator::Mul, nullptr);
+        lhs, rhs, resData, common::Operator::Mul, nullptr);
 
     std::weak_ptr<ComputeNode<T>> weakRes = resNode;
 
@@ -167,7 +167,7 @@ div(const std::shared_ptr<ComputeNode<T>>& lhs,
         lhs->getData()->divide(*rhs->getData()));
 
     std::shared_ptr<ComputeNode<T>> resNode = std::make_shared<ComputeNode<T>>(
-        lhs, rhs, resData, Operator::Div, nullptr);
+        lhs, rhs, resData, common::Operator::Div, nullptr);
 
     std::weak_ptr<ComputeNode<T>> weakRes = resNode;
 
@@ -217,7 +217,7 @@ matmul(const std::shared_ptr<ComputeNode<T>>& lhs,
         lhs->getData()->matmul(*rhs->getData()));
 
     std::shared_ptr<ComputeNode<T>> resNode = std::make_shared<ComputeNode<T>>(
-        lhs, rhs, resData, Operator::MatMul, nullptr);
+        lhs, rhs, resData, common::Operator::MatMul, nullptr);
 
     std::weak_ptr<ComputeNode<T>> weakRes = resNode;
 

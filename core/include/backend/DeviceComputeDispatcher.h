@@ -16,18 +16,19 @@
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 //
 
-#ifndef HAHAHA_COMPUTE_DEVICE_COMPUTE_DISPATCHER_H
-#define HAHAHA_COMPUTE_DEVICE_COMPUTE_DISPATCHER_H
+#ifndef HAHAHA_BACKEND_DEVICE_COMPUTE_DISPATCHER_H
+#define HAHAHA_BACKEND_DEVICE_COMPUTE_DISPATCHER_H
 
 #include <stdexcept>
-#include "compute/Device.h"
-#include "compute/compute_graph/Operator.h"
+
+#include "backend/Device.h"
+#include "common/Operator.h"
 
 namespace hahaha::math {
 template <typename T> class TensorWrapper;
-}
+} // namespace hahaha::math
 
-namespace hahaha::compute {
+namespace hahaha::backend {
 
 /**
  * @brief Top-level dispatcher for device-specific computations.
@@ -39,15 +40,15 @@ namespace hahaha::compute {
 template <typename T>
 class DeviceComputeDispatcher {
   public:
-    static void dispatchBinary(Operator op,
+    static void dispatchBinary(common::Operator op,
                                const math::TensorWrapper<T>& lhs,
                                const math::TensorWrapper<T>& rhs,
                                math::TensorWrapper<T>& res) {
         auto device = lhs.getDevice();
-        if (device.type == DeviceType::CPU) {
+        if (device.type == backend::DeviceType::CPU) {
             // Placeholder: Call CPU kernels
             // In a real implementation, this would call specialized functions
-            // from hahaha::compute::cpu namespace
+            // from hahaha::backend::cpu namespace
             size_t size = lhs.getSize();
             auto* lPtr = lhs.data_.getData().get();
             auto* rPtr = rhs.data_.getData().get();
@@ -55,14 +56,19 @@ class DeviceComputeDispatcher {
 
             for (size_t i = 0; i < size; ++i) {
                 switch (op) {
-                    case Operator::Add: resPtr[i] = lPtr[i] + rPtr[i]; break;
-                    case Operator::Sub: resPtr[i] = lPtr[i] - rPtr[i]; break;
-                    case Operator::Mul: resPtr[i] = lPtr[i] * rPtr[i]; break;
-                    case Operator::Div: resPtr[i] = lPtr[i] / rPtr[i]; break;
+                    case common::Operator::Add: resPtr[i] = lPtr[i] + rPtr[i]; break;
+                    case common::Operator::Sub: resPtr[i] = lPtr[i] - rPtr[i]; break;
+                    case common::Operator::Mul: resPtr[i] = lPtr[i] * rPtr[i]; break;
+                    case common::Operator::Div:
+                        if (rPtr[i] == T(0)) {
+                            throw std::runtime_error("Division by zero");
+                        }
+                        resPtr[i] = lPtr[i] / rPtr[i];
+                        break;
                     default: throw std::runtime_error("Unsupported binary op");
                 }
             }
-        } else if (device.type == DeviceType::GPU) {
+        } else if (device.type == backend::DeviceType::GPU) {
             throw std::runtime_error("GPU dispatch not yet implemented");
         } else {
             throw std::runtime_error("Unsupported device type for dispatch");
@@ -73,14 +79,33 @@ class DeviceComputeDispatcher {
                                const math::TensorWrapper<T>& rhs,
                                math::TensorWrapper<T>& res) {
         auto device = lhs.getDevice();
-        if (device.type == DeviceType::CPU) {
-            // Placeholder for CPU MatMul
+        if (device.type == backend::DeviceType::CPU) {
+            const auto& lhsDims = lhs.getShape().getDims();
+            const auto& rhsDims = rhs.getShape().getDims();
+            
+            size_t rows = lhsDims[0];
+            size_t cols = rhsDims[1];
+            size_t inner = lhsDims[1];
+
+            auto* lPtr = lhs.data_.getData().get();
+            auto* rPtr = rhs.data_.getData().get();
+            auto* resPtr = res.data_.getData().get();
+
+            for (size_t i = 0; i < rows; ++i) {
+                for (size_t j = 0; j < cols; ++j) {
+                    T sum = T(0);
+                    for (size_t k = 0; k < inner; ++k) {
+                        sum += lPtr[i * inner + k] * rPtr[k * cols + j];
+                    }
+                    resPtr[i * cols + j] = sum;
+                }
+            }
         } else {
             throw std::runtime_error("MatMul dispatch not yet implemented");
         }
     }
 };
 
-} // namespace hahaha::compute
+} // namespace hahaha::backend
 
-#endif // HAHAHA_COMPUTE_DEVICE_COMPUTE_DISPATCHER_H
+#endif // HAHAHA_BACKEND_DEVICE_COMPUTE_DISPATCHER_H

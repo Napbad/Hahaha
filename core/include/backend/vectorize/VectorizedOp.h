@@ -16,13 +16,13 @@
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 //
 
-#ifndef HAHAHA_COMPUTE_VECTORIZE_VECTORIZED_OP_H
-#define HAHAHA_COMPUTE_VECTORIZE_VECTORIZED_OP_H
+#ifndef HAHAHA_BACKEND_VECTORIZE_VECTORIZED_OP_H
+#define HAHAHA_BACKEND_VECTORIZE_VECTORIZED_OP_H
 
 #include <cstddef>
 #include <vector>
 
-namespace hahaha::compute::vectorize {
+namespace hahaha::backend::vectorize {
 
 /**
  * @brief Base class for vectorized operations on large data sets.
@@ -57,6 +57,6 @@ class VectorizedOp {
     virtual size_t getPreferredWidth() const = 0;
 };
 
-} // namespace hahaha::compute::vectorize
+} // namespace hahaha::backend::vectorize
 
-#endif // HAHAHA_COMPUTE_VECTORIZE_VECTORIZED_OP_H
+#endif // HAHAHA_BACKEND_VECTORIZE_VECTORIZED_OP_H

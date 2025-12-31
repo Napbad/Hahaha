@@ -16,10 +16,10 @@
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 //
 
-#ifndef HAHAHA_COMPUTE_COMPUTE_GRAPH_OPERATOR_H
-#define HAHAHA_COMPUTE_COMPUTE_GRAPH_OPERATOR_H
+#ifndef HAHAHA_COMMON_OPERATOR_H
+#define HAHAHA_COMMON_OPERATOR_H
 
-namespace hahaha::compute {
+namespace hahaha::common {
 
 /**
  * @brief Enumeration of all supported operations in the computational graph.
@@ -27,7 +27,7 @@ namespace hahaha::compute {
  * This enum is used by ComputeNode to identify which operation produced it,
  * allowing for metadata tracking and potentially different execution paths.
  */
-enum Operator {
+enum class Operator {
     Add = 0,   /**< Element-wise addition. */
     Sub,       /**< Element-wise subtraction. */
     Mul,       /**< Element-wise multiplication. */
@@ -53,5 +53,5 @@ enum Operator {
     None       /**< No operation (leaf node). */
 };
 
-} // namespace hahaha::compute
-#endif // HAHAHA_COMPUTE_COMPUTE_GRAPH_OPERATOR_H
+} // namespace hahaha::common
+#endif // HAHAHA_COMMON_OPERATOR_H

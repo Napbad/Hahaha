@@ -16,14 +16,14 @@
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 //
 
-#ifndef HAHAHA_COMPUTE_GPU_GPU_KERNEL_H
-#define HAHAHA_COMPUTE_GPU_GPU_KERNEL_H
+#ifndef HAHAHA_BACKEND_GPU_GPU_KERNEL_H
+#define HAHAHA_BACKEND_GPU_GPU_KERNEL_H
 
 #include <memory>
 #include <string>
 #include <vector>
 
-namespace hahaha::compute::gpu {
+namespace hahaha::backend::gpu {
 
 /**
  * @brief Represents a GPU kernel that can be executed on a device.
@@ -61,6 +61,6 @@ class GpuKernel {
     [[nodiscard]] virtual std::string getName() const = 0;
 };
 
-} // namespace hahaha::compute::gpu
+} // namespace hahaha::backend::gpu
 
-#endif // HAHAHA_COMPUTE_GPU_GPU_KERNEL_H
+#endif // HAHAHA_BACKEND_GPU_GPU_KERNEL_H

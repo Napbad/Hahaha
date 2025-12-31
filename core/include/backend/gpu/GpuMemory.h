@@ -16,12 +16,12 @@
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 //
 
-#ifndef HAHAHA_COMPUTE_GPU_GPU_MEMORY_H
-#define HAHAHA_COMPUTE_GPU_GPU_MEMORY_H
+#ifndef HAHAHA_BACKEND_GPU_GPU_MEMORY_H
+#define HAHAHA_BACKEND_GPU_GPU_MEMORY_H
 
 #include <cstddef>
 
-namespace hahaha::compute::gpu {
+namespace hahaha::backend::gpu {
 
 /**
  * @brief Utilities for GPU memory allocation and data transfer.
@@ -68,6 +68,6 @@ class GpuMemory {
     copyDeviceToDevice(void* dest_ptr, const void* src_ptr, size_t size);
 };
 
-} // namespace hahaha::compute::gpu
+} // namespace hahaha::backend::gpu
 
-#endif // HAHAHA_COMPUTE_GPU_GPU_MEMORY_H
+#endif // HAHAHA_BACKEND_GPU_GPU_MEMORY_H
