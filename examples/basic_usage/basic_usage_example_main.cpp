@@ -13,14 +13,14 @@
 // limitations under the License.
 //
 // Contributors:
-// Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 // jiansongshen (jason.shen111@outlook.com) (https://github.com/jiansongshen)
 //
 
-
-#include <gtest/gtest.h>
-
+#include "tensor_basic.h"
 int main() {
-    ::testing::InitGoogleTest();
-    return RUN_ALL_TESTS();
+    tensor_basic_add_example();
+    tensor_basic_sub_example();
+    tensor_basic_mul_example();
+    tensor_basic_div_example();
+    tensor_basic_matmul_example();
 }
