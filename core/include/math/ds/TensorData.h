@@ -20,7 +20,9 @@
 #define HAHAHA_MATH_DS_TENSOR_DATA_H
 
 #include <memory>
+#include <stdexcept>
 
+#include "compute/Device.h"
 #include "math/ds/NestedData.h"
 #include "math/ds/TensorShape.h"
 #include "math/ds/TensorStride.h"
@@ -34,7 +36,8 @@ template <typename T> class TensorWrapper;
  *
  * TensorData manages the raw memory allocation, the shape of the tensor,
  * and the memory strides. It uses std::unique_ptr for automatic memory
- * management.
+ * management on the CPU. For GPU, a separate memory management strategy
+ * would be needed.
  *
  * This class is designed to be wrapped by TensorWrapper, which provides
  * the high-level API.
@@ -49,15 +52,25 @@ template <typename T> class TensorData {
     TensorData() = default;
 
     /**
-     * @brief Construct with given shape and initial value.
+     * @brief Construct with given shape and initial value on a specific device.
      * @param shape The shape of the tensor.
      * @param initValue Initial value for all elements.
+     * @param device The device where the data should reside.
      */
-    TensorData(const TensorShape& shape, T initValue)
-        : shape_(shape), stride_(shape) {
+    TensorData(const TensorShape& shape,
+               T initValue,
+               compute::Device device = compute::Device())
+        : shape_(shape), stride_(shape), device_(device) {
         size_t size = shape_.getTotalSize();
-        data_ = std::make_unique<T[]>(size);
-        std::fill(data_.get(), data_.get() + size, initValue);
+        if (device_.type == compute::DeviceType::CPU
+            || device_.type == compute::DeviceType::SIMD) {
+            data_ = std::make_unique<T[]>(size);
+            std::fill(data_.get(), data_.get() + size, initValue);
+        } else {
+            // TODO: Handle GPU allocation using compute::gpu::GpuMemory
+            throw std::runtime_error(
+                "GPU allocation not yet implemented in TensorData");
+        }
     }
 
     /**
@@ -65,10 +78,17 @@ template <typename T> class TensorData {
      * @param other The TensorData to copy from.
      */
     TensorData(const TensorData& other)
-        : shape_(other.shape_), stride_(other.stride_) {
+        : shape_(other.shape_), stride_(other.stride_), device_(other.device_) {
         size_t size = shape_.getTotalSize();
-        data_ = std::make_unique<T[]>(size);
-        std::copy(other.data_.get(), other.data_.get() + size, data_.get());
+        if (device_.type == compute::DeviceType::CPU
+            || device_.type == compute::DeviceType::SIMD) {
+            data_ = std::make_unique<T[]>(size);
+            std::copy(other.data_.get(), other.data_.get() + size, data_.get());
+        } else {
+            // TODO: Handle GPU deep copy
+            throw std::runtime_error(
+                "GPU deep copy not yet implemented in TensorData");
+        }
     }
 
     /**
@@ -77,7 +97,7 @@ template <typename T> class TensorData {
      */
     TensorData(TensorData&& other) noexcept
         : data_(std::move(other.data_)), shape_(std::move(other.shape_)),
-          stride_(std::move(other.stride_)) {
+          stride_(std::move(other.stride_)), device_(other.device_) {
     }
 
     /**
@@ -95,6 +115,7 @@ template <typename T> class TensorData {
             data_ = std::move(other.data_);
             shape_ = std::move(other.shape_);
             stride_ = std::move(other.stride_);
+            device_ = other.device_;
         }
         return *this;
     }
@@ -109,7 +130,8 @@ template <typename T> class TensorData {
      * lists).
      * @param data The NestedData object containing flattened data and shape.
      */
-    explicit TensorData(NestedData<T>&& data) : shape_(data.getShape()) {
+    explicit TensorData(NestedData<T>&& data)
+        : shape_(data.getShape()), device_(compute::Device()) {
         size_t size = data.getFlatData().size();
         data_ = std::make_unique<T[]>(size);
         std::copy(
@@ -173,10 +195,27 @@ template <typename T> class TensorData {
         stride_ = stride;
     }
 
+    /**
+     * @brief Get the device where the data is stored.
+     * @return Const reference to the device.
+     */
+    [[nodiscard]] const compute::Device& getDevice() const {
+        return device_;
+    }
+
+    /**
+     * @brief Set the device for this tensor data.
+     * @param device New device.
+     */
+    void setDevice(const compute::Device& device) {
+        device_ = device;
+    }
+
   private:
     std::unique_ptr<T[]> data_; /**< Raw heap-allocated data array. */
     TensorShape shape_;         /**< Dimensionality metadata. */
     TensorStride stride_;       /**< Memory skip values for indexing. */
+    compute::Device device_;    /**< Device where data resides. */
 
     friend class TensorWrapper<T>;
 };

@@ -27,6 +27,8 @@
 #include <stdexcept>
 #include <vector>
 
+#include "compute/Device.h"
+#include "compute/DeviceComputeDispatcher.h"
 #include "math/ds/TensorData.h"
 #include "math/ds/TensorShape.h"
 
@@ -56,12 +58,16 @@ template <typename T> class TensorWrapper {
     TensorWrapper() = default;
 
     /**
-     * @brief Construct a tensor with a given shape and initial value.
+     * @brief Construct a tensor with a given shape and initial value on a
+     * specific device.
      * @param shape The shape of the tensor.
      * @param initValue The initial value for all elements.
+     * @param device The device where the data should reside.
      */
-    explicit TensorWrapper(const TensorShape& shape, T initValue = 0)
-        : data_(TensorData<T>(shape, initValue)) {
+    explicit TensorWrapper(const TensorShape& shape,
+                           T initValue = 0,
+                           compute::Device device = compute::Device())
+        : data_(TensorData<T>(shape, initValue, device)) {
     }
 
     /**
@@ -130,6 +136,39 @@ template <typename T> class TensorWrapper {
      */
     [[nodiscard]] const TensorStride& getStride() const {
         return data_.getStride();
+    }
+
+    /**
+     * @brief Get the device where the tensor resides.
+     * @return const compute::Device& reference to the device.
+     */
+    [[nodiscard]] const compute::Device& getDevice() const {
+        return data_.getDevice();
+    }
+
+    /**
+     * @brief Move the tensor to a different device.
+     * @param device The target device.
+     */
+    void to(const compute::Device& device) {
+        if (data_.getDevice() == device) {
+            return;
+        }
+
+        // Logic for moving data between devices
+        if (device.type == compute::DeviceType::CPU
+            || device.type == compute::DeviceType::SIMD) {
+            if (data_.getDevice().type == compute::DeviceType::GPU) {
+                // TODO: Implement GPU to CPU transfer
+                throw std::runtime_error(
+                    "GPU to CPU transfer not yet implemented");
+            }
+        } else if (device.type == compute::DeviceType::GPU) {
+            // TODO: Implement CPU to GPU transfer
+            throw std::runtime_error("CPU to GPU transfer not yet implemented");
+        }
+
+        data_.setDevice(device);
     }
 
     /**
@@ -253,17 +292,16 @@ template <typename T> class TensorWrapper {
                 "Tensors must have the same shape for addition");
         }
 
+        checkSameDevice(other);
+
         TensorWrapper<T> result;
         result.data_.setShape(data_.getShape());
         result.data_.setStride(data_.getStride());
+        result.data_.setDevice(data_.getDevice());
+        result.data_.setData(std::make_unique<T[]>(getSize()));
 
-        size_t tensorSize = getSize();
-        result.data_.setData(std::make_unique<T[]>(tensorSize));
-
-        for (size_t i = 0; i < tensorSize; ++i) {
-            result.data_.getData()[i] =
-                data_.getData()[i] + other.data_.getData()[i];
-        }
+        compute::DeviceComputeDispatcher<T>::dispatchBinary(
+            compute::Operator::Add, *this, other, result);
 
         return result;
     }
@@ -282,17 +320,16 @@ template <typename T> class TensorWrapper {
                 "Tensors must have the same shape for subtraction");
         }
 
+        checkSameDevice(other);
+
         TensorWrapper<T> result;
         result.data_.setShape(data_.getShape());
         result.data_.setStride(data_.getStride());
+        result.data_.setDevice(data_.getDevice());
+        result.data_.setData(std::make_unique<T[]>(getSize()));
 
-        size_t tensorSize = getSize();
-        result.data_.setData(std::make_unique<T[]>(tensorSize));
-
-        for (size_t i = 0; i < tensorSize; ++i) {
-            result.data_.getData()[i] =
-                data_.getData()[i] - other.data_.getData()[i];
-        }
+        compute::DeviceComputeDispatcher<T>::dispatchBinary(
+            compute::Operator::Sub, *this, other, result);
 
         return result;
     }
@@ -311,17 +348,16 @@ template <typename T> class TensorWrapper {
                 "Tensors must have the same shape for multiplication");
         }
 
+        checkSameDevice(other);
+
         TensorWrapper<T> result;
         result.data_.setShape(data_.getShape());
         result.data_.setStride(data_.getStride());
+        result.data_.setDevice(data_.getDevice());
+        result.data_.setData(std::make_unique<T[]>(getSize()));
 
-        size_t tensorSize = getSize();
-        result.data_.setData(std::make_unique<T[]>(tensorSize));
-
-        for (size_t i = 0; i < tensorSize; ++i) {
-            result.data_.getData()[i] =
-                data_.getData()[i] * other.data_.getData()[i];
-        }
+        compute::DeviceComputeDispatcher<T>::dispatchBinary(
+            compute::Operator::Mul, *this, other, result);
 
         return result;
     }
@@ -340,21 +376,16 @@ template <typename T> class TensorWrapper {
                 "Tensors must have the same shape for division");
         }
 
+        checkSameDevice(other);
+
         TensorWrapper<T> result;
         result.data_.setShape(data_.getShape());
         result.data_.setStride(data_.getStride());
+        result.data_.setDevice(data_.getDevice());
+        result.data_.setData(std::make_unique<T[]>(getSize()));
 
-        size_t tensorSize = getSize();
-        result.data_.setData(std::make_unique<T[]>(tensorSize));
-
-        for (size_t i = 0; i < tensorSize; ++i) {
-            if (other.data_.getData()[i] == T(0)) {
-                throw std::runtime_error("Division by zero at index "
-                                         + std::to_string(i));
-            }
-            result.data_.getData()[i] =
-                data_.getData()[i] / other.data_.getData()[i];
-        }
+        compute::DeviceComputeDispatcher<T>::dispatchBinary(
+            compute::Operator::Div, *this, other, result);
 
         return result;
     }
@@ -373,6 +404,8 @@ template <typename T> class TensorWrapper {
             throw std::invalid_argument(
                 "matmul is only implemented for 2D tensors");
         }
+
+        checkSameDevice(other);
 
         const auto& thisDims = data_.getShape().getDims();
         const auto& otherDims = other.data_.getShape().getDims();
@@ -393,18 +426,11 @@ template <typename T> class TensorWrapper {
         TensorWrapper<T> result;
         result.data_.setShape(TensorShape({rows, cols}));
         result.data_.setStride(TensorStride(result.data_.getShape()));
+        result.data_.setDevice(data_.getDevice());
         result.data_.setData(std::make_unique<T[]>(rows * cols));
 
-        for (size_t i = 0; i < rows; ++i) {
-            for (size_t j = 0; j < cols; ++j) {
-                T sum = T(0);
-                for (size_t k = 0; k < inner; ++k) {
-                    sum += data_.getData()[i * inner + k]
-                        * other.data_.getData()[k * cols + j];
-                }
-                result.data_.getData()[i * cols + j] = sum;
-            }
-        }
+        compute::DeviceComputeDispatcher<T>::dispatchMatMul(
+            *this, other, result);
 
         return result;
     }
@@ -479,6 +505,8 @@ template <typename T> class TensorWrapper {
                 "Tensors must have the same shape for addition");
         }
 
+        checkSameDevice(other);
+
         size_t tensorSize = getSize();
 
         for (size_t i = 0; i < tensorSize; ++i) {
@@ -491,9 +519,23 @@ template <typename T> class TensorWrapper {
   private:
     TensorData<T> data_; /**< Managed tensor data and metadata. */
 
+    /**
+     * @brief Ensure that the other tensor is on the same device.
+     * @param other The other tensor to check.
+     */
+    void checkSameDevice(const TensorWrapper<T>& other) const {
+        if (getDevice() != other.getDevice()) {
+            throw std::invalid_argument(
+                "Tensors must be on the same device for this operation (found "
+                + getDevice().toString() + " and "
+                + other.getDevice().toString() + ")");
+        }
+    }
+
     // Friend classes for internal access
     friend class ::TensorWrapperTest;
     friend class hahaha::compute::ComputeNode<T>;
+    friend class hahaha::compute::DeviceComputeDispatcher<T>;
 };
 
 } // namespace hahaha::math

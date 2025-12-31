@@ -56,3 +56,4 @@ hahaha = declare_dependency(link_with: hahaha_lib,
 
 
 subdir('tests')
+subdir('examples')

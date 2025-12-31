@@ -13,14 +13,14 @@
 // limitations under the License.
 //
 // Contributors:
-// Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 // jiansongshen (jason.shen111@outlook.com) (https://github.com/jiansongshen)
 //
 
-
-#include <gtest/gtest.h>
-
+#include "autograd_basic.h"
 int main() {
-    ::testing::InitGoogleTest();
-    return RUN_ALL_TESTS();
+    auto_grad_add_example();
+    auto_grad_sub_example();
+    auto_grad_mul_example();
+    auto_grad_div_example();
+    auto_grad_matmul_example();
 }
