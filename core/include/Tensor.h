@@ -1,4 +1,4 @@
-// Copyright (c) 2025 Contributors of hahaha(https://github.com/Napbad/Hahaha)
+// Copyright (c) 2025 Contributors of Hahaha(https://github.com/Napbad/Hahaha)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -163,19 +163,19 @@ template <typename T> class Tensor {
     }
 
     // Friend functions for scalar-tensor operations (scalar op Tensor)
-    friend Tensor<T> operator*(T scalar, const Tensor<T>& tensor) {
+    friend Tensor operator*(T scalar, const Tensor<T>& tensor) {
         return Tensor(compute::mul(scalar, tensor.computeNode_));
     }
 
-    friend Tensor<T> operator+(T scalar, const Tensor<T>& tensor) {
+    friend Tensor operator+(T scalar, const Tensor<T>& tensor) {
         return Tensor(compute::add(scalar, tensor.computeNode_));
     }
 
-    friend Tensor<T> operator-(T scalar, const Tensor<T>& tensor) {
+    friend Tensor operator-(T scalar, const Tensor<T>& tensor) {
         return Tensor(compute::sub(scalar, tensor.computeNode_));
     }
 
-    friend Tensor<T> operator/(T scalar, const Tensor<T>& tensor) {
+    friend Tensor operator/(T scalar, const Tensor<T>& tensor) {
         return Tensor(compute::div(scalar, tensor.computeNode_));
     }
 

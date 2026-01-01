@@ -1,4 +1,4 @@
-// Copyright (c) 2025 Contributors of hahaha(https://github.com/Napbad/Hahaha)
+// Copyright (c) 2025 Contributors of Hahaha(https://github.com/Napbad/Hahaha)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -351,11 +351,11 @@ div(const std::shared_ptr<ComputeNode<T>>& lhs,
             }
             if (rhs->getRequiresGrad()) {
                 auto lhsData = lhs->getData();
-                auto y_sq = rhsData->multiply(*rhsData);
-                auto neg_x = -(*lhsData);
-                auto local_grad = neg_x.divide(y_sq);
+                auto rhsDataSquare = rhsData->multiply(*rhsData);
+                auto negLhsData = -(*lhsData);
+                auto localGrad = negLhsData.divide(rhsDataSquare);
                 auto gradRhs = std::make_shared<math::TensorWrapper<T>>(
-                    gradPtr->multiply(local_grad));
+                    gradPtr->multiply(localGrad));
                 rhs->accumulateGrad(gradRhs);
                 rhs->backward();
             }
@@ -393,10 +393,10 @@ std::shared_ptr<ComputeNode<T>> div(const std::shared_ptr<ComputeNode<T>>& lhs,
             }
             if (rhs->getRequiresGrad()) {
                 // d(x/s)/ds = -x/s^2
-                auto s_sq = rhsScalar * rhsScalar;
-                auto neg_x = -(*(lhs->getData()));
-                auto local_grad = neg_x.divide(s_sq);
-                auto scalarGradVal = gradPtr->multiply(local_grad).sum();
+                auto rhsSquareData = rhsScalar * rhsScalar;
+                auto negLhsData = -(*(lhs->getData()));
+                auto localGrad = negLhsData.divide(rhsSquareData);
+                auto scalarGradVal = gradPtr->multiply(localGrad).sum();
                 auto scalarGrad = std::make_shared<math::TensorWrapper<T>>(
                     math::TensorShape({}),
                     scalarGradVal,
@@ -432,12 +432,12 @@ div(const T& lhsScalar, const std::shared_ptr<ComputeNode<T>>& rhs) {
             auto rhsData = rhs->getData();
             if (lhs->getRequiresGrad()) {
                 // d(s/x)/ds = 1/x
-                auto local_grad = std::make_shared<math::TensorWrapper<T>>(
+                auto localGrad = std::make_shared<math::TensorWrapper<T>>(
                                       math::TensorShape(rhsData->getShape()),
                                       T(1),
                                       rhsData->getDevice())
                                       ->divide(*rhsData);
-                auto scalarGradVal = gradPtr->multiply(local_grad).sum();
+                auto scalarGradVal = gradPtr->multiply(localGrad).sum();
                 auto scalarGrad = std::make_shared<math::TensorWrapper<T>>(
                     math::TensorShape({}),
                     scalarGradVal,
@@ -447,15 +447,15 @@ div(const T& lhsScalar, const std::shared_ptr<ComputeNode<T>>& rhs) {
             }
             if (rhs->getRequiresGrad()) {
                 // d(s/x)/dx = -s/x^2
-                auto x_sq = rhsData->multiply(*rhsData);
-                auto neg_s = -lhsScalar;
-                auto local_grad = std::make_shared<math::TensorWrapper<T>>(
+                auto rhsSquareData = rhsData->multiply(*rhsData);
+                auto negLhsData = -lhsScalar;
+                auto localGrad = std::make_shared<math::TensorWrapper<T>>(
                                       math::TensorShape(rhsData->getShape()),
-                                      neg_s,
+                                      negLhsData,
                                       rhsData->getDevice())
-                                      ->divide(x_sq);
+                                      ->divide(rhsSquareData);
                 auto gradRhs = std::make_shared<math::TensorWrapper<T>>(
-                    gradPtr->multiply(local_grad));
+                    gradPtr->multiply(localGrad));
                 rhs->accumulateGrad(gradRhs);
                 rhs->backward();
             }
@@ -552,14 +552,14 @@ transpose(const std::shared_ptr<ComputeNode<T>>& parent) {
 
     resNode->setGradFun([weakParent, weakRes]() {
         auto res = weakRes.lock();
-        auto p = weakParent.lock();
-        if (res && p) {
+        auto parent = weakParent.lock();
+        if (res && parent) {
             auto gradPtr = res->getGrad();
-            if (p->getRequiresGrad()) {
+            if (parent->getRequiresGrad()) {
                 auto transposedGrad = std::make_shared<math::TensorWrapper<T>>(
                     gradPtr->transpose());
-                p->accumulateGrad(transposedGrad);
-                p->backward();
+                parent->accumulateGrad(transposedGrad);
+                parent->backward();
             }
         }
     });

@@ -1,5 +1,66 @@
 {
     "mesonbuild.configureOnOpen": true,
     "C_Cpp.default.compileCommands": "/workspace/builddir/compile_commands.json",
-    "C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild"
+    "C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild",
+
+    "psi-header.variables": [
+        ["projectname", "hahaha"],
+        ["projecturl", "https://github.com/Napbad/Hahaha"],
+        ["author", "Napbad"],
+        ["authoremail", "napbad.sen@gmail.com"],
+        ["authorurl", "https://github.com/Napbad"]
+    ],
+
+    // Language comment configuration: force line comments only
+    "psi-header.lang-config": [
+        { "language": "c",          "prefix": "// ", "begin": "", "end": "" },
+        { "language": "cpp",        "prefix": "// ", "begin": "", "end": "" },
+        { "language": "h",          "prefix": "// ", "begin": "", "end": "" },
+        { "language": "python",     "prefix": "# ",  "begin": "", "end": "" },
+        { "language": "javascript", "prefix": "// ", "begin": "", "end": "" },
+        { "language": "typescript", "prefix": "// ", "begin": "", "end": "" },
+        { "language": "java",       "prefix": "// ", "begin": "", "end": "" },
+        { "language": "go",         "prefix": "// ", "begin": "", "end": "" },
+        { "language": "rust",       "prefix": "// ", "begin": "", "end": "" },
+        { "language": "shellscript","prefix": "# ",  "begin": "", "end": "" },
+        { "language": "yaml",       "prefix": "# ",  "begin": "", "end": "" },
+        { "language": "json",       "prefix": "// ", "begin": "", "end": "" }
+    ],
+
+    // Unified header template in English (standard Apache 2.0)
+    "psi-header.templates": [
+        {
+            "language": "*",
+            "template": [
+                "Copyright (c) <<yeartoyear(fc!P, now)>> Contributors of <<projectname>>(<<projecturl>>)",
+                "",
+                "Licensed under the Apache License, Version 2.0 (the \"License\");",
+                "you may not use this file except in compliance with the License.",
+                "You may obtain a copy of the License at",
+                "",
+                "    https://www.apache.org/licenses/LICENSE-2.0",
+                "",
+                "Unless required by applicable law or agreed to in writing, software",
+                "distributed under the License is distributed on an \"AS IS\" BASIS,",
+                "WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.",
+                "See the License for the specific language governing permissions and",
+                "limitations under the License.",
+                "",
+                "Contributors:",
+                "<<author>> (<<authoremail>>) (<<authorurl>>)",
+                ""
+            ]
+        }
+    ],
+
+    "psi-header.config": {
+        "forceToTop": true,
+        "blankLinesAfter": 1
+    },
+
+    // Auto insert header on new files and update year range on save
+    "psi-header.changes-tracking": {
+        "autoHeader": "autoSave"
+    }
+
 }

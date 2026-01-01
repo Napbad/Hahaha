@@ -1,4 +1,4 @@
-// Copyright (c) 2025 Contributors of hahaha(https://github.com/Napbad/Hahaha)
+// Copyright (c) 2025 Contributors of Hahaha(https://github.com/Napbad/Hahaha)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.

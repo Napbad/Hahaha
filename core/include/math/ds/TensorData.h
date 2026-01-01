@@ -1,4 +1,4 @@
-// Copyright (c) 2025 Contributors of hahaha(https://github.com/Napbad/Hahaha)
+// Copyright (c) 2025 Contributors of Hahaha(https://github.com/Napbad/Hahaha)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 #ifndef HAHAHA_MATH_DS_TENSOR_DATA_H
 #define HAHAHA_MATH_DS_TENSOR_DATA_H
 
-#include <cstddef>
 #include <memory>
 #include <stdexcept>
 
@@ -156,7 +155,7 @@ template <typename T> class TensorData {
      * @param data The NestedData object containing flattened data and shape.
      */
     explicit TensorData(NestedData<T>&& data)
-        : shape_(data.getShape()), device_(backend::Device()) {
+        : shape_(data.getShape()) {
         size_t size = data.getFlatData().size();
         if (size > 0) {
             data_ = std::make_unique<T[]>(size);

@@ -1,4 +1,4 @@
-// Copyright (c) 2025 Contributors of hahaha(https://github.com/Napbad/Hahaha)
+// Copyright (c) 2025 Contributors of Hahaha(https://github.com/Napbad/Hahaha)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,22 +20,18 @@
 #define HAHAHA_MATH_DS_TENSOR_SHAPE_H
 
 #include <algorithm>
-#include <cstddef>
 #include <initializer_list>
 #include <iostream>
 #include <string>
 #include <vector>
 
 #include "common/definitions.h"
-#include "utils/common/HelperStruct.h"
 
 class TensorShapeTest;
 
 namespace hahaha::math {
 
 using hahaha::common::u32;
-using hahaha::utils::isInitList;
-using hahaha::utils::isLegalDataType;
 
 /**
  * @brief Represents the shape (dimensions) of a tensor.
@@ -119,7 +115,7 @@ class TensorShape {
 
     /** @brief Reverse the dimensions (e.g., for converting layout). */
     void reverse() {
-        std::reverse(dims_.begin(), dims_.end());
+        std::ranges::reverse(dims_);
     }
 
     /**
@@ -130,6 +126,7 @@ class TensorShape {
         std::string result = "(";
 #pragma unroll 5
         for (size_t i = 0; i < dims_.size(); ++i) {
+            // NOLINENEXTLINE
             result += std::to_string(dims_[i]);
             if (i != dims_.size() - 1) {
                 result += ", ";

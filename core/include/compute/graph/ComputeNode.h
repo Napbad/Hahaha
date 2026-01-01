@@ -1,4 +1,4 @@
-// Copyright (c) 2025 Contributors of hahaha(https://github.com/Napbad/Hahaha)
+// Copyright (c) 2025 Contributors of Hahaha(https://github.com/Napbad/Hahaha)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -223,12 +223,12 @@ template <typename T> class ComputeNode {
         }
     }
 
-    static std::shared_ptr<ComputeNode<T>>
-    createUnary(std::shared_ptr<ComputeNode<T>> parent,
+    static std::shared_ptr<ComputeNode>
+    createUnary(std::shared_ptr<ComputeNode> parent,
                 std::shared_ptr<math::TensorWrapper<T>> res,
                 common::Operator operatorType,
                 std::function<void()> gradFun = nullptr) {
-        std::shared_ptr<ComputeNode<T>> node = std::make_shared<ComputeNode<T>>(
+        std::shared_ptr<ComputeNode> node = std::make_shared<ComputeNode>(
             res, operatorType, std::move(gradFun));
         node->addParent(parent);
         node->setRequiresGrad(parent->getRequiresGrad());
@@ -236,7 +236,7 @@ template <typename T> class ComputeNode {
     }
 
   private:
-    std::vector<std::shared_ptr<ComputeNode<T>>> parents_; /**< Input nodes. */
+    std::vector<std::shared_ptr<ComputeNode>> parents_; /**< Input nodes. */
     std::shared_ptr<math::TensorWrapper<T>> data_;         /**< Forward data. */
     common::Operator operatorType_ =
         common::Operator::None; /**< Operation used. */
@@ -245,7 +245,7 @@ template <typename T> class ComputeNode {
     std::function<void()> gradFun_; /**< Backprop logic. */
     std::shared_ptr<math::TensorWrapper<T>> grad_; /**< Accumulated grad. */
 
-    friend class hahaha::Tensor<T>;
+    friend class Tensor<T>;
 };
 
 } // namespace hahaha::compute
