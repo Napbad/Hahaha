@@ -14,6 +14,7 @@
 //
 // Contributors:
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
+// jiansongshen (jason.shen111@outlook.com ) (https://github.com/jiansongshen )
 //
 
 #ifndef HAHAHA_MATH_TENSOR_WRAPPER_H
@@ -29,9 +30,9 @@
 
 #include "backend/Device.h"
 #include "backend/DeviceComputeDispatcher.h"
+#include "common/Operator.h"
 #include "math/ds/TensorData.h"
 #include "math/ds/TensorShape.h"
-#include "common/Operator.h"
 
 class TensorWrapperTest;
 
@@ -66,9 +67,28 @@ template <typename T> class TensorWrapper {
      * @param device The device where the data should reside.
      */
     explicit TensorWrapper(const TensorShape& shape,
-                           T initValue = 0,
+                           T initValue,
                            backend::Device device = backend::Device())
-        : data_(TensorData<T>(shape, initValue, device)) {
+        : data_(TensorData<T>(TensorShape(shape), initValue, device)) {
+    }
+
+    /**
+     * @brief Construct a tensor with a given shape on a specific device,
+     *        with elements initialized to 0 (default).
+     * @param shape The shape of the tensor.
+     * @param device The device where the data should reside.
+     */
+    explicit TensorWrapper(const TensorShape& shape, backend::Device device)
+        : data_(TensorData<T>(TensorShape(shape), T(0), device)) {
+    }
+
+    /**
+     * @brief Construct a tensor with a given shape, with elements initialized
+     * to 0 (default CPU).
+     * @param shape The shape of the tensor.
+     */
+    explicit TensorWrapper(const TensorShape& shape)
+        : data_(TensorData<T>(TensorShape(shape), T(0), backend::Device())) {
     }
 
     /**
@@ -102,18 +122,21 @@ template <typename T> class TensorWrapper {
         }
         return *this;
     }
-
-    /**
-     * @brief Destructor.
-     */
-    ~TensorWrapper() = default;
-
     /**
      * @brief Construct from NestedData (e.g., nested initializer list).
      * @param data The source nested data.
      */
     explicit TensorWrapper(NestedData<T>&& data) : data_(std::move(data)) {
     }
+
+    explicit TensorWrapper(const std::vector<T>& initVec)
+        : data_(TensorData<T>(initVec)) {
+    }
+
+    /**
+     * @brief Destructor.
+     */
+    ~TensorWrapper() = default;
 
     /**
      * @brief Get a reference to the raw data pointer.
@@ -125,10 +148,21 @@ template <typename T> class TensorWrapper {
 
     /**
      * @brief Get the tensor's shape.
-     * @return const TensorShape& reference to internal shape.
+     * @return const std::vector<size_t>& reference to internal shape.
      */
-    [[nodiscard]] const TensorShape& getShape() const {
-        return data_.getShape();
+    [[nodiscard]] const std::vector<size_t>& getShape() const {
+        return data_.getShape().getDims();
+    }
+
+    /**
+     * @brief Get the tensor's shape.
+     * @return size_t of totalSize.
+     */
+    [[nodiscard]] size_t getTotalSize() const {
+        if (data_.getData() == nullptr) {
+            return 0;
+        }
+        return data_.getShape().getTotalSize();
     }
 
     /**
@@ -160,12 +194,12 @@ template <typename T> class TensorWrapper {
         if (device.type == backend::DeviceType::CPU
             || device.type == backend::DeviceType::SIMD) {
             if (data_.getDevice().type == backend::DeviceType::GPU) {
-                // TODO: Implement GPU to CPU transfer
+                // TODO(jiansongshen): Implement GPU to CPU transfer
                 throw std::runtime_error(
                     "GPU to CPU transfer not yet implemented");
             }
         } else if (device.type == backend::DeviceType::GPU) {
-            // TODO: Implement CPU to GPU transfer
+            // TODO(jiansongshen): Implement CPU to GPU transfer
             throw std::runtime_error("CPU to GPU transfer not yet implemented");
         }
 
@@ -344,6 +378,7 @@ template <typename T> class TensorWrapper {
      * @return TensorWrapper<T> result tensor.
      */
     TensorWrapper<T> multiply(const TensorWrapper<T>& other) const {
+
         if (getShape() != other.getShape()) {
             throw std::invalid_argument(
                 "Tensors must have the same shape for multiplication");
@@ -392,6 +427,102 @@ template <typename T> class TensorWrapper {
     }
 
     /**
+     * @brief Scalar addition.
+     */
+    TensorWrapper<T> add(T scalar) const {
+        TensorWrapper<T> result;
+        result.data_.setShape(data_.getShape());
+        result.data_.setStride(data_.getStride());
+        result.data_.setDevice(data_.getDevice());
+        result.data_.setData(std::make_unique<T[]>(getSize()));
+
+        backend::DeviceComputeDispatcher<T>::dispatchScalar(
+            common::Operator::Add, *this, scalar, result);
+
+        return result;
+    }
+
+    /**
+     * @brief Scalar subtraction.
+     */
+    TensorWrapper<T> subtract(T scalar) const {
+        TensorWrapper<T> result;
+        result.data_.setShape(data_.getShape());
+        result.data_.setStride(data_.getStride());
+        result.data_.setDevice(data_.getDevice());
+        result.data_.setData(std::make_unique<T[]>(getSize()));
+
+        backend::DeviceComputeDispatcher<T>::dispatchScalar(
+            common::Operator::Sub, *this, scalar, result);
+
+        return result;
+    }
+
+    /**
+     * @brief Scalar multiplication.
+     */
+    TensorWrapper<T> multiply(T scalar) const {
+        TensorWrapper<T> result;
+        result.data_.setShape(data_.getShape());
+        result.data_.setStride(data_.getStride());
+        result.data_.setDevice(data_.getDevice());
+        result.data_.setData(std::make_unique<T[]>(getSize()));
+
+        backend::DeviceComputeDispatcher<T>::dispatchScalar(
+            common::Operator::Mul, *this, scalar, result);
+
+        return result;
+    }
+
+    /**
+     * @brief Scalar division.
+     */
+    TensorWrapper<T> divide(T scalar) const {
+        TensorWrapper<T> result;
+        result.data_.setShape(data_.getShape());
+        result.data_.setStride(data_.getStride());
+        result.data_.setDevice(data_.getDevice());
+        result.data_.setData(std::make_unique<T[]>(getSize()));
+
+        backend::DeviceComputeDispatcher<T>::dispatchScalar(
+            common::Operator::Div, *this, scalar, result);
+
+        return result;
+    }
+
+    /**
+     * @brief Subtraction from scalar (scalar - tensor).
+     */
+    TensorWrapper<T> subtractFrom(T scalar) const {
+        TensorWrapper<T> result;
+        result.data_.setShape(data_.getShape());
+        result.data_.setStride(data_.getStride());
+        result.data_.setDevice(data_.getDevice());
+        result.data_.setData(std::make_unique<T[]>(getSize()));
+
+        backend::DeviceComputeDispatcher<T>::dispatchScalar(
+            common::Operator::Sub, scalar, *this, result);
+
+        return result;
+    }
+
+    /**
+     * @brief Division into scalar (scalar / tensor).
+     */
+    TensorWrapper<T> divideInto(T scalar) const {
+        TensorWrapper<T> result;
+        result.data_.setShape(data_.getShape());
+        result.data_.setStride(data_.getStride());
+        result.data_.setDevice(data_.getDevice());
+        result.data_.setData(std::make_unique<T[]>(getSize()));
+
+        backend::DeviceComputeDispatcher<T>::dispatchScalar(
+            common::Operator::Div, scalar, *this, result);
+
+        return result;
+    }
+
+    /**
      * @brief Matrix multiplication (for 2D tensors).
      *
      * Formula: C[i, j] = sum(A[i, k] * B[k, j]) for k in 0..K-1
@@ -422,7 +553,6 @@ template <typename T> class TensorWrapper {
 
         size_t rows = thisDims[0];
         size_t cols = otherDims[1];
-        size_t inner = thisDims[1];
 
         TensorWrapper<T> result;
         result.data_.setShape(TensorShape({rows, cols}));
@@ -469,6 +599,29 @@ template <typename T> class TensorWrapper {
     }
 
     /**
+     * @brief Sum all the data in the tensor wrapper.
+     */
+    T sum() const {
+        T result = T(0);
+        auto totalSize = getSize();
+        for (size_t i = 0; i < totalSize; ++i) {
+            result += data_[i];
+        }
+        return result;
+    }
+
+    /**
+     * @brief Clean all the value of the tensor, set to default value (likely
+     * 0).
+     */
+    void clear() {
+        auto totalSize = data_.getShape().getTotalSize();
+        for (size_t i = 0; i < totalSize; ++i) {
+            data_[i] = T();
+        }
+    }
+
+    /**
      * @brief Broadcast tensor to match the shape of another tensor.
      * @param other The target tensor for broadcasting.
      */
@@ -488,6 +641,21 @@ template <typename T> class TensorWrapper {
     TensorWrapper<T> operator/(const TensorWrapper<T>& other) const {
         return divide(other);
     }
+
+    // Scalar operators
+    TensorWrapper<T> operator+(T scalar) const {
+        return add(scalar);
+    }
+    TensorWrapper<T> operator-(T scalar) const {
+        return subtract(scalar);
+    }
+    TensorWrapper<T> operator*(T scalar) const {
+        return multiply(scalar);
+    }
+    TensorWrapper<T> operator/(T scalar) const {
+        return divide(scalar);
+    }
+
     TensorWrapper<T> operator-() const {
         TensorWrapper<T> result;
         result.data_.setShape(data_.getShape());
@@ -517,6 +685,41 @@ template <typename T> class TensorWrapper {
         return *this;
     }
 
+    TensorWrapper<T>& operator+=(T scalar) {
+        size_t tensorSize = getSize();
+        for (size_t i = 0; i < tensorSize; ++i) {
+            data_.getData()[i] += scalar;
+        }
+        return *this;
+    }
+
+    TensorWrapper<T>& operator-=(T scalar) {
+        size_t tensorSize = getSize();
+        for (size_t i = 0; i < tensorSize; ++i) {
+            data_.getData()[i] -= scalar;
+        }
+        return *this;
+    }
+
+    TensorWrapper<T>& operator*=(T scalar) {
+        size_t tensorSize = getSize();
+        for (size_t i = 0; i < tensorSize; ++i) {
+            data_.getData()[i] *= scalar;
+        }
+        return *this;
+    }
+
+    TensorWrapper<T>& operator/=(T scalar) {
+        if (scalar == T(0)) {
+            throw std::runtime_error("Division by zero");
+        }
+        size_t tensorSize = getSize();
+        for (size_t i = 0; i < tensorSize; ++i) {
+            data_.getData()[i] /= scalar;
+        }
+        return *this;
+    }
+
   private:
     TensorData<T> data_; /**< Managed tensor data and metadata. */
 
@@ -538,6 +741,27 @@ template <typename T> class TensorWrapper {
     friend class hahaha::compute::ComputeNode<T>;
     friend class hahaha::backend::DeviceComputeDispatcher<T>;
 };
+
+// Non-member scalar-tensor operators
+template <typename T>
+TensorWrapper<T> operator+(T scalar, const TensorWrapper<T>& tensor) {
+    return tensor.add(scalar);
+}
+
+template <typename T>
+TensorWrapper<T> operator-(T scalar, const TensorWrapper<T>& tensor) {
+    return tensor.subtractFrom(scalar);
+}
+
+template <typename T>
+TensorWrapper<T> operator*(T scalar, const TensorWrapper<T>& tensor) {
+    return tensor.multiply(scalar);
+}
+
+template <typename T>
+TensorWrapper<T> operator/(T scalar, const TensorWrapper<T>& tensor) {
+    return tensor.divideInto(scalar);
+}
 
 } // namespace hahaha::math
 

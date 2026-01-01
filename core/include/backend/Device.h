@@ -28,9 +28,10 @@ namespace hahaha::backend {
  * @brief Types of devices supported for computation.
  */
 enum class DeviceType : std::uint8_t {
-    CPU,  /**< Standard Central Processing Unit. */
-    GPU,  /**< Graphics Processing Unit. */
-    SIMD  /**< Single Instruction, Multiple Data (vectorized CPU instructions). */
+    CPU, /**< Standard Central Processing Unit. */
+    GPU, /**< Graphics Processing Unit. */
+    SIMD /**< Single Instruction, Multiple Data (vectorized CPU instructions).
+          */
 };
 
 /**
@@ -38,7 +39,8 @@ enum class DeviceType : std::uint8_t {
  */
 struct Device {
     DeviceType type = DeviceType::CPU; /**< Type of the device. */
-    std::uint8_t id = 0;              /**< Unique identifier for multiple devices of the same type. */
+    std::uint8_t id =
+        0; /**< Unique identifier for multiple devices of the same type. */
 
     /** @brief Default constructor (CPU, ID 0). */
     Device() = default;
@@ -49,7 +51,8 @@ struct Device {
      * @param deviceId Device ID.
      */
     explicit Device(DeviceType deviceType, std::uint8_t deviceId = 0)
-        : type(deviceType), id(deviceId) {}
+        : type(deviceType), id(deviceId) {
+    }
 
     /** @brief Check if two devices are identical. */
     bool operator==(const Device& other) const {
@@ -65,9 +68,15 @@ struct Device {
     [[nodiscard]] std::string toString() const {
         std::string deviceName;
         switch (type) {
-            case DeviceType::CPU: deviceName = "CPU"; break;
-            case DeviceType::GPU: deviceName = "GPU"; break;
-            case DeviceType::SIMD: deviceName = "SIMD"; break;
+        case DeviceType::CPU:
+            deviceName = "CPU";
+            break;
+        case DeviceType::GPU:
+            deviceName = "GPU";
+            break;
+        case DeviceType::SIMD:
+            deviceName = "SIMD";
+            break;
         }
         return deviceName + ":" + std::to_string(id);
     }
@@ -76,4 +85,3 @@ struct Device {
 } // namespace hahaha::backend
 
 #endif // HAHAHA_BACKEND_DEVICE_H
-

@@ -16,10 +16,11 @@
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
 //
 
-#include "display/Visualizer.h"
-#include "imgui.h"
 #include <algorithm>
 #include <map>
+
+#include "display/Visualizer.h"
+#include "imgui.h"
 
 namespace hahaha::display {
 
@@ -43,7 +44,7 @@ class MLVisualizer : public IVisualizer {
         epochs_.push_back(static_cast<float>(epoch));
         lossHistory_.push_back(loss);
         accHistory_.push_back(accuracy);
-        
+
         if (lossHistory_.size() > 100) {
             lossHistory_.erase(lossHistory_.begin());
             accHistory_.erase(accHistory_.begin());
@@ -74,64 +75,77 @@ class MLVisualizer : public IVisualizer {
         return lastAction_ == ControlAction::Stop;
     }
 
-    void visualizeTensor(const std::string& name, const math::TensorWrapper<float>& data) override {
-        // Simple implementation: just store name for now, 
+    void visualizeTensor(const std::string& name,
+                         const math::TensorWrapper<float>& data) override {
+        // Simple implementation: just store name for now,
         // real implementation would convert tensor to texture
         activeTensors_[name] = &data;
     }
 
   private:
     void renderControlPanel() {
-        if (!show_control_) return;
+        if (!show_control_)
+            return;
 
         ImGui::Begin("Training Control");
         ImGui::Text("Status: %s", status_.c_str());
-        
+
         lastAction_ = ControlAction::None;
-        if (ImGui::Button("Start")) lastAction_ = ControlAction::Start;
+        if (ImGui::Button("Start"))
+            lastAction_ = ControlAction::Start;
         ImGui::SameLine();
-        if (ImGui::Button("Pause")) lastAction_ = ControlAction::Pause;
+        if (ImGui::Button("Pause"))
+            lastAction_ = ControlAction::Pause;
         ImGui::SameLine();
-        if (ImGui::Button("Stop")) lastAction_ = ControlAction::Stop;
+        if (ImGui::Button("Stop"))
+            lastAction_ = ControlAction::Stop;
         ImGui::SameLine();
-        if (ImGui::Button("Reset")) lastAction_ = ControlAction::Reset;
+        if (ImGui::Button("Reset"))
+            lastAction_ = ControlAction::Reset;
 
         ImGui::End();
     }
 
     void renderGraph() {
         ImGui::Begin("Model Architecture");
-        
+
         ImDrawList* drawList = ImGui::GetWindowDrawList();
         ImVec2 cursorPos = ImGui::GetCursorScreenPos();
-        
+
         float nodeWidth = 120.0f;
         float nodeHeight = 50.0f;
         float spacingY = 40.0f;
-        
+
         ImVec2 current_pos = {cursorPos.x + 50, cursorPos.y + 20};
 
         for (size_t i = 0; i < layers_.size(); ++i) {
             const auto& layer = layers_[i];
-            
+
             // Draw node box
             ImVec2 p_min = current_pos;
-            ImVec2 p_max = {current_pos.x + nodeWidth, current_pos.y + nodeHeight};
-            drawList->AddRectFilled(p_min, p_max, IM_COL32(60, 60, 70, 255), 5.0f);
+            ImVec2 p_max = {current_pos.x + nodeWidth,
+                            current_pos.y + nodeHeight};
+            drawList->AddRectFilled(
+                p_min, p_max, IM_COL32(60, 60, 70, 255), 5.0f);
             drawList->AddRect(p_min, p_max, IM_COL32(200, 200, 200, 255), 5.0f);
-            
+
             // Draw text
-            std::string label = layer.name + "\n(" + std::to_string(layer.inputSize) + "->" + std::to_string(layer.outputSize) + ")";
+            std::string label = layer.name + "\n("
+                + std::to_string(layer.inputSize) + "->"
+                + std::to_string(layer.outputSize) + ")";
             ImGui::SetCursorScreenPos({current_pos.x + 5, current_pos.y + 5});
             ImGui::Text("%s", label.c_str());
 
             // Draw connection to next
             if (i < layers_.size() - 1) {
-                ImVec2 start = {current_pos.x + nodeWidth / 2, current_pos.y + nodeHeight};
-                ImVec2 end = {current_pos.x + nodeWidth / 2, current_pos.y + nodeHeight + spacingY};
-                drawList->AddLine(start, end, IM_COL32(255, 255, 255, 255), 2.0f);
+                ImVec2 start = {current_pos.x + nodeWidth / 2,
+                                current_pos.y + nodeHeight};
+                ImVec2 end = {current_pos.x + nodeWidth / 2,
+                              current_pos.y + nodeHeight + spacingY};
+                drawList->AddLine(
+                    start, end, IM_COL32(255, 255, 255, 255), 2.0f);
             }
-            
+
             current_pos.y += nodeHeight + spacingY;
         }
 
@@ -140,10 +154,24 @@ class MLVisualizer : public IVisualizer {
 
     void renderMetrics() {
         ImGui::Begin("Training Metrics");
-        
+
         if (!lossHistory_.empty()) {
-            ImGui::PlotLines("Loss", lossHistory_.data(), static_cast<int>(lossHistory_.size()), 0, nullptr, 0.0f, FLT_MAX, ImVec2(0, 80));
-            ImGui::PlotLines("Accuracy", accHistory_.data(), static_cast<int>(accHistory_.size()), 0, nullptr, 0.0f, 1.0f, ImVec2(0, 80));
+            ImGui::PlotLines("Loss",
+                             lossHistory_.data(),
+                             static_cast<int>(lossHistory_.size()),
+                             0,
+                             nullptr,
+                             0.0f,
+                             FLT_MAX,
+                             ImVec2(0, 80));
+            ImGui::PlotLines("Accuracy",
+                             accHistory_.data(),
+                             static_cast<int>(accHistory_.size()),
+                             0,
+                             nullptr,
+                             0.0f,
+                             1.0f,
+                             ImVec2(0, 80));
         } else {
             ImGui::Text("No metrics recorded yet.");
         }
@@ -156,7 +184,7 @@ class MLVisualizer : public IVisualizer {
     std::string status_ = "Idle";
     bool show_control_ = true;
     ControlAction lastAction_ = ControlAction::None;
-    
+
     std::vector<LayerInfo> layers_;
     std::vector<float> lossHistory_;
     std::vector<float> accHistory_;
@@ -169,4 +197,3 @@ std::unique_ptr<IVisualizer> createMLVisualizer() {
 }
 
 } // namespace hahaha::display
-

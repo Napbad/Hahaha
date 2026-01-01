@@ -29,13 +29,20 @@
 namespace hahaha::compute {
 
 /**
- * @brief Element-wise addition operator.
- *
- * Forward: z = x + y
- * Backward:
- *   dL/dx = dL/dz * dz/dx = dL/dz * 1
- *   dL/dy = dL/dz * dz/dy = dL/dz * 1
+ * @brief Helper to create a constant scalar node on the same device as a
+ * reference node.
  */
+template <typename T>
+std::shared_ptr<ComputeNode<T>>
+createScalarNode(const T& value,
+                 const std::shared_ptr<ComputeNode<T>>& refNode) {
+    auto scalarWrapper = std::make_shared<math::TensorWrapper<T>>(
+        math::TensorShape({}), value, refNode->getData()->getDevice());
+    return std::make_shared<ComputeNode<T>>(scalarWrapper);
+}
+
+// --- Addition ---
+
 template <typename T>
 std::shared_ptr<ComputeNode<T>>
 add(const std::shared_ptr<ComputeNode<T>>& lhs,
@@ -47,9 +54,14 @@ add(const std::shared_ptr<ComputeNode<T>>& lhs,
         lhs, rhs, resData, common::Operator::Add, nullptr);
 
     std::weak_ptr<ComputeNode<T>> weakRes = resNode;
+    std::weak_ptr<ComputeNode<T>> weakLhs = lhs;
+    std::weak_ptr<ComputeNode<T>> weakRhs = rhs;
 
-    auto gradFun = [lhs, rhs, weakRes]() {
-        if (auto res = weakRes.lock()) {
+    resNode->setGradFun([weakLhs, weakRhs, weakRes]() {
+        auto res = weakRes.lock();
+        auto lhs = weakLhs.lock();
+        auto rhs = weakRhs.lock();
+        if (res && lhs && rhs) {
             auto gradPtr = res->getGrad();
             if (lhs->getRequiresGrad()) {
                 lhs->accumulateGrad(gradPtr);
@@ -60,20 +72,56 @@ add(const std::shared_ptr<ComputeNode<T>>& lhs,
                 rhs->backward();
             }
         }
-    };
+    });
 
-    resNode->setGradFun(gradFun);
     return resNode;
 }
 
-/**
- * @brief Element-wise subtraction operator.
- *
- * Forward: z = x - y
- * Backward:
- *   dL/dx = dL/dz * dz/dx = dL/dz * 1
- *   dL/dy = dL/dz * dz/dy = dL/dz * (-1)
- */
+template <typename T>
+std::shared_ptr<ComputeNode<T>> add(const std::shared_ptr<ComputeNode<T>>& lhs,
+                                    const T& rhsScalar) {
+    auto rhs = createScalarNode(rhsScalar, lhs);
+    auto resData = std::make_shared<math::TensorWrapper<T>>(
+        lhs->getData()->add(rhsScalar));
+
+    auto resNode = std::make_shared<ComputeNode<T>>(
+        lhs, rhs, resData, common::Operator::Add, nullptr);
+
+    std::weak_ptr<ComputeNode<T>> weakRes = resNode;
+    std::weak_ptr<ComputeNode<T>> weakLhs = lhs;
+    std::weak_ptr<ComputeNode<T>> weakRhs = rhs;
+
+    resNode->setGradFun([weakLhs, weakRhs, weakRes]() {
+        auto res = weakRes.lock();
+        auto lhs = weakLhs.lock();
+        auto rhs = weakRhs.lock();
+        if (res && lhs && rhs) {
+            auto gradPtr = res->getGrad();
+            if (lhs->getRequiresGrad()) {
+                lhs->accumulateGrad(gradPtr);
+                lhs->backward();
+            }
+            if (rhs->getRequiresGrad()) {
+                auto scalarGrad = std::make_shared<math::TensorWrapper<T>>(
+                    math::TensorShape({}),
+                    gradPtr->sum(),
+                    rhs->getData()->getDevice());
+                rhs->accumulateGrad(scalarGrad);
+                rhs->backward();
+            }
+        }
+    });
+    return resNode;
+}
+
+template <typename T>
+std::shared_ptr<ComputeNode<T>>
+add(const T& lhsScalar, const std::shared_ptr<ComputeNode<T>>& rhs) {
+    return add(rhs, lhsScalar); // Commutative
+}
+
+// --- Subtraction ---
+
 template <typename T>
 std::shared_ptr<ComputeNode<T>>
 sub(const std::shared_ptr<ComputeNode<T>>& lhs,
@@ -85,36 +133,109 @@ sub(const std::shared_ptr<ComputeNode<T>>& lhs,
         lhs, rhs, resData, common::Operator::Sub, nullptr);
 
     std::weak_ptr<ComputeNode<T>> weakRes = resNode;
+    std::weak_ptr<ComputeNode<T>> weakLhs = lhs;
+    std::weak_ptr<ComputeNode<T>> weakRhs = rhs;
 
-    auto gradFun = [lhs, rhs, weakRes]() {
-        if (auto res = weakRes.lock()) {
+    resNode->setGradFun([weakLhs, weakRhs, weakRes]() {
+        auto res = weakRes.lock();
+        auto lhs = weakLhs.lock();
+        auto rhs = weakRhs.lock();
+        if (res && lhs && rhs) {
             auto gradPtr = res->getGrad();
             if (lhs->getRequiresGrad()) {
                 lhs->accumulateGrad(gradPtr);
                 lhs->backward();
             }
             if (rhs->getRequiresGrad()) {
-                // dL/dy = dL/dz * (-1)
                 auto negGrad =
                     std::make_shared<math::TensorWrapper<T>>(-(*gradPtr));
                 rhs->accumulateGrad(negGrad);
                 rhs->backward();
             }
         }
-    };
+    });
 
-    resNode->setGradFun(gradFun);
     return resNode;
 }
 
-/**
- * @brief Element-wise multiplication operator.
- *
- * Forward: z = x * y
- * Backward:
- *   dL/dx = dL/dz * dz/dx = dL/dz * y
- *   dL/dy = dL/dz * dz/dy = dL/dz * x
- */
+template <typename T>
+std::shared_ptr<ComputeNode<T>> sub(const std::shared_ptr<ComputeNode<T>>& lhs,
+                                    const T& rhsScalar) {
+    auto rhs = createScalarNode(rhsScalar, lhs);
+    auto resData = std::make_shared<math::TensorWrapper<T>>(
+        lhs->getData()->subtract(rhsScalar));
+
+    auto resNode = std::make_shared<ComputeNode<T>>(
+        lhs, rhs, resData, common::Operator::Sub, nullptr);
+
+    std::weak_ptr<ComputeNode<T>> weakRes = resNode;
+    std::weak_ptr<ComputeNode<T>> weakLhs = lhs;
+    std::weak_ptr<ComputeNode<T>> weakRhs = rhs;
+
+    resNode->setGradFun([weakLhs, weakRhs, weakRes]() {
+        auto res = weakRes.lock();
+        auto lhs = weakLhs.lock();
+        auto rhs = weakRhs.lock();
+        if (res && lhs && rhs) {
+            auto gradPtr = res->getGrad();
+            if (lhs->getRequiresGrad()) {
+                lhs->accumulateGrad(gradPtr);
+                lhs->backward();
+            }
+            if (rhs->getRequiresGrad()) {
+                auto scalarGrad = std::make_shared<math::TensorWrapper<T>>(
+                    math::TensorShape({}),
+                    -(gradPtr->sum()),
+                    rhs->getData()->getDevice());
+                rhs->accumulateGrad(scalarGrad);
+                rhs->backward();
+            }
+        }
+    });
+    return resNode;
+}
+
+template <typename T>
+std::shared_ptr<ComputeNode<T>>
+sub(const T& lhsScalar, const std::shared_ptr<ComputeNode<T>>& rhs) {
+    auto lhs = createScalarNode(lhsScalar, rhs);
+    auto resData = std::make_shared<math::TensorWrapper<T>>(
+        rhs->getData()->subtractFrom(lhsScalar));
+
+    auto resNode = std::make_shared<ComputeNode<T>>(
+        lhs, rhs, resData, common::Operator::Sub, nullptr);
+
+    std::weak_ptr<ComputeNode<T>> weakRes = resNode;
+    std::weak_ptr<ComputeNode<T>> weakLhs = lhs;
+    std::weak_ptr<ComputeNode<T>> weakRhs = rhs;
+
+    resNode->setGradFun([weakLhs, weakRhs, weakRes]() {
+        auto res = weakRes.lock();
+        auto lhs = weakLhs.lock();
+        auto rhs = weakRhs.lock();
+        if (res && lhs && rhs) {
+            auto gradPtr = res->getGrad();
+            if (lhs->getRequiresGrad()) {
+                auto scalarGrad = std::make_shared<math::TensorWrapper<T>>(
+                    math::TensorShape({}),
+                    gradPtr->sum(),
+                    lhs->getData()->getDevice());
+                lhs->accumulateGrad(scalarGrad);
+                lhs->backward();
+            }
+            if (rhs->getRequiresGrad()) {
+                auto negGrad =
+                    std::make_shared<math::TensorWrapper<T>>(-(*gradPtr));
+                rhs->accumulateGrad(negGrad);
+                rhs->backward();
+            }
+        }
+    });
+    return resNode;
+}
+
+// --- Multiplication ---
+
 template <typename T>
 std::shared_ptr<ComputeNode<T>>
 mul(const std::shared_ptr<ComputeNode<T>>& lhs,
@@ -126,39 +247,81 @@ mul(const std::shared_ptr<ComputeNode<T>>& lhs,
         lhs, rhs, resData, common::Operator::Mul, nullptr);
 
     std::weak_ptr<ComputeNode<T>> weakRes = resNode;
+    std::weak_ptr<ComputeNode<T>> weakLhs = lhs;
+    std::weak_ptr<ComputeNode<T>> weakRhs = rhs;
 
-    auto gradFun = [lhs, rhs, weakRes]() {
-        if (auto res = weakRes.lock()) {
+    resNode->setGradFun([weakLhs, weakRhs, weakRes]() {
+        auto res = weakRes.lock();
+        auto lhs = weakLhs.lock();
+        auto rhs = weakRhs.lock();
+        if (res && lhs && rhs) {
             auto gradPtr = res->getGrad();
             if (lhs->getRequiresGrad()) {
-                // dL/dx = grad_output * y
                 auto gradLhs = std::make_shared<math::TensorWrapper<T>>(
                     gradPtr->multiply(*rhs->getData()));
                 lhs->accumulateGrad(gradLhs);
                 lhs->backward();
             }
             if (rhs->getRequiresGrad()) {
-                // dL/dy = grad_output * x
                 auto gradRhs = std::make_shared<math::TensorWrapper<T>>(
                     gradPtr->multiply(*lhs->getData()));
                 rhs->accumulateGrad(gradRhs);
                 rhs->backward();
             }
         }
-    };
+    });
 
-    resNode->setGradFun(gradFun);
     return resNode;
 }
 
-/**
- * @brief Element-wise division operator.
- *
- * Forward: z = x / y
- * Backward:
- *   dL/dx = dL/dz * dz/dx = dL/dz * (1/y)
- *   dL/dy = dL/dz * dz/dy = dL/dz * (-x / y^2)
- */
+template <typename T>
+std::shared_ptr<ComputeNode<T>> mul(const std::shared_ptr<ComputeNode<T>>& lhs,
+                                    const T& rhsScalar) {
+    auto rhs = createScalarNode(rhsScalar, lhs);
+    auto resData = std::make_shared<math::TensorWrapper<T>>(
+        lhs->getData()->multiply(rhsScalar));
+
+    auto resNode = std::make_shared<ComputeNode<T>>(
+        lhs, rhs, resData, common::Operator::Mul, nullptr);
+
+    std::weak_ptr<ComputeNode<T>> weakRes = resNode;
+    std::weak_ptr<ComputeNode<T>> weakLhs = lhs;
+    std::weak_ptr<ComputeNode<T>> weakRhs = rhs;
+
+    resNode->setGradFun([weakLhs, weakRhs, weakRes, rhsScalar]() {
+        auto res = weakRes.lock();
+        auto lhs = weakLhs.lock();
+        auto rhs = weakRhs.lock();
+        if (res && lhs && rhs) {
+            auto gradPtr = res->getGrad();
+            if (lhs->getRequiresGrad()) {
+                auto gradLhs = std::make_shared<math::TensorWrapper<T>>(
+                    gradPtr->multiply(rhsScalar));
+                lhs->accumulateGrad(gradLhs);
+                lhs->backward();
+            }
+            if (rhs->getRequiresGrad()) {
+                auto scalarGradVal = gradPtr->multiply(*lhs->getData()).sum();
+                auto scalarGrad = std::make_shared<math::TensorWrapper<T>>(
+                    math::TensorShape({}),
+                    scalarGradVal,
+                    rhs->getData()->getDevice());
+                rhs->accumulateGrad(scalarGrad);
+                rhs->backward();
+            }
+        }
+    });
+    return resNode;
+}
+
+template <typename T>
+std::shared_ptr<ComputeNode<T>>
+mul(const T& lhsScalar, const std::shared_ptr<ComputeNode<T>>& rhs) {
+    return mul(rhs, lhsScalar); // Commutative
+}
+
+// --- Division ---
+
 template <typename T>
 std::shared_ptr<ComputeNode<T>>
 div(const std::shared_ptr<ComputeNode<T>>& lhs,
@@ -170,45 +333,139 @@ div(const std::shared_ptr<ComputeNode<T>>& lhs,
         lhs, rhs, resData, common::Operator::Div, nullptr);
 
     std::weak_ptr<ComputeNode<T>> weakRes = resNode;
+    std::weak_ptr<ComputeNode<T>> weakLhs = lhs;
+    std::weak_ptr<ComputeNode<T>> weakRhs = rhs;
 
-    auto gradFun = [lhs, rhs, weakRes]() {
-        if (auto res = weakRes.lock()) {
+    resNode->setGradFun([weakLhs, weakRhs, weakRes]() {
+        auto res = weakRes.lock();
+        auto lhs = weakLhs.lock();
+        auto rhs = weakRhs.lock();
+        if (res && lhs && rhs) {
             auto gradPtr = res->getGrad();
             auto rhsData = rhs->getData();
-
             if (lhs->getRequiresGrad()) {
-                // dL/dx = grad_output / y
-                auto grad = std::make_shared<math::TensorWrapper<T>>(
+                auto gradLhs = std::make_shared<math::TensorWrapper<T>>(
                     gradPtr->divide(*rhsData));
-                lhs->accumulateGrad(grad);
+                lhs->accumulateGrad(gradLhs);
                 lhs->backward();
             }
             if (rhs->getRequiresGrad()) {
-                // dL/dy = grad_output * (-x / y^2)
                 auto lhsData = lhs->getData();
                 auto y_sq = rhsData->multiply(*rhsData);
                 auto neg_x = -(*lhsData);
                 auto local_grad = neg_x.divide(y_sq);
-                auto grad = std::make_shared<math::TensorWrapper<T>>(
+                auto gradRhs = std::make_shared<math::TensorWrapper<T>>(
                     gradPtr->multiply(local_grad));
-                rhs->accumulateGrad(grad);
+                rhs->accumulateGrad(gradRhs);
                 rhs->backward();
             }
         }
-    };
+    });
 
-    resNode->setGradFun(gradFun);
     return resNode;
 }
 
-/**
- * @brief Matrix multiplication operator.
- *
- * Forward: Z = X @ Y (Matrix dot product)
- * Backward:
- *   dL/dX = dL/dZ @ Y^T
- *   dL/dY = X^T @ dL/dZ
- */
+template <typename T>
+std::shared_ptr<ComputeNode<T>> div(const std::shared_ptr<ComputeNode<T>>& lhs,
+                                    const T& rhsScalar) {
+    auto rhs = createScalarNode(rhsScalar, lhs);
+    auto resData = std::make_shared<math::TensorWrapper<T>>(
+        lhs->getData()->divide(rhsScalar));
+
+    auto resNode = std::make_shared<ComputeNode<T>>(
+        lhs, rhs, resData, common::Operator::Div, nullptr);
+
+    std::weak_ptr<ComputeNode<T>> weakRes = resNode;
+    std::weak_ptr<ComputeNode<T>> weakLhs = lhs;
+    std::weak_ptr<ComputeNode<T>> weakRhs = rhs;
+
+    resNode->setGradFun([weakLhs, weakRhs, weakRes, rhsScalar]() {
+        auto res = weakRes.lock();
+        auto lhs = weakLhs.lock();
+        auto rhs = weakRhs.lock();
+        if (res && lhs && rhs) {
+            auto gradPtr = res->getGrad();
+            if (lhs->getRequiresGrad()) {
+                auto gradLhs = std::make_shared<math::TensorWrapper<T>>(
+                    gradPtr->divide(rhsScalar));
+                lhs->accumulateGrad(gradLhs);
+                lhs->backward();
+            }
+            if (rhs->getRequiresGrad()) {
+                // d(x/s)/ds = -x/s^2
+                auto s_sq = rhsScalar * rhsScalar;
+                auto neg_x = -(*(lhs->getData()));
+                auto local_grad = neg_x.divide(s_sq);
+                auto scalarGradVal = gradPtr->multiply(local_grad).sum();
+                auto scalarGrad = std::make_shared<math::TensorWrapper<T>>(
+                    math::TensorShape({}),
+                    scalarGradVal,
+                    rhs->getData()->getDevice());
+                rhs->accumulateGrad(scalarGrad);
+                rhs->backward();
+            }
+        }
+    });
+    return resNode;
+}
+
+template <typename T>
+std::shared_ptr<ComputeNode<T>>
+div(const T& lhsScalar, const std::shared_ptr<ComputeNode<T>>& rhs) {
+    auto lhs = createScalarNode(lhsScalar, rhs);
+    auto resData = std::make_shared<math::TensorWrapper<T>>(
+        rhs->getData()->divideInto(lhsScalar));
+
+    auto resNode = std::make_shared<ComputeNode<T>>(
+        lhs, rhs, resData, common::Operator::Div, nullptr);
+
+    std::weak_ptr<ComputeNode<T>> weakRes = resNode;
+    std::weak_ptr<ComputeNode<T>> weakLhs = lhs;
+    std::weak_ptr<ComputeNode<T>> weakRhs = rhs;
+
+    resNode->setGradFun([weakLhs, weakRhs, weakRes, lhsScalar]() {
+        auto res = weakRes.lock();
+        auto lhs = weakLhs.lock();
+        auto rhs = weakRhs.lock();
+        if (res && lhs && rhs) {
+            auto gradPtr = res->getGrad();
+            auto rhsData = rhs->getData();
+            if (lhs->getRequiresGrad()) {
+                // d(s/x)/ds = 1/x
+                auto local_grad = std::make_shared<math::TensorWrapper<T>>(
+                                      math::TensorShape(rhsData->getShape()),
+                                      T(1),
+                                      rhsData->getDevice())
+                                      ->divide(*rhsData);
+                auto scalarGradVal = gradPtr->multiply(local_grad).sum();
+                auto scalarGrad = std::make_shared<math::TensorWrapper<T>>(
+                    math::TensorShape({}),
+                    scalarGradVal,
+                    lhs->getData()->getDevice());
+                lhs->accumulateGrad(scalarGrad);
+                lhs->backward();
+            }
+            if (rhs->getRequiresGrad()) {
+                // d(s/x)/dx = -s/x^2
+                auto x_sq = rhsData->multiply(*rhsData);
+                auto neg_s = -lhsScalar;
+                auto local_grad = std::make_shared<math::TensorWrapper<T>>(
+                                      math::TensorShape(rhsData->getShape()),
+                                      neg_s,
+                                      rhsData->getDevice())
+                                      ->divide(x_sq);
+                auto gradRhs = std::make_shared<math::TensorWrapper<T>>(
+                    gradPtr->multiply(local_grad));
+                rhs->accumulateGrad(gradRhs);
+                rhs->backward();
+            }
+        }
+    });
+    return resNode;
+}
+
+// --- Matrix Multiplication ---
+
 template <typename T>
 std::shared_ptr<ComputeNode<T>>
 matmul(const std::shared_ptr<ComputeNode<T>>& lhs,
@@ -220,13 +477,16 @@ matmul(const std::shared_ptr<ComputeNode<T>>& lhs,
         lhs, rhs, resData, common::Operator::MatMul, nullptr);
 
     std::weak_ptr<ComputeNode<T>> weakRes = resNode;
+    std::weak_ptr<ComputeNode<T>> weakLhs = lhs;
+    std::weak_ptr<ComputeNode<T>> weakRhs = rhs;
 
-    auto gradFun = [lhs, rhs, weakRes]() {
-        if (auto res = weakRes.lock()) {
+    resNode->setGradFun([weakLhs, weakRhs, weakRes]() {
+        auto res = weakRes.lock();
+        auto lhs = weakLhs.lock();
+        auto rhs = weakRhs.lock();
+        if (res && lhs && rhs) {
             auto gradPtr = res->getGrad();
-
             if (lhs->getRequiresGrad()) {
-                // dL/dX = dL/dZ @ Y^T
                 auto rhsT = rhs->getData()->transpose();
                 auto gradLhs = std::make_shared<math::TensorWrapper<T>>(
                     gradPtr->matmul(rhsT));
@@ -234,7 +494,6 @@ matmul(const std::shared_ptr<ComputeNode<T>>& lhs,
                 lhs->backward();
             }
             if (rhs->getRequiresGrad()) {
-                // dL/dY = X^T @ dL/dZ
                 auto lhsT = lhs->getData()->transpose();
                 auto gradRhs = std::make_shared<math::TensorWrapper<T>>(
                     lhsT.matmul(*gradPtr));
@@ -242,9 +501,68 @@ matmul(const std::shared_ptr<ComputeNode<T>>& lhs,
                 rhs->backward();
             }
         }
-    };
+    });
 
-    resNode->setGradFun(gradFun);
+    return resNode;
+}
+
+// --- Unary Operations ---
+
+template <typename T>
+std::shared_ptr<ComputeNode<T>>
+reshape(const std::shared_ptr<ComputeNode<T>>& parent,
+        const std::vector<size_t>& newShape) {
+    auto resData = std::make_shared<math::TensorWrapper<T>>(
+        parent->getData()->reshape(newShape));
+
+    std::shared_ptr<ComputeNode<T>> resNode =
+        ComputeNode<T>::createUnary(parent, resData, common::Operator::Reshape);
+
+    std::weak_ptr<ComputeNode<T>> weakRes = resNode;
+    std::weak_ptr<ComputeNode<T>> weakParent = parent;
+    auto originalShape = parent->getData()->getShape();
+
+    resNode->setGradFun([weakParent, weakRes, originalShape]() {
+        auto res = weakRes.lock();
+        auto p = weakParent.lock();
+        if (res && p) {
+            auto gradPtr = res->getGrad();
+            if (p->getRequiresGrad()) {
+                auto reshapedGrad = std::make_shared<math::TensorWrapper<T>>(
+                    gradPtr->reshape(originalShape));
+                p->accumulateGrad(reshapedGrad);
+                p->backward();
+            }
+        }
+    });
+    return resNode;
+}
+
+template <typename T>
+std::shared_ptr<ComputeNode<T>>
+transpose(const std::shared_ptr<ComputeNode<T>>& parent) {
+    auto resData = std::make_shared<math::TensorWrapper<T>>(
+        parent->getData()->transpose());
+
+    std::shared_ptr<ComputeNode<T>> resNode = ComputeNode<T>::createUnary(
+        parent, resData, common::Operator::Transpose);
+
+    std::weak_ptr<ComputeNode<T>> weakRes = resNode;
+    std::weak_ptr<ComputeNode<T>> weakParent = parent;
+
+    resNode->setGradFun([weakParent, weakRes]() {
+        auto res = weakRes.lock();
+        auto p = weakParent.lock();
+        if (res && p) {
+            auto gradPtr = res->getGrad();
+            if (p->getRequiresGrad()) {
+                auto transposedGrad = std::make_shared<math::TensorWrapper<T>>(
+                    gradPtr->transpose());
+                p->accumulateGrad(transposedGrad);
+                p->backward();
+            }
+        }
+    });
     return resNode;
 }
 

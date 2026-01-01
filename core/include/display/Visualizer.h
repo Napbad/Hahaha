@@ -39,13 +39,7 @@ struct LayerInfo {
 /**
  * @brief User actions from the control panel.
  */
-enum class ControlAction {
-    None,
-    Start,
-    Pause,
-    Stop,
-    Reset
-};
+enum class ControlAction { None, Start, Pause, Stop, Reset };
 
 /**
  * @brief Top-level interface for visualizing Machine Learning models and
@@ -61,9 +55,8 @@ class IVisualizer {
      * @param width Width of the window.
      * @param height Height of the window.
      */
-    virtual void init(const std::string& title,
-                      int width = 1280,
-                      int height = 720) = 0;
+    virtual void
+    init(const std::string& title, int width = 1280, int height = 720) = 0;
 
     /**
      * @brief Clear the current model structure visualization.
@@ -82,15 +75,17 @@ class IVisualizer {
      * @param loss Current loss value.
      * @param accuracy Current accuracy value (optional).
      */
-    virtual void recordMetrics(int epoch, float loss, float accuracy = 0.0f) = 0;
+    virtual void
+    recordMetrics(int epoch, float loss, float accuracy = 0.0f) = 0;
 
     /**
      * @brief Visualize a tensor as an image/heatmap.
      * @param name Name of the visualization window.
      * @param data Tensor data to visualize.
      */
-    virtual void visualizeTensor(const std::string& name,
-                                 const hahaha::math::TensorWrapper<float>& data) = 0;
+    virtual void
+    visualizeTensor(const std::string& name,
+                    const hahaha::math::TensorWrapper<float>& data) = 0;
 
     /**
      * @brief Render the current frame of the visualization.
@@ -134,4 +129,3 @@ std::unique_ptr<IVisualizer> createMLVisualizer();
 } // namespace hahaha::display
 
 #endif // HAHAHA_DISPLAY_VISUALIZER_H
-

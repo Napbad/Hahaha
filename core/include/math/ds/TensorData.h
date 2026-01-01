@@ -19,6 +19,7 @@
 #ifndef HAHAHA_MATH_DS_TENSOR_DATA_H
 #define HAHAHA_MATH_DS_TENSOR_DATA_H
 
+#include <cstddef>
 #include <memory>
 #include <stdexcept>
 
@@ -72,7 +73,24 @@ template <typename T> class TensorData {
                 "GPU allocation not yet implemented in TensorData");
         }
     }
-
+    /**
+     * @brief Construct with given shape and initial value on a specific device.
+     * @param shape The shape of the tensor.
+     * @param device The device where the data should reside.
+     */
+    explicit TensorData(const TensorShape& shape,
+                        backend::Device device = backend::Device())
+        : shape_(shape), stride_(shape), device_(device) {
+        size_t size = shape_.getTotalSize();
+        if (device_.type == backend::DeviceType::CPU
+            || device_.type == backend::DeviceType::SIMD) {
+            data_ = std::make_unique<T[]>(size);
+        } else {
+            // TODO: Handle GPU allocation using compute::gpu::GpuMemory
+            throw std::runtime_error(
+                "GPU allocation not yet implemented in TensorData");
+        }
+    }
     /**
      * @brief Copy constructor. Performs a deep copy of the underlying array.
      * @param other The TensorData to copy from.
@@ -98,6 +116,13 @@ template <typename T> class TensorData {
     TensorData(TensorData&& other) noexcept
         : data_(std::move(other.data_)), shape_(std::move(other.shape_)),
           stride_(std::move(other.stride_)), device_(other.device_) {
+    }
+
+    explicit TensorData(const std::vector<T>& initVec)
+        : data_(std::make_unique<T[]>(initVec.size())),
+          shape_(TensorShape(std::vector<size_t>{initVec.size()})) {
+        stride_ = TensorStride(shape_);
+        std::copy(initVec.begin(), initVec.end(), data_.get());
     }
 
     /**
@@ -133,9 +158,14 @@ template <typename T> class TensorData {
     explicit TensorData(NestedData<T>&& data)
         : shape_(data.getShape()), device_(backend::Device()) {
         size_t size = data.getFlatData().size();
-        data_ = std::make_unique<T[]>(size);
-        std::copy(
-            data.getFlatData().begin(), data.getFlatData().end(), data_.get());
+        if (size > 0) {
+            data_ = std::make_unique<T[]>(size);
+            std::copy(data.getFlatData().begin(),
+                      data.getFlatData().end(),
+                      data_.get());
+        } else {
+            data_ = nullptr; // Explicitly null for truly empty tensors
+        }
         stride_ = TensorStride(shape_);
     }
 
@@ -161,6 +191,14 @@ template <typename T> class TensorData {
      */
     void setData(std::unique_ptr<T[]> data) {
         data_ = std::move(data);
+    }
+
+    /**
+     * @brief Return value of target index of the flat data
+     * @param idx the index of the data.
+     */
+    T& operator[](size_t idx) const {
+        return data_[idx];
     }
 
     /**

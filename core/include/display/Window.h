@@ -19,9 +19,10 @@
 #ifndef HAHAHA_DISPLAY_WINDOW_H
 #define HAHAHA_DISPLAY_WINDOW_H
 
+#include <string>
+
 #include "imgui.h"
 #include "imgui_internal.h"
-#include <string>
 
 namespace hahaha::display {
 

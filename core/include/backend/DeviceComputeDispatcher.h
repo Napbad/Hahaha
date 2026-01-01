@@ -37,8 +37,7 @@ namespace hahaha::backend {
  * respective hardware-optimized implementations (CPU, SIMD, GPU, etc.).
  * It decouples math logic in TensorWrapper from device-specific kernels.
  */
-template <typename T>
-class DeviceComputeDispatcher {
+template <typename T> class DeviceComputeDispatcher {
   public:
     static void dispatchBinary(common::Operator op,
                                const math::TensorWrapper<T>& lhs,
@@ -46,27 +45,33 @@ class DeviceComputeDispatcher {
                                math::TensorWrapper<T>& res) {
         auto device = lhs.getDevice();
         if (device.type == backend::DeviceType::CPU) {
-            // Placeholder: Call CPU kernels
-            // In a real implementation, this would call specialized functions
-            // from hahaha::backend::cpu namespace
             size_t size = lhs.getSize();
             auto* lPtr = lhs.data_.getData().get();
             auto* rPtr = rhs.data_.getData().get();
             auto* resPtr = res.data_.getData().get();
 
-            for (size_t i = 0; i < size; ++i) {
-                switch (op) {
-                    case common::Operator::Add: resPtr[i] = lPtr[i] + rPtr[i]; break;
-                    case common::Operator::Sub: resPtr[i] = lPtr[i] - rPtr[i]; break;
-                    case common::Operator::Mul: resPtr[i] = lPtr[i] * rPtr[i]; break;
-                    case common::Operator::Div:
-                        if (rPtr[i] == T(0)) {
-                            throw std::runtime_error("Division by zero");
-                        }
-                        resPtr[i] = lPtr[i] / rPtr[i];
-                        break;
-                    default: throw std::runtime_error("Unsupported binary op");
+            switch (op) {
+            case common::Operator::Add:
+                for (size_t i = 0; i < size; ++i)
+                    resPtr[i] = lPtr[i] + rPtr[i];
+                break;
+            case common::Operator::Sub:
+                for (size_t i = 0; i < size; ++i)
+                    resPtr[i] = lPtr[i] - rPtr[i];
+                break;
+            case common::Operator::Mul:
+                for (size_t i = 0; i < size; ++i)
+                    resPtr[i] = lPtr[i] * rPtr[i];
+                break;
+            case common::Operator::Div:
+                for (size_t i = 0; i < size; ++i) {
+                    if (rPtr[i] == T(0))
+                        throw std::runtime_error("Division by zero");
+                    resPtr[i] = lPtr[i] / rPtr[i];
                 }
+                break;
+            default:
+                throw std::runtime_error("Unsupported binary op");
             }
         } else if (device.type == backend::DeviceType::GPU) {
             throw std::runtime_error("GPU dispatch not yet implemented");
@@ -75,14 +80,91 @@ class DeviceComputeDispatcher {
         }
     }
 
+    static void dispatchScalar(common::Operator op,
+                               const math::TensorWrapper<T>& lhs,
+                               T rhs,
+                               math::TensorWrapper<T>& res) {
+        auto device = lhs.getDevice();
+        if (device.type == backend::DeviceType::CPU) {
+            size_t size = lhs.getSize();
+            auto* lPtr = lhs.data_.getData().get();
+            auto* resPtr = res.data_.getData().get();
+
+            switch (op) {
+            case common::Operator::Add:
+                for (size_t i = 0; i < size; ++i)
+                    resPtr[i] = lPtr[i] + rhs;
+                break;
+            case common::Operator::Sub:
+                for (size_t i = 0; i < size; ++i)
+                    resPtr[i] = lPtr[i] - rhs;
+                break;
+            case common::Operator::Mul:
+                for (size_t i = 0; i < size; ++i)
+                    resPtr[i] = lPtr[i] * rhs;
+                break;
+            case common::Operator::Div:
+                if (rhs == T(0))
+                    throw std::runtime_error("Division by zero");
+                for (size_t i = 0; i < size; ++i)
+                    resPtr[i] = lPtr[i] / rhs;
+                break;
+            default:
+                throw std::runtime_error("Unsupported scalar op");
+            }
+        } else {
+            throw std::runtime_error(
+                "Scalar dispatch not yet implemented for this device");
+        }
+    }
+
+    static void dispatchScalar(common::Operator op,
+                               T lhs,
+                               const math::TensorWrapper<T>& rhs,
+                               math::TensorWrapper<T>& res) {
+        auto device = rhs.getDevice();
+        if (device.type == backend::DeviceType::CPU) {
+            size_t size = rhs.getSize();
+            auto* rPtr = rhs.data_.getData().get();
+            auto* resPtr = res.data_.getData().get();
+
+            switch (op) {
+            case common::Operator::Add:
+                for (size_t i = 0; i < size; ++i)
+                    resPtr[i] = lhs + rPtr[i];
+                break;
+            case common::Operator::Sub:
+                for (size_t i = 0; i < size; ++i)
+                    resPtr[i] = lhs - rPtr[i];
+                break;
+            case common::Operator::Mul:
+                for (size_t i = 0; i < size; ++i)
+                    resPtr[i] = lhs * rPtr[i];
+                break;
+            case common::Operator::Div:
+                for (size_t i = 0; i < size; ++i) {
+                    if (rPtr[i] == T(0))
+                        throw std::runtime_error("Division by zero");
+                    resPtr[i] = lhs / rPtr[i];
+                }
+                break;
+            default:
+                throw std::runtime_error("Unsupported scalar op");
+            }
+        } else {
+            throw std::runtime_error(
+                "Scalar dispatch not yet implemented for this device");
+        }
+    }
+
     static void dispatchMatMul(const math::TensorWrapper<T>& lhs,
                                const math::TensorWrapper<T>& rhs,
                                math::TensorWrapper<T>& res) {
         auto device = lhs.getDevice();
         if (device.type == backend::DeviceType::CPU) {
-            const auto& lhsDims = lhs.getShape().getDims();
-            const auto& rhsDims = rhs.getShape().getDims();
-            
+            const auto& lhsDims = lhs.getShape();
+            const auto& rhsDims = rhs.getShape();
+
             size_t rows = lhsDims[0];
             size_t cols = rhsDims[1];
             size_t inner = lhsDims[1];

@@ -17,9 +17,11 @@
 //
 
 #include "display/GlfwWindow.h"
+
+#include <stdexcept>
+
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-#include <stdexcept>
 
 namespace hahaha::display {
 
@@ -88,4 +90,3 @@ void GlfwWindow::close() {
 }
 
 } // namespace hahaha::display
-

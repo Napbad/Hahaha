@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <initializer_list>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -75,6 +76,11 @@ class TensorShape {
      * @param dims Vector of dimension sizes.
      */
     explicit TensorShape(const std::vector<size_t>& dims) : dims_(dims) {
+        if (dims_.empty()) {
+            // Ensure that a shape with an empty vector explicitly represents a
+            // 0-dimensional scalar.
+            dims_.clear();
+        }
     }
 
     /** @brief Copy assignment operator. */
@@ -97,10 +103,13 @@ class TensorShape {
      * Total size is the product of all dimension sizes.
      * Formula: size = product(dims[i]) for i in 0..N-1
      *
-     * @return u64 product of all dimensions (1 for empty shape).
+     * @return product of all dimensions (1 for empty shape).
      */
-    [[nodiscard]] hahaha::common::u64 getTotalSize() const {
-        hahaha::common::u64 size = 1;
+    [[nodiscard]] size_t getTotalSize() const {
+        if (dims_.empty()) {
+            return 1;
+        }
+        size_t size = 1;
 #pragma unroll 5
         for (const auto& dim : dims_) {
             size *= dim;

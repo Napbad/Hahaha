@@ -14,15 +14,19 @@
 //
 // Contributors:
 // Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
+// jiansongshen (jason.shen111@outlook.com) (https://github.com/jiansongshen)
 //
 
 #ifndef HAHAHA_TENSOR_H
 #define HAHAHA_TENSOR_H
 
 #include <memory>
+#include <vector>
 
 #include "backend/Device.h"
 #include "compute/graph/ComputeFun.h"
+#include "compute/graph/ComputeNode.h"
+#include "math/TensorWrapper.h"
 #include "math/ds/TensorData.h"
 #include "utils/common/HelperStruct.h"
 
@@ -52,8 +56,7 @@ template <typename T> class Tensor {
      * @brief Construct a Tensor from an existing TensorWrapper.
      * @param data The numerical data wrapper.
      */
-    // NOLINTNEXTLINE
-    Tensor(const math::TensorWrapper<T>& data)
+    explicit Tensor(const math::TensorWrapper<T>& data)
         : computeNode_(std::make_shared<compute::ComputeNode<T>>(
               std::make_shared<math::TensorWrapper<T>>(data))) {
     }
@@ -69,22 +72,10 @@ template <typename T> class Tensor {
     }
 
     /**
-     * @brief Construct a scalar Tensor.
-     * @param val The scalar value.
-     */
-    // NOLINTNEXTLINE
-    Tensor(T val)
-        : computeNode_(std::make_shared<compute::ComputeNode<T>>(
-              std::make_shared<math::TensorWrapper<T>>(
-                  math::NestedData<T>(val)))) {
-    }
-
-    /**
      * @brief Construct a Tensor from a shared pointer to TensorWrapper.
      * @param dataPtr pointer to the numerical data.
      */
-    // NOLINTNEXTLINE
-    Tensor(std::shared_ptr<math::TensorWrapper<T>> dataPtr)
+    explicit Tensor(std::shared_ptr<math::TensorWrapper<T>> dataPtr)
         : computeNode_(std::make_shared<compute::ComputeNode<T>>(dataPtr)) {
     }
 
@@ -94,6 +85,13 @@ template <typename T> class Tensor {
      */
     explicit Tensor(std::shared_ptr<compute::ComputeNode<T>> computeNode)
         : computeNode_(computeNode) {
+    }
+
+    /** @brief Build a tensor from a vector. */
+    static Tensor buildFromVector(const std::vector<T>& vec) {
+        auto computeNode = std::make_shared<compute::ComputeNode<T>>(
+            std::make_shared<math::TensorWrapper<T>>(vec));
+        return Tensor(computeNode);
     }
 
     /** @brief Addition operator. Builds an 'Add' node. */
@@ -116,9 +114,69 @@ template <typename T> class Tensor {
         return Tensor(compute::div(this->computeNode_, other.computeNode_));
     }
 
+    /** @brief Scalar multiplication operator (Tensor * scalar). */
+    Tensor<T> operator*(T scalar) const {
+        return Tensor(compute::mul(this->computeNode_, scalar));
+    }
+
+    /** @brief Scalar addition operator (Tensor + scalar). */
+    Tensor<T> operator+(T scalar) const {
+        return Tensor(compute::add(this->computeNode_, scalar));
+    }
+
+    /** @brief Scalar subtraction operator (Tensor - scalar). */
+    Tensor<T> operator-(T scalar) const {
+        return Tensor(compute::sub(this->computeNode_, scalar));
+    }
+
+    /** @brief Scalar division operator (Tensor / scalar). */
+    Tensor<T> operator/(T scalar) const {
+        return Tensor(compute::div(this->computeNode_, scalar));
+    }
+
     /** @brief Matrix multiplication. */
     Tensor<T> matmul(const Tensor<T>& other) const {
         return Tensor(compute::matmul(this->computeNode_, other.computeNode_));
+    }
+
+    /**
+     * @brief Reshape tensor to new dimensions.
+     *
+     * Total size must remain invariant.
+     *
+     * @param newShape Vector of new dimension sizes.
+     * @return TensorWrapper<T> A new tensor with reshaped dimensions.
+     */
+    Tensor<T> reshape(const std::vector<size_t>& newShape) const {
+        return Tensor(compute::reshape(this->computeNode_, newShape));
+    }
+
+    /**
+     * @brief Transpose operation (for 2D tensors).
+     *
+     * Formula: B[j, i] = A[i, j]
+     *
+     * @return TensorWrapper<T> transposed tensor.
+     */
+    Tensor<T> transpose() const {
+        return Tensor(compute::transpose(this->computeNode_));
+    }
+
+    // Friend functions for scalar-tensor operations (scalar op Tensor)
+    friend Tensor<T> operator*(T scalar, const Tensor<T>& tensor) {
+        return Tensor(compute::mul(scalar, tensor.computeNode_));
+    }
+
+    friend Tensor<T> operator+(T scalar, const Tensor<T>& tensor) {
+        return Tensor(compute::add(scalar, tensor.computeNode_));
+    }
+
+    friend Tensor<T> operator-(T scalar, const Tensor<T>& tensor) {
+        return Tensor(compute::sub(scalar, tensor.computeNode_));
+    }
+
+    friend Tensor<T> operator/(T scalar, const Tensor<T>& tensor) {
+        return Tensor(compute::div(scalar, tensor.computeNode_));
     }
 
     /**
@@ -140,6 +198,20 @@ template <typename T> class Tensor {
             return std::make_shared<Tensor<T>>(computeNode_->getGrad());
         }
         return nullptr;
+    }
+
+    /**
+     * @brief Clear the tensor.
+     */
+    void clear() {
+        computeNode_->getData()->clear();
+    }
+
+    /**
+     * @brief Clean the gradient of the node.
+     */
+    void clearGrad() {
+        computeNode_->clearGrad();
     }
 
     /** @brief Get the underlying data wrapper. */
