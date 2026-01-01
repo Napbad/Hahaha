@@ -17,7 +17,6 @@
 // jiansongshen (jason.shen111@outlook.com) (https://github.com/jiansongshen)
 //
 
-
 #include <gtest/gtest.h>
 
 int main() {

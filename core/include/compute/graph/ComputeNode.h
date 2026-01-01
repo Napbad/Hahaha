@@ -65,6 +65,24 @@ template <typename T> class ComputeNode {
     }
 
     /**
+     * @brief Construct a node with a single result tensor and an operation.
+     *        Used for unary operations or when the graph structure is built
+     * step-by-step.
+     * @param res Result tensor data.
+     * @param operatorType The operation performed.
+     * @param gradFun The function to compute gradients.
+     */
+    ComputeNode(std::shared_ptr<math::TensorWrapper<T>> res,
+                common::Operator operatorType,
+                std::function<void()> gradFun = nullptr)
+        : data_(res), operatorType_(operatorType),
+          gradFun_(std::move(gradFun)) {
+        if (operatorType_ == common::Operator::None) {
+            throw std::invalid_argument("Operator cannot be None");
+        }
+    }
+
+    /**
      * @brief Construct a node as a result of an operation.
      * @param lhs Left-hand side parent node.
      * @param rhs Right-hand side parent node.
@@ -143,6 +161,18 @@ template <typename T> class ComputeNode {
     }
 
     /**
+     * @brief Clean the gradient of the node.
+     */
+    void clearGrad() {
+        grad_->clear();
+        for (auto& parent : parents_) {
+            if (parent) {
+                parent->clearGrad();
+            }
+        }
+    }
+
+    /**
      * @brief Check if this node requires gradient calculation.
      * @return true if gradients are needed.
      */
@@ -184,8 +214,8 @@ template <typename T> class ComputeNode {
         }
         // If it's the root of the backward pass (Loss), initialize dL/dz = 1
         if (!grad_) {
-            grad_ =
-                std::make_shared<math::TensorWrapper<T>>(data_->getShape(), 1);
+            grad_ = std::make_shared<math::TensorWrapper<T>>(
+                math::TensorShape(data_->getShape()), 1);
         }
         // Call the operator-specific gradient function
         if (gradFun_) {
@@ -193,10 +223,23 @@ template <typename T> class ComputeNode {
         }
     }
 
+    static std::shared_ptr<ComputeNode<T>>
+    createUnary(std::shared_ptr<ComputeNode<T>> parent,
+                std::shared_ptr<math::TensorWrapper<T>> res,
+                common::Operator operatorType,
+                std::function<void()> gradFun = nullptr) {
+        std::shared_ptr<ComputeNode<T>> node = std::make_shared<ComputeNode<T>>(
+            res, operatorType, std::move(gradFun));
+        node->addParent(parent);
+        node->setRequiresGrad(parent->getRequiresGrad());
+        return node;
+    }
+
   private:
     std::vector<std::shared_ptr<ComputeNode<T>>> parents_; /**< Input nodes. */
     std::shared_ptr<math::TensorWrapper<T>> data_;         /**< Forward data. */
-    common::Operator operatorType_ = common::Operator::None; /**< Operation used. */
+    common::Operator operatorType_ =
+        common::Operator::None; /**< Operation used. */
 
     bool requiresGrad_ = false;     /**< Grad requirement flag. */
     std::function<void()> gradFun_; /**< Backprop logic. */

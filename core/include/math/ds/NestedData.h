@@ -19,6 +19,7 @@
 #ifndef HAHAHA_MATH_DS_NESTED_DATA_H
 #define HAHAHA_MATH_DS_NESTED_DATA_H
 
+#include <stdexcept>
 #include <initializer_list>
 #include <vector>
 
@@ -50,7 +51,7 @@ template <typename T> struct NestedData {
      * @param data The scalar value.
      */
     // NOLINTNEXTLINE google-explicit-constructor
-    NestedData(T data) {
+    NestedData(T data) : shape_({}) {
         flatData_.push_back(data);
     }
 
@@ -67,8 +68,16 @@ template <typename T> struct NestedData {
         }
 
         shape_.push_back(data.size());
-        const auto& firstShape = data.begin()->shape_;
-        shape_.insert(shape_.end(), firstShape.begin(), firstShape.end());
+        const auto& firstNestedData = *data.begin();
+        // Check if all nested data have the same shape
+        for (const auto& val : data) {
+            if (val.shape_ != firstNestedData.shape_) {
+                throw std::invalid_argument("Nested initializer list has "
+                                            "inconsistent shapes.");
+            }
+        }
+        shape_.insert(shape_.end(), firstNestedData.shape_.begin(),
+                      firstNestedData.shape_.end());
 
         size_t totalElements = 0;
 #pragma unroll 5

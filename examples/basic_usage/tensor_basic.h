@@ -24,7 +24,7 @@
 #include "common/definitions.h"
 
 void tensor_basic_init_example() {
-    hahaha::Tensor<hahaha::common::u32> t1 = {{1, 2}};
+    hahaha::Tensor<hahaha::common::u32> t1({1, 2});
 
     hahaha::Tensor<hahaha::common::u32> t2({{1, 2}, {3, 4}});
 

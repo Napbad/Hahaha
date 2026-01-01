@@ -37,7 +37,9 @@ class GlfwWindow : public Window {
     bool render() override;
     void close() override;
 
-    [[nodiscard]] GLFWwindow* getHandle() const { return window_; }
+    [[nodiscard]] GLFWwindow* getHandle() const {
+        return window_;
+    }
 
   private:
     GLFWwindow* window_ = nullptr;
@@ -46,4 +48,3 @@ class GlfwWindow : public Window {
 } // namespace hahaha::display
 
 #endif // HAHAHA_DISPLAY_GLFW_WINDOW_H
-
