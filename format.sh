@@ -1,4 +1,7 @@
 #!/bin/bash
-
-# Find and format all C/C++/Header files in src/ and tests/
-find core/ tests/ -type f \( -name "*.cpp" -o -name "*.c" -o -name "*.h" -o -name "*.hpp" \) -print0 | xargs -0 clang-format -i
+#!/bin/bash
+if [[ "$1" == "--check" ]]; then
+  clang-format --style=file --dry-run --Werror $(find core examples tests -name "*.cpp" -o -name "*.hpp" -o -name "*.h" -o -name "*.cuh")
+else
+  clang-format -i --style=file $(find core examples tests -name "*.cpp" -o -name "*.hpp" -o -name "*.h" -o -name "*.cuh")
+fi
