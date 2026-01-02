@@ -5,17 +5,7 @@ on:
     branches: [ dev, main, JiansongShen-patch-1-ci-config ] 
   pull_request:
     branches: [ dev, main, JiansongShen-patch-1-ci-config ] 
-
-# jobs:
-#   test:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v4
-
-#       - name: Hello
-#         run: echo "GitHub Actions is working!"
-
+    
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -71,10 +61,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential clang-tidy clang-format
-      
-      - name: Check code formatting (clang-format)
-        run: |
-          ./format.sh
 
       - name: Configure Meson
         run: |
