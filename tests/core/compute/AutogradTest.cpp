@@ -556,3 +556,62 @@ TEST_F(AutogradTest, ThreeDim_ScalarDivideTensor) {
     EXPECT_FLOAT_EQ(a.grad()->at({0, 0, 0}), -20.0f / (2.0f * 2.0f)); // -5.0f
     EXPECT_FLOAT_EQ(a.grad()->at({1, 1, 1}), -20.0f / (5.0f * 5.0f)); // -0.8f
 }
+
+TEST_F(AutogradTest, ScalarTensor_Operations) {
+    Tensor<float> a(NestedData<float>{{{1.0f, 2.0f}, {3.0f, 4.0f}},
+                                      {{5.0f, 6.0f}, {7.0f, 8.0f}}});
+    Tensor<float> s(NestedData<float>(2.0f)); // Scalar tensor
+    a.setRequiresGrad(true);
+    s.setRequiresGrad(true);
+
+    auto c = a * s; // f = a * s
+    EXPECT_FLOAT_EQ(c.at({0, 0, 0}), 2.0f);
+    EXPECT_FLOAT_EQ(c.at({1, 1, 1}), 16.0f);
+
+    c.backward();
+
+    ASSERT_NE(a.grad(), nullptr);
+    ASSERT_NE(s.grad(), nullptr);
+
+    // d(f)/da = s = 2.0
+    EXPECT_FLOAT_EQ(a.grad()->at({0, 0, 0}), 2.0f);
+    EXPECT_FLOAT_EQ(a.grad()->at({1, 1, 1}), 2.0f);
+
+    // d(f)/ds = sum(a) = 1+2+3+4+5+6+7+8 = 36
+    EXPECT_FLOAT_EQ(s.grad()->at({}), 36.0f);
+}
+
+TEST_F(AutogradTest, ScalarTensor_NonCommutative) {
+    Tensor<float> a(NestedData<float>{{{1.0f, 2.0f}, {3.0f, 4.0f}},
+                                      {{5.0f, 6.0f}, {7.0f, 8.0f}}});
+    Tensor<float> s(NestedData<float>(10.0f)); // Scalar tensor
+    a.setRequiresGrad(true);
+    s.setRequiresGrad(true);
+
+    // c = s - a
+    auto c = s - a;
+    EXPECT_FLOAT_EQ(c.at({0, 0, 0}), 9.0f);
+    EXPECT_FLOAT_EQ(c.at({1, 1, 1}), 2.0f);
+
+    c.backward();
+
+    // d(c)/da = -1
+    EXPECT_FLOAT_EQ(a.grad()->at({0, 0, 0}), -1.0f);
+    // d(c)/ds = sum(1) = 8
+    EXPECT_FLOAT_EQ(s.grad()->at({}), 8.0f);
+
+    a.clearGrad();
+    s.clearGrad();
+
+    // d = s / a
+    auto d = s / a;
+    d.backward();
+
+    // d(d)/da = -s / a^2 = -10 / 1^2 = -10
+    EXPECT_FLOAT_EQ(a.grad()->at({0, 0, 0}), -10.0f);
+    // d(d)/ds = sum(1/a) = sum(1/1 + 1/2 + ... + 1/8)
+    float expected_s_grad = 0;
+    for (int i = 1; i <= 8; ++i)
+        expected_s_grad += 1.0f / static_cast<float>(i);
+    EXPECT_NEAR(s.grad()->at({}), expected_s_grad, 1e-5);
+}
