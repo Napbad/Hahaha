@@ -92,7 +92,10 @@ RUN apt-get update && apt-get install -y \
     libgl1-mesa-dev \
     libglu1-mesa-dev \
     pkgconf \
+    pipx \
     && rm -rf /var/lib/apt/lists/*
+
+RUN  pipx ensurepath &&  pipx install pre-commit &&  pre-commit install
 
 # Make clang/clang++ the system default C/C++ compilers so tools like Meson
 # which consult `cc`/`c++` or $CC/$CXX will use clang inside the container.
@@ -137,4 +140,3 @@ WORKDIR /workspace
 # RUN uv sync
 
 CMD ["/bin/fish"]
-
