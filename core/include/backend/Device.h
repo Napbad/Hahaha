@@ -19,6 +19,7 @@
 #ifndef HAHAHA_BACKEND_DEVICE_H
 #define HAHAHA_BACKEND_DEVICE_H
 
+#include <cstdint>
 #include <string>
 
 namespace hahaha::backend {

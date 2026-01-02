@@ -186,6 +186,29 @@ template <typename T> class DeviceComputeDispatcher {
             throw std::runtime_error("MatMul dispatch not yet implemented");
         }
     }
+
+    /**
+     * @brief Performs res = res + alpha * x in-place.
+     * @param alpha Scaling factor.
+     * @param x_tensor Input tensor.
+     * @param res_tensor Result tensor (updated in-place).
+     */
+    static void dispatchAxpy(T alpha,
+                             const math::TensorWrapper<T>& x_tensor,
+                             math::TensorWrapper<T>& res_tensor) {
+        auto device = res_tensor.getDevice();
+        if (device.type == backend::DeviceType::CPU) {
+            size_t size = res_tensor.getSize();
+            auto* xPtr = x_tensor.data_.getData().get();
+            auto* resPtr = res_tensor.data_.getData().get();
+
+            for (size_t i = 0; i < size; ++i) {
+                resPtr[i] += alpha * xPtr[i];
+            }
+        } else {
+            throw std::runtime_error("Axpy dispatch not yet implemented");
+        }
+    }
 };
 
 } // namespace hahaha::backend

@@ -21,19 +21,26 @@
 #include "Optimizer.h"
 
 namespace hahaha::ml {
-template<typename T>
-class SGDOptimizer : public Optimizer<T> {
+template <typename T> class SGDOptimizer : public Optimizer<T> {
   public:
-
-private:
+    /**
+     * @brief Construct a new SGDOptimizer.
+     * @param parameters List of tensors to optimize.
+     * @param learningRate Learning rate.
+     */
+    SGDOptimizer(std::vector<Tensor<T>> parameters, T learningRate)
+        : Optimizer<T>(std::move(parameters), learningRate) {
+    }
 
     /**
      * @brief Performs parameter updates using SGD logic.
      *
      * Iterates through all tracked parameters that require gradients and
-     * performs the in-place subtraction of the scaled gradient.
+     * performs the in-place subtraction of the scaled gradient:
+     * theta = theta - lr * gradient
      */
     void step() override {
+        T lr = this->getLearningRate();
         for (auto& param : this->getParameters()) {
             if (!param.getRequiresGrad()) {
                 continue;
@@ -44,17 +51,9 @@ private:
                 continue;
             }
 
-            auto data = param.data();
-            auto gradData = grad->data();
-
-            const size_t size = data->getTotalSize();
-            T* paramDataPtr = data->getRawData();
-            const T* gradDataPtr = gradData->getRawData().get();
-
-            // Perform update: p = p - learningRate * g
-            for (size_t i = 0; i < size; ++i) {
-                paramDataPtr[i] -= this->getLearningRate() * gradDataPtr[i];
-            }
+            // theta = theta - lr * gradient
+            // Use TensorWrapper's axpy for device-neutral in-place update
+            param.data()->axpy(-lr, *(grad->data()));
         }
     }
 };

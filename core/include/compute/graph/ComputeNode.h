@@ -52,7 +52,8 @@ namespace hahaha::compute {
  *
  * @tparam T The numeric data type (e.g., float, double).
  */
-template <typename T> class ComputeNode {
+template <typename T>
+class ComputeNode : public std::enable_shared_from_this<ComputeNode<T>> {
     static_assert(utils::isLegalDataType<T>::value,
                   "T must be a legal data type");
 
@@ -165,7 +166,9 @@ template <typename T> class ComputeNode {
      * @brief Clean the gradient of the node.
      */
     void clearGrad() {
-        grad_->clear();
+        if (grad_) {
+            grad_->clear();
+        }
         for (auto& parent : parents_) {
             if (parent) {
                 parent->clearGrad();
@@ -213,14 +216,27 @@ template <typename T> class ComputeNode {
         if (!requiresGrad_) {
             return;
         }
-        // If it's the root of the backward pass (Loss), initialize dL/dz = 1
+
+        // 1. Get the topological sort of the graph ending at this node
+        TopoSort<T> sorter;
+        std::vector<std::shared_ptr<ComputeNode<T>>> topoList =
+            sorter.toTopoList(this->shared_from_this());
+
+        // 2. Initialize the gradient of the root node (e.g., Loss) to 1.0
         if (!grad_) {
             grad_ = std::make_shared<math::TensorWrapper<T>>(
-                math::TensorShape(data_->getShape()), 1);
+                math::TensorShape(data_->getShape()), 1.0f);
         }
-        // Call the operator-specific gradient function
-        if (gradFun_) {
-            gradFun_();
+
+        // 3. Iterate backwards through the topological list
+        // topoList is [Inputs..., Ops..., Output]
+        // reverse is [Output, Ops..., Inputs...]
+        for (auto it = topoList.rbegin(); it != topoList.rend(); ++it) {
+            auto& node = *it;
+            // Execute the gradient function for this node to propagate to parents
+            if (node->gradFun_) {
+                node->gradFun_();
+            }
         }
     }
 
@@ -238,7 +254,7 @@ template <typename T> class ComputeNode {
 
   private:
     std::vector<std::shared_ptr<ComputeNode>> parents_; /**< Input nodes. */
-    std::shared_ptr<math::TensorWrapper<T>> data_;         /**< Forward data. */
+    std::shared_ptr<math::TensorWrapper<T>> data_;      /**< Forward data. */
     common::Operator operatorType_ =
         common::Operator::None; /**< Operation used. */
 

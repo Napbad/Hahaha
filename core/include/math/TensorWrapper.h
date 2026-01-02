@@ -660,7 +660,7 @@ template <typename T> class TensorWrapper {
         TensorWrapper<T> result;
         result.data_.setShape(data_.getShape());
         result.data_.setStride(data_.getStride());
-        size_t tensorSize = getSize();
+        const size_t tensorSize = getSize();
         result.data_.setData(std::make_unique<T[]>(tensorSize));
         for (size_t i = 0; i < tensorSize; ++i) {
             result.data_.getData()[i] = -data_.getData()[i];
@@ -676,7 +676,7 @@ template <typename T> class TensorWrapper {
 
         checkSameDevice(other);
 
-        size_t tensorSize = getSize();
+        const size_t tensorSize = getSize();
 
         for (size_t i = 0; i < tensorSize; ++i) {
             data_.getData()[i] = data_.getData()[i] + other.data_.getData()[i];
@@ -686,7 +686,7 @@ template <typename T> class TensorWrapper {
     }
 
     TensorWrapper<T>& operator+=(T scalar) {
-        size_t tensorSize = getSize();
+        const size_t tensorSize = getSize();
         for (size_t i = 0; i < tensorSize; ++i) {
             data_.getData()[i] += scalar;
         }
@@ -694,7 +694,7 @@ template <typename T> class TensorWrapper {
     }
 
     TensorWrapper<T>& operator-=(T scalar) {
-        size_t tensorSize = getSize();
+        const size_t tensorSize = getSize();
         for (size_t i = 0; i < tensorSize; ++i) {
             data_.getData()[i] -= scalar;
         }
@@ -702,7 +702,7 @@ template <typename T> class TensorWrapper {
     }
 
     TensorWrapper<T>& operator*=(T scalar) {
-        size_t tensorSize = getSize();
+        const size_t tensorSize = getSize();
         for (size_t i = 0; i < tensorSize; ++i) {
             data_.getData()[i] *= scalar;
         }
@@ -713,11 +713,27 @@ template <typename T> class TensorWrapper {
         if (scalar == T(0)) {
             throw std::runtime_error("Division by zero");
         }
-        size_t tensorSize = getSize();
+        const size_t tensorSize = getSize();
         for (size_t i = 0; i < tensorSize; ++i) {
             data_.getData()[i] /= scalar;
         }
         return *this;
+    }
+
+    /**
+     * @brief In-place update: this = this + alpha * other
+     * Useful for optimizers (e.g., SGD: param = param - lr * grad)
+     * @param alpha Scaling factor
+     * @param other Other tensor
+     */
+    void axpy(T alpha, const TensorWrapper<T>& other) {
+        if (getShape() != other.getShape()) {
+            throw std::invalid_argument("Shape mismatch in axpy");
+        }
+        checkSameDevice(other);
+        
+        // Dispatch to backend for hardware-specific optimization
+        backend::DeviceComputeDispatcher<T>::dispatchAxpy(alpha, other, *this);
     }
 
   private:
