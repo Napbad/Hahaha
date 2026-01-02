@@ -18,9 +18,7 @@
 //
 
 #include <gtest/gtest.h>
-class DatasetTest : public ::testing::Test {public:
-
-private:
-
-
+class DatasetTest : public ::testing::Test {
+  public:
+  private:
 };
