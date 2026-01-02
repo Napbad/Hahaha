@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ dev, main ] 
+    branches: [ dev, main, JiansongShen-patch-1-ci-config ] 
   pull_request:
-    branches: [ dev, main ] 
+    branches: [ dev, main, JiansongShen-patch-1-ci-config ] 
 
 jobs:
   build-and-test:
