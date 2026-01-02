@@ -164,7 +164,7 @@ TEST_F(TensorWrapperTest, GetTotalSize_ReturnsCorrectCount) {
 // --- Move/Copy Semantics Tests ---
 
 TEST_F(TensorWrapperTest, MoveConstructor_TransfersOwnershipAndLeavesSourceValidButUnspecified) {
-    TensorWrapper<int> tensor_orig(NestedData<int>{{1, 2}, {3, 4}});
+            TensorWrapper<int> tensor_orig(NestedData<int>{{1, 2}, {3, 4}});
     TensorWrapper<int> tensor_moved(std::move(tensor_orig));
     EXPECT_EQ(tensor_moved.getTotalSize(), 4);
     // tensor_orig's state is valid but unspecified, can check for some properties
