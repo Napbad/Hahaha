@@ -1,0 +1,74 @@
+name: CI  
+
+on:
+  push:
+    branches: [ dev, main, JiansongShen-patch-1-ci-config ] 
+  pull_request:
+    branches: [ dev, main, JiansongShen-patch-1-ci-config ] 
+    
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: CPU-only
+            cuda: false
+          - name: With-CUDA
+            cuda: true
+
+    name: ${{ matrix.name }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      
+      - name: Install Meson and Ninja
+        run: pip install meson ninja
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential clang-tidy clang-format libglib2.0-dev pkg-config \
+            cmake libgtest-dev \
+            libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev
+            
+      - name: Install Google Test from source
+        run: |
+          sudo apt-get install -y cmake libgtest-dev
+          if [ ! -d "/usr/src/googletest" ]; then
+            sudo mkdir -p /usr/src/googletest
+            sudo apt-get source libgtest-dev || echo "apt-get source failed, fallback to git"
+            if [ -d "/usr/src/googletest" ] && [ -z "$(ls -A /usr/src/googletest)" ]; then
+              sudo git clone https://github.com/google/googletest.git /usr/src/googletest
+              cd /usr/src/googletest
+              sudo git checkout release-1.14.0  
+            fi
+          fi
+          cd /usr/src/googletest
+          sudo cmake -B build -S .
+          sudo cmake --build build --target install
+          sudo ldconfig  
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential clang-tidy clang-format
+
+      - name: Configure Meson
+        run: |
+          meson setup build
+          
+      - name: Build
+        run: meson compile -C build
+
+      - name: Run tests
+        run: meson test -C build --verbose
+      
