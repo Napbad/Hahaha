@@ -45,7 +45,7 @@ template <typename T> class DeviceComputeDispatcher {
                                math::TensorWrapper<T>& res) {
         auto device = lhs.getDevice();
         if (device.type == backend::DeviceType::CPU) {
-            size_t size = lhs.getSize();
+            size_t size = lhs.getTotalSize();
             auto* lPtr = lhs.data_.getData().get();
             auto* rPtr = rhs.data_.getData().get();
             auto* resPtr = res.data_.getData().get();
@@ -86,7 +86,7 @@ template <typename T> class DeviceComputeDispatcher {
                                math::TensorWrapper<T>& res) {
         auto device = lhs.getDevice();
         if (device.type == backend::DeviceType::CPU) {
-            size_t size = lhs.getSize();
+            size_t size = lhs.getTotalSize();
             auto* lPtr = lhs.data_.getData().get();
             auto* resPtr = res.data_.getData().get();
 
@@ -124,7 +124,7 @@ template <typename T> class DeviceComputeDispatcher {
                                math::TensorWrapper<T>& res) {
         auto device = rhs.getDevice();
         if (device.type == backend::DeviceType::CPU) {
-            size_t size = rhs.getSize();
+            size_t size = rhs.getTotalSize();
             auto* rPtr = rhs.data_.getData().get();
             auto* resPtr = res.data_.getData().get();
 
@@ -198,7 +198,7 @@ template <typename T> class DeviceComputeDispatcher {
                              math::TensorWrapper<T>& res_tensor) {
         auto device = res_tensor.getDevice();
         if (device.type == backend::DeviceType::CPU) {
-            size_t size = res_tensor.getSize();
+            size_t size = res_tensor.getTotalSize();
             auto* xPtr = x_tensor.data_.getData().get();
             auto* resPtr = res_tensor.data_.getData().get();
 

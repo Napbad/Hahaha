@@ -17,7 +17,8 @@ A lightweight numerical computing and machine learning library with core compone
 
 - Docker (for containerized development)
 - Git
-- CMake ≥ 3.10
+- Meson ≥ 1.3.2
+- ninja ≥ 1.11.1
 - NVIDIA GPU with CUDA 13.0 support (optional, for GPU acceleration)
 
 ### Quick Start with Docker
@@ -34,7 +35,7 @@ docker run --gpus all -it --rm -v $(pwd):/workspace hahaha-dev
 
 # Compile the project
 mkdir build && cd build
-cmake .. && make
+meson .. && ninja
 ```
 
 ### VS Code Development

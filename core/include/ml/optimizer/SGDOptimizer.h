@@ -57,6 +57,6 @@ template <typename T> class SGDOptimizer : public Optimizer<T> {
         }
     }
 };
-} // namespace hahaha::ml
+} // namespace hahaha::ml_basic_usage
 
 #endif // HAHAHA_SGDOPTIMIZER_H_E57DB5EDFD0E4CC4914AB64FBF0C0859
