@@ -43,6 +43,28 @@ jobs:
       - name: Install Meson and Ninja
         run: pip install meson ninja
 
+              - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential clang-tidy clang-format libglib2.0-dev pkg-config
+
+      - name: Install Google Test from source
+        run: |
+          sudo apt-get install -y cmake libgtest-dev
+          if [ ! -d "/usr/src/googletest" ]; then
+            sudo mkdir -p /usr/src/googletest
+            sudo apt-get source libgtest-dev || echo "apt-get source failed, fallback to git"
+            if [ -d "/usr/src/googletest" ] && [ -z "$(ls -A /usr/src/googletest)" ]; then
+              sudo git clone https://github.com/google/googletest.git /usr/src/googletest
+              cd /usr/src/googletest
+              sudo git checkout release-1.14.0  
+            fi
+          fi
+          cd /usr/src/googletest
+          sudo cmake -B build -S .
+          sudo cmake --build build --target install
+          sudo ldconfig  
+
       - name: Install dependencies
         run: |
           sudo apt-get update
