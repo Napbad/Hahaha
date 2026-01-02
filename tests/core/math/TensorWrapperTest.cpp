@@ -152,13 +152,13 @@ TEST_F(TensorWrapperTest, GetDimensions_ReturnsCorrectCount) {
     EXPECT_EQ(tensor_2d.getDimensions(), 2);
 }
 
-TEST_F(TensorWrapperTest, GetSize_ReturnsCorrectCount) {
+TEST_F(TensorWrapperTest, GetTotalSize_ReturnsCorrectCount) {
     TensorWrapper<int> tensor_scalar(NestedData<int>{1});
-    EXPECT_EQ(tensor_scalar.getSize(), 1);
+    EXPECT_EQ(tensor_scalar.getTotalSize(), 1);
     TensorWrapper<int> tensor_1d(NestedData<int>{1, 2, 3});
-    EXPECT_EQ(tensor_1d.getSize(), 3);
+    EXPECT_EQ(tensor_1d.getTotalSize(), 3);
     TensorWrapper<int> tensor_2d(NestedData<int>{{1, 2}, {3, 4}});
-    EXPECT_EQ(tensor_2d.getSize(), 4);
+    EXPECT_EQ(tensor_2d.getTotalSize(), 4);
 }
 
 // --- Move/Copy Semantics Tests ---
