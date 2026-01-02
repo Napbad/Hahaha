@@ -24,6 +24,7 @@
 #include <utility>
 #include <vector>
 
+#include "TopoSort.h"
 #include "common/Operator.h"
 #include "math/TensorWrapper.h"
 #include "utils/common/HelperStruct.h"
@@ -245,7 +246,8 @@ template <typename T> class ComputeNode {
     std::function<void()> gradFun_; /**< Backprop logic. */
     std::shared_ptr<math::TensorWrapper<T>> grad_; /**< Accumulated grad. */
 
-    friend class Tensor<T>;
+    friend class hahaha::Tensor<T>;
+    template <typename U> friend class TopoSort;
 };
 
 } // namespace hahaha::compute
