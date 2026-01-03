@@ -1,4 +1,5 @@
-//  Copyright (c) ${original.year} - 2026 Contributors of Hahaha("https://github.com/Napbad/Hahaha")
+//  Copyright (c) ${original.year} - 2026 Contributors of
+//  Hahaha("https://github.com/Napbad/Hahaha")
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -37,10 +38,10 @@ template <typename T> class SGDOptimizer : public Optimizer<T> {
      *
      * Iterates through all tracked parameters that require gradients and
      * performs the in-place subtraction of the scaled gradient:
-     * theta = theta - lr * gradient
+     * theta = theta - learningRate * gradient
      */
     void step() override {
-        T lr = this->getLearningRate();
+        T learningRate = this->getLearningRate();
         for (auto& param : this->getParameters()) {
             if (!param.getRequiresGrad()) {
                 continue;
@@ -51,12 +52,12 @@ template <typename T> class SGDOptimizer : public Optimizer<T> {
                 continue;
             }
 
-            // theta = theta - lr * gradient
+            // theta = theta - learningRate * gradient
             // Use TensorWrapper's axpy for device-neutral in-place update
-            param.data()->axpy(-lr, *(grad->data()));
+            param.data()->axpy(-learningRate, *(grad->data()));
         }
     }
 };
-} // namespace hahaha::ml_basic_usage
+} // namespace hahaha::ml
 
 #endif // HAHAHA_SGDOPTIMIZER_H_E57DB5EDFD0E4CC4914AB64FBF0C0859
