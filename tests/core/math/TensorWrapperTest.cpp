@@ -42,6 +42,12 @@ TEST_F(TensorWrapperTest, Constructor_Default_CreatesEmptyTensor) {
     EXPECT_EQ(tensor.getShape().size(), 0);
 }
 
+TEST_F(TensorWrapperTest, GetRawData_ReturnsSharedPtrToBuffer) {
+    TensorWrapper<int> tensor(TensorShape({2, 2}), 7);
+    auto& raw = tensor.getRawData();
+    EXPECT_NE(raw.get(), nullptr);
+}
+
 TEST_F(TensorWrapperTest, Constructor_ShapeInitValueDevice_CreatesCorrectTensor) {
     TensorWrapper<float> tensor(TensorShape({2, 3}), 1.0f, Device(DeviceType::CPU, 0));
     EXPECT_EQ(tensor.getTotalSize(), 6);
@@ -115,13 +121,13 @@ TEST_F(TensorWrapperTest, GetShape_ReturnsCorrectDimensionsAndSize) {
 
 TEST_F(TensorWrapperTest, GetStride_ReturnsCorrectValues) {
     TensorWrapper<int> tensor_2d(NestedData<int>{{1, 2}, {3, 4}});
-    EXPECT_EQ(tensor_2d.getStride().getDims()[0], 2);
-    EXPECT_EQ(tensor_2d.getStride().getDims()[1], 1);
+    EXPECT_EQ(tensor_2d.getStride().getStrides()[0], 2);
+    EXPECT_EQ(tensor_2d.getStride().getStrides()[1], 1);
 
     TensorWrapper<int> tensor_3d(NestedData<int>{{{1, 2}, {3, 4}}, {{5, 6}, {7, 8}}});
-    EXPECT_EQ(tensor_3d.getStride().getDims()[0], 4);
-    EXPECT_EQ(tensor_3d.getStride().getDims()[1], 2);
-    EXPECT_EQ(tensor_3d.getStride().getDims()[2], 1);
+    EXPECT_EQ(tensor_3d.getStride().getStrides()[0], 4);
+    EXPECT_EQ(tensor_3d.getStride().getStrides()[1], 2);
+    EXPECT_EQ(tensor_3d.getStride().getStrides()[2], 1);
 }
 
 TEST_F(TensorWrapperTest, GetDevice_ReturnsCorrectDefaultDevice) {
@@ -141,6 +147,12 @@ TEST_F(TensorWrapperTest, ElementAccess_OutOfBounds_ThrowsOutOfRange) {
     TensorWrapper<int> tensor(NestedData<int>{{1, 2}, {3, 4}});
     EXPECT_THROW(tensor.at({0, 0, 0}), std::out_of_range); // Dimension mismatch
     EXPECT_THROW(tensor.at({2, 0}), std::out_of_range);     // Index out of bounds
+}
+
+TEST_F(TensorWrapperTest, ElementAccess_ConstAt_WorksAndThrowsOnMismatch) {
+    const TensorWrapper<int> tensor(NestedData<int>{{1, 2}, {3, 4}});
+    EXPECT_EQ(tensor.at({0, 1}), 2);
+    EXPECT_THROW(tensor.at({0}), std::out_of_range);
 }
 
 TEST_F(TensorWrapperTest, GetDimensions_ReturnsCorrectCount) {
@@ -479,8 +491,69 @@ TEST_F(TensorWrapperTest, To_DifferentDevice_NotImplemented_ThrowsRuntimeError) 
     EXPECT_THROW(tensor.to(Device(DeviceType::GPU, 0)), std::runtime_error);
 }
 
-TEST_F(TensorWrapperTest, Broadcast_NotImplemented_ThrowsRuntimeError) {
-    TensorWrapper<int> tensor1(NestedData<int>{1});
-    TensorWrapper<int> tensor2(NestedData<int>{1, 2});
-    EXPECT_THROW(tensor1.broadcast(tensor2), std::runtime_error);
+TEST_F(TensorWrapperTest, Clear_OnEmptyTensor_NoThrow) {
+    TensorWrapper<int> tensor;
+    EXPECT_NO_THROW(tensor.clear());
+    EXPECT_EQ(tensor.getTotalSize(), 0);
+}
+
+TEST_F(TensorWrapperTest, Sum_OnEmptyTensor_ReturnsZero) {
+    TensorWrapper<int> tensor;
+    EXPECT_EQ(tensor.sum(), 0);
+}
+
+TEST_F(TensorWrapperTest, BroadcastTo_SameShape_ReturnsViewWithSameStride) {
+    TensorWrapper<int> src(NestedData<int>{{1, 2}, {3, 4}}); // shape (2,2)
+    auto view = src.broadcastTo(TensorShape({2, 2}));
+
+    EXPECT_EQ(view.getShape().size(), 2);
+    EXPECT_EQ(view.getShape()[0], 2);
+    EXPECT_EQ(view.getShape()[1], 2);
+    EXPECT_EQ(view.getStride().toString(), src.getStride().toString());
+    EXPECT_EQ(view.getRawData().get(), src.getRawData().get());
+}
+
+TEST_F(TensorWrapperTest, BroadcastTo_PrefixDim_InsertsZeroStride) {
+    TensorWrapper<int> src(NestedData<int>{1, 2, 3}); // shape (3)
+    auto view = src.broadcastTo(TensorShape({2, 3})); // view shape (2,3)
+    EXPECT_EQ(view.getShape().size(), 2);
+    EXPECT_EQ(view.getShape()[0], 2);
+    EXPECT_EQ(view.getShape()[1], 3);
+
+    // prefix dim stride is 0, last dim stride is original 1
+    ASSERT_EQ(view.getStride().getStrides().size(), 2);
+    EXPECT_EQ(view.getStride().getStrides()[0], 0);
+    EXPECT_EQ(view.getStride().getStrides()[1], 1);
+    EXPECT_EQ(view.getRawData().get(), src.getRawData().get());
+}
+
+TEST_F(TensorWrapperTest, BroadcastTo_DimOneGetsZeroStride) {
+    TensorWrapper<int> src(NestedData<int>{{1, 2, 3}}); // shape (1,3)
+    auto view = src.broadcastTo(TensorShape({2, 3}));   // (2,3)
+    ASSERT_EQ(view.getStride().getStrides().size(), 2);
+    EXPECT_EQ(view.getStride().getStrides()[0], 0);
+    EXPECT_EQ(view.getStride().getStrides()[1], src.getStride().getStrides()[1]);
+}
+
+TEST_F(TensorWrapperTest, BroadcastTo_Incompatible_ThrowsInvalidArgument) {
+    TensorWrapper<int> src(NestedData<int>{{1, 2}, {3, 4}}); // (2,2)
+    EXPECT_THROW(src.broadcastTo(TensorShape({3, 2})), std::invalid_argument);
+}
+
+TEST_F(TensorWrapperTest, BroadcastTo_TargetRankSmaller_ThrowsInvalidArgument) {
+    TensorWrapper<int> src(NestedData<int>{{1, 2, 3}}); // (1,3)
+    EXPECT_THROW(src.broadcastTo(TensorShape({3})), std::invalid_argument);
+}
+
+TEST_F(TensorWrapperTest, ScalarTensorTensorOps_TwoScalars_Work) {
+    TensorWrapper<float> a(2.0f);
+    TensorWrapper<float> b(3.0f);
+    auto sum = a + b;
+    auto diff = a - b;
+    auto prod = a * b;
+    auto quot = b / a;
+    EXPECT_FLOAT_EQ(sum.at({}), 5.0f);
+    EXPECT_FLOAT_EQ(diff.at({}), -1.0f);
+    EXPECT_FLOAT_EQ(prod.at({}), 6.0f);
+    EXPECT_FLOAT_EQ(quot.at({}), 1.5f);
 }

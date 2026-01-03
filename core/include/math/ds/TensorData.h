@@ -59,7 +59,7 @@ template <typename T> class TensorData {
      */
     TensorData(const TensorShape& shape,
                T initValue,
-               backend::Device device = backend::Device())
+               const backend::Device device = backend::Device())
         : shape_(shape), stride_(shape), device_(device) {
         size_t size = shape_.getTotalSize();
         if (device_.type == backend::DeviceType::CPU
@@ -72,13 +72,14 @@ template <typename T> class TensorData {
                 "GPU allocation not yet implemented in TensorData");
         }
     }
+
     /**
      * @brief Construct with given shape and initial value on a specific device.
      * @param shape The shape of the tensor.
      * @param device The device where the data should reside.
      */
     explicit TensorData(const TensorShape& shape,
-                        backend::Device device = backend::Device())
+                        const backend::Device device = backend::Device())
         : shape_(shape), stride_(shape), device_(device) {
         size_t size = shape_.getTotalSize();
         if (device_.type == backend::DeviceType::CPU
@@ -118,7 +119,7 @@ template <typename T> class TensorData {
     }
 
     explicit TensorData(const std::vector<T>& initVec)
-        : data_(std::make_unique<T[]>(initVec.size())),
+        : data_(std::make_shared<T[]>(initVec.size())),
           shape_(TensorShape(std::vector<size_t>{initVec.size()})) {
         stride_ = TensorStride(shape_);
         std::copy(initVec.begin(), initVec.end(), data_.get());
@@ -142,6 +143,15 @@ template <typename T> class TensorData {
             device_ = other.device_;
         }
         return *this;
+    }
+
+    TensorData share() const {
+        TensorData sharedData = TensorData();
+        sharedData.shape_ = shape_;
+        sharedData.stride_ = stride_;
+        sharedData.device_ = device_;
+        sharedData.data_ = data_;
+        return sharedData;
     }
 
     /**

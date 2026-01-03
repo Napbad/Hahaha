@@ -17,9 +17,9 @@
 //
 //
 
-#include "ml/model/LinearRegression.h"
-
 #include <gtest/gtest.h>
+
+#include "ml/model/LinearRegression.h"
 
 using namespace hahaha::ml;
 using namespace hahaha::common;
@@ -33,4 +33,5 @@ class LinearRegressionTest : public ::testing::Test {
 };
 
 TEST_F(LinearRegressionTest, LinearRegressionInit) {
+    LinearRegression<f32> linearRegression;
 }

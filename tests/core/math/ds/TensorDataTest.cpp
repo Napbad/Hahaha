@@ -19,6 +19,11 @@
 #include "math/ds/TensorData.h"
 
 #include <gtest/gtest.h>
+
+#include <vector>
+
+#include "backend/Device.h"
+
 class TensorDataTest : public ::testing::Test {
   protected:
     void SetUp() override {
@@ -44,10 +49,53 @@ TEST_F(TensorDataTest, InitWithInitializerList) {
     EXPECT_EQ(twoElementTensor.getData()[1], 2);
 }
 
+TEST_F(TensorDataTest, InitWithEmptyNestedData_ProducesNullDataAndScalarShape) {
+    TensorData<int> empty(hahaha::math::NestedData<int>{});
+    EXPECT_EQ(empty.getShape().getDims().size(), 0);
+    EXPECT_EQ(empty.getData().get(), nullptr);
+}
+
 TEST_F(TensorDataTest, DefaultConstructor) {
     TensorData<float> defaultConstructedTensor;
     EXPECT_EQ(defaultConstructedTensor.getShape().getDims().size(), 0);
     EXPECT_EQ(defaultConstructedTensor.getData().get(), nullptr);
+}
+
+TEST_F(TensorDataTest, ShapeOnlyConstructor_DefaultDeviceAllocates) {
+    hahaha::math::TensorShape shape({2, 2});
+    TensorData<int> td(shape);
+    EXPECT_EQ(td.getShape().getTotalSize(), 4);
+    EXPECT_NE(td.getData().get(), nullptr);
+}
+
+TEST_F(TensorDataTest, ShapeValueConstructor_GpuDevice_ThrowsRuntimeError) {
+    hahaha::math::TensorShape shape({2, 2});
+    EXPECT_THROW(TensorData<int>(shape,
+                                 1,
+                                 hahaha::backend::Device(
+                                     hahaha::backend::DeviceType::GPU,
+                                     0)),
+                 std::runtime_error);
+}
+
+TEST_F(TensorDataTest, ShapeOnlyConstructor_GpuDevice_ThrowsRuntimeError) {
+    hahaha::math::TensorShape shape({2, 2});
+    EXPECT_THROW(TensorData<int>(shape,
+                                 hahaha::backend::Device(
+                                     hahaha::backend::DeviceType::GPU,
+                                     0)),
+                 std::runtime_error);
+}
+
+TEST_F(TensorDataTest, InitVecConstructor_Creates1DTensor) {
+    std::vector<int> vec = {7, 8, 9};
+    TensorData<int> td(vec);
+    EXPECT_EQ(td.getShape().getDims().size(), 1);
+    EXPECT_EQ(td.getShape().getDims()[0], 3);
+    EXPECT_EQ(td.getStride().getSize(), 1);
+    EXPECT_EQ(td.getStride()[0], 1);
+    EXPECT_EQ(td.getData()[0], 7);
+    EXPECT_EQ(td.getData()[2], 9);
 }
 
 TEST_F(TensorDataTest, ShapeValueConstructor) {
@@ -122,4 +170,36 @@ TEST_F(TensorDataTest, SettersAndGetters) {
     EXPECT_EQ(td.getData()[0], 10);
     EXPECT_EQ(td.getShape().getTotalSize(), 4);
     EXPECT_EQ(td.getStride()[0], 2);
+}
+
+TEST_F(TensorDataTest, Share_SharesBufferButCopiesMetadata) {
+    TensorData<int> original(hahaha::math::TensorShape({2, 2}), 3);
+    auto shared = original.share();
+
+    // Shares underlying buffer
+    EXPECT_EQ(shared.getData().get(), original.getData().get());
+    // Metadata is value-copied
+    EXPECT_EQ(shared.getShape(), original.getShape());
+    EXPECT_EQ(shared.getStride().toString(), original.getStride().toString());
+
+    // Mutating shared data mutates original data (same buffer)
+    shared.getData()[0] = 42;
+    EXPECT_EQ(original.getData()[0], 42);
+
+    // Mutating metadata on shared should not affect original
+    shared.setShape(hahaha::math::TensorShape({4}));
+    EXPECT_NE(shared.getShape(), original.getShape());
+}
+
+TEST_F(TensorDataTest, Device_GetSet_Works) {
+    TensorData<int> td(hahaha::math::TensorShape({1}), 1);
+    EXPECT_EQ(td.getDevice().type, hahaha::backend::DeviceType::CPU);
+    td.setDevice(hahaha::backend::Device(hahaha::backend::DeviceType::SIMD, 0));
+    EXPECT_EQ(td.getDevice().type, hahaha::backend::DeviceType::SIMD);
+}
+
+TEST_F(TensorDataTest, OperatorIndex_ReferencesUnderlyingData) {
+    TensorData<int> td(hahaha::math::TensorShape({3}), 0);
+    td[1] = 123;
+    EXPECT_EQ(td.getData()[1], 123);
 }

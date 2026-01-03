@@ -66,9 +66,20 @@ TEST_F(TensorStrideTest, EmptyStride) {
     ASSERT_EQ(stride.getSize(), 0);
 }
 
+TEST_F(TensorStrideTest, ToString_EmptyStride) {
+    TensorStride stride(TensorShape({}));
+    ASSERT_EQ(stride.toString(), "[]");
+}
+
 TEST_F(TensorStrideTest, ToString) {
     TensorStride stride(TensorShape({2, 3}));
     ASSERT_EQ(stride.toString(), "[3, 1]");
+}
+
+TEST_F(TensorStrideTest, Reverse_EmptyStride_NoThrow) {
+    TensorStride stride(TensorShape({}));
+    EXPECT_NO_THROW(stride.reverse());
+    EXPECT_EQ(stride.getSize(), 0);
 }
 
 TEST_F(TensorStrideTest, Reverse) {
@@ -99,4 +110,12 @@ TEST_F(TensorStrideTest, atConst) {
     const TensorStride stride(TensorShape({2, 3}));
     ASSERT_EQ(stride.at(0), 3);
     ASSERT_EQ(stride.at(1), 1);
+}
+
+TEST_F(TensorStrideTest, getStrides_MutableAccess_AllowsEdit) {
+    TensorStride stride(TensorShape({2, 3}));
+    auto& strides = stride.getStrides();
+    ASSERT_EQ(strides.size(), 2);
+    strides[0] = 999;
+    EXPECT_EQ(stride[0], 999);
 }

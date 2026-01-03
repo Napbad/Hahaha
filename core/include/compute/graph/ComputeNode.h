@@ -236,7 +236,7 @@ class ComputeNode : public std::enable_shared_from_this<ComputeNode<T>> {
             // Execute the gradient function for this node to propagate to parents
             if (node->gradFun_) {
                 node->gradFun_();
-            }
+        }
         }
     }
 

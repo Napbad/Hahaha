@@ -21,7 +21,6 @@
 
 #include <algorithm>
 #include <initializer_list>
-#include <iostream>
 #include <string>
 #include <vector>
 
@@ -31,7 +30,7 @@ class TensorShapeTest;
 
 namespace hahaha::math {
 
-using hahaha::common::u32;
+using common::u32;
 
 /**
  * @brief Represents the shape (dimensions) of a tensor.
@@ -133,6 +132,36 @@ class TensorShape {
             }
         }
         result += ")";
+        return result;
+    }
+
+    [[nodiscard]] static std::optional<std::vector<size_t>>
+    broadcastShape(const TensorShape& shape1, const TensorShape& shape2) {
+        std::optional result = std::vector<size_t>{};
+
+        long shapeIdx1 = static_cast<long>(shape1.getDims().size() - 1);
+        long shapeIdx2 = static_cast<long>(shape2.getDims().size() - 1);
+
+        const auto& dims1 = shape1.getDims();
+        const auto& dims2 = shape2.getDims();
+
+        while (shapeIdx1 >= 0 || shapeIdx2 >= 0) {
+
+            auto d1 = shapeIdx1 < 0 ? 1 : dims1[shapeIdx1];
+            auto d2 = shapeIdx2 < 0 ? 1 : dims2[shapeIdx2];
+
+            if (d1 == d2 || d2 == 1) {
+                result->push_back(d1);
+            } else if (d1 == 1) {
+                result->push_back(d2);
+            } else if (d1 != d2) {
+                return std::nullopt;
+            }
+            shapeIdx1--;
+            shapeIdx2--;
+        }
+
+        std::ranges::reverse(*result);
         return result;
     }
 
