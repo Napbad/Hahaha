@@ -28,7 +28,7 @@ template <typename T> class Loss {
     virtual ~Loss() = default;
 
     virtual Tensor<T> computeLoss(Tensor<T> /*yTrue*/, Tensor<T> /*yPredict*/) {
-        return Tensor<T>();
+        return Tensor<T>(T(0));
     }
 };
 

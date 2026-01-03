@@ -28,6 +28,9 @@ namespace hahaha::ml {
 
 template <typename T> class LinearRegression : public Model<T> {
   public:
+    LinearRegression() : weight_(T(0)), bias_(T(0)) {
+    }
+
     Parameters<T> getParameters() override {
         Parameters<T> parameters;
 
@@ -58,10 +61,9 @@ template <typename T> class LinearRegression : public Model<T> {
         auto yPredict = x.matmul(weight_) + bias_;
         auto mseLoss = computeMSELoss(y, yPredict);
 
-        SGDOptimizer<T> sgdOptimizer;
+        SGDOptimizer<T> sgdOptimizer({}, T(0.00001));
         sgdOptimizer.addParameter(weight_);
         sgdOptimizer.addParameter(bias_);
-        sgdOptimizer.setLearningRate(0.00001);
 
         sgdOptimizer.zeroGrad();
         mseLoss.backward();

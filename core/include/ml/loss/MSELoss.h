@@ -27,9 +27,9 @@ namespace hahaha::ml {
 template <typename T> class MSELoss : public Loss<T> {
   public:
     Tensor<T> computeLoss(Tensor<T> yTrue, Tensor<T> yPredict) {
-        Tensor<T> loss;
-        loss = ((yTrue - yPredict) * (yTrue - yPredict)).sum();
-        return loss;
+        // NOTE: Tensor::sum() currently returns a scalar value (T), not a Tensor.
+        // Wrap it back into a scalar Tensor.
+        return Tensor<T>(((yTrue - yPredict) * (yTrue - yPredict)).sum());
     }
 };
 

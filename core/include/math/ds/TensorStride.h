@@ -19,7 +19,6 @@
 #ifndef HAHAHA_MATH_DS_TENSOR_STRIDE_H
 #define HAHAHA_MATH_DS_TENSOR_STRIDE_H
 
-#include <cstdio>
 #include <sstream>
 #include <vector>
 
@@ -27,7 +26,7 @@
 #include "math/ds/TensorShape.h"
 
 namespace hahaha::math {
-using hahaha::common::u32;
+using common::u32;
 
 /**
  * @brief Represents the memory strides of a tensor.
@@ -74,7 +73,11 @@ class TensorStride {
      * @brief Get the strides vector.
      * @return const std::vector<size_t>& strides.
      */
-    [[nodiscard]] const std::vector<size_t>& getDims() const {
+    [[nodiscard]] const std::vector<size_t>& getStrides() const {
+        return strides_;
+    }
+
+    [[nodiscard]] std::vector<size_t>& getStrides() {
         return strides_;
     }
 
@@ -136,7 +139,7 @@ class TensorStride {
      * @return size_t The stride value.
      * @throw std::out_of_range If index is invalid.
      */
-    size_t at(size_t index) {
+    size_t at(const size_t index) {
         if (index >= strides_.size()) {
             throw std::out_of_range("Index out of range");
         }
@@ -149,7 +152,7 @@ class TensorStride {
      * @return size_t The stride value.
      * @throw std::out_of_range If index is invalid.
      */
-    [[nodiscard]] size_t at(size_t index) const {
+    [[nodiscard]] size_t at(const size_t index) const {
         if (index >= strides_.size()) {
             throw std::out_of_range("Index out of range");
         }

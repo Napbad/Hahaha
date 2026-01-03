@@ -277,7 +277,7 @@ template <typename T> class Tensor {
      * @return Total size of elements
      */
     [[nodiscard]] size_t getTotalSize() const {
-        return computeNode_->getTotalSize();
+        return computeNode_->getData()->getTotalSize();
     }
 
     T sum() const {

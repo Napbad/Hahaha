@@ -30,5 +30,6 @@
   },
   // Use root user for development
   "remoteUser": "root",
-  "postCreateCommand": "/workspace/dev/post_build.sh"
+  "postCreateCommand": "/workspace/dev/post_build.sh",
+  "workspaceFolder": "/workspace"
 }

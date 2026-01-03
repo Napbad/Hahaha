@@ -19,8 +19,8 @@
 #include "math/ds/TensorShape.h"
 
 #include <cstddef>
+#include <optional>
 #include <gtest/gtest.h>
-#include <iostream>
 
 class TensorShapeTest : public ::testing::Test {
   protected:
@@ -54,6 +54,14 @@ TEST_F(TensorShapeTest, InitWithStdVector) {
     ASSERT_EQ(ts1.getDims().at(1), 5);
     ASSERT_EQ(ts1.getDims().at(2), 6);
     ASSERT_EQ(ts1.getDims().at(3), 7);
+}
+
+TEST_F(TensorShapeTest, InitWithEmptyStdVector_IsScalarShape) {
+    std::vector<size_t> dims;
+    auto ts = TensorShape(dims);
+    ASSERT_EQ(ts.getDims().size(), 0);
+    ASSERT_EQ(ts.getTotalSize(), 1);
+    ASSERT_EQ(ts.toString(), "()");
 }
 
 TEST_F(TensorShapeTest, MoveConstructor) {
@@ -154,4 +162,41 @@ TEST_F(TensorShapeTest, OperatorEqual) {
 
 TEST_F(TensorShapeTest, OperatorNotEqual) {
     ASSERT_TRUE(TensorShape({1, 2, 3}) != TensorShape({1, 2, 4}));
+}
+
+TEST_F(TensorShapeTest, BroadcastShape_SameShape_ReturnsSame) {
+    auto res = TensorShape::broadcastShape(TensorShape({2, 3, 4}),
+                                           TensorShape({2, 3, 4}));
+    ASSERT_TRUE(res.has_value());
+    EXPECT_EQ(TensorShape(*res), TensorShape({2, 3, 4}));
+}
+
+TEST_F(TensorShapeTest, BroadcastShape_ScalarWithTensor_ReturnsTensorShape) {
+    // scalar is rank-0 (dims == {})
+    auto res = TensorShape::broadcastShape(TensorShape({}),
+                                           TensorShape({2, 3}));
+    ASSERT_TRUE(res.has_value());
+    EXPECT_EQ(TensorShape(*res), TensorShape({2, 3}));
+}
+
+TEST_F(TensorShapeTest, BroadcastShape_PrefixDims_ReturnsTargetShape) {
+    // (3) with (2,3) -> (2,3)
+    auto res =
+        TensorShape::broadcastShape(TensorShape({3}), TensorShape({2, 3}));
+    ASSERT_TRUE(res.has_value());
+    EXPECT_EQ(TensorShape(*res), TensorShape({2, 3}));
+}
+
+TEST_F(TensorShapeTest, BroadcastShape_DimOneBroadcasts) {
+    // (1,3) with (2,3) -> (2,3)
+    auto res =
+        TensorShape::broadcastShape(TensorShape({1, 3}), TensorShape({2, 3}));
+    ASSERT_TRUE(res.has_value());
+    EXPECT_EQ(TensorShape(*res), TensorShape({2, 3}));
+}
+
+TEST_F(TensorShapeTest, BroadcastShape_Incompatible_ReturnsNullopt) {
+    auto res =
+        TensorShape::broadcastShape(TensorShape({2, 3}), TensorShape({4, 3}));
+    ASSERT_FALSE(res.has_value());
 }
