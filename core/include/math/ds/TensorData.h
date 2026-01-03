@@ -35,7 +35,7 @@ template <typename T> class TensorWrapper;
  * @brief Internal storage class for tensor data and metadata.
  *
  * TensorData manages the raw memory allocation, the shape of the tensor,
- * and the memory strides. It uses std::unique_ptr for automatic memory
+ * and the memory strides. It uses std::shared_ptr for automatic memory
  * management on the CPU. For GPU, a separate memory management strategy
  * would be needed.
  *
@@ -64,7 +64,7 @@ template <typename T> class TensorData {
         size_t size = shape_.getTotalSize();
         if (device_.type == backend::DeviceType::CPU
             || device_.type == backend::DeviceType::SIMD) {
-            data_ = std::make_unique<T[]>(size);
+            data_ = std::make_shared<T[]>(size);
             std::fill(data_.get(), data_.get() + size, initValue);
         } else {
             // TODO: Handle GPU allocation using compute::gpu::GpuMemory
@@ -83,7 +83,7 @@ template <typename T> class TensorData {
         size_t size = shape_.getTotalSize();
         if (device_.type == backend::DeviceType::CPU
             || device_.type == backend::DeviceType::SIMD) {
-            data_ = std::make_unique<T[]>(size);
+            data_ = std::make_shared<T[]>(size);
         } else {
             // TODO: Handle GPU allocation using compute::gpu::GpuMemory
             throw std::runtime_error(
@@ -99,7 +99,7 @@ template <typename T> class TensorData {
         size_t size = shape_.getTotalSize();
         if (device_.type == backend::DeviceType::CPU
             || device_.type == backend::DeviceType::SIMD) {
-            data_ = std::make_unique<T[]>(size);
+            data_ = std::make_shared<T[]>(size);
             std::copy(other.data_.get(), other.data_.get() + size, data_.get());
         } else {
             // TODO: Handle GPU deep copy
@@ -145,7 +145,7 @@ template <typename T> class TensorData {
     }
 
     /**
-     * @brief Destructor. Automatically releases the unique_ptr.
+     * @brief Destructor. Automatically releases the shared_ptr.
      */
     ~TensorData() = default;
 
@@ -154,11 +154,10 @@ template <typename T> class TensorData {
      * lists).
      * @param data The NestedData object containing flattened data and shape.
      */
-    explicit TensorData(NestedData<T>&& data)
-        : shape_(data.getShape()) {
+    explicit TensorData(NestedData<T>&& data) : shape_(data.getShape()) {
         size_t size = data.getFlatData().size();
         if (size > 0) {
-            data_ = std::make_unique<T[]>(size);
+            data_ = std::make_shared<T[]>(size);
             std::copy(data.getFlatData().begin(),
                       data.getFlatData().end(),
                       data_.get());
@@ -170,25 +169,25 @@ template <typename T> class TensorData {
 
     /**
      * @brief Get the raw data pointer.
-     * @return Reference to the unique_ptr holding the data.
+     * @return Reference to the shared_ptr holding the data.
      */
-    std::unique_ptr<T[]>& getData() {
+    std::shared_ptr<T[]>& getData() {
         return data_;
     }
 
     /**
      * @brief Const version of data pointer access.
-     * @return Const reference to the unique_ptr.
+     * @return Const reference to the shared_ptr.
      */
-    const std::unique_ptr<T[]>& getData() const {
+    const std::shared_ptr<T[]>& getData() const {
         return data_;
     }
 
     /**
      * @brief Replace the current data array.
-     * @param data New data array as unique_ptr.
+     * @param data New data array as shared_ptr.
      */
-    void setData(std::unique_ptr<T[]> data) {
+    void setData(std::shared_ptr<T[]> data) {
         data_ = std::move(data);
     }
 
@@ -249,7 +248,7 @@ template <typename T> class TensorData {
     }
 
   private:
-    std::unique_ptr<T[]> data_; /**< Raw heap-allocated data array. */
+    std::shared_ptr<T[]> data_; /**< Raw heap-allocated data array. */
     TensorShape shape_;         /**< Dimensionality metadata. */
     TensorStride stride_;       /**< Memory skip values for indexing. */
     backend::Device device_;    /**< Device where data resides. */

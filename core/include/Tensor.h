@@ -227,6 +227,10 @@ template <typename T> class Tensor {
         computeNode_->getData()->to(device);
     }
 
+    [[nodiscard]] const std::vector<size_t>& getShape() const {
+        return computeNode_->getData()->getShape();
+    }
+
     /** @brief Get the device where the tensor resides. */
     [[nodiscard]] const backend::Device& getDevice() const {
         return computeNode_->getData()->getDevice();
@@ -266,6 +270,18 @@ template <typename T> class Tensor {
      */
     void setComputeNode(std::shared_ptr<compute::ComputeNode<T>> node) {
         computeNode_ = node;
+    }
+
+    /**
+     * @brief Return total size of elements it holds
+     * @return Total size of elements
+     */
+    [[nodiscard]] size_t getTotalSize() const {
+        return computeNode_->getTotalSize();
+    }
+
+    T sum() const {
+        return computeNode_->getData()->sum();
     }
 
   private:

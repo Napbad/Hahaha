@@ -228,7 +228,8 @@ template <typename T> class TensorWrapper {
         const auto* idxIt = indices.begin();
         const auto& strideDims = data_.getStride().getDims();
 
-        for (size_t i = 0; i < shapeDims.size(); ++i) {
+        auto dimsSize = shapeDims.size();
+        for (size_t i = 0; i < dimsSize; ++i) {
             size_t dimIdx = *idxIt;
             if (dimIdx >= shapeDims[i]) {
                 throw std::out_of_range("Index out of bounds at dimension "
@@ -276,7 +277,7 @@ template <typename T> class TensorWrapper {
      */
     TensorWrapper<T> reshape(const std::vector<size_t>& newShape) const {
         size_t totalSize = std::accumulate(
-            newShape.begin(), newShape.end(), 1ULL, std::multiplies<size_t>());
+            newShape.begin(), newShape.end(), 1ULL, std::multiplies());
         if (totalSize != getTotalSize()) {
             throw std::invalid_argument("New shape total size ("
                                         + std::to_string(totalSize)
@@ -403,7 +404,7 @@ template <typename T> class TensorWrapper {
      * @param other The tensor to multiply.
      * @return TensorWrapper<T> result tensor.
      */
-    TensorWrapper<T> multiply(const TensorWrapper<T>& other) const {
+    TensorWrapper multiply(const TensorWrapper& other) const {
         if (getTotalSize() == 1 && other.getTotalSize() > 1) {
             return other.multiply(data_.getData()[0]);
         }
@@ -635,7 +636,7 @@ template <typename T> class TensorWrapper {
      *
      * @return TensorWrapper<T> transposed tensor.
      */
-    TensorWrapper<T> transpose() const {
+    TensorWrapper transpose() const {
         if (getDimensions() != 2) {
             throw std::invalid_argument(
                 "transpose is only implemented for 2D tensors for now");
@@ -645,7 +646,7 @@ template <typename T> class TensorWrapper {
         size_t rows = shapeDims[0];
         size_t cols = shapeDims[1];
 
-        TensorWrapper<T> result;
+        TensorWrapper result;
         result.data_.setShape(TensorShape({cols, rows}));
         result.data_.setStride(TensorStride(result.data_.getShape()));
         result.data_.setData(std::make_unique<T[]>(getTotalSize()));
@@ -665,7 +666,7 @@ template <typename T> class TensorWrapper {
      */
     T sum() const {
         T result = T(0);
-        auto totalSize = getTotalSize();
+        const auto totalSize = getTotalSize();
         for (size_t i = 0; i < totalSize; ++i) {
             result += data_[i];
         }
@@ -687,7 +688,7 @@ template <typename T> class TensorWrapper {
      * @brief Broadcast tensor to match the shape of another tensor.
      * @param other The target tensor for broadcasting.
      */
-    void broadcast(const TensorWrapper<T>& /*other*/) {
+    void broadcast([[maybe_unused]] const TensorWrapper& other) {
         throw std::runtime_error("Broadcasting not implemented yet");
     }
 
@@ -859,7 +860,7 @@ template <typename T> class TensorWrapper {
             throw std::invalid_argument("Shape mismatch in axpy");
         }
         checkSameDevice(other);
-        
+
         // Dispatch to backend for hardware-specific optimization
         backend::DeviceComputeDispatcher<T>::dispatchAxpy(alpha, other, *this);
     }
