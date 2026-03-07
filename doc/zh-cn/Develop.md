@@ -41,7 +41,7 @@ python3 dev/format.py
 | 私有成员变量          | camelCase + 后缀 `_`                  | `data_`, `shape_`, `requiresGrad_`       | 区分私有；示例：`std::vector<float> data_;` |
 | 常量（constexpr/static）| snake_case（优先） 或 PascalCase       | `default_init_value`, `MaxBatchSize`      | 避免全大写；示例：`constexpr float default_init_value = 0.01f;` |
 | 枚举 / 枚举值         | PascalCase（枚举类） + PascalCase 值   | `enum class InitializationMode { Xavier, He };` | 强类型；示例：`InitializationMode::Xavier` |
-| 命名空间              | snake_case                             | `hahaha::core`, `hahaha::math`             | 层次分明；示例：`namespace hahaha::math { ... }` |
+| 命名空间              | snake_case                             | `hahaha::core`, `hahaha::math`             | 层次分明；示例：`namespace h3::math { ... }` |
 | **头文件防护宏**      | 全大写 + 项目前缀 + 路径 + `_H`        | `HAHAHA_CORE_MATRIX_H`                    | **你的要求：全大写**；示例：`#ifndef HAHAHA_CORE_MATRIX_H #define HAHAHA_CORE_MATRIX_H ... #endif` |
 | 其他宏（如配置宏）    | PascalCase + 下划线                    | `Hahaha_Enable_Cuda`, `Hahaha_Debug_Log`  | 仅用于配置/调试；示例：`#ifdef Hahaha_Enable_Cuda ... #endif` |
 | 文件名                | PascalCase 或 snake_case (.cpp/.h)     | `Tensor.h`, `ComputeNode.h`               | 核心类文件使用 PascalCase，工具/辅助文件使用 snake_case |

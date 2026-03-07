@@ -137,8 +137,7 @@ if (HAHAHA_USE_CUDA)
     add_library(hahaha STATIC ${HAHAHA_CPP_SOURCES} ${HAHAHA_CUDA_SOURCES})
     add_compile_definitions(HAHAHA_USE_CUDA)
 else ()
-    add_library(hahaha STATIC ${HAHAHA_CPP_SOURCES}
-            core/include/backend/vectorize/arch/simd_impl.h)
+    add_library(hahaha STATIC ${HAHAHA_CPP_SOURCES})
 endif ()
 add_library(hahaha::hahaha ALIAS hahaha)
 
@@ -263,7 +262,7 @@ install(DIRECTORY "${PROJECT_SOURCE_DIR}/core/include/"
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 install(EXPORT hahahaTargets
-        NAMESPACE hahaha::
+        NAMESPACE h3::
         DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/hahaha"
 )
 
@@ -271,4 +270,4 @@ install(EXPORT hahahaTargets
 # Full configuration: build tests and examples
 enable_testing()
 add_subdirectory(tests)
-add_subdirectory(examples)
+#add_subdirectory(examples)

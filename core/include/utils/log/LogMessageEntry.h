@@ -25,7 +25,7 @@
 
 #include "utils/log/LogLevel.h"
 
-namespace hahaha::utils {
+namespace h3::utils {
 
 /**
  * @brief Represents a single log message entry in the queue.
@@ -97,6 +97,6 @@ struct alignas(64) LogMessageEntry {
     LogLevel level_;      /**< Log severity level. */
 };
 
-} // namespace hahaha::utils
+} // namespace h3::utils
 
 #endif // HAHAHA_UTILS_LOG_LOG_MESSAGE_ENTRY_H_

@@ -26,6 +26,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+import xml.etree.ElementTree as ET
 
 
 def get_root_dir():
@@ -115,6 +116,53 @@ def detect_cuda():
 
 def get_cmake_generator(build_dir: Path):
     """Get appropriate CMake generator for the platform."""
+    def _cmake_generators() -> set[str]:
+        """Return the set of generators supported by the current cmake."""
+        try:
+            p = subprocess.run(
+                ["cmake", "--help"],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            text = (p.stdout or "") + (p.stderr or "")
+        except Exception:
+            return set()
+
+        # Parse the "Generators" section best-effort.
+        gens: set[str] = set()
+        in_section = False
+        for line in text.splitlines():
+            if line.strip() == "Generators":
+                in_section = True
+                continue
+            if not in_section:
+                continue
+            # Stop when we leave the section (blank line after content)
+            if in_section and not line.strip():
+                # Keep going; some cmake versions have extra whitespace.
+                continue
+            # Typical format:
+            # * Ninja                       = Generates build.ninja files.
+            #   Unix Makefiles              = Generates standard UNIX makefiles.
+            m = re.match(r"^\s*(?:\*?\s*)?(.+?)\s*=\s+Generates", line)
+            if m:
+                gens.add(m.group(1).strip())
+        return gens
+
+    def _is_windows() -> bool:
+        return platform.system() == "Windows"
+
+    def _default_generator() -> str:
+        # Prefer Ninja when available everywhere; otherwise fall back to Unix Makefiles on Unix.
+        available = _cmake_generators()
+        if "Ninja" in available:
+            return "Ninja"
+        if not _is_windows() and "Unix Makefiles" in available:
+            return "Unix Makefiles"
+        # Windows: keep historical default.
+        return "Visual Studio 17 2022" if _is_windows() else "Ninja"
+
     # Check if CMakeCache.txt exists and read the generator
     cmake_cache = build_dir / "CMakeCache.txt"
     if cmake_cache.exists():
@@ -125,6 +173,23 @@ def get_cmake_generator(build_dir: Path):
                         match = re.search(r"CMAKE_GENERATOR:INTERNAL=(.+)", line)
                         if match:
                             generator = match.group(1).strip()
+                            # If the cache came from a different platform/toolchain (e.g. VS on WSL),
+                            # don't reuse it.
+                            if (not _is_windows()) and generator.startswith("Visual Studio"):
+                                fallback = _default_generator()
+                                print(
+                                    f"Found cached generator '{generator}', but host is not Windows. "
+                                    f"Using '{fallback}' instead."
+                                )
+                                return fallback
+                            available = _cmake_generators()
+                            if available and generator not in available:
+                                fallback = _default_generator()
+                                print(
+                                    f"Cached generator '{generator}' is not available on this host. "
+                                    f"Using '{fallback}' instead."
+                                )
+                                return fallback
                             print(f"Using existing generator: {generator}")
                             return generator
         except Exception:
@@ -167,8 +232,45 @@ def get_cmake_generator(build_dir: Path):
         # Default to Visual Studio 17 2022
         return "Visual Studio 17 2022"
     else:
-        # Unix-like systems use Ninja
-        return "Ninja"
+        # Unix-like systems: prefer Ninja but allow fallback.
+        return _default_generator()
+
+
+def get_vcpkg_triplet() -> str | None:
+    """Return the appropriate vcpkg triplet for this host (or None to let vcpkg pick)."""
+    # Respect user override.
+    env_triplet = os.environ.get("VCPKG_TARGET_TRIPLET")
+    if env_triplet:
+        return env_triplet
+    if platform.system() == "Windows":
+        return "x64-windows-static"
+    # On Linux/macOS, do not force a Windows triplet.
+    return None
+
+
+def get_vcpkg_toolchain_file(root_dir: Path) -> str | None:
+    """Return the vcpkg toolchain file to use (or None to let CMakeLists decide).
+
+    Priority:
+    - environment CMAKE_TOOLCHAIN_FILE (explicit override)
+    - environment VCPKG_ROOT (use <VCPKG_ROOT>/scripts/buildsystems/vcpkg.cmake)
+    - repo-local vcpkg toolchain if present (<repo>/vcpkg/vcpkg_root/...)
+    """
+    env_toolchain = os.environ.get("CMAKE_TOOLCHAIN_FILE")
+    if env_toolchain:
+        return env_toolchain
+
+    env_vcpkg_root = os.environ.get("VCPKG_ROOT")
+    if env_vcpkg_root:
+        candidate = Path(env_vcpkg_root) / "scripts" / "buildsystems" / "vcpkg.cmake"
+        if candidate.exists():
+            return str(candidate)
+
+    repo_toolchain = root_dir / "vcpkg" / "vcpkg_root" / "scripts" / "buildsystems" / "vcpkg.cmake"
+    if repo_toolchain.exists():
+        return str(repo_toolchain)
+
+    return None
 
 
 def clean_build_dir(build_dir: Path):
@@ -182,6 +284,57 @@ def configure_cmake(build_dir: Path, enable_cuda: str, capture_output: bool = Fa
     """Configure CMake with appropriate settings.
     If capture_output is True, returns (success, stderr_text) for fallback handling.
     """
+    def _looks_like_cache_mismatch(text: str) -> bool:
+        # Common error strings when reusing a build directory created from a different
+        # absolute path (Windows drive vs WSL /mnt path, different source dir, etc.).
+        needles = [
+            "CMakeCache.txt directory",
+            "is different than the directory",
+            "does not match the source",
+            "used to generate cache",
+            "Re-run cmake with a different source directory",
+        ]
+        t = text or ""
+        return any(n in t for n in needles)
+
+    def _wipe_cmake_cache(dir_path: Path) -> None:
+        # Keep this conservative: remove the cache and CMakeFiles to force a clean re-configure.
+        for p in [dir_path / "CMakeCache.txt", dir_path / "CMakeFiles"]:
+            try:
+                if p.is_dir():
+                    shutil.rmtree(p)
+                elif p.exists():
+                    p.unlink()
+            except Exception:
+                pass
+
+    def _cached_toolchain_file(dir_path: Path) -> str | None:
+        cache = dir_path / "CMakeCache.txt"
+        if not cache.exists():
+            return None
+        try:
+            for line in cache.read_text(encoding="utf-8", errors="ignore").splitlines():
+                if line.startswith("CMAKE_TOOLCHAIN_FILE:"):
+                    m = re.search(r"CMAKE_TOOLCHAIN_FILE:(?:FILEPATH|UNINITIALIZED)=(.+)", line)
+                    if m:
+                        return m.group(1).strip()
+        except Exception:
+            return None
+        return None
+
+    def _cached_vcpkg_root_dir(dir_path: Path) -> str | None:
+        cache = dir_path / "CMakeCache.txt"
+        if not cache.exists():
+            return None
+        try:
+            for line in cache.read_text(encoding="utf-8", errors="ignore").splitlines():
+                if line.startswith("Z_VCPKG_ROOT_DIR:INTERNAL="):
+                    return line.split("=", 1)[1].strip()
+        except Exception:
+            return None
+        return None
+
+    root_dir = get_root_dir()
     generator = get_cmake_generator(build_dir)
     
     cmake_args = [
@@ -193,6 +346,30 @@ def configure_cmake(build_dir: Path, enable_cuda: str, capture_output: bool = Fa
         "-G",
         generator,
     ]
+    vcpkg_triplet = get_vcpkg_triplet()
+    vcpkg_toolchain = get_vcpkg_toolchain_file(root_dir)
+
+    # If the build dir was configured with a different toolchain (common when switching
+    # between Windows and WSL), wipe cache so vcpkg/toolchain is consistent.
+    cached_toolchain = _cached_toolchain_file(build_dir)
+    if vcpkg_toolchain and cached_toolchain and Path(cached_toolchain) != Path(vcpkg_toolchain):
+        print(
+            f"Build dir toolchain mismatch (cached '{cached_toolchain}' vs requested '{vcpkg_toolchain}'). "
+            "Wiping CMake cache..."
+        )
+        _wipe_cmake_cache(build_dir)
+
+    # vcpkg toolchain caches the resolved root dir internally (Z_VCPKG_ROOT_DIR). If that
+    # points at a drvfs mount (/mnt/c, /mnt/d), vcpkg/CMake can fail with "Operation not permitted".
+    if vcpkg_toolchain:
+        expected_root = str(Path(vcpkg_toolchain).resolve().parents[2])  # <root>/scripts/buildsystems/vcpkg.cmake
+        cached_root = _cached_vcpkg_root_dir(build_dir)
+        if cached_root and Path(cached_root) != Path(expected_root):
+            print(
+                f"Build dir vcpkg root mismatch (cached '{cached_root}' vs expected '{expected_root}'). "
+                "Wiping CMake cache..."
+            )
+            _wipe_cmake_cache(build_dir)
     
     # Visual Studio generators use --config instead of CMAKE_BUILD_TYPE
     if generator.startswith("Visual Studio"):
@@ -201,7 +378,13 @@ def configure_cmake(build_dir: Path, enable_cuda: str, capture_output: bool = Fa
             "-DHAHAHA_BUILD_TESTS=ON",
             "-DHAHAHA_BUILD_EXAMPLES=OFF",
             "-DHAHAHA_ENABLE_COVERAGE=ON",
+            "-DVCPKG_INSTALL_OPTIONS=--binarysource=clear",
+            "-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDebug",
         ])
+        if vcpkg_toolchain:
+            cmake_args.append(f"-DCMAKE_TOOLCHAIN_FILE={vcpkg_toolchain}")
+        if vcpkg_triplet:
+            cmake_args.append(f"-DVCPKG_TARGET_TRIPLET={vcpkg_triplet}")
     else:
         cmake_args.extend([
             "-DCMAKE_BUILD_TYPE=Debug",
@@ -209,7 +392,12 @@ def configure_cmake(build_dir: Path, enable_cuda: str, capture_output: bool = Fa
             "-DHAHAHA_BUILD_TESTS=ON",
             "-DHAHAHA_BUILD_EXAMPLES=OFF",
             "-DHAHAHA_ENABLE_COVERAGE=ON",
+            "-DVCPKG_INSTALL_OPTIONS=--binarysource=clear",
         ])
+        if vcpkg_toolchain:
+            cmake_args.append(f"-DCMAKE_TOOLCHAIN_FILE={vcpkg_toolchain}")
+        if vcpkg_triplet:
+            cmake_args.append(f"-DVCPKG_TARGET_TRIPLET={vcpkg_triplet}")
 
     if enable_cuda == "on":
         cmake_args.append("-DHAHAHA_USE_CUDA=ON")
@@ -225,7 +413,20 @@ def configure_cmake(build_dir: Path, enable_cuda: str, capture_output: bool = Fa
             capture_output=True,
             text=True,
         )
-        return result.returncode == 0, (result.stderr or "") + (result.stdout or "")
+        out = (result.stderr or "") + (result.stdout or "")
+        # If the build dir was generated from a different absolute path (common on WSL),
+        # wipe cache and retry once.
+        if result.returncode != 0 and _looks_like_cache_mismatch(out):
+            print("CMake cache/source dir mismatch detected. Wiping CMake cache and retrying...")
+            _wipe_cmake_cache(build_dir)
+            result2 = subprocess.run(
+                cmake_args,
+                capture_output=True,
+                text=True,
+            )
+            out2 = (result2.stderr or "") + (result2.stdout or "")
+            return result2.returncode == 0, out + "\n" + out2
+        return result.returncode == 0, out
     else:
         # Always capture output to show errors even when not using capture_output mode
         result = subprocess.run(
@@ -233,14 +434,26 @@ def configure_cmake(build_dir: Path, enable_cuda: str, capture_output: bool = Fa
             capture_output=True,
             text=True,
         )
+        out = (result.stdout or "") + (result.stderr or "")
         if result.stdout:
             print(result.stdout)
         if result.stderr:
             print(result.stderr, file=sys.stderr)
-        if result.returncode != 0:
-            raise subprocess.CalledProcessError(
-                result.returncode, cmake_args, result.stdout, result.stderr
+        if result.returncode != 0 and _looks_like_cache_mismatch(out):
+            print("CMake cache/source dir mismatch detected. Wiping CMake cache and retrying...")
+            _wipe_cmake_cache(build_dir)
+            result = subprocess.run(
+                cmake_args,
+                capture_output=True,
+                text=True,
             )
+            if result.stdout:
+                print(result.stdout)
+            if result.stderr:
+                print(result.stderr, file=sys.stderr)
+        if result.returncode != 0:
+            raise subprocess.CalledProcessError(result.returncode, cmake_args, result.stdout, result.stderr)
+        return None
 
 
 def build_project(build_dir: Path, parallel: int = 8):
@@ -278,6 +491,129 @@ def find_test_executable(build_dir: Path):
         if test_path.exists():
             return test_path
     return None
+
+
+def is_visual_studio_build(build_dir: Path) -> bool:
+    """Return True if the build directory is using a Visual Studio generator."""
+    cmake_cache = build_dir / "CMakeCache.txt"
+    if not cmake_cache.exists():
+        return False
+    try:
+        text = cmake_cache.read_text(encoding="utf-8", errors="ignore")
+        return "Visual Studio" in text
+    except Exception:
+        return False
+
+
+def find_opencppcoverage(user_path: str | None) -> Path | None:
+    """Find OpenCppCoverage.exe.
+
+    Order:
+    - user provided path
+    - PATH (OpenCppCoverage.exe)
+    - common install locations (including repo's default hint)
+    """
+    candidates: list[Path] = []
+    if user_path:
+        candidates.append(Path(user_path))
+
+    # PATH lookup
+    which = shutil.which("OpenCppCoverage.exe")
+    if which:
+        candidates.append(Path(which))
+
+    # Common locations (keep the user's hinted location first)
+    candidates.extend([
+        Path(r"D:\programs\OpenCppCoverage\OpenCppCoverage.exe"),
+        Path(r"C:\Program Files\OpenCppCoverage\OpenCppCoverage.exe"),
+        Path(r"C:\Program Files (x86)\OpenCppCoverage\OpenCppCoverage.exe"),
+    ])
+
+    for c in candidates:
+        try:
+            if c.exists():
+                return c
+        except Exception:
+            pass
+    return None
+
+
+def parse_cobertura_summary(cobertura_xml: Path) -> dict:
+    """Parse Cobertura XML and return summary rates and counts (best-effort)."""
+    tree = ET.parse(cobertura_xml)
+    root = tree.getroot()
+    # Cobertura uses attributes like line-rate/branch-rate (0..1)
+    line_rate = float(root.attrib.get("line-rate", "0") or "0")
+    branch_rate = float(root.attrib.get("branch-rate", "0") or "0")
+
+    # Some exporters include totals
+    lines_valid = int(root.attrib.get("lines-valid", "0") or "0")
+    lines_covered = int(root.attrib.get("lines-covered", "0") or "0")
+    branches_valid = int(root.attrib.get("branches-valid", "0") or "0")
+    branches_covered = int(root.attrib.get("branches-covered", "0") or "0")
+
+    return {
+        "line_rate": line_rate,
+        "branch_rate": branch_rate,
+        "lines_valid": lines_valid,
+        "lines_covered": lines_covered,
+        "branches_valid": branches_valid,
+        "branches_covered": branches_covered,
+    }
+
+
+def run_coverage_opencppcoverage(root_dir: Path, build_dir: Path, opencppcoverage_path: Path, export_html: bool):
+    """Run coverage analysis using OpenCppCoverage (Windows/MSVC)."""
+    test_exe = find_test_executable(build_dir)
+    if not test_exe:
+        raise FileNotFoundError(f"Could not find test executable under build dir: {build_dir}")
+
+    out_dir = root_dir / "coverage_report"
+    cobertura_xml = root_dir / "coverage.xml"
+
+    # Always generate Cobertura XML so we can print a CLI summary.
+    export_args = ["--export_type", f"cobertura:{cobertura_xml}"]
+    if export_html:
+        export_args += ["--export_type", f"html:{out_dir}"]
+
+    # Source selection: focus on core, exclude tests/vcpkg/examples/display.
+    # Note: OpenCppCoverage's patterns are glob-like.
+    args = [
+        str(opencppcoverage_path),
+        "--sources", str(root_dir / "core"),
+        "--excluded_sources", "*tests*",
+        "--excluded_sources", "*vcpkg*",
+        "--excluded_sources", "*examples*",
+        "--excluded_sources", "*core\\src\\display*",
+        "--excluded_sources", "*core\\include\\display*",
+        *export_args,
+        "--",
+        str(test_exe),
+    ]
+
+    print("== coverage (OpenCppCoverage) ==")
+    print("Running:", " ".join(args))
+    subprocess.run(args, check=True, cwd=root_dir)
+
+    if cobertura_xml.exists():
+        s = parse_cobertura_summary(cobertura_xml)
+        line_pct = s["line_rate"] * 100.0
+        branch_pct = s["branch_rate"] * 100.0
+        print()
+        print("== coverage summary (from cobertura xml) ==")
+        if s["lines_valid"] > 0:
+            print(f"Line   : {line_pct:.2f}% ({s['lines_covered']}/{s['lines_valid']})")
+        else:
+            print(f"Line   : {line_pct:.2f}%")
+        if s["branches_valid"] > 0:
+            print(f"Branch : {branch_pct:.2f}% ({s['branches_covered']}/{s['branches_valid']})")
+        else:
+            print(f"Branch : {branch_pct:.2f}%")
+        print(f"Cobertura XML: {cobertura_xml}")
+        if export_html:
+            print(f"HTML report   : {out_dir / 'index.html'}")
+    else:
+        print(f"Warning: cobertura xml not found: {cobertura_xml}", file=sys.stderr)
 
 
 def run_tests(build_dir: Path, enable_cuda: str, continue_on_failure: bool = False):
@@ -376,8 +712,18 @@ def run_tests(build_dir: Path, enable_cuda: str, continue_on_failure: bool = Fal
             raise
 
 
-def run_coverage(root_dir: Path, enable_cuda: str):
-    """Run coverage analysis using gcovr."""
+def run_coverage(root_dir: Path, build_dir: Path, enable_cuda: str, opencppcoverage_path: Path | None, export_html: bool):
+    """Run coverage analysis using gcovr (gcc/clang) or OpenCppCoverage (Windows/MSVC)."""
+    if platform.system() == "Windows" and is_visual_studio_build(build_dir):
+        occ = find_opencppcoverage(str(opencppcoverage_path) if opencppcoverage_path else None)
+        if not occ:
+            raise FileNotFoundError(
+                "OpenCppCoverage.exe not found. Provide --opencppcoverage-path or install it "
+                "(expected e.g. D:\\programs\\OpenCppCoverage\\OpenCppCoverage.exe)."
+            )
+        return run_coverage_opencppcoverage(root_dir, build_dir, occ, export_html=export_html)
+
+    # Non-Windows/MSVC: use gcovr
     gcovr_common_args = [
         "gcovr",
         "-r",
@@ -459,6 +805,16 @@ def main():
         action="store_true",
         help="Skip running tests and generate coverage directly (useful when tests have bugs)",
     )
+    parser.add_argument(
+        "--opencppcoverage-path",
+        default=None,
+        help="Path to OpenCppCoverage.exe (Windows/MSVC). If omitted, will search PATH and common locations.",
+    )
+    parser.add_argument(
+        "--no-html",
+        action="store_true",
+        help="Do not export HTML coverage report (still prints CLI summary and writes coverage.xml where applicable).",
+    )
 
     args = parser.parse_args()
 
@@ -533,7 +889,13 @@ def main():
             sys.exit(8)
 
     # Generate the coverage report
-    run_coverage(root_dir, enable_cuda)
+    run_coverage(
+        root_dir,
+        build_dir,
+        enable_cuda,
+        Path(args.opencppcoverage_path) if args.opencppcoverage_path else None,
+        export_html=(not args.no_html),
+    )
 
 
 if __name__ == "__main__":

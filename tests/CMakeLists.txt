@@ -32,9 +32,11 @@ if (HAHAHA_USE_CUDA)
   find_package(CUDAToolkit REQUIRED)
 endif ()
 
-add_executable(hahaha_tests ${HAHAHA_TEST_SOURCES}
-        core/backend/vectorize/SimdComputeFunsTest.cpp)
+add_executable(hahaha_tests ${HAHAHA_TEST_SOURCES})
 target_link_libraries(hahaha_tests PRIVATE hahaha::hahaha ${_gtest_main_target})
+
+# Downgrade C++ standard for tests to match pre-built gtest library (avoids linker errors like unresolved std::rotate)
+set_target_properties(hahaha_tests PROPERTIES CXX_STANDARD 20)
 
 # Optional coverage flags (gcc/clang).
 if(HAHAHA_ENABLE_COVERAGE)

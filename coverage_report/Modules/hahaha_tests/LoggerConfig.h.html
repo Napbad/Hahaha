@@ -1,0 +1,187 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+        <meta charset="utf-8"/>
+	    <title>LoggerConfig.h</title>
+	    <link href="../../third-party/google-code-prettify/prettify-CppCoverage.css" type="text/css" rel="stylesheet" />
+	    <script type="text/javascript" src="../../third-party/google-code-prettify/prettify.js"></script>
+	</head>
+    <body onload="prettyPrint()">
+        <h4></h4>
+        <pre class="prettyprint lang-cpp linenums">
+// Copyright (c) 2025 Contributors of Hahaha(https://github.com/Napbad/Hahaha)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Contributors:
+// Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
+//
+
+#ifndef HAHAHA_UTILS_LOG_LOGGER_CONFIG_H
+#define HAHAHA_UTILS_LOG_LOGGER_CONFIG_H
+
+#include &lt;string&gt;
+#include &lt;utility&gt;
+
+#include "utils/log/LogColor.h"
+#include "utils/log/LogLevel.h"
+
+namespace h3::utils {
+constexpr LogColor DefaultColor = LogColor::BLACK;
+constexpr LogLevel DefaultLevel = LogLevel::INFO;
+constexpr std::string_view DefaultFile = "log.txt";
+
+/**
+ * @brief Configuration settings for the Logger.
+ */
+class LoggerConfig {
+  public:
+    /**
+     * @brief Construct a LoggerConfig with basic settings.
+     * @param color Default text color.
+     * @param level Minimum log level to display.
+     * @param file Output log file path.
+     */
+<span style = "background-color:#dfd">    explicit LoggerConfig(LogColor color = DefaultColor,</span>
+                          LogLevel level = DefaultLevel,
+                          std::string_view file = DefaultFile)
+<span style = "background-color:#dfd">        : color_(color), level_(level), file_(file) {
+    }</span>
+
+    /**
+     * @brief Construct a full LoggerConfig.
+     * @param color Default text color.
+     * @param level Minimum log level.
+     * @param file Log file path.
+     * @param writeToFile Enable file logging.
+     * @param writeToConsole Enable console logging.
+     * @param timeEnabled Enable timestamping.
+     */
+    LoggerConfig(LogColor color,
+                 LogLevel level,
+                 std::string file,
+                 bool writeToFile,
+                 bool writeToConsole,
+                 bool timeEnabled)
+<span style = "background-color:#dfd">        : color_(color), level_(level), file_(std::move(file)),
+          writeToFile_(writeToFile), writeToConsole_(writeToConsole),
+          timeEnabled_(timeEnabled) {
+    }</span>
+
+<span style = "background-color:#dfd">    [[nodiscard]] LoggerConfig(const LoggerConfig&amp;) = default;
+    LoggerConfig(LoggerConfig&amp;&amp;) = default;
+    LoggerConfig&amp; operator=(const LoggerConfig&amp;) = default;
+    LoggerConfig&amp; operator=(LoggerConfig&amp;&amp;) = default;</span>
+
+<span style = "background-color:#dfd">    ~LoggerConfig() = default;</span>
+
+    /**
+     * @brief Get the default text color.
+     * @return LogColor The color setting.
+     */
+<span style = "background-color:#dfd">    [[nodiscard]] LogColor getColor() const {
+        return color_;
+    }</span>
+
+    /**
+     * @brief Get the minimum log level.
+     * @return LogLevel The log level.
+     */
+<span style = "background-color:#dfd">    [[nodiscard]] LogLevel getLevel() const {
+        return level_;
+    }</span>
+
+    /**
+     * @brief Get the log file path.
+     * @return std::string_view The file path.
+     */
+<span style = "background-color:#dfd">    [[nodiscard]] std::string_view getFile() const {
+        return file_;
+    }</span>
+
+    /**
+     * @brief Check if file logging is enabled.
+     * @return bool True if file logging is enabled.
+     */
+<span style = "background-color:#dfd">    [[nodiscard]] bool isWriteToFile() const {
+        return writeToFile_;
+    }</span>
+
+    /**
+     * @brief Check if console logging is enabled.
+     * @return bool True if console logging is enabled.
+     */
+<span style = "background-color:#dfd">    [[nodiscard]] bool isWriteToConsole() const {
+        return writeToConsole_;
+    }</span>
+
+    /**
+     * @brief Check if timestamp is enabled.
+     * @return bool True if timestamp is enabled.
+     */
+<span style = "background-color:#dfd">    [[nodiscard]] bool isEnableTime() const {
+        return timeEnabled_;
+    }</span>
+
+    /**
+     * @brief Set the default text color.
+     * @param color The new color.
+     */
+<span style = "background-color:#dfd">    void setColor(LogColor color) {
+        color_ = color;
+    }</span>
+
+    /**
+     * @brief Set the minimum log level.
+     * @param level The new log level.
+     */
+<span style = "background-color:#dfd">    void setLevel(LogLevel level) {
+        level_ = level;
+    }</span>
+
+    /**
+     * @brief Set the log file path.
+     * @param file The new file path.
+     */
+<span style = "background-color:#dfd">    void setFile(std::string_view file) {
+        file_ = file;
+    }</span>
+
+  private:
+    LogColor color_;
+    LogLevel level_;
+    std::string file_;
+
+<span style = "background-color:#dfd">    bool writeToFile_ = true;
+    bool writeToConsole_ = true;
+    bool timeEnabled_ = false;</span>
+};
+
+} // namespace h3::utils
+
+#endif // HAHAHA_UTILS_LOG_LOGGER_CONFIG_H</pre>
+        <hr />
+        <table width="100%">
+            <thead>
+                <tr>
+                    <th align="center">
+                        <small>Generated by</small>
+                        <a href="https://github.com/OpenCppCoverage/OpenCppCoverage/releases">
+                            <strong>OpenCppCoverage (Version: 0.9.9.0)</strong>
+                        </a>
+                    </th>
+                </tr>
+            </thead>
+        </table>
+    </body>
+</html>

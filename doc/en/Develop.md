@@ -41,7 +41,7 @@ Strictly mix CamelCase + snake_case. Avoid `SCREAMING_SNAKE_CASE` for variables/
 | Private Members | camelCase + suffix `_` | `data_`, `shape_`, `requiresGrad_` | Distinguish private state; e.g., `std::vector<float> data_;` |
 | Constants (constexpr/static) | snake_case (pref) or PascalCase | `default_init_value`, `MaxBatchSize` | Avoid all-caps; e.g., `constexpr float default_init_value = 0.01f;` |
 | Enums / Enum Values | PascalCase | `enum class InitializationMode { Xavier, He };` | Strongly typed; e.g., `InitializationMode::Xavier` |
-| Namespaces | snake_case | `hahaha::core`, `hahaha::math` | Hierarchical; e.g., `namespace hahaha::math { ... }` |
+| Namespaces | snake_case | `hahaha::core`, `hahaha::math` | Hierarchical; e.g., `namespace h3::math { ... }` |
 | **Header Guards** | UPPER_SNAKE | `HAHAHA_MATH_MATRIX_H` | **Requirement: All-caps**; e.g., `#ifndef HAHAHA_MATH_MATRIX_H ... #endif` |
 | Other Macros | PascalCase + underscore | `Hahaha_Enable_Cuda`, `Hahaha_Debug_Log` | Configuration/Debug only; e.g., `#ifdef Hahaha_Enable_Cuda ... #endif` |
 | Filenames | PascalCase or snake_case | `Tensor.h`, `ComputeNode.h` | Core classes use PascalCase; utility files use snake_case |

@@ -13,121 +13,61 @@
 // limitations under the License.
 //
 // Contributors:
-// Napbad (napbad.sen@gmail.com ) (https://github.com/Napbad )
+// Napbad (napbad.sen@gmail.com) (https://github.com/Napbad)
 //
 
-#ifndef HAHAHA_BACKEND_DEVICE_H
-#define HAHAHA_BACKEND_DEVICE_H
+#pragma once
 
-#include <cstdint>
-#include <memory>
-#include <span>
-#include <string>
+#include "common/data/Types.h"
+#include "common/macros.h"
 
-#include "DeviceBuffer.h"
+namespace h3::backend {
 
-namespace hahaha::backend {
+using common::Bool;
+using common::Float32;
+using common::Float64;
+using common::Int32;
+using common::Int64;
+using common::Int8;
+using common::SizeType;
+using common::UInt8;
 
-/**
- * @brief Types of devices supported for computation.
- */
-enum class DeviceType : std::uint8_t {
+enum class DeviceType : Int8 {
     CPU = 0,
-    CUDA = 1, // NVIDIA GPUs
-    HIP = 2,  // AMD GPUs
-    MPS = 3,  // Apple Silicon
-    XLA = 4,  // TPUs / OpenXLA
-    COMPILE_TIME_MAX = 5
+    CUDA = 1,
 };
 
-/**
- * @brief Represents a compute device where data resides and operations occur.
- */
-class alignas(8) Device {
+struct Device {
+    DeviceType type;
+    Int32 index;
 
-    class DeviceRegistry;
-
-  public:
-    virtual ~Device() = default;
-
-    /**
-     * @brief Construct a Device with type and ID.
-     * @param deviceType Device type.
-     * @param deviceId Device ID.
-     */
-    explicit Device(const DeviceType deviceType,
-                    const std::uint8_t deviceId = 0)
-        : type_(deviceType), id_(deviceId) {
+    explicit Device(const DeviceType t, const Int32 i = -1) : type(t), index(i) {
     }
 
-    /** @brief Check if two devices are identical. */
     bool operator==(const Device& other) const {
-        return type_ == other.type_ && id_ == other.id_;
+        return type == other.type && index == other.index;
     }
-
-    /** @brief Check if two devices are different. */
-    bool operator!=(const Device& other) const {
-        return !(*this == other);
-    }
-
-    /** @brief Get a string representation of the device. */
-    [[nodiscard]] std::string toString() const {
-        std::string deviceName;
-        switch (type_) {
-        case DeviceType::CPU:
-            deviceName = "CPU";
-            break;
-        case DeviceType::CUDA:
-            deviceName = "CUDA";
-            break;
-        case DeviceType::HIP:
-            deviceName = "HIP";
-            break;
-        case DeviceType::MPS:
-            deviceName = "MPS";
-            break;
-        case DeviceType::XLA:
-            deviceName = "XLA";
-            break;
-        default:
-            deviceName = "Unknown";
-            break;
-        }
-        return deviceName + ":" + std::to_string(id_);
-    }
-
-    virtual DeviceBuffer allocate(size_t size) = 0;
-
-    virtual void deallocate(DeviceBuffer buffer) = 0;
-
-    virtual void copyMemoryToThis(std::span<std::byte> src,
-                                  std::span<std::byte> dst,
-                                  const std::shared_ptr<Device>& srcDevice) = 0;
-
-    virtual void
-    copyMemoryFromThis(std::span<std::byte> src,
-                       std::span<std::byte> dst,
-                       const std::shared_ptr<Device>& dstDevice) = 0;
-
-    [[nodiscard]] DeviceType getType() const {
-        return type_;
-    }
-
-    [[nodiscard]] std::uint8_t getId() const {
-        return id_;
-    }
-
-  protected:
-    DeviceType type_ = DeviceType::CPU; /**< Type of the device. */
-    std::uint8_t id_ =
-        0; /**< Unique identifier for multiple devices of the same type. */
-
-    /** @brief Default constructor (CPU, ID 0). */
-    Device() = default;
-
-    friend class DeviceRegistry;
 };
 
-} // namespace hahaha::backend
+enum class ScalarType : Int8 { Float, Double, Int, Long, Byte, Bool };
 
-#endif // HAHAHA_BACKEND_DEVICE_H
+inline SizeType elementSize(ScalarType t) {
+    switch (t) {
+    case ScalarType::Float:
+        return sizeof(Float32);
+    case ScalarType::Double:
+        return sizeof(Float64);
+    case ScalarType::Int:
+        return sizeof(Int32);
+    case ScalarType::Long:
+        return sizeof(Int64);
+    case ScalarType::Byte:
+        return sizeof(UInt8);
+    case ScalarType::Bool:
+        return sizeof(Bool);
+    default:
+        return 0;
+    }
+}
+
+} // namespace h3::backend

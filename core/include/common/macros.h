@@ -49,88 +49,88 @@
 
 #if defined(__x86_64__) || defined(_M_X64) || defined(__amd64__)
 
-    #ifndef HAHAHA_ARCH_X86_64
-        #define HAHAHA_ARCH_X86_64 1
+    #ifndef ARCH_X86_64
+        #define ARCH_X86_64 1
     #endif
-    #ifndef HAHAHA_ARCH_IS_X86_FAMILY
-        #define HAHAHA_ARCH_IS_X86_FAMILY 1
+    #ifndef ARCH_IS_X86_FAMILY
+        #define ARCH_IS_X86_FAMILY 1
     #endif
-    #ifndef HAHAHA_ARCH_BITS
-        #define HAHAHA_ARCH_BITS 64
+    #ifndef ARCH_BITS
+        #define ARCH_BITS 64
     #endif
-    #ifndef HAHAHA_ARCH_NAME
-        #define HAHAHA_ARCH_NAME "x86-64"
+    #ifndef ARCH_NAME
+        #define ARCH_NAME "x86-64"
     #endif
 
 #elif defined(__i386__) || defined(_M_IX86) || defined(__i386)
 
-    #ifndef HAHAHA_ARCH_X86_32
-        #define HAHAHA_ARCH_X86_32 1
+    #ifndef ARCH_X86_32
+        #define ARCH_X86_32 1
     #endif
-    #ifndef HAHAHA_ARCH_IS_X86_FAMILY
-        #define HAHAHA_ARCH_IS_X86_FAMILY 1
+    #ifndef ARCH_IS_X86_FAMILY
+        #define ARCH_IS_X86_FAMILY 1
     #endif
-    #ifndef HAHAHA_ARCH_BITS
-        #define HAHAHA_ARCH_BITS 32
+    #ifndef ARCH_BITS
+        #define ARCH_BITS 32
     #endif
-    #ifndef HAHAHA_ARCH_NAME
-        #define HAHAHA_ARCH_NAME "x86"
+    #ifndef ARCH_NAME
+        #define ARCH_NAME "x86"
     #endif
 
 #elif defined(__aarch64__) || defined(_M_ARM64)
 
-    #ifndef HAHAHA_ARCH_ARM64
-        #define HAHAHA_ARCH_ARM64 1
+    #ifndef ARCH_ARM64
+        #define ARCH_ARM64 1
     #endif
-    #ifndef HAHAHA_ARCH_BITS
-        #define HAHAHA_ARCH_BITS 64
+    #ifndef ARCH_BITS
+        #define ARCH_BITS 64
     #endif
-    #ifndef HAHAHA_ARCH_NAME
-        #define HAHAHA_ARCH_NAME "arm64"
+    #ifndef ARCH_NAME
+        #define ARCH_NAME "arm64"
     #endif
 
 #elif defined(__arm__) || defined(__thumb__) || defined(ARM) || defined(_M_ARM)
 
-    #ifndef HAHAHA_ARCH_ARM32
-        #define HAHAHA_ARCH_ARM32 1
+    #ifndef ARCH_ARM32
+        #define ARCH_ARM32 1
     #endif
-    #ifndef HAHAHA_ARCH_BITS
-        #define HAHAHA_ARCH_BITS 32
+    #ifndef ARCH_BITS
+        #define ARCH_BITS 32
     #endif
-    #ifndef HAHAHA_ARCH_NAME
-        #define HAHAHA_ARCH_NAME "arm32"
+    #ifndef ARCH_NAME
+        #define ARCH_NAME "arm32"
     #endif
 
 #elif defined(__powerpc64__) || defined(__ppc64__)
 
-    #ifndef HAHAHA_ARCH_PPC64
-        #define HAHAHA_ARCH_PPC64 1
+    #ifndef ARCH_PPC64
+        #define ARCH_PPC64 1
     #endif
-    #ifndef HAHAHA_ARCH_BITS
-        #define HAHAHA_ARCH_BITS 64
+    #ifndef ARCH_BITS
+        #define ARCH_BITS 64
     #endif
-    #ifndef HAHAHA_ARCH_NAME
-        #define HAHAHA_ARCH_NAME "ppc64"
+    #ifndef ARCH_NAME
+        #define ARCH_NAME "ppc64"
     #endif
 
 #elif defined(__riscv) && __riscv_xlen == 64
 
-    #ifndef HAHAHA_ARCH_RISCV64
-        #define HAHAHA_ARCH_RISCV64 1
+    #ifndef ARCH_RISCV64
+        #define ARCH_RISCV64 1
     #endif
-    #ifndef HAHAHA_ARCH_BITS
-        #define HAHAHA_ARCH_BITS 64
+    #ifndef ARCH_BITS
+        #define ARCH_BITS 64
     #endif
-    #ifndef HAHAHA_ARCH_NAME
-        #define HAHAHA_ARCH_NAME "riscv64"
+    #ifndef ARCH_NAME
+        #define ARCH_NAME "riscv64"
     #endif
 
 #else
 
     #warning "Unknown / unsupported architecture"
 
-    #ifndef HAHAHA_ARCH_UNKNOWN
-        #define HAHAHA_ARCH_UNKNOWN 1
+    #ifndef ARCH_UNKNOWN
+        #define ARCH_UNKNOWN 1
     #endif
 
 #endif

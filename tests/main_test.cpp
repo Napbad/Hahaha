@@ -29,7 +29,7 @@ int main() {
     int result = RUN_ALL_TESTS();
 
     // Ensure logger is shut down and file is closed before attempting cleanup
-    hahaha::utils::Logger::shutdown();
+    h3::utils::Logger::shutdown();
 
     // Clean up default log file if it exists after all tests
     if (std::filesystem::exists("log.txt")) {

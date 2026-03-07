@@ -36,7 +36,7 @@
 #include "utils/log/LogMessageEntry.h"
 #include "utils/log/LoggerConfig.h"
 
-namespace hahaha::utils {
+namespace h3::utils {
 /**
  * @brief Thread-safe asynchronous logging system.
  *
@@ -105,6 +105,26 @@ class Logger {
         }
         if (logger.stream_.is_open()) {
             logger.stream_.close();
+        }
+    }
+
+    /**
+     * @brief Restart the logger
+     */
+    static void restart() {
+        Logger& logger = instance();
+        std::lock_guard<std::mutex> lock(logger.mutex_);
+        if (!logger.running_) {
+            logger.running_ = true;
+            if (logger.config_.isWriteToFile()) {
+                // Re-open in append mode or truncate? Default constructor uses
+                // default open mode (truncate?) std::ofstream default mode is
+                // truncate. But here we might want to append if we are restarting?
+                // For testing, we usually want fresh start or append.
+                // Let's match constructor behavior:
+                logger.stream_.open(logger.config_.getFile().data());
+            }
+            logger.workerThread_ = std::thread(&Logger::process, &logger);
         }
     }
 
@@ -318,49 +338,49 @@ inline void Logger::trace(const char* msg) {
 //     log(fullMessage, level);
 // }
 
-} // namespace hahaha::utils
+} // namespace h3::utils
 
 inline void info(const std::string& msg) {
-    hahaha::utils::Logger::info(msg);
+    h3::utils::Logger::info(msg);
 }
 inline void info(const char* msg) {
-    hahaha::utils::Logger::info(msg);
+    h3::utils::Logger::info(msg);
 }
 inline void debug(const std::string& msg) {
-    hahaha::utils::Logger::debug(msg);
+    h3::utils::Logger::debug(msg);
 }
 inline void debug(const char* msg) {
-    hahaha::utils::Logger::debug(msg);
+    h3::utils::Logger::debug(msg);
 }
 inline void warn(const std::string& msg) {
-    hahaha::utils::Logger::warn(msg);
+    h3::utils::Logger::warn(msg);
 }
 inline void warn(const char* msg) {
-    hahaha::utils::Logger::warn(msg);
+    h3::utils::Logger::warn(msg);
 }
 inline void error(const std::string& msg) {
-    hahaha::utils::Logger::error(msg);
+    h3::utils::Logger::error(msg);
 }
 inline void error(const char* msg) {
-    hahaha::utils::Logger::error(msg);
+    h3::utils::Logger::error(msg);
 }
 inline void fatal(const std::string& msg) {
-    hahaha::utils::Logger::fatal(msg);
+    h3::utils::Logger::fatal(msg);
 }
 inline void fatal(const char* msg) {
-    hahaha::utils::Logger::fatal(msg);
+    h3::utils::Logger::fatal(msg);
 }
 inline void trace(const std::string& msg) {
-    hahaha::utils::Logger::trace(msg);
+    h3::utils::Logger::trace(msg);
 }
 inline void trace(const char* msg) {
-    hahaha::utils::Logger::trace(msg);
+    h3::utils::Logger::trace(msg);
 }
-inline void log(const std::string& msg, const hahaha::utils::LogLevel level) {
-    hahaha::utils::Logger::log(msg, level);
+inline void log(const std::string& msg, const h3::utils::LogLevel level) {
+    h3::utils::Logger::log(msg, level);
 }
-inline void log(const char* msg, const hahaha::utils::LogLevel level) {
-    hahaha::utils::Logger::log(msg, level);
+inline void log(const char* msg, const h3::utils::LogLevel level) {
+    h3::utils::Logger::log(msg, level);
 }
 
 #endif // HAHAHA_UTILS_LOG_LOGGER_H

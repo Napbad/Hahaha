@@ -292,3 +292,4 @@ Testing/
 Testing
 out/
 builddir/
+coverage_report/

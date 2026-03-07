@@ -12,9 +12,9 @@
       "--gpus", "all",
       "--privileged"
     ],
-    "mounts": [
-      "type=bind,source=${localWorkspaceFolder},target=/workspace"
-    ],
+    // "mounts": [
+    //   "type=bind,source=${localWorkspaceFolder},target=/workspace"
+    // ],
     "workspaceFolder": "/workspace",
     "remoteUser": "root",
     "postCreateCommand": "/workspace/dev/post_build.sh",

@@ -70,5 +70,6 @@
         "--compile-commands-dir=builddir",
         "--compile-commands-dir=buildDir",
         "--compile-commands-dir=cmake-build"
-    ]
+    ],
+    "AndreaNovelHelper.workspaceDisabled": false
 }
