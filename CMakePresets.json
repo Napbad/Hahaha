@@ -4,7 +4,7 @@
   "configurePresets": [
     {
       "name": "vcpkg-windows",
-      "description": "Windows build using repo-local vcpkg (<repo>/vcpkg/vcpkg_root). Run dev/dev_env_setup.py first.",
+      "description": "Windows build using system vcpkg. Set VCPKG_ROOT environment variable.",
       "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" },
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/cmake-build-${presetName}",
@@ -13,7 +13,6 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vcpkg/vcpkg_root/scripts/buildsystems/vcpkg.cmake",
         "VCPKG_TARGET_TRIPLET": "x64-windows-static"
       }
     },
@@ -27,13 +26,13 @@
     },
     {
       "name": "vcpkg-linux",
-      "description": "Linux build using repo-local vcpkg (<repo>/vcpkg/vcpkg_root). Run dev/dev_env_setup.py first.",
+      "description": "Linux build using system vcpkg. Set VCPKG_ROOT environment variable.",
       "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" },
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/cmake-build-${presetName}",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vcpkg/vcpkg_root/scripts/buildsystems/vcpkg.cmake"
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
       }
     },
     {
@@ -46,13 +45,12 @@
     },
     {
       "name": "vcpkg-macos",
-      "description": "macOS build using repo-local vcpkg (<repo>/vcpkg/vcpkg_root). Run dev/dev_env_setup.py first.",
+      "description": "macOS build using system vcpkg. Set VCPKG_ROOT environment variable.",
       "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Darwin" },
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/cmake-build-${presetName}",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vcpkg/vcpkg_root/scripts/buildsystems/vcpkg.cmake"
+        "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
