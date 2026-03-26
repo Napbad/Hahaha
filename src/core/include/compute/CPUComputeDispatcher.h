@@ -20,4 +20,14 @@
 // Created by napbad on 3/26/26.
 //
 
-#include "ComputeNode.h"
+#ifndef HAHAHA_CPUCOMPUTEDISPATCHER_H_DD5A255B24F54C4FB7D39587DB18905D
+#define HAHAHA_CPUCOMPUTEDISPATCHER_H_DD5A255B24F54C4FB7D39587DB18905D
+
+namespace h3::core::backend::cpu {
+class CPUComputeDispatcher : public ComputeDispatcher {
+public:
+    std::expected<void, Error> dispatch(const ComputeKernel& kernel, const ComputeKernelArgs& args) override;
+};
+}
+
+#endif // HAHAHA_CPUCOMPUTEDISPATCHER_H_DD5A255B24F54C4FB7D39587DB18905D

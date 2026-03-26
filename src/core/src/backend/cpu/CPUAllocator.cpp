@@ -20,7 +20,8 @@
 // Created by napbad on 3/26/26.
 //
 
-#ifndef HAHAHA_CUDACOMPUTEDISPATCHER_H_55A7CD63A5D54C4C9BB0877600FCD458
-#define HAHAHA_CUDACOMPUTEDISPATCHER_H_55A7CD63A5D54C4C9BB0877600FCD458
+#include "../../../include/backend/cpu/CPUAllocator.h"
 
-#endif // HAHAHA_CUDACOMPUTEDISPATCHER_H_55A7CD63A5D54C4C9BB0877600FCD458
+std::expected<h3::core::Ptr, h3::core::Error> h3::core::backend::cpu::CPUAllocator::
+allocate(SizeT size) {
+}

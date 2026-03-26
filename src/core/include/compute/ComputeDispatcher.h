@@ -20,4 +20,19 @@
 // Created by napbad on 3/26/26.
 //
 
-#include "Tensor.h"
+#ifndef HAHAHA_COMPUTEDISPATCHER_H_290902236E544C94A3504172247EF7D3
+#define HAHAHA_COMPUTEDISPATCHER_H_290902236E544C94A3504172247EF7D3
+#include <vector>
+
+#include "defines.h"
+
+namespace h3::core::backend {
+class ComputeDispatcher {
+public:
+    virtual ~ComputeDispatcher() = default;
+
+    virtual void dispatch(Operator op, std::vector<>, Type type);
+};
+}
+
+#endif // HAHAHA_COMPUTEDISPATCHER_H_290902236E544C94A3504172247EF7D3

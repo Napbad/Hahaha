@@ -20,4 +20,4 @@
 // Created by napbad on 3/26/26.
 //
 
-#include "TensorStride.h"
+#include "../../include/ds/TensorStride.h"
