@@ -25,7 +25,7 @@
 #include "utils/log/LogColor.h"
 #include "utils/log/LogLevel.h"
 
-namespace hahaha::utils {
+namespace h3::utils::log {
 constexpr LogColor DefaultColor = LogColor::BLACK;
 constexpr LogLevel DefaultLevel = LogLevel::INFO;
 constexpr std::string_view DefaultFile = "log.txt";
@@ -156,6 +156,6 @@ class LoggerConfig {
     bool timeEnabled_ = false;
 };
 
-} // namespace hahaha::utils
+} // namespace h3::utils::log
 
 #endif // HAHAHA_UTILS_LOG_LOGGER_CONFIG_H

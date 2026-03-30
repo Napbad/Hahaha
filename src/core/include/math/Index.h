@@ -22,5 +22,44 @@
 
 #ifndef HAHAHA_INDICE_H_699C069F8A6B4822AE5EFB3C6785F732
 #define HAHAHA_INDICE_H_699C069F8A6B4822AE5EFB3C6785F732
+#include <vector>
+
+#include "defines.h"
+
+namespace h3::core::math {
+
+class Index {
+public:
+    Index& operator,(const SizeT index) {
+        m_indices.push_back(index);
+        return *this;
+    }
+
+    // NOLINTNEXTLINE
+    Index(const SizeT index) {
+        m_indices.push_back(index);
+    }
+
+    [[nodiscard]] std::vector<SizeT>& indicesRef() {
+        return m_indices;
+    }
+
+    [[nodiscard]] const std::vector<SizeT>& indicesRef() const {
+        return m_indices;
+    }
+
+    SizeT operator[](const SizeT index) const {
+        return m_indices[index];
+    }
+
+    [[nodiscard]] SizeT size() const {
+        return static_cast<SizeT>(m_indices.size());
+    }
+
+private:
+    std::vector<SizeT> m_indices;
+};
+
+}
 
 #endif // HAHAHA_INDICE_H_699C069F8A6B4822AE5EFB3C6785F732

@@ -19,3 +19,20 @@
 //
 // Created by napbad on 3/26/26.
 //
+
+#include "compute/ComputeDispatcher.h"
+
+namespace h3::core::compute {
+
+std::expected<void, Error> ComputeDispatcher::dispatchOnCPU(Operator op,
+                                                       std::vector<ComputeNode>
+                                                       nodes,
+                                                       DataType type,
+                                                       const backend::Device
+                                                       device) {
+
+
+    return {};
+}
+
+}

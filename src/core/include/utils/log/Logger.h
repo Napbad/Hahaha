@@ -36,7 +36,7 @@
 #include "utils/log/LogMessageEntry.h"
 #include "utils/log/LoggerConfig.h"
 
-namespace hahaha::utils {
+namespace h3::utils::log {
 /**
  * @brief Thread-safe asynchronous logging system.
  *
@@ -318,49 +318,49 @@ inline void Logger::trace(const char* msg) {
 //     log(fullMessage, level);
 // }
 
-} // namespace hahaha::utils
+} // namespace h3::utils::log
 
 inline void info(const std::string& msg) {
-    hahaha::utils::Logger::info(msg);
+    h3::utils::log::Logger::info(msg);
 }
 inline void info(const char* msg) {
-    hahaha::utils::Logger::info(msg);
+    h3::utils::log::Logger::info(msg);
 }
 inline void debug(const std::string& msg) {
-    hahaha::utils::Logger::debug(msg);
+    h3::utils::log::Logger::debug(msg);
 }
 inline void debug(const char* msg) {
-    hahaha::utils::Logger::debug(msg);
+    h3::utils::log::Logger::debug(msg);
 }
 inline void warn(const std::string& msg) {
-    hahaha::utils::Logger::warn(msg);
+    h3::utils::log::Logger::warn(msg);
 }
 inline void warn(const char* msg) {
-    hahaha::utils::Logger::warn(msg);
+    h3::utils::log::Logger::warn(msg);
 }
 inline void error(const std::string& msg) {
-    hahaha::utils::Logger::error(msg);
+    h3::utils::log::Logger::error(msg);
 }
 inline void error(const char* msg) {
-    hahaha::utils::Logger::error(msg);
+    h3::utils::log::Logger::error(msg);
 }
 inline void fatal(const std::string& msg) {
-    hahaha::utils::Logger::fatal(msg);
+    h3::utils::log::Logger::fatal(msg);
 }
 inline void fatal(const char* msg) {
-    hahaha::utils::Logger::fatal(msg);
+    h3::utils::log::Logger::fatal(msg);
 }
 inline void trace(const std::string& msg) {
-    hahaha::utils::Logger::trace(msg);
+    h3::utils::log::Logger::trace(msg);
 }
 inline void trace(const char* msg) {
-    hahaha::utils::Logger::trace(msg);
+    h3::utils::log::Logger::trace(msg);
 }
-inline void log(const std::string& msg, const hahaha::utils::LogLevel level) {
-    hahaha::utils::Logger::log(msg, level);
+inline void log(const std::string& msg, const h3::utils::log::LogLevel level) {
+    h3::utils::log::Logger::log(msg, level);
 }
-inline void log(const char* msg, const hahaha::utils::LogLevel level) {
-    hahaha::utils::Logger::log(msg, level);
+inline void log(const char* msg, const h3::utils::log::LogLevel level) {
+    h3::utils::log::Logger::log(msg, level);
 }
 
 #endif // HAHAHA_UTILS_LOG_LOGGER_H

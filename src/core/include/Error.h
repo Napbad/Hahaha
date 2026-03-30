@@ -22,5 +22,41 @@
 
 #ifndef HAHAHA_ERROR_H_FEDE53AD90D34788ACC93B3F7C3582C8
 #define HAHAHA_ERROR_H_FEDE53AD90D34788ACC93B3F7C3582C8
+#include <string>
+#include <utility>
+
+namespace h3::core {
+
+enum class ErrorCode {
+    BaseError = 1,
+    MemoryError,
+    DeviceNotSupportedError,
+    DeviceNotAvailableError,
+    InvalidArgument,
+};
+
+class Error {
+public:
+    Error(std::string message, const ErrorCode code)
+        : m_message(std::move(message)),
+          m_code(code) {
+    }
+
+    explicit Error(const char* str) : m_message(str), m_code(ErrorCode::BaseError) {
+    }
+
+    [[nodiscard]] std::string message() const {
+        return m_message;
+    }
+
+    [[nodiscard]] ErrorCode code() const {
+        return m_code;
+    }
+
+private:
+    std::string m_message;
+    ErrorCode m_code;
+};
+}
 
 #endif //HAHAHA_ERROR_H_FEDE53AD90D34788ACC93B3F7C3582C8

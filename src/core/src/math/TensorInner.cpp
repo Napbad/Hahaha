@@ -1,0 +1,82 @@
+//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/Napbad/Hahaha)
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//       https://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+//  Contributors:
+//  Napbad (napbad.sen@gmail.com) (https://github.com/Napbad)
+//
+
+//
+// Created by napbad on 3/26/26.
+//
+
+#include "math/TensorInner.h"
+
+#include "utils/handler/exception_handler.h"
+
+namespace h3::core::math {
+Scalar TensorInner::operator()(const Index& index) const {
+
+    if (index.size() != m_stride.size()) {
+        if (index.size() > m_stride.size()) {
+            ThrowInvalid(
+                "The size of indexes is bigger than stride size, indexes size: {}, strides size: {}",
+                index.size(),
+                m_stride.size());
+        }
+        if (index.size() < m_stride.size()) {
+            ThrowInvalid(
+                "The size of indexes is smaller than stride, with indexes size: {}, strides size: {}, if you want to index a Tensor result, use [] instead",
+                index.size(),
+                m_stride.size()
+                );
+        }
+    }
+
+    SizeT offset = 1;
+    for (auto i = index.size() - 1; i >= 0; --i) {
+        offset += index[i] * m_stride[i];
+    }
+
+    backend::CommonPointer targetPtr = m_storage.data() + offset;
+
+    return {m_metadata.dataType, targetPtr, true};
+}
+
+TensorInner TensorInner::operator[](SizeT index) const {
+    if (m_shape.empty()) {
+        ThrowInvalid("Can't index a scalar");
+    }
+
+    if (index > m_shape[0]) {
+        ThrowInvalid(
+            "Wrong index, the input index is {}, but the shape on this dim is {}",
+            index,
+            m_shape[0]);
+    }
+
+    auto sizes = m_shape.sizes();
+    sizes.erase(sizes.begin());
+    auto stride = m_stride.strides();
+    stride.erase(sizes.begin());
+    auto data = m_storage.data() + sizeOf(dataType()) * index * m_stride[0];
+
+    auto res = TensorInner(TensorShape(sizes),
+                           TensorStride(stride),
+                           m_storage,
+                           m_metadata);
+    res.m_metadata.isView = true;
+    return res;
+}
+
+}

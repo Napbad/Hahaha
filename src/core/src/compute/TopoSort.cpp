@@ -12,12 +12,5 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
-//  Contributors:
-//  Napbad (napbad.sen@gmail.com) (https://github.com/Napbad)
-//
 
-//
-// Created by napbad on 3/26/26.
-//
-
-#include "../../include/compute/TopoSort.h"
+#include "compute/TopoSort.h"

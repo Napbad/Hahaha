@@ -22,14 +22,60 @@
 
 #ifndef HAHAHA_DEVICE_H_5F6E415902B445AA92F71929169DEC1E
 #define HAHAHA_DEVICE_H_5F6E415902B445AA92F71929169DEC1E
+#include <string>
+#include <bits/stringfwd.h>
+
+#include "defines.h"
 
 namespace h3::core::backend {
-    class Device {
-    public:
 
-    private:
+enum class DeviceType { CPU = 0, CUDA, UNKNOWN };
 
-    };
+inline std::string to_string(const DeviceType type) {
+    switch (type) {
+    case DeviceType::CPU:
+        return "CPU";
+    case DeviceType::CUDA:
+        return "CUDA";
+    default:
+        return "UNKNOWN";
+    }
 }
+
+class Device {
+public:
+    Device() : m_index(0), m_type(DeviceType::CPU) {
+    }
+
+    Device(const SizeT idx, const DeviceType type) : m_index(idx), m_type(type) {
+    }
+
+    [[nodiscard]] SizeT index() const {
+        return m_index;
+    }
+
+    [[nodiscard]] DeviceType type() const {
+        return m_type;
+    }
+
+    [[nodiscard]] std::string toString() const {
+        return "Device { " + to_string(m_type) + ": " +
+            std::to_string(m_index) + " }";
+    }
+
+    bool operator==(const Device& other) const = default;
+
+private:
+    SizeT m_index;
+    DeviceType m_type;
+};
+
+struct DeviceHash {
+    std::size_t operator()(const Device& device) const {
+        return std::hash<std::size_t>{}(device.index()) ^ 
+               (std::hash<int>{}(static_cast<int>(device.type())) << 1);
+    }
+};
+} // namespace h3::core::backend
 
 #endif // HAHAHA_DEVICE_H_5F6E415902B445AA92F71929169DEC1E

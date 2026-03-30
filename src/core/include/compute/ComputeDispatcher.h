@@ -22,16 +22,34 @@
 
 #ifndef HAHAHA_COMPUTEDISPATCHER_H_290902236E544C94A3504172247EF7D3
 #define HAHAHA_COMPUTEDISPATCHER_H_290902236E544C94A3504172247EF7D3
+#include <expected>
 #include <vector>
 
+#include "ComputeNode.h"
 #include "defines.h"
+#include "Error.h"
+#include "backend/Device.h"
 
-namespace h3::core::backend {
+namespace h3::core::compute {
 class ComputeDispatcher {
 public:
-    virtual ~ComputeDispatcher() = default;
+    ~ComputeDispatcher();
 
-    virtual void dispatch(Operator op, std::vector<>, Type type);
+    std::expected<void, Error> dispatch(Operator op,
+                                        std::vector<ComputeNode> nodes,
+                                        DataType type,
+                                        backend::Device device);
+
+private:
+    std::expected<void, Error> dispatchOnCUDA(Operator op,
+                                              std::vector<ComputeNode> nodes,
+                                              DataType type,
+                                              backend::Device device);
+
+    std::expected<void, Error> dispatchOnCPU(Operator op,
+                                             std::vector<ComputeNode> nodes,
+                                             DataType type,
+                                             backend::Device device);
 };
 }
 

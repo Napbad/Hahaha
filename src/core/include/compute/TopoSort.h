@@ -12,15 +12,10 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
-//  Contributors:
-//  Napbad (napbad.sen@gmail.com) (https://github.com/Napbad)
-//
 
-//
-// Created by napbad on 3/26/26.
-//
+#ifndef HAHAHA_TOPOSORT_H
+#define HAHAHA_TOPOSORT_H
 
-#ifndef HAHAHA_TOPOSORT_H_2F122A051AEB4F5D9A4C2BBAFC0ECD57
-#define HAHAHA_TOPOSORT_H_2F122A051AEB4F5D9A4C2BBAFC0ECD57
+// Placeholder header: topological sort API to be wired to the compute graph.
 
-#endif // HAHAHA_TOPOSORT_H_2F122A051AEB4F5D9A4C2BBAFC0ECD57
+#endif

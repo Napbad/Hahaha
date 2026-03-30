@@ -22,5 +22,17 @@
 
 #ifndef HAHAHA_COMPUTENODE_H_D3F0BB4E059144318EA7871C7175E12A
 #define HAHAHA_COMPUTENODE_H_D3F0BB4E059144318EA7871C7175E12A
+#include "math/TensorInner.h"
+
+namespace h3::core::compute {
+class ComputeNode {
+public:
+    std::shared_ptr<math::TensorInner> tensor() {
+        return m_tensor;
+    }
+private:
+    std::shared_ptr<math::TensorInner> m_tensor;
+};
+}
 
 #endif // HAHAHA_COMPUTENODE_H_D3F0BB4E059144318EA7871C7175E12A

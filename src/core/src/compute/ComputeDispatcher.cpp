@@ -20,4 +20,39 @@
 // Created by napbad on 3/26/26.
 //
 
-#include "../../include/compute/ComputeDispatcher.h"
+#include "compute/ComputeDispatcher.h"
+
+#include <expected>
+
+#include "Error.h"
+
+namespace h3::core::compute {
+
+ComputeDispatcher::~ComputeDispatcher() = default;
+
+std::expected<void, Error> ComputeDispatcher::dispatch(Operator op,
+                                                       std::vector<ComputeNode>
+                                                       nodes,
+                                                       DataType type,
+                                                       const backend::Device
+                                                       device) {
+
+    switch (device.type()) {
+    case backend::DeviceType::CPU:
+
+        break;
+    default: ;
+        return std::unexpected(Error(
+            "unknown device type",
+            ErrorCode::DeviceNotSupportedError));
+    }
+
+    return {};
+}
+
+std::expected<void, Error> ComputeDispatcher::dispatchOnCUDA(Operator op,
+    std::vector<ComputeNode> nodes,
+    DataType type,
+    backend::Device device) {
+}
+}

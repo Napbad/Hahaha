@@ -20,4 +20,4 @@
 // Created by napbad on 3/26/26.
 //
 
-#include "../../include/ds/TensorShape.h"
+#include "../../include/ml/Tensor.h"

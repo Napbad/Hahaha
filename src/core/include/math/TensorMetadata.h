@@ -17,10 +17,20 @@
 //
 
 //
-// Created by napbad on 3/26/26.
+// Created by napbad on 3/27/26.
 //
 
-#ifndef HAHAHA_ALLOCATOR_H_66B60E809AE7413F9740BCAF7977C1EC
-#define HAHAHA_ALLOCATOR_H_66B60E809AE7413F9740BCAF7977C1EC
+#ifndef HAHAHA_TENSORMETADATA_H_64668641F44F44B59C57F69B3E3967CC
+#define HAHAHA_TENSORMETADATA_H_64668641F44F44B59C57F69B3E3967CC
+#include "defines.h"
 
-#endif // HAHAHA_ALLOCATOR_H_66B60E809AE7413F9740BCAF7977C1EC
+namespace h3::core::math {
+struct TensorMetadata {
+    bool isContinuous : 1 = true;
+    bool isChannelsLast : 1 = true;
+    bool isView : 1 = false;
+    DataType dataType : 8 = DataType::Float32;
+};
+}
+
+#endif //HAHAHA_TENSORMETADATA_H_64668641F44F44B59C57F69B3E3967CC

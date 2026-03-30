@@ -22,5 +22,45 @@
 
 #ifndef HAHAHA_TENSORSHAPE_H_D00755481C5B426DA11E0C244ED22F33
 #define HAHAHA_TENSORSHAPE_H_D00755481C5B426DA11E0C244ED22F33
+#include <vector>
+
+#include "defines.h"
+
+namespace h3::core::math {
+// Inner class, which is used to implement base TensorOperations
+class TensorShape {
+public:
+    explicit TensorShape(const std::vector<SizeT>& dims) : m_sizes(dims) {
+
+    }
+
+    std::vector<SizeT>& sizesRef() {
+        return m_sizes;
+    }
+
+    [[nodiscard]] const std::vector<SizeT>& sizesRef() const {
+        return m_sizes;
+    }
+
+    [[nodiscard]] SizeT rank() const {
+        return static_cast<SizeT>(m_sizes.size());
+    }
+
+    SizeT operator[](const SizeT index) const {
+        return m_sizes[index];
+    }
+
+    [[nodiscard]] bool empty() const {
+        return m_sizes.empty();
+    }
+
+    [[nodiscard]] std::vector<SizeT> sizes() const {
+        return m_sizes;
+    }
+
+private:
+    std::vector<SizeT> m_sizes;
+};
+}
 
 #endif // HAHAHA_TENSORSHAPE_H_D00755481C5B426DA11E0C244ED22F33

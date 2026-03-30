@@ -19,3 +19,22 @@
 //
 // Created by napbad on 3/26/26.
 //
+
+#ifndef H3_CORE_COMPUTE_COMPUTE_NODE_H_
+#define H3_CORE_COMPUTE_COMPUTE_NODE_H_
+
+#include <memory>
+#include "math/TensorInner.h"
+
+namespace h3::core::compute {
+class ComputeNode {
+public:
+    std::shared_ptr<math::TensorInner> tensor() {
+        return m_tensor;
+    }
+private:
+    std::shared_ptr<math::TensorInner> m_tensor;
+};
+}
+
+#endif // H3_CORE_COMPUTE_COMPUTE_NODE_H_

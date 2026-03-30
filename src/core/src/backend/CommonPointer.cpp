@@ -12,12 +12,29 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
-//  Contributors:
-//  Napbad (napbad.sen@gmail.com) (https://github.com/Napbad)
-//
 
-//
-// Created by napbad on 3/26/26.
-//
+#include "backend/CommonPointer.h"
 
-#include "../../include/ds/SliceSettings.h"
+#include <memory>
+
+#include "backend/MemoryManager.h"
+#include "utils/handler/exception_handler.h"
+
+namespace h3::core::backend {
+
+void CommonPointer::destroy() const {
+    if (m_ptr == nullptr) {
+        return;
+    }
+    if (std::shared_ptr<MemoryManager> mgr = getMemoryManagerOn(m_device)) {
+        mgr->deallocate(*this);
+        return;
+    }
+    if (m_device.type() == DeviceType::CPU && m_device.index() == 0) {
+        getDefaultMemoryManager()->deallocate(*this);
+        return;
+    }
+    ThrowRuntime("no suitable deallocator found for device {}", m_device.toString());
+}
+
+}

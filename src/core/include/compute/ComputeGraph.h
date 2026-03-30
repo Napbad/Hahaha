@@ -23,4 +23,15 @@
 #ifndef HAHAHA_COMPUTEGRAPH_H_A1D8E39CDBA1480EBE6E902C8FAECF86
 #define HAHAHA_COMPUTEGRAPH_H_A1D8E39CDBA1480EBE6E902C8FAECF86
 
+#include <memory>
+#include "math/TensorInner.h"
+
+namespace h3::core::compute {
+class ComputeGraph {
+public:
+private:
+};
+}
+
 #endif // HAHAHA_COMPUTEGRAPH_H_A1D8E39CDBA1480EBE6E902C8FAECF86
+

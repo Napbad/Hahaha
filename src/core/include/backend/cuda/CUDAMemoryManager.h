@@ -22,5 +22,27 @@
 
 #ifndef HAHAHA_CUDAALLOCATOR_H_D2E304FBE1E2437386E55468F4C39AE7
 #define HAHAHA_CUDAALLOCATOR_H_D2E304FBE1E2437386E55468F4C39AE7
+#include "backend/MemoryManager.h"
+
+namespace h3::core::backend::cuda {
+class CUDAMemoryManager : public MemoryManager{
+public:
+    ~CUDAMemoryManager() override;
+
+    std::expected<CommonPointer, Error> allocate(SizeT size) override;
+
+    void deallocate(CommonPointer ptr) override;
+
+    std::expected<void, Error> move(CommonPointer dst, CommonPointer src, SizeT size) override;
+
+    std::expected<void, Error> copy(CommonPointer dst, CommonPointer src, SizeT size) override;
+
+    std::expected<void, Error>
+    copyFromHostToDevice(CommonPointer dst, CommonPointer src, SizeT size) override;
+
+    std::expected<void, Error>
+    copyFromDeviceToHost(CommonPointer dst, CommonPointer src, SizeT size) override;
+};
+}
 
 #endif // HAHAHA_CUDAALLOCATOR_H_D2E304FBE1E2437386E55468F4C39AE7

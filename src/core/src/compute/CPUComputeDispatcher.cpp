@@ -24,4 +24,14 @@
 
 namespace h3::core::compute {
 
+std::expected<void, Error> ComputeDispatcher::dispatchOnCPU(Operator op,
+                                                       std::vector<ComputeNode>
+                                                       nodes,
+                                                       DataType type,
+                                                       const backend::Device
+                                                       device) {
+
+
+    return {};
+}
 }

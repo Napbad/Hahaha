@@ -20,4 +20,59 @@
 // Created by napbad on 3/26/26.
 //
 
-#include "Storage.h"
+#include "backend/Storage.h"
+
+namespace h3::core::backend {
+
+Storage Storage::createView() const {
+
+    auto res = Storage(
+        m_data,
+        m_memoryManager,
+        m_size,
+        true
+        );
+
+    return res;
+}
+
+std::expected<Storage, Error> Storage::clone() const {
+    auto resPtr = m_memoryManager->allocate(m_size);
+    if (!resPtr.has_value()) {
+        return std::unexpected(resPtr.error());
+    }
+    return {Storage(resPtr.value(), m_memoryManager, m_size, false)};
+}
+
+std::expected<CommonPointer, Error> Storage::resize(const SizeT size) {
+    if (size == this->size()) {
+        return {data()};
+    }
+
+    if (size < this->size()) {
+        return std::unexpected(Error(
+            "target size is smaller than current size, cannot resize",
+            ErrorCode::InvalidArgument));
+    }
+
+    std::expected<CommonPointer, Error> expected = memoryManager()->allocate(size);
+    if (!expected.has_value()) {
+        return std::unexpected(expected.error());
+    }
+
+    const auto sourcePtr = data();
+
+    if (std::expected<void, Error> res = memoryManager()->move(
+            expected.value(),
+            sourcePtr,
+            size);
+        !res.has_value()) {
+        return std::unexpected(res.error());
+    }
+    memoryManager()->deallocate(sourcePtr);
+
+    m_data = expected.value();
+
+    return expected;
+}
+}

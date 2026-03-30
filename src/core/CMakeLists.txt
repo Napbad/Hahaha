@@ -12,6 +12,8 @@ else ()
     add_library(hahaha_core STATIC ${CORE_CPP_SOURCES})
 endif ()
 
+include_directories(${PROJECT_SOURCE_DIR}/src/core/include)
+
 add_library(hahaha::core ALIAS hahaha_core)
 
 # Set include directories
