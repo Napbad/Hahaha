@@ -22,6 +22,7 @@
 
 #ifndef HAHAHA_ERROR_H_FEDE53AD90D34788ACC93B3F7C3582C8
 #define HAHAHA_ERROR_H_FEDE53AD90D34788ACC93B3F7C3582C8
+#include <format>
 #include <string>
 #include <utility>
 
@@ -33,17 +34,31 @@ enum class ErrorCode {
     DeviceNotSupportedError,
     DeviceNotAvailableError,
     InvalidArgument,
+    RuntimeError,
 };
 
 class Error {
-public:
+  public:
     Error(std::string message, const ErrorCode code)
-        : m_message(std::move(message)),
-          m_code(code) {
+        : m_message(std::move(message)), m_code(code) {
     }
 
     explicit Error(const char* str) : m_message(str), m_code(ErrorCode::BaseError) {
     }
+
+    template <typename... Args>
+    Error(const ErrorCode code,
+          std::format_string<Args...> formatMsg,
+          Args&&... args)
+        : m_message(std::format(formatMsg, std::forward<Args>(args)...)),
+          m_code(code){
+
+          }
+    explicit Error(const std::string& string) {
+        m_message = string;
+        m_code = ErrorCode::BaseError;
+    }
+    ;
 
     [[nodiscard]] std::string message() const {
         return m_message;
@@ -53,10 +68,17 @@ public:
         return m_code;
     }
 
-private:
+  private:
     std::string m_message;
     ErrorCode m_code;
 };
-}
 
-#endif //HAHAHA_ERROR_H_FEDE53AD90D34788ACC93B3F7C3582C8
+template <typename... Args>
+Error err(const ErrorCode code,
+          std::format_string<Args...> fmt,
+          Args&&... formatContent) {
+    return Error(std::format(fmt, std::forward<Args>(formatContent)...), code);
+}
+} // namespace h3::core
+
+#endif // HAHAHA_ERROR_H_FEDE53AD90D34788ACC93B3F7C3582C8

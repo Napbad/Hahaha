@@ -20,4 +20,12 @@
 // Created by napbad on 3/26/26.
 //
 
-#include "../../include/ml/Tensor.h"
+#include "ml/Tensor.h"
+
+#include "utils/handler/exception_handler.h"
+namespace h3::core::ml {
+
+Tensor Tensor::add(const Tensor& other) const {
+    return Tensor(m_node + other.m_node);
+}
+} // namespace h3::core::ml

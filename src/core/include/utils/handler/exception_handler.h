@@ -22,22 +22,22 @@
 
 #ifndef HAHAHA_EXCEPTION_HANDLER_H_DBA81902DB894B6D944EA99780129F9C
 #define HAHAHA_EXCEPTION_HANDLER_H_DBA81902DB894B6D944EA99780129F9C
-#define _ThrowWithFormat(ExceptionType, ...) \
+#define ThrowWithFormat(ExceptionType, ...) \
 throw ExceptionType(std::format(__VA_ARGS__))
 
 // 1. For invalid arguments passed to a function
-#define ThrowInvalid(...)    _ThrowWithFormat(std::invalid_argument, __VA_ARGS__)
+#define ThrowInvalid(...)    ThrowWithFormat(std::invalid_argument, __VA_ARGS__)
 
 // 2. For errors that occur at runtime (files, networks, etc.)
-#define ThrowRuntime(...)    _ThrowWithFormat(std::runtime_error, __VA_ARGS__)
+#define ThrowRuntime(...)    ThrowWithFormat(std::runtime_error, __VA_ARGS__)
 
 // 3. For index-out-of-bounds errors
-#define ThrowOutOfRange(...) _ThrowWithFormat(std::out_of_range, __VA_ARGS__)
+#define ThrowOutOfRange(...) ThrowWithFormat(std::out_of_range, __VA_ARGS__)
 
 // 4. For internal logic/pre-condition violations
-#define ThrowLogic(...)      _ThrowWithFormat(std::logic_error, __VA_ARGS__)
+#define ThrowLogic(...)      ThrowWithFormat(std::logic_error, __VA_ARGS__)
 
 // 5. For resource/memory overflow (less common but useful)
-#define ThrowOverflow(...)   _ThrowWithFormat(std::overflow_error, __VA_ARGS__)
+#define ThrowOverflow(...)   ThrowWithFormat(std::overflow_error, __VA_ARGS__)
 
 #endif //HAHAHA_EXCEPTION_HANDLER_H_DBA81902DB894B6D944EA99780129F9C

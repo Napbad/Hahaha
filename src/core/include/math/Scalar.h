@@ -57,6 +57,7 @@ public:
 
     [[nodiscard]] backend::Device device() const {
         return m_data.device();
+
     }
 
     /// Byte size of the stored element (same as \ref sizeOf(dtype())).

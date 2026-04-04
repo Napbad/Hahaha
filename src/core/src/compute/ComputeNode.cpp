@@ -21,3 +21,28 @@
 //
 
 #include "compute/ComputeNode.h"
+
+#include "utils/handler/exception_handler.h"
+
+namespace h3::core::compute {
+
+DataType detectResDataType(const DataType lhs, const DataType rhs) {
+    return std::max(lhs, rhs);
+}
+void checkCanRunBinOper(const std::shared_ptr<math::TensorInner>& t1,
+                        const std::shared_ptr<math::TensorInner>& t2) {
+
+    if (t1->shapeRef() != t2->shapeRef()
+        && !t1->shapeRef().canBroadcastWith(t2->shapeRef())) {
+        ThrowInvalid("Tensor have different shapes, and they can not broadcast");
+    }
+}
+ComputeNode ComputeNode::add(const ComputeNode& other) const {
+    checkCanRunBinOper(tensorInner(), other.tensorInner());
+    DataType resType = detectResDataType(tensorInner()->dataType(),
+                                         other.tensorInner()->dataType());
+    math::TensorInner(tensorInner()->shape());
+
+    return ComputeNode(tensorInner());
+}
+} // namespace h3::core::compute

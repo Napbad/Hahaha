@@ -23,23 +23,42 @@
 #define HAHAHA_STORAGE_H_70F22415576A41E6913976C1B6331B99
 #include <memory>
 
-#include "MemoryManager.h"
 #include "Device.h"
+#include "MemoryManager.h"
+#include "utils/handler/exception_handler.h"
 
 namespace h3::core::backend {
 
 class Storage {
-public:
+  public:
     Storage(const CommonPointer& data,
             const std::shared_ptr<MemoryManager>& manager,
             const SizeT size,
-            const bool isView) : m_data(data), m_memoryManager(manager),
-                                 m_size(size), m_isView(isView) {
-    };
+            const bool isView)
+        : m_data(data), m_memoryManager(manager), m_size(size), m_isView(isView) {};
 
-    Storage() : m_data(CommonPointer()), m_memoryManager(getDefaultMemoryManager()),
-                m_size(0), m_isView(false) {
+    Storage()
+        : m_data(CommonPointer()), m_memoryManager(getDefaultMemoryManager()),
+          m_size(0), m_isView(false) {
+    }
 
+    Storage(const SizeT nBytes, const Device device)
+        : m_size(nBytes), m_isView(false) {
+        m_memoryManager = getMemoryManagerOn(device);
+        if (!m_memoryManager) {
+            const std::string str = device.toString();
+            throw std::invalid_argument(
+                "Trying to allocate storage on target device failed, the device is "
+                + str + ", but can not found an allocator");
+        }
+        if (const auto res = m_memoryManager->allocate(nBytes); res.has_value()) {
+            m_data = res.value();
+        } else {
+            throw std::invalid_argument(
+                "Trying to allocate storage on target device failed, the device is "
+                + device.toString() + ", but can not allocate memory with size "
+                + std::to_string(nBytes));
+        }
     }
 
     ~Storage() {
@@ -70,12 +89,12 @@ public:
 
     std::expected<CommonPointer, Error> resize(SizeT size);
 
-private:
+  private:
     CommonPointer m_data;
     std::shared_ptr<MemoryManager> m_memoryManager;
     SizeT m_size;
     bool m_isView;
 };
-}
+} // namespace h3::core::backend
 
 #endif // HAHAHA_STORAGE_H_70F22415576A41E6913976C1B6331B99

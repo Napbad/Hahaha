@@ -25,9 +25,9 @@
 #include "utils/log/LogColor.h"
 #include "utils/log/LogLevel.h"
 
-namespace h3::utils::log {
-constexpr LogColor DefaultColor = LogColor::BLACK;
-constexpr LogLevel DefaultLevel = LogLevel::INFO;
+namespace h3::core::utils::log {
+constexpr auto DefaultColor = LogColor::BLACK;
+constexpr auto DefaultLevel = LogLevel::INFO;
 constexpr std::string_view DefaultFile = "log.txt";
 
 /**
@@ -156,6 +156,6 @@ class LoggerConfig {
     bool timeEnabled_ = false;
 };
 
-} // namespace h3::utils::log
+} // namespace h3::core::utils::log
 
 #endif // HAHAHA_UTILS_LOG_LOGGER_CONFIG_H

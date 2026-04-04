@@ -34,20 +34,26 @@
 namespace h3::core::math {
 // Inner class, which is used to implement base TensorOperations
 class TensorInner {
-public:
-    explicit TensorInner(const TensorShape& shape) : m_shape(shape),
-                                                     m_stride(shape) {
-
+  public:
+    explicit TensorInner(const TensorShape& shape)
+        : m_shape(shape), m_stride(shape), m_offset(0) {
     }
 
     TensorInner(TensorShape shape,
                 TensorStride stride,
                 const backend::Storage& storage,
-                const TensorMetadata& metadata) : m_shape(std::move(shape)),
-                                                  m_stride(std::move(stride)),
-                                                  m_storage(storage),
-                                                  m_metadata(metadata) {
+                const SizeT offset,
+                const TensorMetadata& metadata)
+        : m_shape(std::move(shape)), m_stride(std::move(stride)), m_storage(storage),
+          m_offset(offset), m_metadata(metadata) {
+    }
 
+    TensorInner(const TensorShape& shape, const TensorMetadata& metadata)
+        : m_shape(shape), m_stride(shape), m_offset(0), m_metadata(metadata) {
+        const SizeT singleElementSize = sizeOf(metadata.dataType);
+        m_storage = backend::Storage(shape.getTotalSize() * singleElementSize,
+                                     metadata.device);
+        m_metadata = metadata;
     }
 
     // shadow copy, use clone() for deep copy instead.
@@ -56,17 +62,17 @@ public:
         this->m_shape = other.m_shape;
         this->m_storage = other.m_storage.createView();
         this->m_metadata = other.m_metadata;
+        this->m_offset = other.m_offset;
 
         return *this;
     }
 
     [[nodiscard]] TensorInner clone() const {
-        return {
-            m_shape,
-            m_stride,
-            m_storage.clone().value(),
-            m_metadata
-        };
+        auto storageClone = m_storage.clone();
+        if (!storageClone.has_value()) {
+            throw std::invalid_argument("Can not clone storage, Error is " + storageClone.error().message());
+        }
+        return {m_shape, m_stride, storageClone.value(), m_offset, m_metadata};
     }
 
     [[nodiscard]] const TensorShape& shapeRef() const {
@@ -108,24 +114,20 @@ public:
     Scalar operator()(const Index& index) const;
     TensorInner operator[](SizeT index) const;
 
-    TensorInner operator +(const TensorInner& other) const;
-    TensorInner operator -(const TensorInner& other) const;
-    TensorInner operator *(const TensorInner& other) const;
-    TensorInner operator /(const TensorInner& other) const;
+    [[nodiscard]] TensorInner
+    slice(int64_t dim, int64_t start, int64_t end, int64_t step = 1) const;
 
-    TensorInner operator +(const Scalar& other) const;
-    TensorInner operator -(const Scalar& other) const;
-    TensorInner operator *(const Scalar& other) const;
-    TensorInner operator /(const Scalar& other) const;
+    [[nodiscard]] bool isContiguous() const noexcept;
+    TensorShape shape();
 
-    [[nodiscard]] TensorInner matmul(const TensorInner& other) const;
-private:
+  private:
     TensorShape m_shape;
     TensorStride m_stride;
+    SizeT m_offset;
     backend::Storage m_storage;
     TensorMetadata m_metadata;
 };
 
-}
+} // namespace h3::core::math
 
-#endif //HAHAHA_TENSORINNER_H_D0EE919AED8B4D9ABD7CA18281E1928E
+#endif // HAHAHA_TENSORINNER_H_D0EE919AED8B4D9ABD7CA18281E1928E

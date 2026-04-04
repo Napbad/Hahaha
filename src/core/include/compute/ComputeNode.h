@@ -26,13 +26,51 @@
 
 namespace h3::core::compute {
 class ComputeNode {
-public:
-    std::shared_ptr<math::TensorInner> tensor() {
+  public:
+    explicit ComputeNode(const math::TensorShape& shape)
+        : m_tensor(std::make_shared<math::TensorInner>(shape)) {
+    }
+    explicit ComputeNode(const std::shared_ptr<math::TensorInner>& shared) {
+        m_tensor = shared;
+    }
+
+    std::shared_ptr<math::TensorInner> tensorInner() {
         return m_tensor;
     }
-private:
+
+    [[nodiscard]] std::shared_ptr<math::TensorInner> tensorInner() const {
+        return m_tensor;
+    }
+
+    [[nodiscard]] ComputeNode add(const ComputeNode& other) const;
+    ComputeNode sub(const ComputeNode& other) const;
+    ComputeNode mul(const ComputeNode& other) const;
+    ComputeNode div(const ComputeNode& other) const;
+
+    ComputeNode& add_(const ComputeNode& other);
+    ComputeNode& sub_(const ComputeNode& other);
+    ComputeNode& mul_(const ComputeNode& other);
+    ComputeNode& div_(const ComputeNode& other);
+
+    ComputeNode operator +(const ComputeNode& other) const;
+    ComputeNode operator -(const ComputeNode& other) const;
+    ComputeNode operator *(const ComputeNode& other) const;
+    ComputeNode operator /(const ComputeNode& other) const;
+
+    [[nodiscard]] ComputeNode matmul(const ComputeNode& other) const;
+
+    ComputeNode to(backend::Device device);
+    ComputeNode to(backend::Device device, DataType dtype);
+
+    [[nodiscard]] ComputeNode view(const math::TensorShape& new_shape) const;
+    [[nodiscard]] ComputeNode reshape(const math::TensorShape& new_shape) const;
+    [[nodiscard]] ComputeNode transpose(int64_t dim0, int64_t dim1) const;
+    [[nodiscard]] ComputeNode permute(const std::vector<int64_t>& dims) const;
+    [[nodiscard]] ComputeNode squeeze(int64_t dim = -1) const;
+    [[nodiscard]] ComputeNode unsqueeze(int64_t dim) const;
+  private:
     std::shared_ptr<math::TensorInner> m_tensor;
 };
-}
+} // namespace h3::core::compute
 
 #endif // HAHAHA_COMPUTENODE_H_D3F0BB4E059144318EA7871C7175E12A

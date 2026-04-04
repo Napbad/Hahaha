@@ -434,7 +434,7 @@ void Scalar::reinterpret(const DataType dtype) {
 }
 
 Scalar Scalar::clone() const {
-    auto p = allocateOne(m_dtype, device());
+    const auto p = allocateOne(m_dtype, device());
     Scalar res(m_dtype, p, false);
     copyBytes(res.m_data, m_data, sizeOf(m_dtype), device());
     return res;

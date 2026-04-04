@@ -23,11 +23,11 @@
 #include <gtest/gtest.h>
 #include <thread>
 
-using hahaha::utils::LogColor;
-using hahaha::utils::Logger;
-using hahaha::utils::LoggerConfig;
-using hahaha::utils::LogLevel;
-using hahaha::utils::LogMessageEntry;
+using h3::core::utils::log::LogColor;
+using h3::core::utils::log::Logger;
+using h3::core::utils::log::LoggerConfig;
+using h3::core::utils::log::LogLevel;
+using h3::core::utils::log::LogMessageEntry;
 
 class LoggerTest : public ::testing::Test {
   protected:

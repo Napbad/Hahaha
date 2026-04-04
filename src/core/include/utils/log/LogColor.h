@@ -20,7 +20,7 @@
 #define HAHAHA_UTILS_LOG_LOG_COLOR_H
 
 #include <string_view>
-namespace h3::utils::log {
+namespace h3::core::utils::log {
 
 /**
  * @brief ANSI color codes for console output.
@@ -67,6 +67,6 @@ inline std::string_view toString(LogColor color) {
     }
 }
 
-} // namespace h3::utils::log
+} // namespace h3::core::utils::log
 
 #endif // HAHAHA_UTILS_LOG_LOG_COLOR_H

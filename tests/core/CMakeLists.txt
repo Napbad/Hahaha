@@ -4,9 +4,12 @@
 # Collect test source files using regex patterns
 collect_test_sources("${CMAKE_CURRENT_SOURCE_DIR}" CORE_TEST_SOURCES)
 
+include_directories(${CMAKE_SOURCE_DIR}/src/core/include)
+
 # Create test executable if there are test files
 if (CORE_TEST_SOURCES)
     add_executable(hahaha_test_core ${CORE_TEST_SOURCES})
+    find_package(GTest CONFIG REQUIRED)
 
     # Link against core library and test framework
     target_link_libraries(hahaha_test_core

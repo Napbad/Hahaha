@@ -17,9 +17,9 @@
 
 #include <gtest/gtest.h>
 
-using hahaha::utils::LogLevel;
-using hahaha::utils::toColoredString;
-using hahaha::utils::toString;
+using h3::core::utils::log::LogLevel;
+using h3::core::utils::log::toColoredString;
+using h3::core::utils::log::toString;
 
 TEST(LogLevelTest, ToString_ValidValues) {
     EXPECT_EQ(toString(LogLevel::TRACE), "TRACE");

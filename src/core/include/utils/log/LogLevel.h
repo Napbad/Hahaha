@@ -22,7 +22,7 @@
 #include <string_view>
 
 #include "utils/log/LogColor.h"
-namespace h3::utils::log {
+namespace h3::core::utils::log {
 
 /**
  * @brief Severity levels for log messages.
@@ -96,6 +96,6 @@ inline std::string_view toColoredString(LogLevel level) {
     return "UNKNOWN";
 }
 
-} // namespace h3::utils::log
+} // namespace h3::core::utils::log
 
 #endif // HAHAHA_UTILS_LOG_LOGGER_LEVEL_H

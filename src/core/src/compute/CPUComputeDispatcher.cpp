@@ -24,14 +24,34 @@
 
 namespace h3::core::compute {
 
-std::expected<void, Error> ComputeDispatcher::dispatchOnCPU(Operator op,
-                                                       std::vector<ComputeNode>
-                                                       nodes,
-                                                       DataType type,
-                                                       const backend::Device
-                                                       device) {
+std::expected<void, Error> dispatchAddOnCPU(std::vector<ComputeNode> nodes,
+                                            DataType type,
+                                            const backend::Device device);
 
+std::expected<void, Error>
+ComputeDispatcher::dispatchOnCPU(Operator op,
+                                 std::vector<ComputeNode> nodes,
+                                 DataType type,
+                                 const backend::Device device) {
+
+    switch (op) {
+    case Operator::Add:
+        return dispatchAddOnCPU(nodes, type, device);
+    default:
+        return std::unexpected(
+            Error("Operator " + toString(op) + " is not supported on CPU",
+                  ErrorCode::RuntimeError));
+    }
+    return {
+
+    };
+}
+
+std::expected<void, Error> dispatchAddOnCPU(std::vector<ComputeNode> nodes,
+                                            DataType type,
+                                            const backend::Device device) {
 
     return {};
 }
-}
+
+} // namespace h3::core::compute

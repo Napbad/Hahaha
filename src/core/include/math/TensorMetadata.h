@@ -30,6 +30,7 @@ struct TensorMetadata {
     bool isChannelsLast : 1 = true;
     bool isView : 1 = false;
     DataType dataType : 8 = DataType::Float32;
+    backend::Device device = backend::Device();
 };
 }
 

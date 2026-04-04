@@ -29,17 +29,17 @@ Scalar TensorInner::operator()(const Index& index) const {
 
     if (index.size() != m_stride.size()) {
         if (index.size() > m_stride.size()) {
-            ThrowInvalid(
-                "The size of indexes is bigger than stride size, indexes size: {}, strides size: {}",
-                index.size(),
-                m_stride.size());
+            ThrowInvalid("The size of indexes is bigger than stride size, indexes "
+                         "size: {}, strides size: {}",
+                         index.size(),
+                         m_stride.size());
         }
         if (index.size() < m_stride.size()) {
-            ThrowInvalid(
-                "The size of indexes is smaller than stride, with indexes size: {}, strides size: {}, if you want to index a Tensor result, use [] instead",
-                index.size(),
-                m_stride.size()
-                );
+            ThrowInvalid("The size of indexes is smaller than stride, with indexes "
+                         "size: {}, strides size: {}, if you want to index a Tensor "
+                         "result, use [] instead",
+                         index.size(),
+                         m_stride.size());
         }
     }
 
@@ -71,12 +71,22 @@ TensorInner TensorInner::operator[](SizeT index) const {
     stride.erase(sizes.begin());
     auto data = m_storage.data() + sizeOf(dataType()) * index * m_stride[0];
 
-    auto res = TensorInner(TensorShape(sizes),
-                           TensorStride(stride),
-                           m_storage,
-                           m_metadata);
+    auto res =
+        TensorInner(TensorShape(sizes), TensorStride(stride), m_storage, m_offset, m_metadata);
     res.m_metadata.isView = true;
     return res;
 }
+TensorInner
+TensorInner::slice(int64_t dim, int64_t start, int64_t end, int64_t step) const {
 
 }
+
+bool TensorInner::isContiguous() const noexcept {
+    return m_metadata.isContinuous;
+}
+
+TensorShape TensorInner::shape() {
+    return m_shape;
+}
+
+} // namespace h3::core::math

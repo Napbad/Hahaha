@@ -19,6 +19,9 @@
 //
 // Created by napbad on 3/26/26.
 //
+
+#ifdef HAHAHA_ENABLE_CUDA
+
 #include <cuda_runtime.h>
 
 #include "backend/cuda/CUDAMemoryManager.h"
@@ -120,3 +123,5 @@ CUDAMemoryManager::copyFromDeviceToHost(CommonPointer dst,
 }
 
 } // namespace h3::core::backend::cuda
+
+#endif

@@ -22,16 +22,22 @@
 
 #ifndef HAHAHA_TENSORSHAPE_H_D00755481C5B426DA11E0C244ED22F33
 #define HAHAHA_TENSORSHAPE_H_D00755481C5B426DA11E0C244ED22F33
+#include <algorithm>
+#include <expected>
+#include <string>
 #include <vector>
 
-#include "defines.h"
+#include "../Error.h"
+#include "../defines.h"
 
 namespace h3::core::math {
 // Inner class, which is used to implement base TensorOperations
 class TensorShape {
-public:
+  public:
     explicit TensorShape(const std::vector<SizeT>& dims) : m_sizes(dims) {
+    }
 
+    explicit TensorShape(const SizeT rank) : m_sizes(rank) {
     }
 
     std::vector<SizeT>& sizesRef() {
@@ -58,9 +64,43 @@ public:
         return m_sizes;
     }
 
-private:
+    bool operator==(const TensorShape& other) const {
+        return m_sizes == other.m_sizes;
+    }
+
+    bool operator!=(const TensorShape& other) const {
+        return m_sizes != other.m_sizes;
+    }
+
+    [[nodiscard]] bool canBroadcastWith(const TensorShape& other) const {
+        if (other.rank() < rank()) {
+            return false;
+        }
+
+        const SizeT rankOther = other.rank();
+        for (auto i = 0; i < rank(); ++i) {
+            if (!(other[rankOther - 1 - i] == 1
+                  || m_sizes[rank() - 1 - i] == other.m_sizes[rank() - 1 - i]
+                  || m_sizes[rank() - 1 - i] == 1)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // return an expected Shape or an Err if shapes cannot broadcast
+    [[nodiscard]] std::expected<TensorShape, Error>
+    broadcastWith(const TensorShape& other) const;
+
+    [[nodiscard]] std::string toString() const;
+    [[nodiscard]] SizeT getTotalSize() const;
+
+  private:
+
+
     std::vector<SizeT> m_sizes;
 };
-}
+} // namespace h3::core::math
 
 #endif // HAHAHA_TENSORSHAPE_H_D00755481C5B426DA11E0C244ED22F33

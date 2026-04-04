@@ -13,11 +13,10 @@
 // limitations under the License.
 //
 
+#include <gtest/gtest.h>
 #include "utils/log/LogColor.h"
 
-#include <gtest/gtest.h>
-
-using hahaha::utils::LogColor;
+using h3::core::utils::log::LogColor;
 
 TEST(LogColorTest, ToString_CoversAllColorsAndDefault) {
     EXPECT_EQ(toString(LogColor::BLACK), "\033[30m");
@@ -31,6 +30,6 @@ TEST(LogColorTest, ToString_CoversAllColorsAndDefault) {
     EXPECT_EQ(toString(LogColor::RESET), "\033[0m");
 
     // Force default branch.
-    auto invalid = static_cast<LogColor>(999);
+    constexpr auto invalid = static_cast<LogColor>(999);
     EXPECT_EQ(toString(invalid), "\033[0m");
 }
