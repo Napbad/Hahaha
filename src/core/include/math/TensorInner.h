@@ -111,6 +111,11 @@ class TensorInner {
         return m_metadata.dataType;
     }
 
+    /// Byte offset of this view into \ref storageRef() (always 0 for root tensors).
+    [[nodiscard]] SizeT storageOffset() const noexcept {
+        return m_offset;
+    }
+
     Scalar operator()(const Index& index) const;
     TensorInner operator[](SizeT index) const;
 
@@ -119,8 +124,9 @@ class TensorInner {
 
     [[nodiscard]] bool isContiguous() const noexcept;
     TensorShape shape();
+    bool computeAndStoreIsContiguous();
 
-  private:
+private:
     TensorShape m_shape;
     TensorStride m_stride;
     SizeT m_offset;

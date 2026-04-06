@@ -1,0 +1,29 @@
+[TRACE]trace std::string
+[TRACE]trace const char*
+[DEBUG]debug std::string
+[DEBUG]debug const char*
+[INFO ]info std::string
+[INFO ]info const char*
+[WARN ]warn std::string
+[WARN ]warn const char*
+[ERROR]error std::string
+[ERROR]error const char*
+[FATAL]fatal std::string
+[FATAL]fatal const char*
+[TRACE]global trace
+[DEBUG]global debug
+[INFO ]global info
+[WARN ]global warn
+[ERROR]global error
+[FATAL]global fatal
+[INFO ]global log
+[INFO ]global log string
+[TRACE]trace message
+[DEBUG]debug message
+[INFO ]info message
+[WARN ]warn message
+[ERROR]error message
+[FATAL]fatal message
+[INFO ]Both enabled
+[DEBUG]Console only, no time
+[WARN ]File only with time

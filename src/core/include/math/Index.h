@@ -36,6 +36,11 @@ public:
     }
 
     // NOLINTNEXTLINE
+    Index (const std::vector<SizeT>& indices) {
+        m_indices = indices;
+    }
+
+    // NOLINTNEXTLINE
     Index(const SizeT index) {
         m_indices.push_back(index);
     }

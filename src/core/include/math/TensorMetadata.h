@@ -26,7 +26,7 @@
 
 namespace h3::core::math {
 struct TensorMetadata {
-    bool isContinuous : 1 = true;
+    bool isContiguous : 1 = true;
     bool isChannelsLast : 1 = true;
     bool isView : 1 = false;
     DataType dataType : 8 = DataType::Float32;

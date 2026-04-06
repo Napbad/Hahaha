@@ -20,7 +20,10 @@
 // Created by napbad on 3/26/26.
 //
 
+#include <algorithm>
+
 #include "math/TensorShape.h"
+
 std::expected<h3::core::math::TensorShape, h3::core::Error>
 h3::core::math::TensorShape::broadcastWith(const TensorShape& other) const {
     if (!canBroadcastWith(other)) {
@@ -28,15 +31,13 @@ h3::core::math::TensorShape::broadcastWith(const TensorShape& other) const {
                                          + " and " + other.toString(),
                                      ErrorCode::InvalidArgument));
     }
-    const SizeT otherRank = other.rank();
-    const SizeT resRank = std::max(otherRank, rank());
-
+    const SizeT resRank = std::max(rank(), other.rank());
     TensorShape resShape(resRank);
 
-    for (SizeT i = 0; i < resRank; ++i) {
-        const SizeT otherDim = i < otherRank ? other.sizes()[static_cast<std::size_t>(i)] : 1;
-        const SizeT thisDim = i < rank() ? sizes()[static_cast<std::size_t>(i)] : 1;
-        resShape.sizesRef()[static_cast<std::size_t>(i)] = std::max(otherDim, thisDim);
+    for (SizeT k = 1; k <= resRank; ++k) {
+        const SizeT da = k <= rank() ? (*this)[rank() - k] : 1;
+        const SizeT db = k <= other.rank() ? other[other.rank() - k] : 1;
+        resShape[resRank - k] = std::max(da, db);
     }
 
     return resShape;

@@ -36,7 +36,7 @@ public:
     ~ComputeDispatcher();
 
     std::expected<void, Error> dispatch(Operator op,
-                                        std::vector<ComputeNode> nodes,
+                                        const std::vector<ComputeNode>& nodes,
                                         DataType type,
                                         backend::Device device);
 
@@ -47,7 +47,7 @@ private:
                                               backend::Device device);
 
     std::expected<void, Error> dispatchOnCPU(Operator op,
-                                             std::vector<ComputeNode> nodes,
+                                             const std::vector<ComputeNode>& nodes,
                                              DataType type,
                                              backend::Device device);
 };

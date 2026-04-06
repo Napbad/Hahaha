@@ -30,29 +30,23 @@ namespace h3::core::compute {
 
 ComputeDispatcher::~ComputeDispatcher() = default;
 
-std::expected<void, Error> ComputeDispatcher::dispatch(Operator op,
-                                                       std::vector<ComputeNode>
-                                                       nodes,
-                                                       DataType type,
+std::expected<void, Error> ComputeDispatcher::dispatch(const Operator op,
+                                                       const std::vector<ComputeNode>
+                                                       & nodes,
+                                                       const DataType type,
                                                        const backend::Device
                                                        device) {
 
     switch (device.type()) {
     case backend::DeviceType::CPU:
-
-        break;
+        return dispatchOnCPU(op, nodes, type, device);
+    case backend::DeviceType::CUDA:
+        return dispatchOnCUDA(op, nodes, type, device);
     default: ;
         return std::unexpected(Error(
             "unknown device type",
             ErrorCode::DeviceNotSupportedError));
     }
-
-    return {};
 }
 
-std::expected<void, Error> ComputeDispatcher::dispatchOnCUDA(Operator op,
-    std::vector<ComputeNode> nodes,
-    DataType type,
-    backend::Device device) {
-}
 }

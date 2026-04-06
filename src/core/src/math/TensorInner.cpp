@@ -43,7 +43,7 @@ Scalar TensorInner::operator()(const Index& index) const {
         }
     }
 
-    SizeT offset = 1;
+    SizeT offset = m_offset;
     for (auto i = index.size() - 1; i >= 0; --i) {
         offset += index[i] * m_stride[i];
     }
@@ -69,10 +69,10 @@ TensorInner TensorInner::operator[](SizeT index) const {
     sizes.erase(sizes.begin());
     auto stride = m_stride.strides();
     stride.erase(sizes.begin());
-    auto data = m_storage.data() + sizeOf(dataType()) * index * m_stride[0];
-
+    const SizeT offset = sizeOf(dataType()) * index * m_stride[0];
+    // share data
     auto res =
-        TensorInner(TensorShape(sizes), TensorStride(stride), m_storage, m_offset, m_metadata);
+        TensorInner(TensorShape(sizes), TensorStride(stride), m_storage, m_offset + offset, m_metadata);
     res.m_metadata.isView = true;
     return res;
 }
@@ -82,11 +82,27 @@ TensorInner::slice(int64_t dim, int64_t start, int64_t end, int64_t step) const 
 }
 
 bool TensorInner::isContiguous() const noexcept {
-    return m_metadata.isContinuous;
+    return m_metadata.isContiguous;
 }
 
 TensorShape TensorInner::shape() {
     return m_shape;
+}
+
+bool TensorInner::computeAndStoreIsContiguous() {
+    SizeT expectedStride = 1;
+    if (m_shape.rank() == 0) {
+        m_metadata.isContiguous = true;
+        return true;
+    }
+    for (SizeT i = 1; i <= m_stride.size(); ++i) {
+        if (m_stride[-i] != expectedStride) {
+            m_metadata.isContiguous = false;
+            return false;
+        }
+        expectedStride *= m_shape[-i];
+    }
+    return m_metadata.isContiguous;
 }
 
 } // namespace h3::core::math

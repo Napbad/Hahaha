@@ -43,7 +43,17 @@ public:
         return static_cast<SizeT>(m_strides.size());
     }
 
-    SizeT operator[](const SizeT index) const {
+    const SizeT& operator[](const SizeT index) const {
+        if (index < 0) {
+            return m_strides[m_strides.size() + index];
+        }
+        return m_strides[index];
+    }
+
+    SizeT& operator[](const SizeT index) {
+        if (index < 0) {
+            return m_strides[m_strides.size() + index];
+        }
         return m_strides[index];
     }
 

@@ -33,7 +33,7 @@
 namespace h3::core::math {
 // Inner class, which is used to implement base TensorOperations
 class TensorShape {
-  public:
+public:
     explicit TensorShape(const std::vector<SizeT>& dims) : m_sizes(dims) {
     }
 
@@ -52,7 +52,17 @@ class TensorShape {
         return static_cast<SizeT>(m_sizes.size());
     }
 
-    SizeT operator[](const SizeT index) const {
+    const SizeT& operator[](const SizeT index) const {
+        if (index < 0) {
+            return m_sizes[m_sizes.size() + index];
+        }
+        return m_sizes[index];
+    }
+
+    SizeT& operator[](const SizeT index) {
+        if (index < 0) {
+            return m_sizes[m_sizes.size() + index];
+        }
         return m_sizes[index];
     }
 
@@ -80,8 +90,8 @@ class TensorShape {
         const SizeT rankOther = other.rank();
         for (auto i = 0; i < rank(); ++i) {
             if (!(other[rankOther - 1 - i] == 1
-                  || m_sizes[rank() - 1 - i] == other.m_sizes[rank() - 1 - i]
-                  || m_sizes[rank() - 1 - i] == 1)) {
+                || m_sizes[rank() - 1 - i] == other.m_sizes[rank() - 1 - i]
+                || m_sizes[rank() - 1 - i] == 1)) {
                 return false;
             }
         }
@@ -96,9 +106,7 @@ class TensorShape {
     [[nodiscard]] std::string toString() const;
     [[nodiscard]] SizeT getTotalSize() const;
 
-  private:
-
-
+private:
     std::vector<SizeT> m_sizes;
 };
 } // namespace h3::core::math

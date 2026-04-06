@@ -22,6 +22,11 @@
 
 #include "compute/ComputeNode.h"
 
+#include <memory>
+#include <vector>
+
+#include "math/TensorInner.h"
+#include "math/TensorStride.h"
 #include "utils/handler/exception_handler.h"
 
 namespace h3::core::compute {
@@ -29,6 +34,7 @@ namespace h3::core::compute {
 DataType detectResDataType(const DataType lhs, const DataType rhs) {
     return std::max(lhs, rhs);
 }
+
 void checkCanRunBinOper(const std::shared_ptr<math::TensorInner>& t1,
                         const std::shared_ptr<math::TensorInner>& t2) {
 
@@ -37,12 +43,66 @@ void checkCanRunBinOper(const std::shared_ptr<math::TensorInner>& t1,
         ThrowInvalid("Tensor have different shapes, and they can not broadcast");
     }
 }
+
 ComputeNode ComputeNode::add(const ComputeNode& other) const {
     checkCanRunBinOper(tensorInner(), other.tensorInner());
     DataType resType = detectResDataType(tensorInner()->dataType(),
                                          other.tensorInner()->dataType());
-    math::TensorInner(tensorInner()->shape());
+    auto resTensor = math::TensorInner(tensorInner()->shape());
 
     return ComputeNode(tensorInner());
+}
+
+ComputeNode ComputeNode::view() const {
+    return ComputeNode(tensorInner());
+}
+
+ComputeNode ComputeNode::broadcastView(const math::TensorShape& newShape) const {
+    const auto self = tensorInner();
+    const auto& selfShape = self->shapeRef();
+    const auto& selfStride = self->strideRef();
+
+    if (!selfShape.canBroadcastWith(newShape) && !newShape.canBroadcastWith(selfShape)) {
+        throw std::invalid_argument(
+            "Tensor with shape: " + selfShape.toString() +
+            " cannot broadcast to shape: " + newShape.toString());
+    }
+
+    const SizeT newRank = newShape.rank();
+    const SizeT selfRank = selfShape.rank();
+    std::vector<SizeT> newStridesVec(static_cast<std::size_t>(newRank));
+
+    for (SizeT k = 0; k < newRank; ++k) {
+        const SizeT newIdx = newRank - 1 - k;
+        const SizeT newDim = newShape[newIdx];
+        SizeT selfDim = 1;
+        SizeT selfStrideVal = 0;
+        if (k < selfRank) {
+            const SizeT selfIdx = selfRank - 1 - k;
+            selfDim = selfShape[selfIdx];
+            selfStrideVal = selfStride[selfIdx];
+        }
+        if (selfDim == newDim) {
+            newStridesVec[static_cast<std::size_t>(newIdx)] = selfStrideVal;
+        } else if (selfDim == 1) {
+            newStridesVec[static_cast<std::size_t>(newIdx)] = 0;
+        } else {
+            throw std::invalid_argument(
+                "Internal broadcast stride mismatch for shape " + selfShape.toString() +
+                " -> " + newShape.toString());
+        }
+    }
+
+    math::TensorMetadata meta = self->metadataRef();
+    meta.isView = true;
+    auto view = std::make_shared<math::TensorInner>(
+        newShape,
+        math::TensorStride(newStridesVec),
+        self->storageRef(),
+        self->storageOffset(),
+        meta);
+    view->computeAndStoreIsContiguous();
+
+    return ComputeNode(view);
 }
 } // namespace h3::core::compute

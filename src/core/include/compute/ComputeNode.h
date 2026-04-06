@@ -26,12 +26,17 @@
 
 namespace h3::core::compute {
 class ComputeNode {
-  public:
+public:
     explicit ComputeNode(const math::TensorShape& shape)
         : m_tensor(std::make_shared<math::TensorInner>(shape)) {
     }
+
     explicit ComputeNode(const std::shared_ptr<math::TensorInner>& shared) {
         m_tensor = shared;
+    }
+
+    explicit ComputeNode(const math::TensorInner&& tensorInner) : m_tensor(
+        std::make_shared<math::TensorInner>(tensorInner)) {
     }
 
     std::shared_ptr<math::TensorInner> tensorInner() {
@@ -62,13 +67,15 @@ class ComputeNode {
     ComputeNode to(backend::Device device);
     ComputeNode to(backend::Device device, DataType dtype);
 
-    [[nodiscard]] ComputeNode view(const math::TensorShape& new_shape) const;
-    [[nodiscard]] ComputeNode reshape(const math::TensorShape& new_shape) const;
+    [[nodiscard]] ComputeNode view() const;
+    [[nodiscard]] ComputeNode broadcastView(const math::TensorShape& newShape) const;
+    [[nodiscard]] ComputeNode reshape(const math::TensorShape& newShape) const;
     [[nodiscard]] ComputeNode transpose(int64_t dim0, int64_t dim1) const;
     [[nodiscard]] ComputeNode permute(const std::vector<int64_t>& dims) const;
     [[nodiscard]] ComputeNode squeeze(int64_t dim = -1) const;
     [[nodiscard]] ComputeNode unsqueeze(int64_t dim) const;
-  private:
+
+private:
     std::shared_ptr<math::TensorInner> m_tensor;
 };
 } // namespace h3::core::compute
