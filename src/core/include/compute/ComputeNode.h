@@ -47,6 +47,9 @@ public:
         return m_tensor;
     }
 
+    [[nodiscard]] backend::Device device() const {
+        return m_tensor->device();
+    }
     [[nodiscard]] ComputeNode add(const ComputeNode& other) const;
     ComputeNode sub(const ComputeNode& other) const;
     ComputeNode mul(const ComputeNode& other) const;

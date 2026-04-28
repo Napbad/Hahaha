@@ -111,6 +111,10 @@ class TensorInner {
         return m_metadata.dataType;
     }
 
+    [[nodiscard]] backend::Device device() const {
+        return m_metadata.device;
+    }
+
     /// Byte offset of this view into \ref storageRef() (always 0 for root tensors).
     [[nodiscard]] SizeT storageOffset() const noexcept {
         return m_offset;

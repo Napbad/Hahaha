@@ -25,6 +25,7 @@
 #include <memory>
 #include <vector>
 
+#include "compute/ComputeDispatcher.h"
 #include "math/TensorInner.h"
 #include "math/TensorStride.h"
 #include "utils/handler/exception_handler.h"
@@ -42,15 +43,25 @@ void checkCanRunBinOper(const std::shared_ptr<math::TensorInner>& t1,
         && !t1->shapeRef().canBroadcastWith(t2->shapeRef())) {
         ThrowInvalid("Tensor have different shapes, and they can not broadcast");
     }
+
+    if (t1->device() != t2->device()) {
+        return ThrowInvalid("Tensor have different devices");
+    }
 }
 
 ComputeNode ComputeNode::add(const ComputeNode& other) const {
     checkCanRunBinOper(tensorInner(), other.tensorInner());
-    DataType resType = detectResDataType(tensorInner()->dataType(),
-                                         other.tensorInner()->dataType());
-    auto resTensor = math::TensorInner(tensorInner()->shape());
+    const DataType resType = detectResDataType(tensorInner()->dataType(),
+                                               other.tensorInner()->dataType());
+    auto resTensor = math::TensorInner(tensorInner()->shape(),
+                                       math::TensorMetadata{.dataType = resType});
 
-    return ComputeNode(tensorInner());
+    ComputeDispatcher::dispatch(Operator::Add,
+                                {*tensorInner(), *other.tensorInner(), resTensor},
+                                resType, other.device()
+        )
+
+    return ComputeNode(std::move(resTensor));
 }
 
 ComputeNode ComputeNode::view() const {
@@ -62,7 +73,8 @@ ComputeNode ComputeNode::broadcastView(const math::TensorShape& newShape) const 
     const auto& selfShape = self->shapeRef();
     const auto& selfStride = self->strideRef();
 
-    if (!selfShape.canBroadcastWith(newShape) && !newShape.canBroadcastWith(selfShape)) {
+    if (!selfShape.canBroadcastWith(newShape) && !newShape.canBroadcastWith(
+        selfShape)) {
         throw std::invalid_argument(
             "Tensor with shape: " + selfShape.toString() +
             " cannot broadcast to shape: " + newShape.toString());
@@ -88,7 +100,8 @@ ComputeNode ComputeNode::broadcastView(const math::TensorShape& newShape) const 
             newStridesVec[static_cast<std::size_t>(newIdx)] = 0;
         } else {
             throw std::invalid_argument(
-                "Internal broadcast stride mismatch for shape " + selfShape.toString() +
+                "Internal broadcast stride mismatch for shape " + selfShape.
+                toString() +
                 " -> " + newShape.toString());
         }
     }
