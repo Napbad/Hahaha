@@ -72,10 +72,15 @@ TensorInner TensorInner::operator[](SizeT index) const {
     const SizeT offset = sizeOf(dataType()) * index * m_stride[0];
     // share data
     auto res =
-        TensorInner(TensorShape(sizes), TensorStride(stride), m_storage, m_offset + offset, m_metadata);
+        TensorInner(TensorShape(sizes),
+                    TensorStride(stride),
+                    m_storage,
+                    m_offset + offset,
+                    m_metadata);
     res.m_metadata.isView = true;
     return res;
 }
+
 TensorInner
 TensorInner::slice(int64_t dim, int64_t start, int64_t end, int64_t step) const {
 
@@ -103,6 +108,23 @@ bool TensorInner::computeAndStoreIsContiguous() {
         expectedStride *= m_shape[-i];
     }
     return m_metadata.isContiguous;
+}
+
+Scalar TensorInner::item() const {
+    if (m_shape.getTotalSize() != 1) {
+        auto sizes = m_shape.sizes();
+        ThrowInvalid("Can't call item() on a Tensor with shape: {}",
+                     m_shape.toString());
+    }
+
+    backend::CommonPointer targetPtr = m_storage.data();
+    return {m_metadata.dataType, targetPtr, true};
+}
+
+TensorInner TensorInner::add(const TensorInner& other) const {
+
+}
+
 }
 
 } // namespace h3::core::math
