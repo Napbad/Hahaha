@@ -116,7 +116,7 @@ class TensorInner {
     }
 
     /// Byte offset of this view into \ref storageRef() (always 0 for root tensors).
-    [[nodiscard]] SizeT storageOffset() const noexcept {
+    [[nodiscard]] SizeT offset() const noexcept {
         return m_offset;
     }
 

@@ -27,6 +27,10 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include <cstring>
+#include <array>
+#include <algorithm>
+#include <numeric>
 
 #include "compute/ComputeDispatcher.h"
 #include "compute/ComputeNode.h"
@@ -40,238 +44,358 @@ namespace h3::core::compute {
 
 namespace {
 
-using ElementwiseBinary = std::expected<void, Error> (*)(math::Scalar& out,
-                                                         const math::Scalar& lhs,
-                                                         const math::Scalar& rhs);
+// Forward declarations for binary operations
+template<typename T>
+struct AddOp {
+    T operator()(const T& a, const T& b) const { return a + b; }
+};
 
-std::expected<void, Error> elementwiseAdd(math::Scalar& out,
-                                          const math::Scalar& lhs,
-                                          const math::Scalar& rhs) {
-    const math::Scalar sum = lhs + rhs;
-    if (sum.dtype() != out.dtype()) {
-        return std::unexpected(Error(
-            "CPU add: Scalar result dtype does not match output element type "
-            "(allocate the output tensor with the promoted element type).",
-            ErrorCode::InvalidArgument));
+template<typename T>
+struct SubOp {
+    T operator()(const T& a, const T& b) const { return a - b; }
+};
+
+template<typename T>
+struct MulOp {
+    T operator()(const T& a, const T& b) const { return a * b; }
+};
+
+template<typename T>
+struct DivOp {
+    T operator()(const T& a, const T& b) const { return a / b; }
+};
+
+/// Represents a collapsed dimension after optimization
+struct CollapsedDim {
+    SizeT size;
+    SizeT lhsStride;
+    SizeT rhsStride;
+    SizeT outStride;
+};
+
+/// Calculates offsets for broadcasting operations with optimizations
+struct BroadcastOffsetCalculator {
+    std::vector<CollapsedDim> collapsedDims;
+    SizeT originalRank;
+    
+    BroadcastOffsetCalculator(
+        const math::TensorShape& lhsShape,
+        const math::TensorShape& rhsShape,
+        const math::TensorShape& outShape,
+        const math::TensorStride& lhsStride,
+        const math::TensorStride& rhsStride,
+        const math::TensorStride& outStride
+    ) : originalRank(outShape.rank()) {
+        const auto& lhsSizes = lhsShape.sizesRef();
+        const auto& rhsSizes = rhsShape.sizesRef();
+        const auto& outSizes = outShape.sizesRef();
+        
+        // Prepare original dimensions with their strides
+        std::vector<CollapsedDim> dims(originalRank);
+        for (SizeT i = 0; i < originalRank; ++i) {
+            // Calculate which dimension to use for strides (accounting for broadcasting)
+            SizeT lhsDimIdx = i + lhsShape.rank() - originalRank;
+            SizeT rhsDimIdx = i + rhsShape.rank() - originalRank;
+            
+            // LHS stride: if broadcasted (size=1), stride is 0
+            dims[i].lhsStride = (lhsDimIdx >= 0 && lhsDimIdx < lhsShape.rank() && lhsSizes[lhsDimIdx] > 1) ? 
+                                lhsStride[lhsDimIdx] : 0;
+            
+            // RHS stride: if broadcasted (size=1), stride is 0
+            dims[i].rhsStride = (rhsDimIdx >= 0 && rhsDimIdx < rhsShape.rank() && rhsSizes[rhsDimIdx] > 1) ? 
+                                rhsStride[rhsDimIdx] : 0;
+                                
+            dims[i].outStride = (i < outStride.size()) ? outStride[i] : 0;
+            dims[i].size = (i < outSizes.size()) ? outSizes[i] : 1;
+        }
+        
+        // Collapse dimensions where possible
+        collapsedDims.reserve(originalRank);
+        
+        if (!dims.empty()) {
+            collapsedDims.push_back(dims[0]);
+            
+            for (SizeT i = 1; i < dims.size(); ++i) {
+                auto& lastDim = collapsedDims.back();
+                
+                // Check if we can collapse current dim with the previous one
+                // This is possible if the strides are compatible with contiguous access
+                bool canCollapse = 
+                    (lastDim.lhsStride == 0 || lastDim.lhsStride == dims[i].outStride) && 
+                    (lastDim.rhsStride == 0 || lastDim.rhsStride == dims[i].outStride) && 
+                    (lastDim.outStride == dims[i].outStride);
+                
+                if (canCollapse) {
+                    // Collapse by multiplying the size and updating strides
+                    lastDim.size *= dims[i].size;
+                } else {
+                    // Keep as separate dimension
+                    collapsedDims.push_back(dims[i]);
+                }
+            }
+        }
     }
-    out = sum;
-    return {};
+    
+    SizeT getTotalElements() const {
+        return std::accumulate(collapsedDims.begin(), collapsedDims.end(), 
+                               static_cast<SizeT>(1),
+                               [](SizeT acc, const CollapsedDim& dim) { 
+                                   return acc * dim.size; 
+                               });
+    }
+};
+
+/// Template-based binary kernel for contiguous tensors (fast path)
+template<typename T, typename Op>
+void runBinaryKernelContiguous(
+    T* __restrict__ outPtr,
+    const T* __restrict__ lhsPtr,
+    const T* __restrict__ rhsPtr,
+    const SizeT totalElements
+) {
+    Op op;
+    #pragma omp parallel for if(totalElements > 10000)
+    for (SizeT i = 0; i < totalElements; ++i) {
+        outPtr[i] = op(lhsPtr[i], rhsPtr[i]);
+    }
 }
 
-std::expected<void, Error> elementwiseSub(math::Scalar& out,
-                                          const math::Scalar& lhs,
-                                          const math::Scalar& rhs) {
-    const math::Scalar v = lhs - rhs;
-    if (v.dtype() != out.dtype()) {
-        return std::unexpected(Error(
-            "CPU sub: Scalar result dtype does not match output element type.",
-            ErrorCode::InvalidArgument));
+/// Template-based binary kernel with optimized stride support (general path)
+template<typename T, typename Op>
+void runBinaryKernelWithStrides(
+    T* __restrict__ outPtr,
+    const T* __restrict__ lhsPtr,
+    const T* __restrict__ rhsPtr,
+    const BroadcastOffsetCalculator& calc
+) {
+    Op op;
+    
+    const SizeT collapsedRank = calc.collapsedDims.size();
+    
+    // Use fixed-size arrays instead of vectors to avoid heap allocations
+    std::array<SizeT, 8> coords{};  // Initialize to 0
+    std::array<SizeT, 8> outOffsets{};
+    std::array<SizeT, 8> lhsOffsets{};
+    std::array<SizeT, 8> rhsOffsets{};
+    
+    // Ensure we don't exceed our max rank
+    if (collapsedRank > 8) {
+        // Fallback to the less optimized version for very high-rank tensors
+        // This shouldn't happen in practice given our max rank assumption
+        throw std::runtime_error("Tensor rank exceeds maximum supported dimensions");
     }
-    out = v;
-    return {};
-}
-
-std::expected<void, Error> elementwiseMul(math::Scalar& out,
-                                          const math::Scalar& lhs,
-                                          const math::Scalar& rhs) {
-    const math::Scalar v = lhs * rhs;
-    if (v.dtype() != out.dtype()) {
-        return std::unexpected(Error(
-            "CPU mul: Scalar result dtype does not match output element type.",
-            ErrorCode::InvalidArgument));
+    
+    // Initialize all arrays to 0
+    for (SizeT i = 0; i < collapsedRank; ++i) {
+        coords[i] = 0;
+        outOffsets[i] = 0;
+        lhsOffsets[i] = 0;
+        rhsOffsets[i] = 0;
     }
-    out = v;
-    return {};
-}
-
-std::expected<void, Error> elementwiseDiv(math::Scalar& out,
-                                          const math::Scalar& lhs,
-                                          const math::Scalar& rhs) {
-    const math::Scalar v = lhs / rhs;
-    if (v.dtype() != out.dtype()) {
-        return std::unexpected(Error(
-            "CPU div: Scalar result dtype does not match output element type.",
-            ErrorCode::InvalidArgument));
-    }
-    out = v;
-    return {};
-}
-
-/// Walk all multi-indices in row-major nested-loop order (last index varies fastest).
-template <class Fn>
-void forEachMultiIndex(const math::TensorShape& shape, Fn&& fn) {
-    const SizeT rank = shape.rank();
-    if (rank == 0) {
-        fn(math::Index(std::vector<SizeT>{}));
-        return;
-    }
-    std::vector<SizeT> coord(static_cast<std::size_t>(rank), 0);
-    for (;;) {
-        fn(math::Index(coord));
-        int d = static_cast<int>(rank) - 1;
+    
+    SizeT totalElements = calc.getTotalElements();
+    
+    // Process elements using optimized coordinate walking
+    #pragma omp parallel for if(totalElements > 10000)
+    for (SizeT elemIdx = 0; elemIdx < totalElements; ++elemIdx) {
+        // Calculate current offsets based on coordinates
+        SizeT outOffset = 0;
+        SizeT lhsOffset = 0;
+        SizeT rhsOffset = 0;
+        
+        for (SizeT i = 0; i < collapsedRank; ++i) {
+            const auto& dim = calc.collapsedDims[i];
+            outOffset += coords[i] * dim.outStride;
+            lhsOffset += coords[i] * dim.lhsStride;
+            rhsOffset += coords[i] * dim.rhsStride;
+        }
+        
+        // Perform the operation
+        outPtr[outOffset] = op(lhsPtr[lhsOffset], rhsPtr[rhsOffset]);
+        
+        // Increment coordinates in row-major order (incremental update)
+        int d = static_cast<int>(collapsedRank) - 1;
         for (; d >= 0; --d) {
-            ++coord[static_cast<std::size_t>(d)];
-            if (coord[static_cast<std::size_t>(d)] < shape[static_cast<SizeT>(d)]) {
+            ++coords[d];
+            if (coords[d] < calc.collapsedDims[d].size) {
                 break;
             }
-            coord[static_cast<std::size_t>(d)] = 0;
+            coords[d] = 0;  // Reset coordinate
         }
+        
+        // If we've processed all elements, break early
         if (d < 0) {
             break;
         }
     }
 }
 
-std::expected<void, Error> expectArity(const std::vector<ComputeNode>& nodes,
-                                       const SizeT expected,
-                                       const Operator op) {
-    if (nodes.size() != expected) {
+/// Main templated binary kernel dispatcher
+template<typename T, typename Op>
+std::expected<void, Error> runBinaryKernel(
+    std::vector<ComputeNode>& nodes,
+    const backend::Device& device,
+    Op op
+) {
+    if (nodes.size() != 3) {
         return std::unexpected(Error(
-            std::string(toString(op)) + " expects " + std::to_string(expected)
-                + " compute nodes, got " + std::to_string(nodes.size()),
+            "Binary operation expects 3 compute nodes (lhs, rhs, out)",
             ErrorCode::InvalidArgument));
     }
-    return {};
-}
 
-std::expected<void, Error> expectDispatchDtype(const std::shared_ptr<math::TensorInner>& t,
-                                               DataType type,
-                                               const char* role) {
-    if (t->dataType() != type) {
-        return std::unexpected(Error(
-            std::string("CPU dispatch: ") + role + " tensor dtype does not match dispatch type.",
-            ErrorCode::InvalidArgument));
-    }
-    return {};
-}
-
-std::expected<void, Error> expectSameDeviceThree(const std::shared_ptr<math::TensorInner>& a,
-                                                 const std::shared_ptr<math::TensorInner>& b,
-                                                 const std::shared_ptr<math::TensorInner>& c,
-                                                 const backend::Device& dispatchDevice) {
-    const backend::Device& da = a->metadataRef().device;
-    const backend::Device& db = b->metadataRef().device;
-    const backend::Device& dc = c->metadataRef().device;
-    if (!(da == db && db == dc)) {
-        return std::unexpected(Error(
-            "CPU dispatch: lhs, rhs, and out must share the same device.",
-            ErrorCode::InvalidArgument));
-    }
-    if (!(da == dispatchDevice)) {
-        return std::unexpected(Error(
-            "CPU dispatch: tensor device does not match dispatch device.",
-            ErrorCode::InvalidArgument));
-    }
-    return {};
-}
-
-/// Shared path for binary broadcast ops: nodes = { lhs, rhs, out }.
-std::expected<void, Error> runBinaryBroadcastOp(Operator op,
-                                                 const std::vector<ComputeNode>& nodes,
-                                                 DataType type,
-                                                 const backend::Device& device,
-                                                 ElementwiseBinary kernel) {
-    if (const auto e = expectArity(nodes, 3, op); !e) {
-        return e;
-    }
-
-    const auto lhsT = nodes[0].tensorInner();
-    const auto rhsT = nodes[1].tensorInner();
-    const auto outT = nodes[2].tensorInner();
-
-    if (const auto e = expectDispatchDtype(lhsT, type, "lhs"); !e) {
-        return e;
-    }
-    if (const auto e = expectDispatchDtype(rhsT, type, "rhs"); !e) {
-        return e;
-    }
-    if (const auto e = expectDispatchDtype(outT, type, "out"); !e) {
-        return e;
-    }
-    if (const auto e = expectSameDeviceThree(lhsT, rhsT, outT, device); !e) {
-        return e;
-    }
-
+    const auto& lhsT = nodes[0].tensorInner();
+    const auto& rhsT = nodes[1].tensorInner();
+    auto outT = nodes[2].tensorInner(); // Note: may be null initially
+    
+    // Calculate broadcasted output shape
     const auto outShapeExp = lhsT->shapeRef().broadcastWith(rhsT->shapeRef());
     if (!outShapeExp) {
         return std::unexpected(outShapeExp.error());
     }
-    const math::TensorShape& outShape = *outShapeExp;
-
-    if (outT->shapeRef() != outShape) {
+    
+    // Create output tensor if it doesn't exist
+    if (outT == nullptr) {
+        nodes[2].setTensorInner(math::TensorInner(
+            outShapeExp.value(),
+            math::TensorMetadata{
+                .dataType = lhsT->dataType(),
+                .device = lhsT->device()
+            }));
+        outT = nodes[2].tensorInner();
+    }
+    
+    // Validate device compatibility
+    if (!(lhsT->device() == rhsT->device() && rhsT->device() == device)) {
         return std::unexpected(Error(
-            std::string("Output shape mismatch for ") + toString(op) + ": expected "
-                + outShape.toString() + ", got " + outT->shapeRef().toString(),
+            "CPU dispatch: lhs, rhs, and dispatch device must match.",
             ErrorCode::InvalidArgument));
     }
-
-    const ComputeNode lhsView = nodes[0].broadcastView(outShape);
-    const ComputeNode rhsView = nodes[1].broadcastView(outShape);
-
-    std::optional<Error> fail;
-    forEachMultiIndex(outShape, [&](const math::Index& idx) {
-        if (fail.has_value()) {
-            return;
-        }
-        math::Scalar outEl = (*outT)(idx);
-        const math::Scalar lhsEl = (*lhsView.tensorInner())(idx);
-        const math::Scalar rhsEl = (*rhsView.tensorInner())(idx);
-        if (std::expected<void, Error> r = kernel(outEl, lhsEl, rhsEl); !r) {
-            fail = std::move(r.error());
-        }
-    });
-
-    if (fail.has_value()) {
-        return std::unexpected(std::move(*fail));
+    
+    const math::TensorShape& outShape = outShapeExp.value();
+    
+    // Check shape compatibility
+    if (outT->shapeRef() != outShape) {
+        return std::unexpected(Error(
+            "Output shape mismatch: expected " + outShape.toString() + 
+            ", got " + outT->shapeRef().toString(),
+            ErrorCode::InvalidArgument));
     }
+    
+    // Get raw pointers to data
+    T* __restrict__ outData = outT->storageRef().data<T>() + outT->offset();
+    const T* __restrict__ lhsData = lhsT->storageRef().data<const T>() + lhsT->offset();
+    const T* __restrict__ rhsData = rhsT->storageRef().data<const T>() + rhsT->offset();
+    
+    // Fast path: if all tensors are contiguous and have the same shape, use simple loop
+    if (lhsT->shapeRef() == outShape && 
+        rhsT->shapeRef() == outShape &&
+        lhsT->strideRef() == math::TensorStride(outShape) &&
+        rhsT->strideRef() == math::TensorStride(outShape) &&
+        outT->strideRef() == math::TensorStride(outShape)) {
+
+        const SizeT totalElements = outShape.getTotalSize();
+        runBinaryKernelContiguous<T, Op>(outData, lhsData, rhsData, totalElements);
+    } else {
+        // General path: use stride-based calculation for broadcasting
+        const auto calculator = BroadcastOffsetCalculator(
+            lhsT->shapeRef(),
+            rhsT->shapeRef(),
+            outShape,
+            lhsT->strideRef(),
+            rhsT->strideRef(),
+            outT->strideRef()
+        );
+        
+        runBinaryKernelWithStrides<T, Op>(
+            outData, lhsData, rhsData, calculator
+        );
+    }
+    
     return {};
 }
 
-std::expected<void, Error> dispatchAddOnCPU(const std::vector<ComputeNode>& nodes,
-                                            DataType type,
-                                            const backend::Device& device) {
-    return runBinaryBroadcastOp(Operator::Add, nodes, type, device, elementwiseAdd);
-}
-
-std::expected<void, Error> dispatchSubOnCPU(const std::vector<ComputeNode>& nodes,
-                                            DataType type,
-                                            const backend::Device& device) {
-    return runBinaryBroadcastOp(Operator::Sub, nodes, type, device, elementwiseSub);
-}
-
-std::expected<void, Error> dispatchMulOnCPU(const std::vector<ComputeNode>& nodes,
-                                            DataType type,
-                                            const backend::Device& device) {
-    return runBinaryBroadcastOp(Operator::Mul, nodes, type, device, elementwiseMul);
-}
-
-std::expected<void, Error> dispatchDivOnCPU(const std::vector<ComputeNode>& nodes,
-                                            DataType type,
-                                            const backend::Device& device) {
-    return runBinaryBroadcastOp(Operator::Div, nodes, type, device, elementwiseDiv);
+/// Type-erased dispatcher that selects the correct template instantiation
+std::expected<void, Error> dispatchTypedBinaryOperation(
+    std::vector<ComputeNode>& nodes,
+    DataType type,
+    const backend::Device& device,
+    const Operator op
+) {
+    switch (op) {
+        case Operator::Add:
+            switch (type) {
+                case DataType::Float32: 
+                    return runBinaryKernel<float, AddOp<float>>(nodes, device, AddOp<float>());
+                case DataType::Float64:
+                    return runBinaryKernel<double, AddOp<double>>(nodes, device, AddOp<double>());
+                case DataType::Int32:
+                    return runBinaryKernel<Int32, AddOp<Int32>>(nodes, device, AddOp<Int32>());
+                case DataType::Int64:
+                    return runBinaryKernel<Int64, AddOp<Int64>>(nodes, device, AddOp<Int64>());
+                default:
+                    break;
+            }
+            break;
+        case Operator::Sub:
+            switch (type) {
+                case DataType::Float32: 
+                    return runBinaryKernel<float, SubOp<float>>(nodes, device, SubOp<float>());
+                case DataType::Float64:
+                    return runBinaryKernel<double, SubOp<double>>(nodes, device, SubOp<double>());
+                case DataType::Int32:
+                    return runBinaryKernel<Int32, SubOp<Int32>>(nodes, device, SubOp<Int32>());
+                case DataType::Int64:
+                    return runBinaryKernel<Int64, SubOp<Int64>>(nodes, device, SubOp<Int64>());
+                default:
+                    break;
+            }
+            break;
+        case Operator::Mul:
+            switch (type) {
+                case DataType::Float32: 
+                    return runBinaryKernel<float, MulOp<float>>(nodes, device, MulOp<float>());
+                case DataType::Float64:
+                    return runBinaryKernel<double, MulOp<double>>(nodes, device, MulOp<double>());
+                case DataType::Int32:
+                    return runBinaryKernel<Int32, MulOp<Int32>>(nodes, device, MulOp<Int32>());
+                case DataType::Int64:
+                    return runBinaryKernel<Int64, MulOp<Int64>>(nodes, device, MulOp<Int64>());
+                default:
+                    break;
+            }
+            break;
+        case Operator::Div:
+            switch (type) {
+                case DataType::Float32: 
+                    return runBinaryKernel<float, DivOp<float>>(nodes, device, DivOp<float>());
+                case DataType::Float64:
+                    return runBinaryKernel<double, DivOp<double>>(nodes, device, DivOp<double>());
+                case DataType::Int32:
+                    return runBinaryKernel<Int32, DivOp<Int32>>(nodes, device, DivOp<Int32>());
+                case DataType::Int64:
+                    return runBinaryKernel<Int64, DivOp<Int64>>(nodes, device, DivOp<Int64>());
+                default:
+                    break;
+            }
+            break;
+        default:
+            break;
+    }
+    
+    return std::unexpected(Error(
+        std::string("Operator ") + toString(op) + " with data type " + std::to_string(static_cast<int>(type)) + 
+        " is not supported on CPU",
+        ErrorCode::RuntimeError));
 }
 
 } // namespace
 
 std::expected<void, Error> ComputeDispatcher::dispatchOnCPU(const Operator op,
-                                                              const std::vector<ComputeNode>& nodes,
-                                                              const DataType type,
-                                                              const backend::Device device) {
+    std::vector<ComputeNode>& nodes,
+    const DataType type,
+    const backend::Device device) {
 
-    switch (op) {
-    case Operator::Add:
-        return dispatchAddOnCPU(nodes, type, device);
-    case Operator::Sub:
-        return dispatchSubOnCPU(nodes, type, device);
-    case Operator::Mul:
-        return dispatchMulOnCPU(nodes, type, device);
-    case Operator::Div:
-        return dispatchDivOnCPU(nodes, type, device);
-    default:
-        return std::unexpected(Error(
-            std::string("Operator ") + toString(op) + " is not supported on CPU",
-            ErrorCode::RuntimeError));
-    }
+    return dispatchTypedBinaryOperation(nodes, type, device, op);
 }
 
 } // namespace h3::core::compute

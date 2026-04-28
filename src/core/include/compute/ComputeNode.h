@@ -27,6 +27,9 @@
 namespace h3::core::compute {
 class ComputeNode {
 public:
+    ComputeNode() {
+        m_tensor = nullptr;
+    }
     explicit ComputeNode(const math::TensorShape& shape)
         : m_tensor(std::make_shared<math::TensorInner>(shape)) {
     }
@@ -77,6 +80,8 @@ public:
     [[nodiscard]] ComputeNode permute(const std::vector<int64_t>& dims) const;
     [[nodiscard]] ComputeNode squeeze(int64_t dim = -1) const;
     [[nodiscard]] ComputeNode unsqueeze(int64_t dim) const;
+
+    void setTensorInner(math::TensorInner&& tensor_inner);
 
 private:
     std::shared_ptr<math::TensorInner> m_tensor;

@@ -69,6 +69,8 @@ public:
         return m_strides;
     }
 
+    bool operator==(const TensorStride& other) const;
+
 private:
     std::vector<SizeT> m_strides;
 

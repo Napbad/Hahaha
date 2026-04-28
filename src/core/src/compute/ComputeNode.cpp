@@ -56,12 +56,13 @@ ComputeNode ComputeNode::add(const ComputeNode& other) const {
     auto resTensor = math::TensorInner(tensorInner()->shape(),
                                        math::TensorMetadata{.dataType = resType});
 
-    ComputeDispatcher::dispatch(Operator::Add,
-                                {*tensorInner(), *other.tensorInner(), resTensor},
-                                resType, other.device()
-        )
-
     return ComputeNode(std::move(resTensor));
+}
+
+ComputeNode ComputeNode::operator+(const ComputeNode& other) const {
+    ComputeNode res;
+     ComputeDispatcher::dispatch(Operator::Add, {*this, other, res});
+    return res;
 }
 
 ComputeNode ComputeNode::view() const {
@@ -108,14 +109,18 @@ ComputeNode ComputeNode::broadcastView(const math::TensorShape& newShape) const 
 
     math::TensorMetadata meta = self->metadataRef();
     meta.isView = true;
-    auto view = std::make_shared<math::TensorInner>(
+    const auto view = std::make_shared<math::TensorInner>(
         newShape,
         math::TensorStride(newStridesVec),
         self->storageRef(),
-        self->storageOffset(),
+        self->offset(),
         meta);
     view->computeAndStoreIsContiguous();
 
     return ComputeNode(view);
+}
+
+void ComputeNode::setTensorInner(math::TensorInner&& tensor_inner) {
+    this->m_tensor = std::make_shared<math::TensorInner>(tensor_inner);
 }
 } // namespace h3::core::compute

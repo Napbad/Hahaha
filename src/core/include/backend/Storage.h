@@ -89,6 +89,11 @@ class Storage {
 
     std::expected<CommonPointer, Error> resize(SizeT size);
 
+    template<typename T>
+    T* data() {
+        return static_cast<T*>(m_data.get());
+    }
+
   private:
     CommonPointer m_data;
     std::shared_ptr<MemoryManager> m_memoryManager;

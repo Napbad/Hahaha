@@ -21,3 +21,8 @@
 //
 
 #include "math/TensorStride.h"
+
+bool h3::core::math::TensorStride::operator==(
+    const TensorStride& other) const {
+    return m_strides == other.m_strides;
+}

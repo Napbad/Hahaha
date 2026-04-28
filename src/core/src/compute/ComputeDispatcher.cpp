@@ -31,12 +31,18 @@ namespace h3::core::compute {
 ComputeDispatcher::~ComputeDispatcher() = default;
 
 std::expected<void, Error> ComputeDispatcher::dispatch(const Operator op,
-                                                       const std::vector<ComputeNode>
-                                                       & nodes,
-                                                       const DataType type,
-                                                       const backend::Device
-                                                       device) {
+                                                       std::vector<ComputeNode>
+                                                       & nodes) {
 
+    if (nodes.size() < 1) {
+        throw std::invalid_argument(
+            std::format(
+                "invalid input while dispatching the operator {}, no tensor is given",
+                toString(op))
+            );
+    }
+    const auto type = nodes.front().tensorInner()->dataType();
+    const auto device = nodes.front().tensorInner()->device();
     switch (device.type()) {
     case backend::DeviceType::CPU:
         return dispatchOnCPU(op, nodes, type, device);
