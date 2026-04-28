@@ -82,7 +82,7 @@ All code must pass `clang-format` and `clang-tidy`.
 #### 5.4 Error Handling and Logging
 - **Exception Handling**: The core library primarily uses `std::invalid_argument` or `std::runtime_error` for fatal errors (e.g., shape mismatch, invalid indices).
 - **Assert**: Use `assert(condition && "msg")` or custom assertions during development; disabled in release.
-- **Logging**: Use the project's built-in system (`hahaha::utils::log::Logger`).
+- **Logging**: Use the project's built-in system (`hahaha::utils::logger`).
   Example: `Logger::getInstance().info("Epoch {}: Loss = {}", epoch, loss);`
 - **Custom Macros**: `Hahaha_Assert(condition, "msg")` (PascalCase + underscore).
 

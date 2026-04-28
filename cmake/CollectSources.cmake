@@ -2,7 +2,7 @@
 # Uses regex to collect C++ and CUDA source files
 
 function(collect_cpp_sources source_dir output_var)
-    # Collect all .cpp files using GLOB_RECURSE with regex pattern
+    # Collect all .cpu files using GLOB_RECURSE with regex pattern
     file(GLOB_RECURSE cpp_files CONFIGURE_DEPENDS
         "${source_dir}/*.cpp"
     )

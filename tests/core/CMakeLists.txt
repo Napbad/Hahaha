@@ -11,6 +11,10 @@ if (CORE_TEST_SOURCES)
     add_executable(hahaha_test_core ${CORE_TEST_SOURCES})
     find_package(GTest CONFIG REQUIRED)
 
+    include_directories(${PROJECT_SOURCE_DIR}/src/core/include)
+
+    find_package(GTest REQUIRED)
+
     # Link against core library and test framework
     target_link_libraries(hahaha_test_core
         PRIVATE

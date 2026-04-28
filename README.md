@@ -154,8 +154,8 @@ If you encounter build issues:
 ```cpp
 #include "public/Tensor.h"
 
-using hahaha::Tensor;
-using hahaha::math::NestedData;
+using h3::Tensor;
+using h3::math::NestedData;
 
 int main() {
     Tensor<float> a(NestedData<float>{{1.0f, 2.0f}, {3.0f, 4.0f}});

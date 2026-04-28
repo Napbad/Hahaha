@@ -19,3 +19,11 @@
 //
 // Created by napbad on 3/26/26.
 //
+
+#include <gtest/gtest.h>
+
+int main() {
+
+    testing::InitGoogleTest();
+    return RUN_ALL_TESTS();
+}

@@ -34,10 +34,10 @@
 #endif
 #endif
 
-using hahaha::backend::DeviceType;
-using hahaha::math::NestedData;
-using hahaha::math::TensorShape;
-using hahaha::math::TensorWrapper;
+using h3::backend::DeviceType;
+using h3::math::NestedData;
+using h3::math::TensorShape;
+using h3::math::TensorWrapper;
 
 /**
  * @brief Simple timer utility for benchmarking.

@@ -20,7 +20,7 @@ import sys
 from pathlib import Path
 
 
-DEFAULT_EXTS = {".cpp", ".hpp", ".h", ".cuh"}
+DEFAULT_EXTS = {".cpu", ".hpp", ".h", ".cuh"}
 DEFAULT_ROOTS = ["core", "examples", "tests"]
 DEFAULT_EXCLUDES = {
     "subprojects",

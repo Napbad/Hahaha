@@ -116,7 +116,7 @@ SpaceBeforeRangeBasedForLoopColon: true
 #### 5.4 错误处理与日志
 - **异常处理**：核心库目前主要通过抛出 `std::invalid_argument` 或 `std::runtime_error` 处理致命错误（如形状不匹配、非法索引）。
 - **Assert**：开发时用 `assert(condition && "消息")` 或自定义断言；发布时禁用。
-- **日志**：使用内置日志系统（`hahaha::utils::log::Logger`）；级别：trace/debug/info/warn/error。
+- **日志**：使用内置日志系统（`hahaha::utils::logger`）；级别：trace/debug/info/warn/error。
   示例：`Logger::getInstance().info("Epoch {}: Loss = {}", epoch, loss);`
 - **自定义宏**：`Hahaha_Assert(condition, "消息")`（PascalCase + 下划线）。
 

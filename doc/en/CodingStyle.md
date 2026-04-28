@@ -109,7 +109,7 @@ Example:
 - **Exceptions**: Use `std::invalid_argument` or `std::runtime_error` for fatal errors (e.g. shape mismatch, invalid index).
 - **Recoverable errors**: Prefer `std::expected<T, E>` (e.g. with `common::Error`) to return either a value or an error, consistent with existing backend dispatch.
 - **Assertions**: Use `assert(condition && "msg")` during development; typically disabled in release.
-- **Logging**: Use the project logging facility (e.g. `hahaha::utils::log::Logger`); avoid ad hoc `printf` / `std::cerr`.
+- **Logging**: Use the project logging facility (e.g. `hahaha::utils::logger`); avoid ad hoc `printf` / `std::cerr`.
 
 ---
 
