@@ -34,6 +34,7 @@ enum class ErrorCode {
     DeviceNotSupportedError,
     DeviceNotAvailableError,
     InvalidArgument,
+    NotImplemented,
     RuntimeError,
 };
 

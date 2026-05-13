@@ -34,7 +34,7 @@
 namespace h3::core::math {
 // Inner class, which is used to implement base TensorOperations
 class TensorInner {
-  public:
+public:
     explicit TensorInner(const TensorShape& shape)
         : m_shape(shape), m_stride(shape), m_offset(0) {
     }
@@ -70,7 +70,8 @@ class TensorInner {
     [[nodiscard]] TensorInner clone() const {
         auto storageClone = m_storage.clone();
         if (!storageClone.has_value()) {
-            throw std::invalid_argument("Can not clone storage, Error is " + storageClone.error().message());
+            throw std::invalid_argument(
+                "Can not clone storage, Error is " + storageClone.error().message());
         }
         return {m_shape, m_stride, storageClone.value(), m_offset, m_metadata};
     }
@@ -121,72 +122,109 @@ class TensorInner {
     }
 
     Scalar operator()(const Index& index) const;
+
     TensorInner operator[](SizeT index) const;
 
-    [[nodiscard]] TensorInner
-    slice(int64_t dim, int64_t start, int64_t end, int64_t step = 1) const;
     [[nodiscard]] Scalar item() const;
 
     // Elementwise (out-of-place)
-    TensorInner add(const TensorInner& other) const;
+    [[nodiscard]] TensorInner add(const TensorInner& other) const;
+
     TensorInner sub(const TensorInner& other) const;
+
     TensorInner mul(const TensorInner& other) const;
+
     TensorInner div(const TensorInner& other) const;
 
     TensorInner add(const Scalar& scalar) const;
+
     TensorInner sub(const Scalar& scalar) const;
+
     TensorInner mul(const Scalar& scalar) const;
+
     TensorInner div(const Scalar& scalar) const;
 
     // In-place (more memory efficient)
     TensorInner& add_(const TensorInner& other);
+
     TensorInner& sub_(const TensorInner& other);
+
     TensorInner& mul_(const TensorInner& other);
+
     TensorInner& div_(const TensorInner& other);
 
     TensorInner& add_(const Scalar& scalar);
+
     TensorInner& sub_(const Scalar& scalar);
+
     TensorInner& mul_(const Scalar& scalar);
+
     TensorInner& div_(const Scalar& scalar);
 
     TensorInner operator +(const TensorInner& other) const;
+
     TensorInner operator -(const TensorInner& other) const;
+
     TensorInner operator *(const TensorInner& other) const;
+
     TensorInner operator /(const TensorInner& other) const;
 
     [[nodiscard]] bool isContiguous() const noexcept;
+
     TensorShape shape();
+
     bool computeAndStoreIsContiguous();
 
     [[nodiscard]] TensorInner matmul(const TensorInner& other) const;
+
     [[nodiscard]] TensorInner transpose() const;
 
     [[nodiscard]] TensorInner reshape(const TensorShape& shape) const;
+
     [[nodiscard]] TensorInner squeeze() const;
+
     [[nodiscard]] TensorInner squeeze(SizeT index) const;
+
     [[nodiscard]] TensorInner unsqueeze() const;
 
-    [[nodiscard]] TensorInner slice(int64_t dim, int64_t start, int64_t end, int64_t step = 1) const;
-    [[nodiscard]] TensorInner narrow(int64_t dim, int64_t start, int64_t length) const;
+
+    [[nodiscard]] TensorInner
+    slice(int64_t dim, int64_t start, int64_t end, int64_t step = 1) const;
+
+    [[nodiscard]] TensorInner narrow(int64_t dim,
+                                     int64_t start,
+                                     int64_t length) const;
+
     [[nodiscard]] TensorInner select(int64_t dim, int64_t index) const;
 
 
     [[nodiscard]] TensorInner sum(int64_t dim, bool keepdim = false) const;
+
     [[nodiscard]] TensorInner sum() const;
+
     [[nodiscard]] TensorInner mean(int64_t dim, bool keepdim = false) const;
+
     [[nodiscard]] TensorInner max() const;
+
     [[nodiscard]] TensorInner min() const;
+
     [[nodiscard]] Scalar mean() const;
 
     [[nodiscard]] TensorInner to(const backend::Device& device) const;
+
     [[nodiscard]] TensorInner to(DataType dtype) const;
-    [[nodiscard]] TensorInner to(const backend::Device& device, DataType dtype) const;
+
+    [[nodiscard]] TensorInner to(const backend::Device& device,
+                                 DataType dtype) const;
 
     [[nodiscard]] TensorInner flatten() const;
+
     [[nodiscard]] TensorInner view(const TensorShape& shape) const;
 
     [[nodiscard]] TensorInner onesWithSameShape() const;
+
     [[nodiscard]] TensorInner zerosWithSameShape() const;
+
     [[nodiscard]] TensorInner randWithSameShape() const;
 
     [[nodiscard]] TensorInner broadcastTo(TensorShape shape) const;

@@ -28,7 +28,6 @@
 #include "ComputeNode.h"
 #include "defines.h"
 #include "Error.h"
-#include "backend/Device.h"
 
 namespace h3::core::compute {
 class ComputeDispatcher {
@@ -37,17 +36,6 @@ public:
 
     static std::expected<void, Error> dispatch(Operator op,
                                                std::vector<ComputeNode>& nodes);
-
-private:
-    static std::expected<void, Error> dispatchOnCUDA(Operator op,
-                                                     std::vector<ComputeNode> nodes,
-                                                     DataType type,
-                                                     backend::Device device);
-
-    static std::expected<void, Error> dispatchOnCPU(Operator op,
-                                                    std::vector<ComputeNode>& nodes,
-                                                    DataType type,
-                                                    backend::Device device);
 };
 }
 

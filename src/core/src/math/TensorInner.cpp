@@ -125,6 +125,4 @@ TensorInner TensorInner::add(const TensorInner& other) const {
 
 }
 
-}
-
 } // namespace h3::core::math

@@ -61,7 +61,12 @@ ComputeNode ComputeNode::add(const ComputeNode& other) const {
 
 ComputeNode ComputeNode::operator+(const ComputeNode& other) const {
     ComputeNode res;
-     ComputeDispatcher::dispatch(Operator::Add, {*this, other, res});
+    std::vector input{*this, other, res};
+
+    if (const auto
+        err = ComputeDispatcher::dispatch(Operator::Add, input); !err.has_value()) {
+        ThrowInvalid("{}", err.error().message());
+    }
     return res;
 }
 

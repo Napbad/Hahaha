@@ -124,4 +124,58 @@ CUDAMemoryManager::copyFromDeviceToHost(CommonPointer dst,
 
 } // namespace h3::core::backend::cuda
 
+#else
+
+#include "backend/cuda/CUDAMemoryManager.h"
+
+namespace h3::core::backend::cuda {
+
+CUDAMemoryManager::~CUDAMemoryManager() = default;
+
+std::expected<CommonPointer, Error> CUDAMemoryManager::allocate(const SizeT size) {
+    return std::unexpected(Error(
+        "CUDA support is not enabled",
+        ErrorCode::NotImplemented));
+}
+
+void CUDAMemoryManager::deallocate(CommonPointer ptr) {
+    // No-op when CUDA is not enabled
+}
+
+std::expected<void, Error> CUDAMemoryManager::move(CommonPointer dst,
+    CommonPointer src,
+    SizeT size) {
+    return std::unexpected(Error(
+        "CUDA support is not enabled",
+        ErrorCode::NotImplemented));
+}
+
+std::expected<void, Error> CUDAMemoryManager::copy(CommonPointer dst,
+    CommonPointer src,
+    SizeT size) {
+    return std::unexpected(Error(
+        "CUDA support is not enabled",
+        ErrorCode::NotImplemented));
+}
+
+std::expected<void, Error>
+CUDAMemoryManager::copyFromHostToDevice(CommonPointer dst,
+    CommonPointer src,
+    SizeT size) {
+    return std::unexpected(Error(
+        "CUDA support is not enabled",
+        ErrorCode::NotImplemented));
+}
+
+std::expected<void, Error>
+CUDAMemoryManager::copyFromDeviceToHost(CommonPointer dst,
+    CommonPointer src,
+    SizeT size) {
+    return std::unexpected(Error(
+        "CUDA support is not enabled",
+        ErrorCode::NotImplemented));
+}
+
+} // namespace h3::core::backend::cuda
+
 #endif

@@ -44,13 +44,7 @@ public:
         return m_sizes;
     }
 
-    [[nodiscard]] SizeT getTotalSize() const {
-        SizeT res = 1;
-        for (auto size : m_sizes) {
-            res *= size;
-        }
-        return res;
-    }
+    [[nodiscard]] SizeT getTotalSize() const;
 
     [[nodiscard]] const std::vector<SizeT>& sizesRef() const {
         return m_sizes;
@@ -111,16 +105,7 @@ public:
     [[nodiscard]] std::expected<TensorShape, Error>
     broadcastWith(const TensorShape& other) const;
 
-    [[nodiscard]] std::string toString() const {
-        std::string shapeStr = "[";
-        for (size_t i = 0; i < m_sizes.size(); ++i) {
-            if (i > 0)
-                shapeStr += ", ";
-            shapeStr += std::to_string(m_sizes[i]);
-        }
-        shapeStr += "]";
-        return shapeStr;
-    }
+    [[nodiscard]] std::string toString() const;
 
 private:
     std::vector<SizeT> m_sizes;

@@ -44,7 +44,8 @@ using SizeT = std::int64_t;
 
 
 enum class Operator {
-    Add, Sub, Mul, Div, Mod, Pow, Sqrt, Log, Exp, Sin, Cos, Tan, Asin, Acos, Atan,
+    Add = 0, Sub, Mul, Div, Mod, Pow, Sqrt, Log, Exp, Sin, Cos, Tan, Asin, Acos,
+    Atan,
     Abs, Sign, Ceil, Floor, Round, Trunc,
     Sinh, Cosh, Tanh, Asinh, Acosh, Atanh, Log10, Log2, Log1p, Exp2, Expm1, Cbrt,
     Erf, Erfc, Tgamma, Lgamma,
@@ -54,47 +55,88 @@ enum class Operator {
 
 inline std::string toString(const Operator op) {
     switch (op) {
-        case Operator::Add: return "Add";
-        case Operator::Sub: return "Sub";
-        case Operator::Mul: return "Mul";
-        case Operator::Div: return "Div";
-        case Operator::Mod: return "Mod";
-        case Operator::Pow: return "Pow";
-        case Operator::Sqrt: return "Sqrt";
-        case Operator::Log: return "Log";
-        case Operator::Exp: return "Exp";
-        case Operator::Sin: return "Sin";
-        case Operator::Cos: return "Cos";
-        case Operator::Tan: return "Tan";
-        case Operator::Asin: return "Asin";
-        case Operator::Acos: return "Acos";
-        case Operator::Atan: return "Atan";
-        case Operator::Abs: return "Abs";
-        case Operator::Sign: return "Sign";
-        case Operator::Ceil: return "Ceil";
-        case Operator::Floor: return "Floor";
-        case Operator::Round: return "Round";
-        case Operator::Trunc: return "Trunc";
-        case Operator::Sinh: return "Sinh";
-        case Operator::Cosh: return "Cosh";
-        case Operator::Tanh: return "Tanh";
-        case Operator::Asinh: return "Asinh";
-        case Operator::Acosh: return "Acosh";
-        case Operator::Atanh: return "Atanh";
-        case Operator::Log10: return "Log10";
-        case Operator::Log2: return "Log2";
-        case Operator::Log1p: return "Log1p";
-        case Operator::Exp2: return "Exp2";
-        case Operator::Expm1: return "Expm1";
-        case Operator::Cbrt: return "Cbrt";
-        case Operator::Erf: return "Erf";
-        case Operator::Erfc: return "Erfc";
-        case Operator::Tgamma: return "Tgamma";
-        case Operator::Lgamma: return "Lgamma";
-        case Operator::Max: return "Max";
-        case Operator::Min: return "Min";
-        case Operator::Clamp: return "Clamp";
-        default: return "UNKNOWN";
+    case Operator::Add:
+        return "Add";
+    case Operator::Sub:
+        return "Sub";
+    case Operator::Mul:
+        return "Mul";
+    case Operator::Div:
+        return "Div";
+    case Operator::Mod:
+        return "Mod";
+    case Operator::Pow:
+        return "Pow";
+    case Operator::Sqrt:
+        return "Sqrt";
+    case Operator::Log:
+        return "Log";
+    case Operator::Exp:
+        return "Exp";
+    case Operator::Sin:
+        return "Sin";
+    case Operator::Cos:
+        return "Cos";
+    case Operator::Tan:
+        return "Tan";
+    case Operator::Asin:
+        return "Asin";
+    case Operator::Acos:
+        return "Acos";
+    case Operator::Atan:
+        return "Atan";
+    case Operator::Abs:
+        return "Abs";
+    case Operator::Sign:
+        return "Sign";
+    case Operator::Ceil:
+        return "Ceil";
+    case Operator::Floor:
+        return "Floor";
+    case Operator::Round:
+        return "Round";
+    case Operator::Trunc:
+        return "Trunc";
+    case Operator::Sinh:
+        return "Sinh";
+    case Operator::Cosh:
+        return "Cosh";
+    case Operator::Tanh:
+        return "Tanh";
+    case Operator::Asinh:
+        return "Asinh";
+    case Operator::Acosh:
+        return "Acosh";
+    case Operator::Atanh:
+        return "Atanh";
+    case Operator::Log10:
+        return "Log10";
+    case Operator::Log2:
+        return "Log2";
+    case Operator::Log1p:
+        return "Log1p";
+    case Operator::Exp2:
+        return "Exp2";
+    case Operator::Expm1:
+        return "Expm1";
+    case Operator::Cbrt:
+        return "Cbrt";
+    case Operator::Erf:
+        return "Erf";
+    case Operator::Erfc:
+        return "Erfc";
+    case Operator::Tgamma:
+        return "Tgamma";
+    case Operator::Lgamma:
+        return "Lgamma";
+    case Operator::Max:
+        return "Max";
+    case Operator::Min:
+        return "Min";
+    case Operator::Clamp:
+        return "Clamp";
+    default:
+        return "UNKNOWN";
     }
 }
 

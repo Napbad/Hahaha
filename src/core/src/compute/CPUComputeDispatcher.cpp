@@ -32,8 +32,9 @@
 #include <algorithm>
 #include <numeric>
 
-#include "compute/ComputeDispatcher.h"
+#include "compute/ComputeContext.h"
 #include "compute/ComputeNode.h"
+#include "compute/operator_executor/OperatorExecutor.h"
 #include "defines.h"
 #include "Error.h"
 #include "math/Index.h"
@@ -390,12 +391,23 @@ std::expected<void, Error> dispatchTypedBinaryOperation(
 
 } // namespace
 
-std::expected<void, Error> ComputeDispatcher::dispatchOnCPU(const Operator op,
-    std::vector<ComputeNode>& nodes,
-    const DataType type,
-    const backend::Device device) {
+class CPUOperatorExecutor final : public OperatorExecutor {
+public:
+    explicit CPUOperatorExecutor(const Operator op)
+        : OperatorExecutor(op) {
+    }
 
-    return dispatchTypedBinaryOperation(nodes, type, device, op);
+    std::expected<void, Error> execute(ComputeContext& context,
+                                      std::vector<ComputeNode>& operands) override {
+        return dispatchTypedBinaryOperation(operands,
+                                            context.dataType(),
+                                            context.device(),
+                                            op());
+    }
+};
+
+std::unique_ptr<OperatorExecutor> makeCPUOperatorExecutor(const Operator op) {
+    return std::make_unique<CPUOperatorExecutor>(op);
 }
 
 } // namespace h3::core::compute

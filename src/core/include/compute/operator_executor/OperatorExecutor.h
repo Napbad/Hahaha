@@ -17,35 +17,44 @@
 //
 
 //
-// Created by napbad on 3/26/26.
+// Created by napbad on 5/11/26.
 //
 
-#include "compute/ComputeContext.h"
-#include "compute/operator_executor/OperatorExecutor.h"
+#ifndef HAHAHA_OPERATOREXECUTOR_H_C959E590EA4A42BC9E046DF267293849
+#define HAHAHA_OPERATOREXECUTOR_H_C959E590EA4A42BC9E046DF267293849
+#include <expected>
+#include <vector>
 
-#include <memory>
-#include <string>
+#include "Error.h"
+#include "compute/ComputeContext.h"
+#include "compute/ComputeNode.h"
+#include "defines.h"
+
 
 namespace h3::core::compute {
 
-class CUDAOperatorExecutor final : public OperatorExecutor {
+
+class OperatorExecutor {
 public:
-    explicit CUDAOperatorExecutor(const Operator op)
-        : OperatorExecutor(op) {
+    explicit OperatorExecutor(const Operator op)
+        : m_op(op) {
     }
 
-    std::expected<void, Error> execute(ComputeContext& context,
-                                      std::vector<ComputeNode>& operands) override {
-        (void) context;
-        (void) operands;
-        return std::unexpected(Error(
-            std::string("Operator ") + toString(op()) + " is not implemented on CUDA yet",
-            ErrorCode::DeviceNotSupportedError));
+    virtual ~OperatorExecutor() = default;
+
+    [[nodiscard]] Operator op() const {
+        return m_op;
     }
+
+    virtual std::expected<void, Error> execute(
+        ComputeContext& context,
+        std::vector<ComputeNode>& operands) = 0;
+
+private:
+    Operator m_op;
 };
 
-std::unique_ptr<OperatorExecutor> makeCUDAOperatorExecutor(const Operator op) {
-    return std::make_unique<CUDAOperatorExecutor>(op);
 }
 
-} // namespace h3::core::compute
+
+#endif //HAHAHA_OPERATOREXECUTOR_H_C959E590EA4A42BC9E046DF267293849

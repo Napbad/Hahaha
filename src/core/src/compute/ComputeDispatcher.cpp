@@ -23,36 +23,39 @@
 #include "compute/ComputeDispatcher.h"
 
 #include <expected>
+#include <format>
+#include <stdexcept>
 
 #include "Error.h"
+#include "compute/ComputeContext.h"
+#include "compute/operator_executor/OperatorExecutorFactory.h"
 
 namespace h3::core::compute {
 
 ComputeDispatcher::~ComputeDispatcher() = default;
 
 std::expected<void, Error> ComputeDispatcher::dispatch(const Operator op,
-                                                       std::vector<ComputeNode>
-                                                       & nodes) {
+                                                       std::vector<ComputeNode>& nodes) {
 
-    if (nodes.size() < 1) {
+    if (nodes.empty()) {
         throw std::invalid_argument(
             std::format(
                 "invalid input while dispatching the operator {}, no tensor is given",
                 toString(op))
             );
     }
+
     const auto type = nodes.front().tensorInner()->dataType();
     const auto device = nodes.front().tensorInner()->device();
-    switch (device.type()) {
-    case backend::DeviceType::CPU:
-        return dispatchOnCPU(op, nodes, type, device);
-    case backend::DeviceType::CUDA:
-        return dispatchOnCUDA(op, nodes, type, device);
-    default: ;
-        return std::unexpected(Error(
-            "unknown device type",
-            ErrorCode::DeviceNotSupportedError));
+    ComputeContext context(device, type);
+
+    static OperatorExecutorFactory factory;
+    const auto executor = factory.get(op, context.deviceType());
+    if (!executor) {
+        return std::unexpected(executor.error());
     }
+
+    return executor.value()->execute(context, nodes);
 }
 
 }
