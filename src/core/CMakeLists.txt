@@ -8,6 +8,7 @@ collect_cuda_sources("${CMAKE_CURRENT_SOURCE_DIR}" CORE_CUDA_SOURCES)
 # Create core library target
 if (HAHAHA_USE_CUDA)
     add_library(hahaha_core STATIC ${CORE_CPP_SOURCES} ${CORE_CUDA_SOURCES})
+    target_compile_definitions(hahaha_core PUBLIC HAHAHA_USE_CUDA)
 else ()
     add_library(hahaha_core STATIC ${CORE_CPP_SOURCES})
 endif ()

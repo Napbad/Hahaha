@@ -36,8 +36,8 @@ DataType detectResDataType(const DataType lhs, const DataType rhs) {
     return std::max(lhs, rhs);
 }
 
-void checkCanRunBinOper(const std::shared_ptr<math::TensorInner>& t1,
-                        const std::shared_ptr<math::TensorInner>& t2) {
+void checkCanRunBinOper(const utils::OwnPointer<math::TensorInner>& t1,
+                        const utils::OwnPointer<math::TensorInner>& t2) {
 
     if (t1->shapeRef() != t2->shapeRef()
         && !t1->shapeRef().canBroadcastWith(t2->shapeRef())) {
@@ -53,21 +53,17 @@ ComputeNode ComputeNode::add(const ComputeNode& other) const {
     checkCanRunBinOper(tensorInner(), other.tensorInner());
     const DataType resType = detectResDataType(tensorInner()->dataType(),
                                                other.tensorInner()->dataType());
-    auto resTensor = math::TensorInner(tensorInner()->shape(),
+    auto resTensor = utils::make_own_ptr<math::TensorInner>(tensorInner()->shape(),
                                        math::TensorMetadata{.dataType = resType});
+
+    std::vector<utils::OwnPointer<math::TensorInner>> operands{tensorInner(), other.tensorInner(), resTensor};
+    ComputeDispatcher::dispatch(Operator::Add, operands);
 
     return ComputeNode(std::move(resTensor));
 }
 
 ComputeNode ComputeNode::operator+(const ComputeNode& other) const {
-    ComputeNode res;
-    std::vector input{*this, other, res};
-
-    if (const auto
-        err = ComputeDispatcher::dispatch(Operator::Add, input); !err.has_value()) {
-        ThrowInvalid("{}", err.error().message());
-    }
-    return res;
+    return add(other);
 }
 
 ComputeNode ComputeNode::view() const {
@@ -114,7 +110,7 @@ ComputeNode ComputeNode::broadcastView(const math::TensorShape& newShape) const 
 
     math::TensorMetadata meta = self->metadataRef();
     meta.isView = true;
-    const auto view = std::make_shared<math::TensorInner>(
+    const auto view = utils::make_own_ptr<math::TensorInner>(
         newShape,
         math::TensorStride(newStridesVec),
         self->storageRef(),
@@ -126,6 +122,6 @@ ComputeNode ComputeNode::broadcastView(const math::TensorShape& newShape) const 
 }
 
 void ComputeNode::setTensorInner(math::TensorInner&& tensor_inner) {
-    this->m_tensor = std::make_shared<math::TensorInner>(tensor_inner);
+    this->m_tensor = utils::make_own_ptr<math::TensorInner>(tensor_inner);
 }
 } // namespace h3::core::compute

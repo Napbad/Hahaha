@@ -22,6 +22,7 @@
 
 #ifndef HAHAHA_OWNPOINTER_H_E25F4B9F87244CA59C7BF66CCA03A943
 #define HAHAHA_OWNPOINTER_H_E25F4B9F87244CA59C7BF66CCA03A943
+#include <type_traits>
 #include <utility>
 
 namespace h3::core::utils {
@@ -29,54 +30,87 @@ namespace h3::core::utils {
  * this smart pointer is used to identify the Owner and Borrower
  * @tparam T this is the exact element type it holds
  */
-template<typename T>
-class OwnPointer {
-public:
+template <typename T> class OwnPointer {
+  public:
     // Constructor - takes ownership of the pointer
-    explicit OwnPointer(T* t = nullptr) : m_ptr(t), m_is_owner(t != nullptr) {}
+    explicit OwnPointer(T* t = nullptr) : m_ptr(t), m_isOwner(t != nullptr) {
+    }
+
+    OwnPointer& operator=(std::nullptr_t) {
+        if (m_isOwner && m_ptr) {
+            delete m_ptr;
+        }
+        m_ptr = nullptr;
+        m_isOwner = false;
+        return *this;
+    }
 
     // Destructor - only delete if we're the owner
     ~OwnPointer() {
-        if (m_is_owner && m_ptr) {
+        if (m_isOwner && m_ptr) {
             delete m_ptr;
             m_ptr = nullptr;
         }
     }
 
     // Copy constructor - become a borrower
-    OwnPointer(const OwnPointer& other) : m_ptr(other.m_ptr), m_is_owner(false) {}
+    OwnPointer(const OwnPointer& other) : m_ptr(other.m_ptr), m_isOwner(false) {
+    }
 
     // Copy assignment operator - become a borrower
     OwnPointer& operator=(const OwnPointer& other) {
         if (this != &other) {
             // If we were the owner, clean up our resource
-            if (m_is_owner && m_ptr) {
+            if (m_isOwner && m_ptr) {
                 delete m_ptr;
             }
             m_ptr = other.m_ptr;
-            m_is_owner = false;  // Always become borrower on copy
+            m_isOwner = false; // Always become borrower on copy
         }
         return *this;
     }
 
+    OwnPointer borrow() {
+        return OwnPointer(m_ptr, false);
+    }
+
     // Move constructor - transfer ownership
-    OwnPointer(OwnPointer&& other) noexcept : m_ptr(other.m_ptr), m_is_owner(other.m_is_owner) {
+    OwnPointer(OwnPointer&& other) noexcept
+        : m_ptr(other.m_ptr), m_isOwner(other.m_isOwner) {
         other.m_ptr = nullptr;
-        other.m_is_owner = false;
+        other.m_isOwner = false;
     }
 
     // Move assignment operator - transfer ownership
     OwnPointer& operator=(OwnPointer&& other) noexcept {
         if (this != &other) {
             // If we were the owner, clean up our resource
-            if (m_is_owner && m_ptr) {
+            if (m_isOwner && m_ptr) {
                 delete m_ptr;
             }
             m_ptr = other.m_ptr;
-            m_is_owner = other.m_is_owner;
+            m_isOwner = other.m_isOwner;
             other.m_ptr = nullptr;
-            other.m_is_owner = false;
+            other.m_isOwner = false;
         }
+        return *this;
+    }
+
+    // Upcast move from OwnPointer<Derived> when Derived* converts to T*
+    template <typename U,
+              typename = std::enable_if_t<std::is_convertible_v<U*, T*> && !std::is_same_v<U, T>>>
+    OwnPointer(OwnPointer<U>&& other) noexcept
+        : m_ptr(other.release()), m_isOwner(m_ptr != nullptr) {
+    }
+
+    template <typename U,
+              typename = std::enable_if_t<std::is_convertible_v<U*, T*> && !std::is_same_v<U, T>>>
+    OwnPointer& operator=(OwnPointer<U>&& other) noexcept {
+        if (m_isOwner && m_ptr) {
+            delete m_ptr;
+        }
+        m_ptr = other.release();
+        m_isOwner = m_ptr != nullptr;
         return *this;
     }
 
@@ -101,8 +135,8 @@ public:
     }
 
     // Check if this is the owner
-    bool is_owner() const {
-        return m_is_owner;
+    [[nodiscard]] bool isOwner() const {
+        return m_isOwner;
     }
 
     // Get the raw pointer (const version)
@@ -119,35 +153,36 @@ public:
     T* release() {
         T* temp = m_ptr;
         m_ptr = nullptr;
-        m_is_owner = false;
+        m_isOwner = false;
         return temp;
     }
 
     // Reset with a new pointer
     void reset(T* t = nullptr) {
-        if (m_is_owner && m_ptr) {
+        if (m_isOwner && m_ptr) {
             delete m_ptr;
         }
         m_ptr = t;
-        m_is_owner = (t != nullptr);
+        m_isOwner = (t != nullptr);
     }
-    
+
     // Explicit conversion to bool
     explicit operator bool() const {
         return m_ptr != nullptr;
     }
 
+  private:
+    T* m_ptr;
+    bool m_isOwner;
 
-private:
-    T *m_ptr;
-    bool m_is_owner;
+    OwnPointer(T* ptr, const bool isOwner) : m_ptr(ptr), m_isOwner(isOwner) {
+    }
 };
 
-template<typename T, typename... Args>
-OwnPointer<T> make_own_ptr(Args&&... args) {
+template <typename T, typename... Args> OwnPointer<T> make_own_ptr(Args&&... args) {
     return OwnPointer<T>(new T(std::forward<Args>(args)...));
 }
 
-}
+} // namespace h3::core::utils
 
-#endif //HAHAHA_OWNPOINTER_H_E25F4B9F87244CA59C7BF66CCA03A943
+#endif // HAHAHA_OWNPOINTER_H_E25F4B9F87244CA59C7BF66CCA03A943

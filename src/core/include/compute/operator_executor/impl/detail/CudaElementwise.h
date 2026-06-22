@@ -16,27 +16,26 @@
 //  Napbad (napbad.sen@gmail.com) (https://github.com/Napbad)
 //
 
-//
-// Created by napbad on 3/26/26.
-//
+#ifndef HAHAHA_CUDAELEMENTWISE_H
+#define HAHAHA_CUDAELEMENTWISE_H
 
-#ifndef HAHAHA_COMPUTEDISPATCHER_H_290902236E544C94A3504172247EF7D3
-#define HAHAHA_COMPUTEDISPATCHER_H_290902236E544C94A3504172247EF7D3
+#include <cuda_runtime.h>
 #include <expected>
-#include <vector>
+#include <string>
 
-#include "ComputeNode.h"
-#include "defines.h"
 #include "Error.h"
 
-namespace h3::core::compute {
-class ComputeDispatcher {
-public:
-    ~ComputeDispatcher();
+namespace h3::core::compute::detail {
 
-    static std::expected<void, Error> dispatch(Operator op,
-                                               std::vector<utils::OwnPointer<math::TensorInner>>& tensors);
-};
+inline std::expected<void, Error> cudaCheck(const cudaError_t err, const char* message) {
+    if (err != cudaSuccess) {
+        return std::unexpected(Error(
+            std::string(message) + ": " + cudaGetErrorString(err),
+            ErrorCode::RuntimeError));
+    }
+    return {};
 }
 
-#endif // HAHAHA_COMPUTEDISPATCHER_H_290902236E544C94A3504172247EF7D3
+} // namespace h3::core::compute::detail
+
+#endif // HAHAHA_CUDAELEMENTWISE_H

@@ -1,4 +1,4 @@
-//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/Napbad/Hahaha)
+﻿//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/Napbad/Hahaha)
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,27 +16,17 @@
 //  Napbad (napbad.sen@gmail.com) (https://github.com/Napbad)
 //
 
-//
-// Created by napbad on 3/26/26.
-//
+#include <memory>
 
-#ifndef HAHAHA_COMPUTEDISPATCHER_H_290902236E544C94A3504172247EF7D3
-#define HAHAHA_COMPUTEDISPATCHER_H_290902236E544C94A3504172247EF7D3
-#include <expected>
-#include <vector>
-
-#include "ComputeNode.h"
+#include "compute/operator_executor/OperatorExecutor.h"
 #include "defines.h"
-#include "Error.h"
+
+#ifdef HAHAHA_USE_CUDA
+#include "compute/operator_executor/impl/BinOperatorExecutor.h"
+#include "compute/operator_executor/impl/MultiOperatorExecutor.h"
+#include "compute/operator_executor/impl/UnaryOperatorExecutor.h"
+#endif
 
 namespace h3::core::compute {
-class ComputeDispatcher {
-public:
-    ~ComputeDispatcher();
 
-    static std::expected<void, Error> dispatch(Operator op,
-                                               std::vector<utils::OwnPointer<math::TensorInner>>& tensors);
-};
-}
-
-#endif // HAHAHA_COMPUTEDISPATCHER_H_290902236E544C94A3504172247EF7D3
+} // namespace h3::core::compute

@@ -18,12 +18,12 @@
 
 #include "compute/operator_executor/OperatorExecutorFactory.h"
 
+#include <memory>
 #include <string>
 
-namespace h3::core::compute {
+#include "compute/operator_executor/CachedExecutor.h"
 
-std::unique_ptr<OperatorExecutor> makeCPUOperatorExecutor(Operator op);
-std::unique_ptr<OperatorExecutor> makeCUDAOperatorExecutor(Operator op);
+namespace h3::core::compute {
 
 namespace {
 constexpr SizeT deviceSlotCount = 2;
@@ -55,21 +55,27 @@ SizeT OperatorExecutorFactory::cacheIndex(const Operator op,
 std::unique_ptr<OperatorExecutor> OperatorExecutorFactory::create(
     const Operator op,
     const backend::DeviceType deviceType) {
+    utils::OwnPointer<OperatorExecutor> owned;
     switch (deviceType) {
     case backend::DeviceType::CPU:
-        return makeCPUOperatorExecutor(op);
+        owned = makeCPUOperatorExecutor(op);
+        break;
     case backend::DeviceType::CUDA:
-        return makeCUDAOperatorExecutor(op);
+        owned = makeCUDAOperatorExecutor(op);
+        break;
     default:
         return nullptr;
     }
+    if (!owned) {
+        return nullptr;
+    }
+    return std::unique_ptr<OperatorExecutor>(owned.release());
 }
 
 std::expected<OperatorExecutor*, Error> OperatorExecutorFactory::get(
     const Operator op,
     const backend::DeviceType deviceType) {
-    const auto slot = deviceSlot(deviceType);
-    if (!slot) {
+    if (const auto slot = deviceSlot(deviceType); !slot) {
         return std::unexpected(slot.error());
     }
 

@@ -16,27 +16,16 @@
 //  Napbad (napbad.sen@gmail.com) (https://github.com/Napbad)
 //
 
-//
-// Created by napbad on 3/26/26.
-//
+#include "compute/operator_executor/impl/MultiOperatorExecutor.h"
+#include "compute/operator_executor/impl/detail/ElementwiseKernel.h"
+#include "compute/operator_executor/impl/detail/OperatorFunctors.h"
 
-#ifndef HAHAHA_COMPUTEDISPATCHER_H_290902236E544C94A3504172247EF7D3
-#define HAHAHA_COMPUTEDISPATCHER_H_290902236E544C94A3504172247EF7D3
-#include <expected>
-#include <vector>
+namespace h3::core::compute::cpu {
 
-#include "ComputeNode.h"
-#include "defines.h"
-#include "Error.h"
-
-namespace h3::core::compute {
-class ComputeDispatcher {
-public:
-    ~ComputeDispatcher();
-
-    static std::expected<void, Error> dispatch(Operator op,
-                                               std::vector<utils::OwnPointer<math::TensorInner>>& tensors);
-};
+std::expected<void, Error> ClampOperatorExecutor::execute(
+    ComputeContext& context,
+    std::vector<utils::OwnPointer<math::TensorInner>>& operands) {
+    return detail::runTernary<ClampFunctor>(context, operands);
 }
 
-#endif // HAHAHA_COMPUTEDISPATCHER_H_290902236E544C94A3504172247EF7D3
+} // namespace h3::core::compute::cpu

@@ -29,8 +29,8 @@ namespace h3::core::compute {
 /// datatype and future execution resources such as streams/allocators.
 class ComputeContext {
 public:
-    ComputeContext(backend::Device device, DataType dataType)
-        : m_device(device), m_dataType(dataType) {
+    ComputeContext(const Operator op, const backend::Device device, const DataType dataType)
+        : m_operator(op), m_device(device), m_dataType(dataType) {
     }
 
     [[nodiscard]] const backend::Device& device() const {
@@ -45,7 +45,12 @@ public:
         return m_dataType;
     }
 
+    [[nodiscard]] Operator op() const {
+        return m_operator;
+    }
+
 private:
+    Operator m_operator;
     backend::Device m_device;
     DataType m_dataType;
 };

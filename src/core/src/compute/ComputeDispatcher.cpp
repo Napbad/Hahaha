@@ -35,9 +35,9 @@ namespace h3::core::compute {
 ComputeDispatcher::~ComputeDispatcher() = default;
 
 std::expected<void, Error> ComputeDispatcher::dispatch(const Operator op,
-                                                       std::vector<ComputeNode>& nodes) {
+                                                       std::vector<utils::OwnPointer<math::TensorInner>>& tensors) {
 
-    if (nodes.empty()) {
+    if (tensors.empty()) {
         throw std::invalid_argument(
             std::format(
                 "invalid input while dispatching the operator {}, no tensor is given",
@@ -45,9 +45,9 @@ std::expected<void, Error> ComputeDispatcher::dispatch(const Operator op,
             );
     }
 
-    const auto type = nodes.front().tensorInner()->dataType();
-    const auto device = nodes.front().tensorInner()->device();
-    ComputeContext context(device, type);
+    const auto type = tensors.front()->dataType();
+    const auto device = tensors.front()->device();
+    ComputeContext context(op, device, type);
 
     static OperatorExecutorFactory factory;
     const auto executor = factory.get(op, context.deviceType());
@@ -55,7 +55,7 @@ std::expected<void, Error> ComputeDispatcher::dispatch(const Operator op,
         return std::unexpected(executor.error());
     }
 
-    return executor.value()->execute(context, nodes);
+    return executor.value()->execute(context, tensors);
 }
 
 }

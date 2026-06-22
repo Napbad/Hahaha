@@ -23,6 +23,7 @@
 #ifndef HAHAHA_COMPUTENODE_H_D3F0BB4E059144318EA7871C7175E12A
 #define HAHAHA_COMPUTENODE_H_D3F0BB4E059144318EA7871C7175E12A
 #include "math/TensorInner.h"
+#include "utils/OwnPointer.h"
 
 namespace h3::core::compute {
 class ComputeNode {
@@ -31,22 +32,22 @@ public:
         m_tensor = nullptr;
     }
     explicit ComputeNode(const math::TensorShape& shape)
-        : m_tensor(std::make_shared<math::TensorInner>(shape)) {
+        : m_tensor(utils::make_own_ptr<math::TensorInner>(shape)) {
     }
 
-    explicit ComputeNode(const std::shared_ptr<math::TensorInner>& shared) {
-        m_tensor = shared;
+    explicit ComputeNode(const utils::OwnPointer<math::TensorInner>& ownerPointer) {
+        m_tensor = ownerPointer;
     }
 
     explicit ComputeNode(const math::TensorInner&& tensorInner) : m_tensor(
-        std::make_shared<math::TensorInner>(tensorInner)) {
+        utils::make_own_ptr<math::TensorInner>(tensorInner)) {
     }
 
-    std::shared_ptr<math::TensorInner> tensorInner() {
+    utils::OwnPointer<math::TensorInner> tensorInner() {
         return m_tensor;
     }
 
-    [[nodiscard]] std::shared_ptr<math::TensorInner> tensorInner() const {
+    [[nodiscard]] utils::OwnPointer<math::TensorInner> tensorInner() const {
         return m_tensor;
     }
 
@@ -84,7 +85,7 @@ public:
     void setTensorInner(math::TensorInner&& tensor_inner);
 
 private:
-    std::shared_ptr<math::TensorInner> m_tensor;
+    utils::OwnPointer<math::TensorInner> m_tensor;
 };
 } // namespace h3::core::compute
 

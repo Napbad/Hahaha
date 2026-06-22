@@ -48,7 +48,7 @@ public:
 
     virtual std::expected<void, Error> execute(
         ComputeContext& context,
-        std::vector<ComputeNode>& operands) = 0;
+        std::vector<utils::OwnPointer<math::TensorInner>>& operands) = 0;
 
 private:
     Operator m_op;

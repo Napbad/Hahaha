@@ -32,22 +32,21 @@
 #include "backend/Device.h"
 #include "defines.h"
 
-
 namespace h3::core::compute {
 
 class OperatorExecutorFactory {
-public:
+  public:
     OperatorExecutorFactory();
 
     std::expected<OperatorExecutor*, Error> get(Operator op,
                                                 backend::DeviceType deviceType);
 
-private:
+  private:
     static SizeT cacheIndex(Operator op, backend::DeviceType deviceType);
     static std::unique_ptr<OperatorExecutor> create(Operator op,
                                                     backend::DeviceType deviceType);
 
-    std::vector<std::unique_ptr<OperatorExecutor> > m_cachedExecutors;
+    std::vector<std::unique_ptr<OperatorExecutor>> m_cachedExecutors;
 };
 
 } // namespace h3::core::compute
