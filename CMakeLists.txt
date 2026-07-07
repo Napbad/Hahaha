@@ -51,3 +51,4 @@ install(EXPORT hahahaTargets
 # =========================== Tests Configuration ===================================
 # Include test subdirectories
 add_subdirectory(tests)
+add_subdirectory(example)

@@ -16,33 +16,21 @@
 //  Napbad (napbad.sen@gmail.com) (https://github.com/Napbad)
 //
 
-//
-// Created by napbad on 3/26/26.
-//
+#include <iostream>
 
 #include "ml/Tensor.h"
 
-#include "utils/handler/exception_handler.h"
+bool PrintInfo = true;
 
-namespace h3::core::ml {
-
-Tensor Tensor::add(const Tensor& other) const {
-    return Tensor(m_node + other.m_node);
+void test_init() {
+    h3::core::ml::Tensor t1({1,2}, h3::core::DataType::Float32);
+    t1[0][1] = 1;
+    if (PrintInfo) {
+        std::cout << t1 << std::endl;
+    }
 }
 
-} // namespace h3::core::ml
-
-std::ostream& operator<<(std::ostream& lhs, const h3::core::ml::Tensor& t1) {
-    const auto tensorInner = t1.node().tensorInner();
-    if (!tensorInner) {
-        lhs << "Empty Tensor";
-        return lhs;
-    }
-
-    lhs << "Tensor(shape=" << tensorInner->shapeRef().toString()
-        << ", dtype=" << tensorInner->device().toString()
-        << ", device=" << (tensorInner->device()).toString()
-        << ")";
-
-    return lhs;
+int main() {
+    test_init();
+    return 0;
 }

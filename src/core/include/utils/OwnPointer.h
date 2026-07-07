@@ -27,8 +27,14 @@
 
 namespace h3::core::utils {
 /**
- * this smart pointer is used to identify the Owner and Borrower
- * @tparam T this is the exact element type it holds
+ * @brief A smart pointer implementation utilizing an Owner-Borrower semantics model.
+ * * Unlike standard smart pointers, OwnPointer allows multiple instances to point to the
+ * same resource, but enforces strict runtime ownership rules:
+ * - Only **one** instance can act as the **Owner** at any given time.
+ * - Multiple instances can act as **Borrowers** holding a shared reference.
+ * - The resource is automatically deleted *only* when the Owner is destroyed or reset.
+ * - A `nullptr` managed pointer can never hold ownership status.
+ * * @tparam T The underlying element type managed by this pointer.
  */
 template <typename T> class OwnPointer {
   public:
@@ -51,6 +57,16 @@ template <typename T> class OwnPointer {
             delete m_ptr;
             m_ptr = nullptr;
         }
+    }
+
+    OwnPointer move() {
+        if (!m_isOwner) {
+            throw std::runtime_error("OwnPointer move called when not owned");
+        }
+        OwnPointer temp(m_ptr, true);
+        this->m_isOwner = false;
+        this->m_ptr = nullptr;
+        return temp;
     }
 
     // Copy constructor - become a borrower
@@ -98,13 +114,15 @@ template <typename T> class OwnPointer {
 
     // Upcast move from OwnPointer<Derived> when Derived* converts to T*
     template <typename U,
-              typename = std::enable_if_t<std::is_convertible_v<U*, T*> && !std::is_same_v<U, T>>>
-    OwnPointer(OwnPointer<U>&& other) noexcept
+              typename = std::enable_if_t<std::is_convertible_v<U*, T*>
+                                          && !std::is_same_v<U, T>>>
+    explicit OwnPointer(OwnPointer<U>&& other) noexcept
         : m_ptr(other.release()), m_isOwner(m_ptr != nullptr) {
     }
 
     template <typename U,
-              typename = std::enable_if_t<std::is_convertible_v<U*, T*> && !std::is_same_v<U, T>>>
+              typename = std::enable_if_t<std::is_convertible_v<U*, T*>
+                                          && !std::is_same_v<U, T>>>
     OwnPointer& operator=(OwnPointer<U>&& other) noexcept {
         if (m_isOwner && m_ptr) {
             delete m_ptr;

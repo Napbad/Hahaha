@@ -94,6 +94,8 @@ class Storage {
         return static_cast<T*>(m_data.get());
     }
 
+    void copyFrom(const CommonPointer& ptr) const;
+
   private:
     CommonPointer m_data;
     std::shared_ptr<MemoryManager> m_memoryManager;

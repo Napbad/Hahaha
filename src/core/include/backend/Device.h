@@ -22,8 +22,8 @@
 
 #ifndef HAHAHA_DEVICE_H_5F6E415902B445AA92F71929169DEC1E
 #define HAHAHA_DEVICE_H_5F6E415902B445AA92F71929169DEC1E
+
 #include <string>
-#include <bits/stringfwd.h>
 
 #include "defines.h"
 
@@ -31,7 +31,7 @@ namespace h3::core::backend {
 
 enum class DeviceType { CPU = 0, CUDA, UNKNOWN };
 
-inline std::string to_string(const DeviceType type) {
+inline std::string deviceTypeToString(const DeviceType type) {
     switch (type) {
     case DeviceType::CPU:
         return "CPU";
@@ -59,7 +59,7 @@ public:
     }
 
     [[nodiscard]] std::string toString() const {
-        return "Device { " + to_string(m_type) + ": " +
+        return "Device { " + deviceTypeToString(m_type) + ": " +
             std::to_string(m_index) + " }";
     }
 
@@ -73,9 +73,16 @@ private:
 struct DeviceHash {
     std::size_t operator()(const Device& device) const {
         return std::hash<std::size_t>{}(device.index()) ^ 
-               (std::hash<int>{}(static_cast<int>(device.type())) << 1);
+               std::hash<int>{}(static_cast<int>(device.type())) << 1;
     }
 };
+
+static const auto DefaultCPUDevice = Device(0, DeviceType::CPU);
+
+inline Device getDefaultCPUDevice() {
+    return DefaultCPUDevice;
+}
+
 } // namespace h3::core::backend
 
 #endif // HAHAHA_DEVICE_H_5F6E415902B445AA92F71929169DEC1E

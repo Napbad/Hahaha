@@ -41,6 +41,7 @@ public:
 
     Scalar(const Scalar& other);
     Scalar(Scalar&& other) noexcept;
+    Scalar(DataType dtype, Int32 int32);
 
     Scalar& operator=(const Scalar& other);
     Scalar& operator=(Scalar&& other) noexcept;

@@ -22,6 +22,7 @@
 
 #ifndef HAHAHA_TENSORSHAPE_H_D00755481C5B426DA11E0C244ED22F33
 #define HAHAHA_TENSORSHAPE_H_D00755481C5B426DA11E0C244ED22F33
+
 #include <algorithm>
 #include <expected>
 #include <string>
@@ -34,7 +35,11 @@ namespace h3::core::math {
 // Inner class, which is used to implement base TensorOperations
 class TensorShape {
 public:
-    explicit TensorShape(const std::vector<SizeT>& dims) : m_sizes(dims) {
+    TensorShape(std::initializer_list<SizeT> dims) : m_sizes(dims) {
+    }
+
+    // NOLINTNEXTLINE
+    TensorShape(const std::vector<SizeT>& dims) : m_sizes(dims) {
     }
 
     explicit TensorShape(const SizeT rank) : m_sizes(rank) {

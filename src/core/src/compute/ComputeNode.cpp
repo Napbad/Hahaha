@@ -28,6 +28,7 @@
 #include "compute/ComputeDispatcher.h"
 #include "math/TensorInner.h"
 #include "math/TensorStride.h"
+#include "ml/Tensor.h"
 #include "utils/handler/exception_handler.h"
 
 namespace h3::core::compute {
@@ -53,13 +54,17 @@ ComputeNode ComputeNode::add(const ComputeNode& other) const {
     checkCanRunBinOper(tensorInner(), other.tensorInner());
     const DataType resType = detectResDataType(tensorInner()->dataType(),
                                                other.tensorInner()->dataType());
-    auto resTensor = utils::make_own_ptr<math::TensorInner>(tensorInner()->shape(),
+    const utils::OwnPointer<math::TensorInner> resTensor = utils::make_own_ptr<math::TensorInner>(tensorInner()->shape(),
                                        math::TensorMetadata{.dataType = resType});
 
-    std::vector<utils::OwnPointer<math::TensorInner>> operands{tensorInner(), other.tensorInner(), resTensor};
-    ComputeDispatcher::dispatch(Operator::Add, operands);
+    std::vector operands{tensorInner(), other.tensorInner(), resTensor};
+    if (auto res = ComputeDispatcher::dispatch(Operator::Add, operands);
+        !res.has_value()) {
+        throw std::invalid_argument(res.error().message());
+    }
 
-    return ComputeNode(std::move(resTensor));
+    auto resNode = ComputeNode(resTensor.move());
+    return ;
 }
 
 ComputeNode ComputeNode::operator+(const ComputeNode& other) const {
@@ -123,5 +128,11 @@ ComputeNode ComputeNode::broadcastView(const math::TensorShape& newShape) const 
 
 void ComputeNode::setTensorInner(math::TensorInner&& tensor_inner) {
     this->m_tensor = utils::make_own_ptr<math::TensorInner>(tensor_inner);
+}
+void ComputeNode::setDtype(const DataType data) const {
+    this->m_tensor->metadataRef().dataType = data;
+}
+void ComputeNode::setScalarValue(const math::Scalar& scalar) const {
+    this->m_tensor->setScalarValue(scalar);
 }
 } // namespace h3::core::compute

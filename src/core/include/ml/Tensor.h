@@ -22,6 +22,7 @@
 
 #ifndef HAHAHA_TENSOR_H_2ACEBAFB3C1048578DCC0E9ABDCA952B
 #define HAHAHA_TENSOR_H_2ACEBAFB3C1048578DCC0E9ABDCA952B
+
 #include <utility>
 
 #include "compute/ComputeNode.h"
@@ -30,10 +31,21 @@ namespace h3::core::ml {
 class Tensor {
 
   public:
-    explicit Tensor(const math::TensorShape& shape) : m_node(shape) {
+    // NOLINTNEXTLINE
+    Tensor(const math::TensorShape& shape, const DataType dtype = DataType::Float32) : m_node(shape) {
+        m_node.setDtype(dtype);
     }
 
     explicit Tensor(compute::ComputeNode node) : m_node(std::move(node)) {
+    }
+
+    Tensor operator[] (const SizeT index) {
+        return Tensor(compute::ComputeNode(m_node.tensorInner()->operator[](index)));
+    }
+
+    Tensor& operator=(const Int32 value) {
+        this->m_node.setScalarValue(math::Scalar(DataType::Float32, value));
+        return *this;
     }
 
     [[nodiscard]] Tensor add(const Tensor& other) const;
@@ -63,9 +75,15 @@ class Tensor {
     [[nodiscard]] Tensor squeeze(int64_t dim = -1) const;
     [[nodiscard]] Tensor unsqueeze(int64_t dim) const;
 
+    [[nodiscard]] compute::ComputeNode node() const {
+        return m_node;
+    }
+
   private:
     compute::ComputeNode m_node;
 };
+
 } // namespace h3::core::ml
 
+std::ostream& operator<<(const std::ostream& lhs, const h3::core::ml::Tensor& t1);
 #endif // HAHAHA_TENSOR_H_2ACEBAFB3C1048578DCC0E9ABDCA952B

@@ -74,7 +74,8 @@ using backend::MemoryManager;
     return isSignedInt(d) || isUnsignedInt(d);
 }
 
-/// Resolves a memory manager for \p device (falls back to default CPU manager when unregistered).
+/// Resolves a memory manager for \p device (falls back to default
+/// CPU manager when unregistered).
 [[nodiscard]] std::shared_ptr<MemoryManager> managerFor(const Device& device) {
     if (auto m = backend::getMemoryManagerOn(device)) {
         return m;
@@ -376,6 +377,14 @@ Scalar::Scalar(Scalar&& other) noexcept
     other.m_data = CommonPointer();
     other.m_isView = true;
 }
+
+Scalar::Scalar(const DataType dtype, Int32 int32, Device  device = ) {
+    this->m_dtype = dtype;
+    this->m_isView = false;
+    this->m_data = allocateOne(dtype, );
+}
+
+
 
 Scalar& Scalar::operator=(const Scalar& other) {
     if (this == &other) {

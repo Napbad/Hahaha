@@ -85,6 +85,11 @@ TensorInner
 TensorInner::slice(int64_t dim, int64_t start, int64_t end, int64_t step) const {
 
 }
+void TensorInner::setScalarValue(const Scalar& scalar) const {
+    if (this->m_shape.rank() == 0 || this->m_shape.getTotalSize() == 1) {
+        this->m_storage.copyFrom(scalar.data());
+    }
+}
 
 bool TensorInner::isContiguous() const noexcept {
     return m_metadata.isContiguous;

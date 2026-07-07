@@ -83,8 +83,11 @@ public:
     [[nodiscard]] ComputeNode unsqueeze(int64_t dim) const;
 
     void setTensorInner(math::TensorInner&& tensor_inner);
+    void setDtype(DataType data) const;
 
-private:
+    void setScalarValue(const math::Scalar& scalar) const;
+
+  private:
     utils::OwnPointer<math::TensorInner> m_tensor;
 };
 } // namespace h3::core::compute

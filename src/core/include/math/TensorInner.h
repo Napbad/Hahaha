@@ -229,7 +229,9 @@ public:
 
     [[nodiscard]] TensorInner broadcastTo(TensorShape shape) const;
 
-private:
+    void setScalarValue(const Scalar& scalar) const;
+
+  private:
     TensorShape m_shape;
     TensorStride m_stride;
     SizeT m_offset;

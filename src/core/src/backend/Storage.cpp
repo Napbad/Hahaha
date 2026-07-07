@@ -75,4 +75,21 @@ std::expected<CommonPointer, Error> Storage::resize(const SizeT size) {
 
     return expected;
 }
+void Storage::copyFrom(const CommonPointer& ptr) const {
+    if (ptr.size() > this->m_size) {
+        throw std::invalid_argument("target size is bigger than current size,"
+                                    " the copy of data will cause unknown behavior");
+    }
+
+
+    if (this->m_data.device() != ptr.device()) {
+        throw std::invalid_argument("target device is different from current device");
+    }
+
+    if (auto res = this->m_memoryManager->copy(this->m_data, ptr, ptr.size());
+        !res.has_value()) {
+        throw std::invalid_argument(std::string("copy failed, the error is: ") + res.error().message);
+    }
+
 }
+} // namespace h3::core::backend
