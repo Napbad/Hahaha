@@ -20,7 +20,7 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
-#include "compute/ComputeContextV2.h"
+#include "compute/ComputeContext.h"
 #include "compute/kernels/CpuKernels.h"
 #include "backend/Device.h"
 #include "defines.h"

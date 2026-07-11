@@ -12,7 +12,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-/// Tests for ComputeDispatcherV2 - the public-facing dispatch API
+/// Tests for ComputeDispatcher - the public-facing dispatch API
 
 #include <gtest/gtest.h>
 #include <vector>
@@ -26,7 +26,7 @@
 
 namespace h3::core::compute {
 
-class ComputeDispatcherV2Test : public ::testing::Test {
+class ComputeDispatcherTest : public ::testing::Test {
 protected:
     void SetUp() override {}
     void TearDown() override {}
@@ -57,7 +57,7 @@ math::TensorInner createTestTensor(const std::vector<Float32>& data) {
     return tensor;
 }
 
-TEST_F(ComputeDispatcherV2Test, DispatchAdd) {
+TEST_F(ComputeDispatcherTest, DispatchAdd) {
     std::vector<Float32> a = {1.0f, 2.0f, 3.0f, 4.0f};
     std::vector<Float32> b = {5.0f, 4.0f, 3.0f, 2.0f};
     std::vector<Float32> expected = {6.0f, 6.0f, 6.0f, 6.0f};
@@ -82,7 +82,7 @@ TEST_F(ComputeDispatcherV2Test, DispatchAdd) {
     }
 }
 
-TEST_F(ComputeDispatcherV2Test, DispatchSub) {
+TEST_F(ComputeDispatcherTest, DispatchSub) {
     std::vector<Float32> a = {10.0f, 8.0f, 6.0f, 4.0f};
     std::vector<Float32> b = {1.0f, 2.0f, 3.0f, 4.0f};
     std::vector<Float32> expected = {9.0f, 6.0f, 3.0f, 0.0f};
@@ -106,7 +106,7 @@ TEST_F(ComputeDispatcherV2Test, DispatchSub) {
     }
 }
 
-TEST_F(ComputeDispatcherV2Test, DispatchMul) {
+TEST_F(ComputeDispatcherTest, DispatchMul) {
     std::vector<Float32> a = {2.0f, 3.0f, 4.0f, 5.0f};
     std::vector<Float32> b = {1.0f, 2.0f, 3.0f, 4.0f};
     std::vector<Float32> expected = {2.0f, 6.0f, 12.0f, 20.0f};
@@ -130,7 +130,7 @@ TEST_F(ComputeDispatcherV2Test, DispatchMul) {
     }
 }
 
-TEST_F(ComputeDispatcherV2Test, DispatchDiv) {
+TEST_F(ComputeDispatcherTest, DispatchDiv) {
     std::vector<Float32> a = {10.0f, 9.0f, 8.0f, 6.0f};
     std::vector<Float32> b = {2.0f, 3.0f, 4.0f, 2.0f};
     std::vector<Float32> expected = {5.0f, 3.0f, 2.0f, 3.0f};
@@ -154,7 +154,7 @@ TEST_F(ComputeDispatcherV2Test, DispatchDiv) {
     }
 }
 
-TEST_F(ComputeDispatcherV2Test, DispatchSqrt) {
+TEST_F(ComputeDispatcherTest, DispatchSqrt) {
     std::vector<Float32> input = {1.0f, 4.0f, 9.0f, 16.0f};
     std::vector<Float32> expected = {1.0f, 2.0f, 3.0f, 4.0f};
     
@@ -176,7 +176,7 @@ TEST_F(ComputeDispatcherV2Test, DispatchSqrt) {
     }
 }
 
-TEST_F(ComputeDispatcherV2Test, DispatchAbs) {
+TEST_F(ComputeDispatcherTest, DispatchAbs) {
     std::vector<Float32> input = {-1.0f, -2.0f, 3.0f, -4.0f};
     std::vector<Float32> expected = {1.0f, 2.0f, 3.0f, 4.0f};
     
@@ -197,7 +197,7 @@ TEST_F(ComputeDispatcherV2Test, DispatchAbs) {
     }
 }
 
-TEST_F(ComputeDispatcherV2Test, DispatchMax) {
+TEST_F(ComputeDispatcherTest, DispatchMax) {
     std::vector<Float32> a = {1.0f, 5.0f, 3.0f, 8.0f};
     std::vector<Float32> b = {4.0f, 2.0f, 7.0f, 6.0f};
     std::vector<Float32> expected = {4.0f, 5.0f, 7.0f, 8.0f};
@@ -221,7 +221,7 @@ TEST_F(ComputeDispatcherV2Test, DispatchMax) {
     }
 }
 
-TEST_F(ComputeDispatcherV2Test, DispatchMin) {
+TEST_F(ComputeDispatcherTest, DispatchMin) {
     std::vector<Float32> a = {1.0f, 5.0f, 3.0f, 8.0f};
     std::vector<Float32> b = {4.0f, 2.0f, 7.0f, 6.0f};
     std::vector<Float32> expected = {1.0f, 2.0f, 3.0f, 6.0f};
@@ -245,7 +245,7 @@ TEST_F(ComputeDispatcherV2Test, DispatchMin) {
     }
 }
 
-TEST_F(ComputeDispatcherV2Test, DispatchEmptyOperands) {
+TEST_F(ComputeDispatcherTest, DispatchEmptyOperands) {
     auto tensorDst = utils::make_own_ptr<math::TensorInner>(createTestTensor({}));
     
     std::vector<utils::OwnPointer<math::TensorInner>> operands;

@@ -12,8 +12,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-#ifndef HAHAHA_COMPUTE_CONTEXT_V2_H
-#define HAHAHA_COMPUTE_CONTEXT_V2_H
+#ifndef HAHAHA_COMPUTE_CONTEXT_H
+#define HAHAHA_COMPUTE_CONTEXT_H
 
 #include <cstddef>
 #include <cstdint>
@@ -46,4 +46,4 @@ using KernelContext = ComputeContext;
 
 } // namespace h3::core::compute
 
-#endif // HAHAHA_COMPUTE_CONTEXT_V2_H
+#endif // HAHAHA_COMPUTE_CONTEXT_H

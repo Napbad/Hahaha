@@ -26,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-#include "compute/ComputeDispatcherV2.h"
+#include "compute/ComputeDispatcher.h"
 #include "math/TensorInner.h"
 #include "math/TensorStride.h"
 #include "ml/Tensor.h"

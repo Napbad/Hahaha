@@ -21,7 +21,7 @@
 #include <vector>
 
 #include "compute/DispatchKey.h"
-#include "compute/ComputeContextV2.h"
+#include "compute/ComputeContext.h"
 #include "defines.h"
 #include "math/TensorInner.h"
 
