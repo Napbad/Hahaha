@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
 if (MSVC)
-    add_compile_options("/execution_charset:utf-8" "/source_charset:utf-8")
-    set(ENV{VSLANG} "1033")
+    add_compile_options(/utf-8)
 endif ()
+
 
 
 #=========================== Project Configuration ===================================
@@ -10,6 +10,9 @@ project(hahaha
         VERSION 0.0.1
         LANGUAGES CXX
 )
+
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(GNUInstallDirs)
 
@@ -51,4 +54,6 @@ install(EXPORT hahahaTargets
 # =========================== Tests Configuration ===================================
 # Include test subdirectories
 add_subdirectory(tests)
+
+# Include example 
 add_subdirectory(example)

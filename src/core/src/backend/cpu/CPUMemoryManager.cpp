@@ -1,4 +1,5 @@
-//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/Napbad/Hahaha)
+//  Copyright (c) 2025-2026 Contributors of
+//  Hahaha(https://github.com/jason-is-debugging/Hahaha)
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -24,54 +25,51 @@
 
 #include <cstring>
 
-
 namespace h3::core::backend::cpu {
 std::expected<CommonPointer, Error> CPUMemoryManager::allocate(const SizeT size) {
     return CommonPointer{new char[size], Device{0, DeviceType::CPU}, size};
 }
 
 void CPUMemoryManager::deallocate(const CommonPointer ptr) {
-    return delete []ptr.as<char>();
+    return delete[] ptr.as<char>();
 }
 
 CPUMemoryManager::~CPUMemoryManager() = default;
 
-std::expected<void, Error> CPUMemoryManager::move(CommonPointer dst,
-    CommonPointer src,
-    SizeT size) {
+std::expected<void, Error>
+CPUMemoryManager::move(CommonPointer dst, CommonPointer src, SizeT size) {
     if (dst.size() < size || src.size() < size) {
-        return std::unexpected(Error("Buffer size insufficient for move operation", 
-            ErrorCode::MemoryError));
+        return std::unexpected(Error("Buffer size insufficient for move operation",
+                                     ErrorCode::MemoryError));
     }
-    
+
     std::memmove(dst.as<void>(), src.as<const void>(), size);
     return {};
 }
 
-std::expected<void, Error> CPUMemoryManager::copy(CommonPointer dst,
-    CommonPointer src,
-    SizeT size) {
+std::expected<void, Error>
+CPUMemoryManager::copy(CommonPointer dst, CommonPointer src, SizeT size) {
     if (dst.size() < size || src.size() < size) {
-        return std::unexpected(Error("Buffer size insufficient for copy operation", 
-            ErrorCode::MemoryError));
+        return std::unexpected(Error("Buffer size insufficient for copy operation",
+                                     ErrorCode::MemoryError));
     }
-    
+
     // For CPU, copy is memcpy (assumes non-overlapping regions)
     std::memcpy(dst.as<void>(), src.as<const void>(), size);
     return {};
 }
 
 std::expected<void, Error> CPUMemoryManager::copyFromHostToDevice(CommonPointer dst,
-    CommonPointer src,
-    SizeT size) {
+                                                                  CommonPointer src,
+                                                                  SizeT size) {
     // For CPU backend, host and device are the same, so just use copy
     return copy(dst, src, size);
 }
 
 std::expected<void, Error> CPUMemoryManager::copyFromDeviceToHost(CommonPointer dst,
-    CommonPointer src,
-    SizeT size) {
+                                                                  CommonPointer src,
+                                                                  SizeT size) {
     // For CPU backend, host and device are the same, so just use copy
     return copy(dst, src, size);
 }
-}
+} // namespace h3::core::backend::cpu

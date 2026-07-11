@@ -1,4 +1,4 @@
-//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/Napbad/Hahaha)
+//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/jason-is-debugging/Hahaha)
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ void Storage::copyFrom(const CommonPointer& ptr) const {
 
     if (auto res = this->m_memoryManager->copy(this->m_data, ptr, ptr.size());
         !res.has_value()) {
-        throw std::invalid_argument(std::string("copy failed, the error is: ") + res.error().message);
+        throw std::invalid_argument(std::string("copy failed, the error is: ") + res.error().message());
     }
 
 }

@@ -1,4 +1,4 @@
-//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/Napbad/Hahaha)
+//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/jason-is-debugging/Hahaha)
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -378,10 +378,11 @@ Scalar::Scalar(Scalar&& other) noexcept
     other.m_isView = true;
 }
 
-Scalar::Scalar(const DataType dtype, Int32 int32, Device  device = ) {
+Scalar::Scalar(const DataType dtype, Int32 int32, Device  device = backend::getDefaultCPUDevice()) {
     this->m_dtype = dtype;
     this->m_isView = false;
-    this->m_data = allocateOne(dtype, );
+    this->m_data = allocateOne(dtype, device);
+    this->m_data.setValue()
 }
 
 

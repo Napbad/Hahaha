@@ -1,0 +1,37 @@
+{
+  "version": "2.4.1",
+  "runner": "terminal",
+  "problems": [],
+  "tasks": [
+    {
+      "type": "shell",
+      "label": "Build: x64-Debug (MSVC)",
+      "command": "C:\\Users\\sjs19\\CodeProject\\Hahaha\\scripts\\build.bat",
+      "args": ["debug"],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "VCPKG_ROOT": "C:\\Users\\sjs19\\Apps\\vcpkg"
+        }
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$msCompile"]
+    },
+    {
+      "type": "shell",
+      "label": "Configure: CMake (MSVC)",
+      "command": "C:\\Users\\sjs19\\CodeProject\\Hahaha\\scripts\\configure.bat",
+      "args": [],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "VCPKG_ROOT": "C:\\Users\\sjs19\\Apps\\vcpkg"
+        }
+      },
+      "problemMatcher": ["$msCompile"]
+    }
+  ]
+}

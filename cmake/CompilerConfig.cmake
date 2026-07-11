@@ -4,8 +4,7 @@
 # MSVC: Use static runtime library to match vcpkg x64-windows-static triplet
 if (MSVC)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    add_compile_options("/execution_charset:utf-8" "/source_charset:utf-8")
-    set(ENV{VSLANG} "1033")
+    add_compile_options("/utf-8")
 endif ()
 
 # C++ Standard Configuration

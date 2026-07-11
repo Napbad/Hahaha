@@ -1,4 +1,4 @@
-//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/Napbad/Hahaha)
+//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/jason-is-debugging/Hahaha)
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 
 namespace h3::core::backend {
 
-void CommonPointer::destroy() const {
+void CommonPointer::destroy() {
     if (m_ptr == nullptr) {
         return;
     }

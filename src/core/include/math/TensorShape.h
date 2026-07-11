@@ -1,4 +1,4 @@
-//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/Napbad/Hahaha)
+//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/jason-is-debugging/Hahaha)
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -35,13 +35,29 @@ namespace h3::core::math {
 // Inner class, which is used to implement base TensorOperations
 class TensorShape {
 public:
-    TensorShape(std::initializer_list<SizeT> dims) : m_sizes(dims) {
+    TensorShape(const std::initializer_list<SizeT> dims) : m_sizes(dims) {
+    }
+
+    TensorShape(const std::initializer_list<int> dims) {
+        m_sizes = std::vector<SizeT>(dims.size());
+        SizeT idx = 0;
+        for (const int i : dims) {
+            m_sizes[idx] = i;
+            ++idx;
+        }
     }
 
     // NOLINTNEXTLINE
     TensorShape(const std::vector<SizeT>& dims) : m_sizes(dims) {
     }
 
+    // NOLINTNEXTLINE
+    TensorShape(const std::vector<int>& dims) {
+        m_sizes = std::vector<SizeT>(dims.size());
+        for (auto i = 0; i < dims.size(); ++i) {
+            m_sizes[i] = (dims[i]);
+        }
+    }
     explicit TensorShape(const SizeT rank) : m_sizes(rank) {
     }
 

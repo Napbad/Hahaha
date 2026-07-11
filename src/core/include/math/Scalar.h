@@ -1,4 +1,4 @@
-//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/Napbad/Hahaha)
+//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/jason-is-debugging/Hahaha)
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@ public:
 
     Scalar(const Scalar& other);
     Scalar(Scalar&& other) noexcept;
+    Scalar(DataType dtype, Int32 int32, backend::Device device);
     Scalar(DataType dtype, Int32 int32);
 
     Scalar& operator=(const Scalar& other);

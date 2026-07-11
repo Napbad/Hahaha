@@ -1,4 +1,4 @@
-//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/Napbad/Hahaha)
+//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/jason-is-debugging/Hahaha)
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include "compute/ComputeNode.h"
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "compute/ComputeDispatcher.h"
@@ -54,7 +55,7 @@ ComputeNode ComputeNode::add(const ComputeNode& other) const {
     checkCanRunBinOper(tensorInner(), other.tensorInner());
     const DataType resType = detectResDataType(tensorInner()->dataType(),
                                                other.tensorInner()->dataType());
-    const utils::OwnPointer<math::TensorInner> resTensor = utils::make_own_ptr<math::TensorInner>(tensorInner()->shape(),
+    utils::OwnPointer<math::TensorInner> resTensor = utils::make_own_ptr<math::TensorInner>(tensorInner()->shape(),
                                        math::TensorMetadata{.dataType = resType});
 
     std::vector operands{tensorInner(), other.tensorInner(), resTensor};
@@ -63,8 +64,8 @@ ComputeNode ComputeNode::add(const ComputeNode& other) const {
         throw std::invalid_argument(res.error().message());
     }
 
-    auto resNode = ComputeNode(resTensor.move());
-    return ;
+    auto movedTensor = resTensor.move();
+    return ComputeNode(movedTensor);
 }
 
 ComputeNode ComputeNode::operator+(const ComputeNode& other) const {

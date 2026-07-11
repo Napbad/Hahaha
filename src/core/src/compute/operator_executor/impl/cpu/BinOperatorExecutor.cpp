@@ -1,4 +1,4 @@
-//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/Napbad/Hahaha)
+//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/jason-is-debugging/Hahaha)
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -28,15 +28,19 @@ namespace h3::core::compute::cpu {
         std::vector<utils::OwnPointer<math::TensorInner>>& operands) {                  \
         return detail::runBinary<Functor>(context, operands);                          \
     }
-
-HAHAHA_DEFINE_BIN_EXECUTOR(Add, AddFunctor)
-HAHAHA_DEFINE_BIN_EXECUTOR(Sub, SubFunctor)
-HAHAHA_DEFINE_BIN_EXECUTOR(Mul, MulFunctor)
-HAHAHA_DEFINE_BIN_EXECUTOR(Div, DivFunctor)
-HAHAHA_DEFINE_BIN_EXECUTOR(Mod, ModFunctor)
-HAHAHA_DEFINE_BIN_EXECUTOR(Pow, PowFunctor)
-HAHAHA_DEFINE_BIN_EXECUTOR(Max, MaxFunctor)
-HAHAHA_DEFINE_BIN_EXECUTOR(Min, MinFunctor)
+std::expected<void, Error> AddOperatorExecutor::execute(
+    ComputeContext& context,
+    std::vector<utils::OwnPointer<math::TensorInner> >& operands) {
+    return detail::runBinary<detail::AddFunctor>(context, operands);
+}
+HAHAHA_DEFINE_BIN_EXECUTOR(Add, detail::AddFunctor)
+HAHAHA_DEFINE_BIN_EXECUTOR(Sub, detail::SubFunctor)
+HAHAHA_DEFINE_BIN_EXECUTOR(Mul, detail::MulFunctor)
+HAHAHA_DEFINE_BIN_EXECUTOR(Div, detail::DivFunctor)
+HAHAHA_DEFINE_BIN_EXECUTOR(Mod, detail::ModFunctor)
+HAHAHA_DEFINE_BIN_EXECUTOR(Pow, detail::PowFunctor)
+HAHAHA_DEFINE_BIN_EXECUTOR(Max, detail::MaxFunctor)
+HAHAHA_DEFINE_BIN_EXECUTOR(Min, detail::MinFunctor)
 
 #undef HAHAHA_DEFINE_BIN_EXECUTOR
 

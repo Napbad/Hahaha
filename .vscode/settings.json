@@ -5,7 +5,7 @@
 
     "psi-header.variables": [
         ["projectname", "hahaha"],
-        ["projecturl", "https://github.com/Napbad/Hahaha"],
+        ["projecturl", "https://github.com/jason-is-debugging/Hahaha"],
         ["author", "Napbad"],
         ["authoremail", "napbad.sen@gmail.com"],
         ["authorurl", "https://github.com/Napbad"]
@@ -64,12 +64,15 @@
     },
 
     "clangd.arguments": [
-        "--compile-commands-dir=cmake-build-debugwithcuda",
+        // "--compile-commands-dir=cmake-build-debugwithcuda",
         "--compile-commands-dir=cmake-build-debug",
-        "--compile-commands-dir=build",
-        "--compile-commands-dir=builddir",
-        "--compile-commands-dir=buildDir",
-        "--compile-commands-dir=cmake-build"
+        // "--compile-commands-dir=build",
+        // "--compile-commands-dir=builddir",
+        // "--compile-commands-dir=buildDir",
+        // "--compile-commands-dir=cmake-build",
+        // "--compile-commands-dir=cmake-build-vcpkg-windows",
+        // "--compile-commands-dir=cmake-build-vcpkg-linux",
+        // "--compile-commands-dir=cmake-build-vcpkg-macos",
     ],
     "AndreaNovelHelper.workspaceDisabled": false
 }

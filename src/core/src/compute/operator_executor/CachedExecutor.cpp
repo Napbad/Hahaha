@@ -1,4 +1,4 @@
-//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/Napbad/Hahaha)
+//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/jason-is-debugging/Hahaha)
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -32,10 +32,9 @@ utils::OwnPointer<OperatorExecutor> makeExecutor(const backend::Device device,
     case backend::DeviceType::CUDA:
         return makeCUDAOperatorExecutor(op);
     default:
-        return nullptr;
+        return {nullptr};
     }
 }
-
 
 
 utils::OwnPointer<OperatorExecutor> makeCPUOperatorExecutor(const Operator op) {
@@ -121,7 +120,7 @@ utils::OwnPointer<OperatorExecutor> makeCPUOperatorExecutor(const Operator op) {
     case Operator::Clamp:
         return utils::make_own_ptr<cpu::ClampOperatorExecutor>();
     default:
-        return nullptr;
+        return {nullptr};
     }
 }
 

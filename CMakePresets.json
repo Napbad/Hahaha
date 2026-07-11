@@ -6,8 +6,8 @@
       "name": "vcpkg-windows",
       "description": "Windows build using system vcpkg. Set VCPKG_ROOT environment variable.",
       "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" },
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/cmake-build-${presetName}",
+      "generator": "Visual Studio 18 2026",
+      "binaryDir": "${sourceDir}/cmake-build-debug",
       "environment": {
         "VSLANG": "1033"
       },
@@ -31,7 +31,7 @@
       "description": "Linux build using system vcpkg. Set VCPKG_ROOT environment variable.",
       "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" },
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/cmake-build-${presetName}",
+      "binaryDir": "${sourceDir}/cmake-build-debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
@@ -51,7 +51,7 @@
       "description": "macOS build using system vcpkg. Set VCPKG_ROOT environment variable.",
       "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Darwin" },
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/cmake-build-${presetName}",
+      "binaryDir": "${sourceDir}/cmake-build-debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"

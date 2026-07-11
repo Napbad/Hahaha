@@ -1,4 +1,4 @@
-//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/Napbad/Hahaha)
+//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/jason-is-debugging/Hahaha)
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -15,186 +15,233 @@
 //  Contributors:
 //  Napbad (napbad.sen@gmail.com) (https://github.com/Napbad)
 //
-
 //
 // Created by napbad on 5/11/26.
 //
 
 #ifndef HAHAHA_OWNPOINTER_H_E25F4B9F87244CA59C7BF66CCA03A943
 #define HAHAHA_OWNPOINTER_H_E25F4B9F87244CA59C7BF66CCA03A943
+#include <stdexcept>
 #include <type_traits>
 #include <utility>
 
 namespace h3::core::utils {
 /**
  * @brief A smart pointer implementation utilizing an Owner-Borrower semantics model.
- * * Unlike standard smart pointers, OwnPointer allows multiple instances to point to the
- * same resource, but enforces strict runtime ownership rules:
+ * * Unlike standard smart pointers, OwnPointer allows multiple instances to point to
+ * the same resource, but enforces strict runtime ownership rules:
  * - Only **one** instance can act as the **Owner** at any given time.
  * - Multiple instances can act as **Borrowers** holding a shared reference.
- * - The resource is automatically deleted *only* when the Owner is destroyed or reset.
+ * - The resource is automatically deleted *only* when the Owner is destroyed or
+ * reset.
  * - A `nullptr` managed pointer can never hold ownership status.
  * * @tparam T The underlying element type managed by this pointer.
  */
 template <typename T> class OwnPointer {
   public:
-    // Constructor - takes ownership of the pointer
-    explicit OwnPointer(T* t = nullptr) : m_ptr(t), m_isOwner(t != nullptr) {
-    }
+    // Forward declaration for upcasting friendship
+    template <typename U> friend class OwnPointer;
 
-    OwnPointer& operator=(std::nullptr_t) {
-        if (m_isOwner && m_ptr) {
-            delete m_ptr;
-        }
-        m_ptr = nullptr;
-        m_isOwner = false;
-        return *this;
-    }
+    /**
+     * @brief Default constructor. Creates an invalid, non-owning pointer.
+     */
+    OwnPointer() : m_ptr(nullptr), m_isOwner(false), m_validity(nullptr) {}
 
-    // Destructor - only delete if we're the owner
+    /**
+     * @brief Construct an OwnPointer from nullptr.
+     */
+    // NOLINTNEXTLINE
+    OwnPointer(std::nullptr_t) : m_ptr(nullptr), m_isOwner(false), m_validity(nullptr) {}
+
+    /**
+     * @brief Destructor. If Owner, invalidates the control block and deletes the
+     * resource.
+     */
     ~OwnPointer() {
-        if (m_isOwner && m_ptr) {
-            delete m_ptr;
-            m_ptr = nullptr;
-        }
+        reset();
     }
 
+    /**
+     * @brief Explicitly transfers ownership out.
+     * @throw std::runtime_error If called by a Borrower.
+     */
     OwnPointer move() {
         if (!m_isOwner) {
             throw std::runtime_error("OwnPointer move called when not owned");
         }
-        OwnPointer temp(m_ptr, true);
+        OwnPointer temp;
+        temp.m_ptr = m_ptr;
+        temp.m_isOwner = true;
+        temp.m_validity = m_validity;
+
+        // Strip ownership from this instance, transforming it into a borrower
         this->m_isOwner = false;
-        this->m_ptr = nullptr;
         return temp;
     }
 
-    // Copy constructor - become a borrower
-    OwnPointer(const OwnPointer& other) : m_ptr(other.m_ptr), m_isOwner(false) {
+    /**
+     * @brief Copy constructor. Creates a Borrower pointing to the same resource and
+     * validity block.
+     */
+    OwnPointer(const OwnPointer& other)
+        : m_ptr(other.m_ptr), m_isOwner(false), m_validity(other.m_validity) {
     }
 
-    // Copy assignment operator - become a borrower
+    /**
+     * @brief Copy assignment. Turns this instance into a Borrower.
+     */
     OwnPointer& operator=(const OwnPointer& other) {
         if (this != &other) {
-            // If we were the owner, clean up our resource
-            if (m_isOwner && m_ptr) {
-                delete m_ptr;
-            }
+            reset(); // Clean up current resource if we were the owner
             m_ptr = other.m_ptr;
-            m_isOwner = false; // Always become borrower on copy
+            m_isOwner = false;
+            m_validity = other.m_validity;
         }
         return *this;
     }
 
-    OwnPointer borrow() {
-        return OwnPointer(m_ptr, false);
+    OwnPointer& operator=(std::nullptr_t) {
+        reset();
+        m_ptr = nullptr;
+        m_isOwner = false;
+        m_validity = nullptr;
+        return *this;
     }
 
-    // Move constructor - transfer ownership
+    /**
+     * @brief Move constructor. Transfers the exact state and role.
+     */
     OwnPointer(OwnPointer&& other) noexcept
-        : m_ptr(other.m_ptr), m_isOwner(other.m_isOwner) {
+        : m_ptr(other.m_ptr), m_isOwner(other.m_isOwner),
+          m_validity(other.m_validity) {
         other.m_ptr = nullptr;
         other.m_isOwner = false;
+        other.m_validity = nullptr;
     }
 
-    // Move assignment operator - transfer ownership
+    /**
+     * @brief Move assignment. Transfers the exact state and role.
+     */
     OwnPointer& operator=(OwnPointer&& other) noexcept {
         if (this != &other) {
-            // If we were the owner, clean up our resource
-            if (m_isOwner && m_ptr) {
-                delete m_ptr;
-            }
+            reset();
             m_ptr = other.m_ptr;
             m_isOwner = other.m_isOwner;
+            m_validity = other.m_validity;
+
             other.m_ptr = nullptr;
             other.m_isOwner = false;
+            other.m_validity = nullptr;
         }
         return *this;
     }
 
-    // Upcast move from OwnPointer<Derived> when Derived* converts to T*
+    /**
+     * @brief Upcasting move constructor supporting polymorphism (Derived* to Base*).
+     */
     template <typename U,
               typename = std::enable_if_t<std::is_convertible_v<U*, T*>
                                           && !std::is_same_v<U, T>>>
-    explicit OwnPointer(OwnPointer<U>&& other) noexcept
-        : m_ptr(other.release()), m_isOwner(m_ptr != nullptr) {
+                                          // NOLINTNEXTLINE
+    OwnPointer(OwnPointer<U>&& other) noexcept
+        : m_ptr(other.m_ptr), m_isOwner(other.m_isOwner),
+          m_validity(other.m_validity) {
+        other.m_ptr = nullptr;
+        other.m_isOwner = false;
+        other.m_validity = nullptr;
     }
 
+    /**
+     * @brief Upcasting move assignment supporting polymorphism (Derived* to Base*).
+     */
     template <typename U,
               typename = std::enable_if_t<std::is_convertible_v<U*, T*>
                                           && !std::is_same_v<U, T>>>
+                                          // NOLINTNEXTLINE
     OwnPointer& operator=(OwnPointer<U>&& other) noexcept {
-        if (m_isOwner && m_ptr) {
+        if (static_cast<void*>(this) != static_cast<void*>(&other)) {
+            reset();
+            m_ptr = other.m_ptr;
+            m_isOwner = other.m_isOwner;
+            m_validity = other.m_validity;
+            other.m_ptr = nullptr;
+            other.m_isOwner = false;
+            other.m_validity = nullptr;
+        }
+        return *this;
+    }
+
+    /**
+     * @brief Explicitly spawn a non-owning Borrower.
+     */
+    OwnPointer borrow() const {
+        return OwnPointer(*this); // Triggers copy constructor (creates borrower)
+    }
+
+    /**
+     * @brief Resets the current smart pointer, releasing ownership if Owner.
+     */
+    void reset() {
+        if (m_isOwner) {
+            if (m_validity) {
+                *m_validity = false;
+            }
             delete m_ptr;
         }
-        m_ptr = other.release();
-        m_isOwner = m_ptr != nullptr;
-        return *this;
+
+        m_ptr = nullptr;
+        m_isOwner = false;
+        m_validity = nullptr;
     }
 
-    // Equality comparison
-    bool operator==(const OwnPointer& other) const {
-        return m_ptr == other.m_ptr;
+    /**
+     * @brief Safety Check: Determines if the managed resource is safely accessible.
+     */
+    [[nodiscard]] bool is_valid() const {
+        return m_ptr != nullptr && m_validity != nullptr && *m_validity;
     }
 
-    // Inequality comparison
-    bool operator!=(const OwnPointer& other) const {
-        return m_ptr != other.m_ptr;
-    }
-
-    // Dereference operator
-    T& operator*() const {
-        return *m_ptr;
-    }
-
-    // Arrow operator
-    T* operator->() const {
-        return m_ptr;
-    }
-
-    // Check if this is the owner
     [[nodiscard]] bool isOwner() const {
         return m_isOwner;
     }
 
-    // Get the raw pointer (const version)
-    const T* get() const {
+    T& operator*() const {
+        if (!is_valid())
+            throw std::runtime_error(
+                "Attempted to dereference an expired Borrower pointer");
+        return *m_ptr;
+    }
+
+    T* operator->() const {
+        if (!is_valid())
+            throw std::runtime_error(
+                "Attempted to access member of an expired Borrower pointer");
         return m_ptr;
     }
 
-    // Get the raw pointer (non-const version)
-    T* get() {
-        return m_ptr;
-    }
-
-    // Release ownership without deleting
-    T* release() {
-        T* temp = m_ptr;
-        m_ptr = nullptr;
-        m_isOwner = false;
-        return temp;
-    }
-
-    // Reset with a new pointer
-    void reset(T* t = nullptr) {
-        if (m_isOwner && m_ptr) {
-            delete m_ptr;
-        }
-        m_ptr = t;
-        m_isOwner = (t != nullptr);
-    }
-
-    // Explicit conversion to bool
     explicit operator bool() const {
-        return m_ptr != nullptr;
+        return is_valid();
     }
 
   private:
     T* m_ptr;
     bool m_isOwner;
+    bool* m_validity;
 
-    OwnPointer(T* ptr, const bool isOwner) : m_ptr(ptr), m_isOwner(isOwner) {
-    }
+    T* get() { return m_ptr; }
+    const T* get() const { return m_ptr; }
+
+    /**
+     * @brief Private constructor for internal use (make_own_ptr).
+     */
+    explicit OwnPointer(T* t)
+        : m_ptr(t), m_isOwner(t != nullptr),
+          m_validity(t != nullptr ? new bool(true) : nullptr) {}
+
+    template <typename U, typename... Args>
+    friend OwnPointer<U> make_own_ptr(Args&&... args);
+
+    friend class OwnPointerTest;
 };
 
 template <typename T, typename... Args> OwnPointer<T> make_own_ptr(Args&&... args) {

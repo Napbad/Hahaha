@@ -1,4 +1,4 @@
-//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/Napbad/Hahaha)
+//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/jason-is-debugging/Hahaha)
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -64,7 +64,8 @@ HAHAHA_OP_HD auto asFloat(T x) -> std::conditional_t<std::is_floating_point_v<T>
         HAHAHA_OP_HD static T apply(const T a, const T b) {                              \
             return static_cast<T>(Expr);                                                 \
         }                                                                                \
-    }
+    };\
+    
 
 HAHAHA_BINARY_FUNCTOR(Add, (a + b))
 HAHAHA_BINARY_FUNCTOR(Sub, (a - b))

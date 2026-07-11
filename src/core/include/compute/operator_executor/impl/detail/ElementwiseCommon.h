@@ -1,4 +1,4 @@
-//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/Napbad/Hahaha)
+//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/jason-is-debugging/Hahaha)
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -49,8 +49,8 @@ checkOperandCount(const std::size_t expected,
 }
 
 inline std::expected<void, Error>
-checkContextAndTensors(ComputeContext& context,
-                       std::span<math::TensorInner* const> inputs,
+checkContextAndTensors(const ComputeContext& context,
+                       const std::span<math::TensorInner* const> inputs,
                        const math::TensorInner& output) {
     const auto dtype = context.dataType();
     const auto device = context.device();
