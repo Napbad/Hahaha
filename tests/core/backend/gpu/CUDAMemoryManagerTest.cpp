@@ -23,7 +23,10 @@
 #include <gtest/gtest.h>
 #include <cstring>
 #include <memory>
+
+#ifdef HAHAHA_USE_CUDA
 #include <cuda_runtime.h>
+#endif
 
 #include "backend/cuda/CUDAMemoryManager.h"
 #include "backend/CommonPointer.h"
@@ -35,9 +38,13 @@ namespace h3::core::backend::cuda {
  * @brief Check if CUDA device is available
  */
 bool isCudaAvailable() {
+#ifdef HAHAHA_USE_CUDA
     int deviceCount = 0;
     cudaError_t err = cudaGetDeviceCount(&deviceCount);
     return (err == cudaSuccess && deviceCount > 0);
+#else
+    return false;
+#endif
 }
 
 /**
@@ -54,8 +61,10 @@ protected:
 
     void TearDown() override {
         m_memoryManager.reset();
+#ifdef HAHAHA_USE_CUDA
         // Synchronize to ensure all CUDA operations are complete
         cudaDeviceSynchronize();
+#endif
     }
 
     std::unique_ptr<CUDAMemoryManager> m_memoryManager;

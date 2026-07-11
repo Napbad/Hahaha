@@ -23,13 +23,16 @@
 #ifndef HAHAHA_TENSORINNER_H_D0EE919AED8B4D9ABD7CA18281E1928E
 #define HAHAHA_TENSORINNER_H_D0EE919AED8B4D9ABD7CA18281E1928E
 #include <utility>
+#include <vector>
 
 #include "Index.h"
 #include "Scalar.h"
 #include "TensorMetadata.h"
 #include "TensorShape.h"
 #include "TensorStride.h"
+#include "backend/Device.h"
 #include "backend/Storage.h"
+#include "utils/OwnPointer.h"
 
 namespace h3::core::math {
 // Inner class, which is used to implement base TensorOperations
@@ -231,6 +234,21 @@ public:
 
     void setScalarValue(const Scalar& scalar) const;
 
+    // Static factory method for creating tensors with initial data
+    template<typename T>
+    [[nodiscard]] static utils::OwnPointer<TensorInner> create(
+        DataType dtype,
+        backend::DeviceType deviceType,
+        const std::vector<Int64>& shape,
+        const std::vector<T>& data = {});
+
+    template<typename T>
+    [[nodiscard]] static utils::OwnPointer<TensorInner> create(
+        DataType dtype,
+        const backend::Device& device,
+        const std::vector<Int64>& shape,
+        const std::vector<T>& data = {});
+
   private:
     TensorShape m_shape;
     TensorStride m_stride;
@@ -238,6 +256,45 @@ public:
     backend::Storage m_storage;
     TensorMetadata m_metadata;
 };
+
+} // namespace h3::core::math
+
+// Template implementations
+namespace h3::core::math {
+
+template<typename T>
+utils::OwnPointer<TensorInner> TensorInner::create(
+    DataType dtype,
+    backend::DeviceType deviceType,
+    const std::vector<Int64>& shape,
+    const std::vector<T>& data) {
+    return create(dtype, backend::Device(0, deviceType), shape, data);
+}
+
+template<typename T>
+utils::OwnPointer<TensorInner> TensorInner::create(
+    DataType dtype,
+    const backend::Device& device,
+    const std::vector<Int64>& shape,
+    const std::vector<T>& data) {
+    TensorShape tensorShape(shape);
+    TensorMetadata meta;
+    meta.dataType = dtype;
+    meta.device = device;
+    meta.isContiguous = true;
+    meta.isView = false;
+    
+    auto tensor = utils::make_own_ptr<TensorInner>(tensorShape, meta);
+    
+    if (!data.empty()) {
+        T* tensorData = tensor->storageRef().data().as<T>();
+        for (size_t i = 0; i < data.size() && i < tensorShape.getTotalSize(); ++i) {
+            tensorData[i] = data[i];
+        }
+    }
+    
+    return tensor;
+}
 
 } // namespace h3::core::math
 

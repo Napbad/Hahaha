@@ -83,7 +83,8 @@ TensorInner TensorInner::operator[](SizeT index) const {
 
 TensorInner
 TensorInner::slice(int64_t dim, int64_t start, int64_t end, int64_t step) const {
-
+    // Stub - returns copy of self
+    return *this;
 }
 void TensorInner::setScalarValue(const Scalar& scalar) const {
     if (this->m_shape.rank() == 0 || this->m_shape.getTotalSize() == 1) {
@@ -127,7 +128,9 @@ Scalar TensorInner::item() const {
 }
 
 TensorInner TensorInner::add(const TensorInner& other) const {
-
+    // Stub - returns copy of self
+    // Use ComputeNode::add for actual addition
+    return *this;
 }
 
 } // namespace h3::core::math

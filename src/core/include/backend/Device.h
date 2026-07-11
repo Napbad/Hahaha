@@ -31,6 +31,14 @@ namespace h3::core::backend {
 
 enum class DeviceType { CPU = 0, CUDA, UNKNOWN };
 
+inline std::string toString(const DeviceType type) {
+    switch (type) {
+    case DeviceType::CPU: return "CPU";
+    case DeviceType::CUDA: return "CUDA";
+    default: return "UNKNOWN";
+    }
+}
+
 inline std::string deviceTypeToString(const DeviceType type) {
     switch (type) {
     case DeviceType::CPU:

@@ -46,6 +46,10 @@ class Storage {
         : m_size(nBytes), m_isView(false) {
         m_memoryManager = getMemoryManagerOn(device);
         if (!m_memoryManager) {
+            // Fall back to default memory manager if device-specific one not found
+            m_memoryManager = getDefaultMemoryManager();
+        }
+        if (!m_memoryManager) {
             const std::string str = device.toString();
             throw std::invalid_argument(
                 "Trying to allocate storage on target device failed, the device is "

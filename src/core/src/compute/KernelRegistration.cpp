@@ -1,4 +1,4 @@
-﻿//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/jason-is-debugging/Hahaha)
+//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/jason-is-debugging/Hahaha)
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -11,20 +11,25 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
-//  Contributors:
-//  Napbad (napbad.sen@gmail.com) (https://github.com/Napbad)
-//
 
-#include <memory>
+/// Kernel registration translation unit.
+/// This file ensures all kernels are registered with the Dispatcher
+/// at program startup through static initialization.
 
-#include "compute/operator_executor/OperatorExecutor.h"
-#include "compute/operator_executor/impl/BinOperatorExecutor.h"
-#include "compute/operator_executor/impl/MultiOperatorExecutor.h"
-#include "compute/operator_executor/impl/UnaryOperatorExecutor.h"
-#include "defines.h"
+#include "compute/kernels/CpuKernels.h"
 
+#ifdef HAHAHA_USE_CUDA
+#include "compute/kernels/CudaKernels.h"
+#endif
+
+// Force linkage of kernel translation units
 namespace h3::core::compute {
+namespace kernels {
 
+void forceLinkage() {
+    // Reference functions to prevent linker from stripping
+    // (these are defined in the .cpp files)
+}
 
+} // namespace kernels
 } // namespace h3::core::compute

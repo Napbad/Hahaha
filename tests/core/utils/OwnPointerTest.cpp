@@ -80,7 +80,7 @@ TEST_F(OwnPointerTest, NullptrConstructorEqualsDefault) {
 
 TEST_F(OwnPointerTest, MakeOwnPtrBasic) {
     auto ptr = make_own_ptr<TestStruct>(123);
-    ASSERT_NE(ptr.get(), nullptr);
+    ASSERT_NE(&(*ptr), nullptr);
     EXPECT_TRUE(ptr.isOwner());
     EXPECT_TRUE(ptr.is_valid());
     EXPECT_EQ(ptr->value, 123);
@@ -88,14 +88,14 @@ TEST_F(OwnPointerTest, MakeOwnPtrBasic) {
 
 TEST_F(OwnPointerTest, MakeOwnPtrMultipleArgs) {
     auto ptr = make_own_ptr<TestStruct>(456, "test_name");
-    ASSERT_NE(ptr.get(), nullptr);
+    EXPECT_NE(&(*ptr), nullptr);
     EXPECT_EQ(ptr->value, 456);
     EXPECT_EQ(ptr->name, "test_name");
 }
 
 TEST_F(OwnPointerTest, MakeOwnPtrDefaultCtor) {
     auto ptr = make_own_ptr<TestStruct>();
-    ASSERT_NE(ptr.get(), nullptr);
+    EXPECT_NE(&(*ptr), nullptr);
     EXPECT_EQ(ptr->value, 0);
     EXPECT_EQ(ptr->name, "default");
 }
@@ -150,7 +150,7 @@ TEST_F(OwnPointerTest, BorrowCreatesBorrower) {
     auto borrower = owner.borrow();
     EXPECT_TRUE(owner.isOwner());
     EXPECT_FALSE(borrower.isOwner());
-    EXPECT_EQ(owner.get(), borrower.get());
+    EXPECT_EQ(&(*owner), &(*borrower));
 }
 
 TEST_F(OwnPointerTest, BorrowFromDefaultIsInvalid) {
@@ -179,9 +179,9 @@ TEST_F(OwnPointerTest, MultipleBorrowers) {
     EXPECT_FALSE(b2.isOwner());
     EXPECT_FALSE(b3.isOwner());
 
-    EXPECT_EQ(owner.get(), b1.get());
-    EXPECT_EQ(b1.get(), b2.get());
-    EXPECT_EQ(b2.get(), b3.get());
+    EXPECT_EQ(&(*owner), &(*b1));
+    EXPECT_EQ(&(*b1), &(*b2));
+    EXPECT_EQ(&(*b2), &(*b3));
 }
 
 // ===== move() Tests =====
@@ -192,7 +192,7 @@ TEST_F(OwnPointerTest, MoveOwnerSucceeds) {
 
     EXPECT_FALSE(owner.isOwner());
     EXPECT_TRUE(moved.isOwner());
-    EXPECT_NE(moved.get(), nullptr);
+    EXPECT_NE(&(*moved), nullptr);
     EXPECT_FALSE(owner.is_valid());
     EXPECT_TRUE(moved.is_valid());
 }
@@ -206,7 +206,7 @@ TEST_F(OwnPointerTest, MovePreservesOwnershipSemantics) {
     EXPECT_TRUE(moved.isOwner());
     EXPECT_FALSE(borrower.isOwner());
 
-    EXPECT_EQ(moved.get(), borrower.get());
+    EXPECT_EQ(&(*moved), &(*borrower));
 }
 
 TEST_F(OwnPointerTest, MoveFromBorrowerThrows) {
@@ -235,7 +235,7 @@ TEST_F(OwnPointerTest, CopyConstructorCreatesBorrower) {
 
     EXPECT_TRUE(owner.isOwner());
     EXPECT_FALSE(copy.isOwner());
-    EXPECT_EQ(owner.get(), copy.get());
+    EXPECT_EQ(&(*owner), &(*copy));
     EXPECT_TRUE(copy.is_valid());
 }
 
@@ -266,7 +266,7 @@ TEST_F(OwnPointerTest, CopyAssignmentFromOwner) {
 
     EXPECT_TRUE(owner.isOwner());
     EXPECT_FALSE(assignee.isOwner());
-    EXPECT_EQ(owner.get(), assignee.get());
+    EXPECT_EQ(&(*owner), &(*assignee));
 }
 
 TEST_F(OwnPointerTest, CopyAssignmentToBorrower) {
@@ -278,7 +278,7 @@ TEST_F(OwnPointerTest, CopyAssignmentToBorrower) {
 
     EXPECT_TRUE(owner2.isOwner());
     EXPECT_FALSE(borrower1.isOwner());
-    EXPECT_EQ(borrower1.get(), owner2.get());
+    EXPECT_EQ(&(*borrower1), &(*owner2));
 }
 
 TEST_F(OwnPointerTest, CopyAssignmentSelfAssignment) {
@@ -310,7 +310,7 @@ TEST_F(OwnPointerTest, CopyAssignmentToExistingOwner) {
 
     EXPECT_TRUE(owner2.isOwner());
     EXPECT_FALSE(borrower1.isOwner());
-    EXPECT_EQ(borrower1.get(), owner2.get());
+    EXPECT_EQ(&(*borrower1), &(*owner2));
 }
 
 // ===== Move Constructor Tests =====
@@ -330,7 +330,7 @@ TEST_F(OwnPointerTest, MoveConstructorBorrower) {
     OwnPointer<TestStruct> moved(std::move(borrower));
 
     EXPECT_FALSE(moved.isOwner());
-    EXPECT_EQ(moved.get(), owner.get());
+    EXPECT_EQ(&(*moved), &(*owner));
 }
 
 TEST_F(OwnPointerTest, MoveConstructorFromDefault) {
@@ -360,7 +360,7 @@ TEST_F(OwnPointerTest, MoveAssignmentFromBorrower) {
     moved = std::move(borrower);
 
     EXPECT_FALSE(moved.isOwner());
-    EXPECT_EQ(moved.get(), owner.get());
+    EXPECT_EQ(&(*moved), &(*owner));
 }
 
 TEST_F(OwnPointerTest, MoveAssignmentSelfAssignment) {
@@ -382,7 +382,7 @@ TEST_F(OwnPointerTest, MoveAssignmentOverExistingOwner) {
 
     EXPECT_TRUE(owner2.isOwner());
     EXPECT_TRUE(b1.isOwner());
-    EXPECT_EQ(b1.get(), owner2.get());
+    EXPECT_EQ(&(*b1), &(*owner2));
 }
 
 TEST_F(OwnPointerTest, MoveAssignmentOverExistingBorrower) {
@@ -396,7 +396,7 @@ TEST_F(OwnPointerTest, MoveAssignmentOverExistingBorrower) {
 
     EXPECT_TRUE(owner2.isOwner());
     EXPECT_TRUE(b1.isOwner());
-    EXPECT_EQ(b1.get(), owner2.get());
+    EXPECT_EQ(&(*b1), &(*owner2));
 }
 
 // ===== Upcasting Move Constructor Tests =====
@@ -416,7 +416,7 @@ TEST_F(OwnPointerTest, UpcastMoveConstructorFromBorrower) {
     OwnPointer<TestStruct> base(std::move(derivedBorrower));
 
     EXPECT_FALSE(base.isOwner());
-    EXPECT_EQ(base.get(), derivedOwner.get());
+    EXPECT_EQ(&(*base), &(*derivedOwner));
 }
 
 TEST_F(OwnPointerTest, UpcastCopyConstructor) {
@@ -425,7 +425,7 @@ TEST_F(OwnPointerTest, UpcastCopyConstructor) {
 
     EXPECT_TRUE(derivedOwner.isOwner());
     EXPECT_FALSE(baseOwner.isOwner());
-    EXPECT_EQ(baseOwner.get(), derivedOwner.get());
+    EXPECT_EQ(&(*baseOwner), &(*derivedOwner));
     EXPECT_EQ(baseOwner->value, 100);
 }
 
@@ -435,7 +435,7 @@ TEST_F(OwnPointerTest, UpcastBorrow) {
 
     EXPECT_TRUE(derivedOwner.isOwner());
     EXPECT_FALSE(baseBorrower.isOwner());
-    EXPECT_EQ(baseBorrower.get(), derivedOwner.get());
+    EXPECT_EQ(&(*baseBorrower), &(*derivedOwner));
 }
 
 // ===== reset() Tests =====
@@ -491,7 +491,7 @@ TEST_F(OwnPointerTest, ResetBorrowerFromOwner) {
 
     EXPECT_TRUE(owner2.isOwner());
     EXPECT_FALSE(borrower.isOwner());
-    EXPECT_EQ(borrower.get(), owner2.get());
+    EXPECT_EQ(&(*borrower), &(*owner2));
 }
 
 TEST_F(OwnPointerTest, ResetBorrowerBecomesOwner) {
@@ -502,7 +502,7 @@ TEST_F(OwnPointerTest, ResetBorrowerBecomesOwner) {
 
     EXPECT_TRUE(owner.isOwner());
     EXPECT_TRUE(borrower.isOwner());
-    EXPECT_EQ(owner.get(), borrower.get());
+    EXPECT_EQ(&(*owner), &(*borrower));
 }
 
 // ===== is_valid() Tests =====
@@ -676,9 +676,9 @@ TEST_F(OwnPointerTest, ChainOfBorrowers) {
     EXPECT_FALSE(b2.isOwner());
     EXPECT_FALSE(b3.isOwner());
 
-    EXPECT_EQ(owner.get(), b1.get());
-    EXPECT_EQ(b1.get(), b2.get());
-    EXPECT_EQ(b2.get(), b3.get());
+    EXPECT_EQ(&(*owner), &(*b1));
+    EXPECT_EQ(&(*b1), &(*b2));
+    EXPECT_EQ(&(*b2), &(*b3));
 
     owner.reset();
     EXPECT_FALSE(b3.is_valid());
@@ -692,7 +692,7 @@ TEST_F(OwnPointerTest, ComplexOwnershipTransfer) {
     auto b2 = owner2.borrow();
 
     b1 = owner2.borrow();
-    EXPECT_EQ(b1.get(), owner2.get());
+    EXPECT_EQ(&(*b1), &(*owner2));
 
     auto moved = owner1.move();
     EXPECT_FALSE(owner1.isOwner());
@@ -713,8 +713,8 @@ TEST_F(OwnPointerTest, ResetBorrowerInvalidatesOtherBorrowers) {
     EXPECT_TRUE(b2.isOwner());
     EXPECT_TRUE(b2.is_valid());
 
-    EXPECT_EQ(b1.get(), owner.get());
-    EXPECT_EQ(b2.get(), owner.get());
+    EXPECT_EQ(&(*b1), &(*owner));
+    EXPECT_EQ(&(*b2), &(*owner));
 }
 
 TEST_F(OwnPointerTest, CopyAssignDefaultToDefault) {
@@ -753,5 +753,5 @@ TEST_F(OwnPointerTest, CopyAssignOverwritesBorrowerStatus) {
     borrower = owner;
 
     EXPECT_FALSE(borrower.isOwner());
-    EXPECT_EQ(borrower.get(), owner.get());
+    EXPECT_EQ(&(*borrower), &(*owner));
 }

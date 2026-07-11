@@ -172,6 +172,31 @@ template <typename T> class OwnPointer {
     }
 
     /**
+     * @brief Upcasting copy constructor supporting polymorphism (Derived* to Base*).
+     */
+    template <typename U,
+              typename = std::enable_if_t<std::is_convertible_v<U*, T*>
+                                          && !std::is_same_v<U, T>>>
+    OwnPointer(const OwnPointer<U>& other) noexcept
+        : m_ptr(other.m_ptr), m_isOwner(false),
+          m_validity(other.m_validity) {
+    }
+
+    /**
+     * @brief Upcasting copy assignment supporting polymorphism (Derived* to Base*).
+     */
+    template <typename U,
+              typename = std::enable_if_t<std::is_convertible_v<U*, T*>
+                                          && !std::is_same_v<U, T>>>
+    OwnPointer& operator=(const OwnPointer<U>& other) noexcept {
+        reset();
+        m_ptr = other.m_ptr;
+        m_isOwner = false;
+        m_validity = other.m_validity;
+        return *this;
+    }
+
+    /**
      * @brief Explicitly spawn a non-owning Borrower.
      */
     OwnPointer borrow() const {
@@ -227,9 +252,6 @@ template <typename T> class OwnPointer {
     T* m_ptr;
     bool m_isOwner;
     bool* m_validity;
-
-    T* get() { return m_ptr; }
-    const T* get() const { return m_ptr; }
 
     /**
      * @brief Private constructor for internal use (make_own_ptr).

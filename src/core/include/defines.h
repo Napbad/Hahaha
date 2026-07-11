@@ -42,6 +42,13 @@ using Float64 = double;
 
 using SizeT = std::int64_t;
 
+// Host/Device inline macro for CUDA compatibility
+#ifdef __CUDACC__
+#define HAHAHA_HD __host__ __device__ inline
+#else
+#define HAHAHA_HD inline
+#endif
+
 
 enum class Operator {
     Add = 0, Sub, Mul, Div, Mod, Pow, Sqrt, Log, Exp, Sin, Cos, Tan, Asin, Acos,
@@ -156,6 +163,22 @@ enum class DataType {
     Float64,
     Count
 };
+
+inline std::string toString(const DataType type) {
+    switch (type) {
+    case DataType::Int8: return "Int8";
+    case DataType::UInt8: return "UInt8";
+    case DataType::Int16: return "Int16";
+    case DataType::UInt16: return "UInt16";
+    case DataType::Int32: return "Int32";
+    case DataType::UInt32: return "UInt32";
+    case DataType::Float32: return "Float32";
+    case DataType::Int64: return "Int64";
+    case DataType::UInt64: return "UInt64";
+    case DataType::Float64: return "Float64";
+    default: return "Unknown";
+    }
+}
 
 inline SizeT sizeOf(const DataType type) {
     switch (type) {
