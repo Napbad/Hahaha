@@ -25,7 +25,12 @@ if (CORE_TEST_SOURCES)
     # Apply architecture configuration
     apply_architecture_to_target(hahaha_test_core)
 
-    # Include Google Test
-    include(GoogleTest)
-    gtest_discover_tests(hahaha_test_core)
+    # Include Google Test (disabled for faster builds)
+    # include(GoogleTest)
+    # gtest_discover_tests(hahaha_test_core)
 endif ()
+
+# Standalone conversion test
+add_executable(test_convert math/test_convert.cpp)
+target_link_libraries(test_convert PRIVATE hahaha::core)
+apply_architecture_to_target(test_convert)

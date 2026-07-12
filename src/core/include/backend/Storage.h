@@ -25,7 +25,6 @@
 
 #include "Device.h"
 #include "MemoryManager.h"
-#include "utils/handler/exception_handler.h"
 
 namespace h3::core::backend {
 
@@ -98,8 +97,9 @@ class Storage {
         return static_cast<T*>(m_data.get());
     }
 
-    void copyFrom(const CommonPointer& ptr) const;
+    void copyFrom(SizeT beginPos, const CommonPointer& ptr) const;
 
+    void init(DataType data, SizeT size);
   private:
     CommonPointer m_data;
     std::shared_ptr<MemoryManager> m_memoryManager;

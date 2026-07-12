@@ -40,6 +40,8 @@ enum class ErrorCode {
 
 class Error {
   public:
+    Error() : m_message("Unknown error"), m_code(ErrorCode::BaseError) {}
+
     Error(std::string message, const ErrorCode code)
         : m_message(std::move(message)), m_code(code) {
     }

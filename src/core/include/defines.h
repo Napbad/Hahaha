@@ -1,4 +1,5 @@
-//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/jason-is-debugging/Hahaha)
+//  Copyright (c) 2025-2026 Contributors of
+//  Hahaha(https://github.com/jason-is-debugging/Hahaha)
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -49,14 +50,47 @@ using SizeT = std::int64_t;
 #define HAHAHA_HD inline
 #endif
 
-
 enum class Operator {
-    Add = 0, Sub, Mul, Div, Mod, Pow, Sqrt, Log, Exp, Sin, Cos, Tan, Asin, Acos,
+    Add = 0,
+    Sub,
+    Mul,
+    Div,
+    Mod,
+    Pow,
+    Sqrt,
+    Log,
+    Exp,
+    Sin,
+    Cos,
+    Tan,
+    Asin,
+    Acos,
     Atan,
-    Abs, Sign, Ceil, Floor, Round, Trunc,
-    Sinh, Cosh, Tanh, Asinh, Acosh, Atanh, Log10, Log2, Log1p, Exp2, Expm1, Cbrt,
-    Erf, Erfc, Tgamma, Lgamma,
-    Max, Min, Clamp,
+    Abs,
+    Sign,
+    Ceil,
+    Floor,
+    Round,
+    Trunc,
+    Sinh,
+    Cosh,
+    Tanh,
+    Asinh,
+    Acosh,
+    Atanh,
+    Log10,
+    Log2,
+    Log1p,
+    Exp2,
+    Expm1,
+    Cbrt,
+    Erf,
+    Erfc,
+    Tgamma,
+    Lgamma,
+    Max,
+    Min,
+    Clamp,
     Count
 };
 
@@ -166,17 +200,28 @@ enum class DataType {
 
 inline std::string toString(const DataType type) {
     switch (type) {
-    case DataType::Int8: return "Int8";
-    case DataType::UInt8: return "UInt8";
-    case DataType::Int16: return "Int16";
-    case DataType::UInt16: return "UInt16";
-    case DataType::Int32: return "Int32";
-    case DataType::UInt32: return "UInt32";
-    case DataType::Float32: return "Float32";
-    case DataType::Int64: return "Int64";
-    case DataType::UInt64: return "UInt64";
-    case DataType::Float64: return "Float64";
-    default: return "Unknown";
+    case DataType::Int8:
+        return "Int8";
+    case DataType::UInt8:
+        return "UInt8";
+    case DataType::Int16:
+        return "Int16";
+    case DataType::UInt16:
+        return "UInt16";
+    case DataType::Int32:
+        return "Int32";
+    case DataType::UInt32:
+        return "UInt32";
+    case DataType::Float32:
+        return "Float32";
+    case DataType::Int64:
+        return "Int64";
+    case DataType::UInt64:
+        return "UInt64";
+    case DataType::Float64:
+        return "Float64";
+    default:
+        return "Unknown";
     }
 }
 
@@ -207,6 +252,56 @@ inline SizeT sizeOf(const DataType type) {
     }
 }
 
+template <DataType T> SizeT sizeOf() {
+    if constexpr (T == DataType::Int8)
+        return sizeof(Int8);
+    else if constexpr (T == DataType::Int16)
+        return sizeof(Int16);
+    else if constexpr (T == DataType::Int32)
+        return sizeof(Int32);
+    else if constexpr (T == DataType::Int64)
+        return sizeof(Int64);
+    else if constexpr (T == DataType::UInt8)
+        return sizeof(UInt8);
+    else if constexpr (T == DataType::UInt16)
+        return sizeof(UInt16);
+    else if constexpr (T == DataType::UInt32)
+        return sizeof(UInt32);
+    else if constexpr (T == DataType::UInt64)
+        return sizeof(UInt64);
+    else if constexpr (T == DataType::Float32)
+        return sizeof(Float32);
+    else if constexpr (T == DataType::Float64)
+        return sizeof(Float64);
+    else
+        return 0;
 }
+
+template <DataType T> std::string_view toString() {
+    if constexpr (T == DataType::Int8)
+        return "Int8";
+    else if constexpr (T == DataType::Int16)
+        return "Int16";
+    else if constexpr (T == DataType::Int32)
+        return "Int32";
+    else if constexpr (T == DataType::Int64)
+        return "Int64";
+    else if constexpr (T == DataType::UInt8)
+        return "UInt8";
+    else if constexpr (T == DataType::UInt16)
+        return "UInt16";
+    else if constexpr (T == DataType::UInt32)
+        return "UInt32";
+    else if constexpr (T == DataType::UInt64)
+        return "UInt64";
+    else if constexpr (T == DataType::Float32)
+        return "Float32";
+    else if constexpr (T == DataType::Float64)
+        return "Float64";
+    else
+        return "Unknown";
+}
+
+} // namespace h3::core
 
 #endif // HAHAHA_DEFINES_H_80319B79F08F4121AFF6C3C33996DDB1

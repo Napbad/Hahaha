@@ -73,6 +73,18 @@ public:
         };
     }
 
+    bool operator==(const CommonPointer& other) const {
+        return m_ptr == other.m_ptr && m_device == other.m_device;
+    }
+
+    bool operator!=(const CommonPointer& other) const {
+        return m_ptr != other.m_ptr || m_device != other.m_device;
+    }
+
+    bool operator==(std::nullptr_t) const {
+        return m_ptr == nullptr;
+    }
+
     /// Releases storage via the \ref MemoryManager for \ref device() 
     void destroy();
 

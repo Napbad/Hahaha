@@ -1,4 +1,5 @@
-//  Copyright (c) 2025-2026 Contributors of Hahaha(https://github.com/jason-is-debugging/Hahaha)
+//  Copyright (c) 2025-2026 Contributors of
+//  Hahaha(https://github.com/jason-is-debugging/Hahaha)
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -23,7 +24,9 @@
 #ifndef HAHAHA_TENSOR_H_2ACEBAFB3C1048578DCC0E9ABDCA952B
 #define HAHAHA_TENSOR_H_2ACEBAFB3C1048578DCC0E9ABDCA952B
 
+#include <iostream>
 #include <utility>
+#include <vector>
 
 #include "compute/ComputeNode.h"
 
@@ -32,18 +35,24 @@ class Tensor {
 
   public:
     // NOLINTNEXTLINE
-    Tensor(const math::TensorShape& shape, const DataType dtype = DataType::Float32) : m_node(shape) {
+    Tensor(const math::TensorShape& shape, const DataType dtype = DataType::Float32)
+        : m_node(shape) {
         m_node.setDtype(dtype);
     }
 
     explicit Tensor(compute::ComputeNode node) : m_node(std::move(node)) {
     }
 
-    Tensor operator[] (const SizeT index) {
+    Tensor operator[](const SizeT index) {
         return Tensor(compute::ComputeNode(m_node.tensorInner()->operator[](index)));
     }
 
     Tensor& operator=(const Int32 value) {
+        this->m_node.setScalarValue(math::Scalar(DataType::Int32, value));
+        return *this;
+    }
+
+    Tensor& operator=(const float value) {
         this->m_node.setScalarValue(math::Scalar(DataType::Float32, value));
         return *this;
     }
@@ -79,11 +88,33 @@ class Tensor {
         return m_node;
     }
 
+    std::expected<math::Scalar, Error> item() {
+        SizeT size = m_node.tensorInner()->getTotalSize();
+        if (m_node.tensorInner()->getTotalSize() != 1) {
+            return std::unexpected(
+                Error("Tensor must have exactly one element", ErrorCode::InvalidArgument));
+        }
+        return {m_node.tensorInner()->item()};
+    }
+
   private:
     compute::ComputeNode m_node;
 };
 
+inline std::ostream& operator<<(std::ostream& lhs, const Tensor& t1) {
+    const auto tensorInner = t1.node().tensorInner();
+    if (!tensorInner) {
+        lhs << "Empty Tensor";
+        return lhs;
+    }
+
+    lhs << "Tensor(shape=" << tensorInner->shapeRef().toString()
+        << ", dtype=" << toString(tensorInner->dataType())
+        << ", device=" << (tensorInner->device()).toString() << ")";
+
+    return lhs;
+}
+
 } // namespace h3::core::ml
 
-std::ostream& operator<<(const std::ostream& lhs, const h3::core::ml::Tensor& t1);
 #endif // HAHAHA_TENSOR_H_2ACEBAFB3C1048578DCC0E9ABDCA952B

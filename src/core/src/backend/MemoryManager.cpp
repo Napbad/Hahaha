@@ -42,9 +42,8 @@ std::expected<void, Error> MemoryManager::move(
         ErrorCode::BaseError));
 }
 
-std::expected<void, Error> MemoryManager::copy(
-    CommonPointer dst,
-    CommonPointer src,
+std::expected<void, Error> MemoryManager::copy(const CommonPointer dst,
+                                               const CommonPointer src,
     const SizeT size) {
     (void)dst;
     (void)src;

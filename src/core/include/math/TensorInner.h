@@ -47,8 +47,8 @@ public:
                 const backend::Storage& storage,
                 const SizeT offset,
                 const TensorMetadata& metadata)
-        : m_shape(std::move(shape)), m_stride(std::move(stride)), m_storage(storage),
-          m_offset(offset), m_metadata(metadata) {
+        : m_shape(std::move(shape)), m_stride(std::move(stride)), m_offset(offset),
+          m_storage(storage), m_metadata(metadata) {
     }
 
     TensorInner(const TensorShape& shape, const TensorMetadata& metadata)
@@ -124,11 +124,13 @@ public:
         return m_offset;
     }
 
-    Scalar operator()(const Index& index) const;
+    Scalar operator()(const Index& index);
 
-    TensorInner operator[](SizeT index) const;
+    TensorInner operator[](SizeT index);
 
     [[nodiscard]] Scalar item() const;
+
+    [[nodiscard]] SizeT getTotalSize() const;
 
     // Elementwise (out-of-place)
     [[nodiscard]] TensorInner add(const TensorInner& other) const;
@@ -232,7 +234,7 @@ public:
 
     [[nodiscard]] TensorInner broadcastTo(TensorShape shape) const;
 
-    void setScalarValue(const Scalar& scalar) const;
+    void setScalarValue(const Scalar& scalar);
 
     // Static factory method for creating tensors with initial data
     template<typename T>
@@ -252,9 +254,13 @@ public:
   private:
     TensorShape m_shape;
     TensorStride m_stride;
-    SizeT m_offset;
+    SizeT m_offset; ///< Byte offset of this view into \ref storageRef() (always 0 for root tensors).
     backend::Storage m_storage;
     TensorMetadata m_metadata;
+
+    // this method is used to ensure that the storage is not empty, because while
+    // init a TensorInner with only shape, the storage might not be a valid storage
+    void ensureStorageExists();
 };
 
 } // namespace h3::core::math

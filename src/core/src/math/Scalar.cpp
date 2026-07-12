@@ -195,6 +195,15 @@ void storeFloat64(Scalar& s, const Float64 v) {
     }
 }
 
+[[nodiscard]] Int8 loadAsInt8(const Scalar& s) {
+    switch (s.dtype()) {
+    case DataType::Int8:
+        return *s.as<Int8>();
+    default:
+        ThrowInvalid("Expected integer dtype");
+    }
+}
+
 [[nodiscard]] Int64 loadAsInt64(const Scalar& s) {
     switch (s.dtype()) {
     case DataType::Int8:
@@ -218,6 +227,161 @@ void storeFloat64(Scalar& s, const Float64 v) {
         }
         return static_cast<Int64>(u);
     }
+    default:
+        ThrowInvalid("Expected integer dtype");
+    }
+}
+
+// Pointer-based load functions for convertToType
+[[nodiscard]] Float64 loadAsFloat64(const void* ptr, const DataType dtype) {
+    switch (dtype) {
+    case DataType::Float32:
+        return *static_cast<const Float32*>(ptr);
+    case DataType::Float64:
+        return *static_cast<const Float64*>(ptr);
+    case DataType::Int8:
+        return *static_cast<const Int8*>(ptr);
+    case DataType::Int16:
+        return *static_cast<const Int16*>(ptr);
+    case DataType::Int32:
+        return *static_cast<const Int32*>(ptr);
+    case DataType::Int64:
+        return static_cast<Float64>(*static_cast<const Int64*>(ptr));
+    case DataType::UInt8:
+        return *static_cast<const UInt8*>(ptr);
+    case DataType::UInt16:
+        return *static_cast<const UInt16*>(ptr);
+    case DataType::UInt32:
+        return *static_cast<const UInt32*>(ptr);
+    case DataType::UInt64:
+        return static_cast<Float64>(*static_cast<const UInt64*>(ptr));
+    default:
+        ThrowLogic("Unhandled DataType in loadAsFloat64");
+    }
+}
+
+[[nodiscard]] Int64 loadAsInt64(const void* ptr, const DataType dtype) {
+    switch (dtype) {
+    case DataType::Int8:
+        return *static_cast<const Int8*>(ptr);
+    case DataType::Int16:
+        return *static_cast<const Int16*>(ptr);
+    case DataType::Int32:
+        return *static_cast<const Int32*>(ptr);
+    case DataType::Int64:
+        return *static_cast<const Int64*>(ptr);
+    case DataType::UInt8:
+        return *static_cast<const UInt8*>(ptr);
+    case DataType::UInt16:
+        return *static_cast<const UInt16*>(ptr);
+    case DataType::UInt32:
+        return *static_cast<const UInt32*>(ptr);
+    case DataType::UInt64: {
+        const UInt64 u = *static_cast<const UInt64*>(ptr);
+        if (u > static_cast<UInt64>(std::numeric_limits<Int64>::max())) {
+            return std::numeric_limits<Int64>::max();
+        }
+        return static_cast<Int64>(u);
+    }
+    default:
+        ThrowInvalid("Expected integer dtype in loadAsInt64");
+    }
+}
+
+void storeFloat64(const CommonPointer& ptr, const Float64 v, const DataType dtype) {
+    switch (dtype) {
+    case DataType::Float32:
+        *static_cast<Float32*>(ptr.get()) = static_cast<Float32>(v);
+        break;
+    case DataType::Float64:
+        *static_cast<Float64*>(ptr.get()) = v;
+        break;
+    case DataType::Int8:
+        *static_cast<Int8*>(ptr.get()) = static_cast<Int8>(std::llround(v));
+        break;
+    case DataType::Int16:
+        *static_cast<Int16*>(ptr.get()) = static_cast<Int16>(std::llround(v));
+        break;
+    case DataType::Int32:
+        *static_cast<Int32*>(ptr.get()) = static_cast<Int32>(std::llround(v));
+        break;
+    case DataType::Int64:
+        *static_cast<Int64*>(ptr.get()) = static_cast<Int64>(std::llround(v));
+        break;
+    case DataType::UInt8:
+        *static_cast<UInt8*>(ptr.get()) = static_cast<UInt8>(std::llround(std::max<Float64>(0, v)));
+        break;
+    case DataType::UInt16:
+        *static_cast<UInt16*>(ptr.get()) = static_cast<UInt16>(std::llround(std::max<Float64>(0, v)));
+        break;
+    case DataType::UInt32:
+        *static_cast<UInt32*>(ptr.get()) = static_cast<UInt32>(std::llround(std::max<Float64>(0, v)));
+        break;
+    case DataType::UInt64:
+        *static_cast<UInt64*>(ptr.get()) = static_cast<UInt64>(std::llround(std::max<Float64>(0, v)));
+        break;
+    default:
+        ThrowLogic("Unhandled DataType in storeFloat64");
+    }
+}
+
+void storeInt64(const CommonPointer& ptr, const Int64 v, const DataType dtype) {
+    switch (dtype) {
+    case DataType::Int8:
+        *static_cast<Int8*>(ptr.get()) = static_cast<Int8>(v);
+        break;
+    case DataType::Int16:
+        *static_cast<Int16*>(ptr.get()) = static_cast<Int16>(v);
+        break;
+    case DataType::Int32:
+        *static_cast<Int32*>(ptr.get()) = static_cast<Int32>(v);
+        break;
+    case DataType::Int64:
+        *static_cast<Int64*>(ptr.get()) = v;
+        break;
+    case DataType::UInt8:
+        *static_cast<UInt8*>(ptr.get()) = static_cast<UInt8>(std::max<Int64>(0, v));
+        break;
+    case DataType::UInt16:
+        *static_cast<UInt16*>(ptr.get()) = static_cast<UInt16>(std::max<Int64>(0, v));
+        break;
+    case DataType::UInt32:
+        *static_cast<UInt32*>(ptr.get()) = static_cast<UInt32>(std::max<Int64>(0, v));
+        break;
+    case DataType::UInt64:
+        *static_cast<UInt64*>(ptr.get()) = static_cast<UInt64>(std::max<Int64>(0, v));
+        break;
+    default:
+        ThrowLogic("Unhandled DataType in storeInt64");
+    }
+}
+
+void storeInt32(Scalar& s, const Int32 v) {
+    switch (s.dtype()) {
+    case DataType::Int8:
+        *s.as<Int8>() = static_cast<Int8>(v);
+        break;
+    case DataType::Int16:
+        *s.as<Int16>() = static_cast<Int16>(v);
+        break;
+    case DataType::Int32:
+        *s.as<Int32>() = v;
+        break;
+    case DataType::Int64:
+        *s.as<Int64>() = v;
+        break;
+    case DataType::UInt8:
+        *s.as<UInt8>() = static_cast<UInt8>(std::max<Int32>(0, v));
+        break;
+    case DataType::UInt16:
+        *s.as<UInt16>() = static_cast<UInt16>(std::max<Int32>(0, v));
+        break;
+    case DataType::UInt32:
+        *s.as<UInt32>() = static_cast<UInt32>(std::max<Int32>(0, v));
+        break;
+    case DataType::UInt64:
+        *s.as<UInt64>() = static_cast<UInt64>(std::max<Int32>(0, v));
+        break;
     default:
         ThrowInvalid("Expected integer dtype");
     }
@@ -378,14 +542,15 @@ Scalar::Scalar(Scalar&& other) noexcept
     other.m_isView = true;
 }
 
-Scalar::Scalar(const DataType dtype, Int32 int32, Device  device = backend::getDefaultCPUDevice()) {
+Scalar::Scalar(const DataType dtype, const Int32 int32, const Device device) {
     this->m_dtype = dtype;
     this->m_isView = false;
     this->m_data = allocateOne(dtype, device);
-    // Copy int32 value into scalar storage
-    if (int32 != 0) {
-        // Stub: actual value copying would be implemented here
-    }
+    // Store the Int32 value into the scalar storage
+    storeInt32(*this, int32);
+}
+
+Scalar::Scalar(const DataType dtype, Int32 int32) : Scalar(dtype, int32, backend::getDefaultCPUDevice()) {
 }
 
 
@@ -458,6 +623,57 @@ void Scalar::swap(Scalar& other) noexcept {
     swap(m_dtype, other.m_dtype);
     swap(m_data, other.m_data);
     swap(m_isView, other.m_isView);
+}
+
+void Scalar::convertToType(const DataType targetDType) {
+
+    if (m_dtype == targetDType) {
+        return;
+    }
+
+    const SizeT srcSize = sizeOf(m_dtype);
+    const SizeT dstSize = sizeOf(targetDType);
+
+    // if is view, the sizes of source and target must be the same
+    if (m_isView) {
+        if (dstSize != srcSize) {
+            ThrowInvalid(
+                "Scalar cannot be reinterpret_cast to a different type if the sizes are different"
+            );
+        }
+        reinterpret(targetDType);
+        return;
+    }
+
+    // Allocate new memory for the target type
+    auto newData = allocateOne(targetDType, device());
+
+    // Handle conversion based on source and target types
+    if (isFloat(m_dtype)) {
+        // Float -> Float or Float -> Int
+        Float64 fVal = loadAsFloat64(*this);
+        if (isFloat(targetDType)) {
+            storeFloat64(newData, fVal, targetDType);
+        } else {
+            // Float -> Int
+            Int64 iVal = std::llround(fVal);
+            storeInt64(newData, iVal, targetDType);
+        }
+    } else {
+        // Int -> Int or Int -> Float
+        Int64 iVal = loadAsInt64(*this);
+        if (isInteger(targetDType)) {
+            storeInt64(newData, iVal, targetDType);
+        } else {
+            // Int -> Float
+            storeFloat64(newData, static_cast<Float64>(iVal), targetDType);
+        }
+    }
+
+    // Destroy old memory and update
+    m_data.destroy();
+    m_data = newData;
+    m_dtype = targetDType;
 }
 
 Scalar Scalar::zeros(const DataType dtype, const Device& device) {
@@ -788,7 +1004,7 @@ std::strong_ordering Scalar::operator<=>(const Scalar& other) const {
 }
 
 std::ostream& operator<<(std::ostream& os, const Scalar& s) {
-    os << "Scalar{dtype=" << static_cast<int>(s.dtype())
+    os << "Scalar{dtype=" << toString(s.dtype())
        << ", device=" << s.device().toString();
     if (isFloat(s.dtype())) {
         os << ", value=" << std::setprecision(17) << loadAsFloat64(s);

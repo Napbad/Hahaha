@@ -22,14 +22,15 @@
 
 #ifndef HAHAHA_TENSORMETADATA_H_64668641F44F44B59C57F69B3E3967CC
 #define HAHAHA_TENSORMETADATA_H_64668641F44F44B59C57F69B3E3967CC
+#include "backend/Device.h"
 #include "defines.h"
 
 namespace h3::core::math {
 struct TensorMetadata {
-    bool isContiguous : 1 = true;
-    bool isChannelsLast : 1 = true;
-    bool isView : 1 = false;
-    DataType dataType : 8 = DataType::Float32;
+    bool isContiguous = true;
+    bool isChannelsLast = true;
+    bool isView = false;
+    DataType dataType = DataType::Float32;
     backend::Device device = backend::Device();
 };
 }

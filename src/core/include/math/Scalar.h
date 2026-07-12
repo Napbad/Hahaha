@@ -26,8 +26,8 @@
 #include <compare>
 #include <iosfwd>
 
-#include "defines.h"
 #include "backend/CommonPointer.h"
+#include "defines.h"
 
 namespace h3::core::math {
 
@@ -86,6 +86,8 @@ public:
     [[nodiscard]] Scalar clone() const;
 
     void swap(Scalar& other) noexcept;
+
+    void convertToType(DataType targetDType);
 
     // --- Factories (owning buffers) ---
 

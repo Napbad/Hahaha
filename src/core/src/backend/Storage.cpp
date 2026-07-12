@@ -22,6 +22,8 @@
 
 #include "backend/Storage.h"
 
+#include "utils/handler/exception_handler.h"
+
 namespace h3::core::backend {
 
 Storage Storage::createView() const {
@@ -75,7 +77,7 @@ std::expected<CommonPointer, Error> Storage::resize(const SizeT size) {
 
     return expected;
 }
-void Storage::copyFrom(const CommonPointer& ptr) const {
+void Storage::copyFrom(const SizeT beginPos, const CommonPointer& ptr) const {
     if (ptr.size() > this->m_size) {
         throw std::invalid_argument("target size is bigger than current size,"
                                     " the copy of data will cause unknown behavior");
@@ -86,10 +88,19 @@ void Storage::copyFrom(const CommonPointer& ptr) const {
         throw std::invalid_argument("target device is different from current device");
     }
 
-    if (auto res = this->m_memoryManager->copy(this->m_data, ptr, ptr.size());
+    if (auto res = this->m_memoryManager->copy(this->m_data + beginPos, ptr, ptr.size());
         !res.has_value()) {
         throw std::invalid_argument(std::string("copy failed, the error is: ") + res.error().message());
-    }
+        }
 
+}
+void Storage::init(const DataType data, const SizeT size) {
+    const SizeT singleSize = sizeOf(data);
+    auto res = this->m_memoryManager->allocate(singleSize * size);
+    if (!res.has_value()) {
+        ThrowInvalid("init failed, the error is: %s", res.error().message());
+    }
+    this->m_data = res.value();
+    this->m_size = singleSize * size;
 }
 } // namespace h3::core::backend
