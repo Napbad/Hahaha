@@ -62,15 +62,8 @@
     },
 
     "clangd.arguments": [
-        // "--compile-commands-dir=cmake-build-debugwithcuda",
         "--compile-commands-dir=cmake-build-debug",
-        // "--compile-commands-dir=build",
-        // "--compile-commands-dir=builddir",
-        // "--compile-commands-dir=buildDir",
-        // "--compile-commands-dir=cmake-build",
-        // "--compile-commands-dir=cmake-build-vcpkg-windows",
-        // "--compile-commands-dir=cmake-build-vcpkg-linux",
-        // "--compile-commands-dir=cmake-build-vcpkg-macos",
+
     ],
     "AndreaNovelHelper.workspaceDisabled": false
 }
